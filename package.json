@@ -1,0 +1,16 @@
+{
+  "name": "juice-balancer-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@kubernetes/client-node": "^0.10.0",
+    "ms": "^2.1.2"
+  }
+}
