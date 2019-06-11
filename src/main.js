@@ -1,11 +1,66 @@
 const k8s = require('@kubernetes/client-node');
-const ms = require('ms');
 
 const kc = new k8s.KubeConfig();
 kc.loadFromCluster();
 
 const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+app.get('/', (req, res) => res.send('JuiceBalancer 🎉🎢🚀'));
+app.post('/balancer/join', async (req, res) => {
+  const { teamname } = req.body;
+
+  const startTime = new Date();
+  console.log('Creating deployment 🎢');
+  await createDeploymentForTeam(teamname);
+  console.log('Created deployment ✅. Waiting for JuiceShop to boot.');
+
+  for (const _ of Array.from({ length: 100 })) {
+    const res = await k8sAppsApi.readNamespacedDeployment(
+      `t-${teamname}-juiceshop`,
+      'default'
+    );
+
+    if (res.body.status.availableReplicas === 1) {
+      break;
+    }
+
+    await sleep(250);
+  }
+  console.log('All Started Up 👌');
+
+  const endTime = new Date();
+  const differenceMs = endTime.getTime() - startTime.getTime();
+  console.log(`Juice Shop StartUp Time: ${differenceMs.toLocaleString()}ms`);
+
+  await createServiceForTeam(teamname).catch(console.error);
+
+  res.send('Started 🎉🎢🚀');
+});
+
+app.listen(port, () => console.log(`JuiceBalancer listening on port ${port}!`));
+
+setInterval(async () => {
+  const res = await k8sAppsApi.listNamespacedDeployment(
+    'default',
+    true,
+    undefined,
+    undefined,
+    undefined,
+    'app=juice-shop'
+  );
+
+  console.log(`Current Deployments:`);
+  for (const deployment of res.body.items) {
+    console.log(` - ${deployment.metadata.name}`);
+  }
+}, 5000);
 
 const createDeploymentForTeam = teamname =>
   k8sAppsApi.createNamespacedDeployment('default', {
@@ -71,39 +126,3 @@ const createServiceForTeam = teamname =>
   });
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-async function main() {
-  const teamname = 'team42';
-
-  const startTime = new Date();
-  console.log('Creating deployment 🎢');
-  await createDeploymentForTeam(teamname);
-  console.log('Created deployment ✅. Waiting for JuiceShop to boot.');
-
-  for (const _ of Array.from({ length: 100 })) {
-    const res = await k8sAppsApi.readNamespacedDeployment(
-      `t-${teamname}-juiceshop`,
-      'default'
-    );
-
-    console.log(`Available Replicas: ${res.body.status.availableReplicas}`);
-    if (res.body.status.availableReplicas === 1) {
-      break;
-    }
-
-    await sleep(100);
-  }
-  console.log('All Started Up 👌');
-
-  const endTime = new Date();
-  const differenceMs = endTime.getTime() - startTime.getTime();
-  console.log(`Juice Shop StartUp Time: ${ms(differenceMs)}`);
-
-  const res = await createServiceForTeam(teamname).catch(console.error);
-}
-
-main();
-
-setTimeout(() => {
-  console.log('finished');
-}, 10000 * 1000);

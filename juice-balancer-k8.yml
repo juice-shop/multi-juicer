@@ -46,7 +46,17 @@ spec:
       serviceAccountName: juice-balancer
       containers:
         - name: juice-balancer
-          image: juice-balancer:v18
+          image: juice-balancer:v24
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: juice-balancer
+spec:
+  selector:
+    app: juice-balancer
+  ports:
+    - port: 3000

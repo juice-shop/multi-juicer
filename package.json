@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@kubernetes/client-node": "^0.10.0",
-    "ms": "^2.1.2"
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1"
   }
 }
