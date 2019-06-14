@@ -1,53 +1,28 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
+
 const {
-  createDeploymentForTeam,
-  createServiceForTeam,
-  getJuiceShopInstances,
-  getJuiceShopInstanceForTeamname,
-} = require('./kubernetes/kubernetes');
+  checkIfTeamAlreadyExists,
+} = require('./teams/checkIfTeamAlreadyExists');
+const { createTeam } = require('./teams/createTeam');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cookieParser('askdbakhdajhvdsjavjdsgv'));
 
-app.get('/', (req, res) => res.send('JuiceBalancer 🎉🎢🚀'));
-app.post('/balancer/join', async (req, res) => {
-  const { teamname } = req.body;
+app.get('/balancer/', (req, res) => res.send('JuiceBalancer 🎉🎢🚀'));
 
-  const startTime = new Date();
-  console.log('Creating deployment 🎢');
-  await createDeploymentForTeam(teamname);
-  console.log('Created deployment ✅. Waiting for JuiceShop to boot.');
+app.post('/balancer/teams/:team/join', checkIfTeamAlreadyExists, createTeam);
 
-  for (const _ of Array.from({ length: 100 })) {
-    const res = await getJuiceShopInstanceForTeamname(teamname);
-
-    if (res.body.status.availableReplicas === 1) {
-      break;
-    }
-
-    await sleep(250);
+// Redirect users without a balancer token to the start page
+app.use((req, res) => {
+  if (req.signedCookies['balancer'] === undefined) {
+    res.redirect('/balancer/');
   }
-  console.log('All Started Up 👌');
-
-  const endTime = new Date();
-  const differenceMs = endTime.getTime() - startTime.getTime();
-  console.log(`Juice Shop StartUp Time: ${differenceMs.toLocaleString()}ms`);
-
-  await createServiceForTeam(teamname);
-
-  res.send('Started 🎉🎢🚀');
 });
 
 app.listen(port, () => console.log(`JuiceBalancer listening on port ${port}!`));
-
-setInterval(async () => {
-  const res = await getJuiceShopInstances();
-  console.log(`Current Deployments:`);
-  for (const deployment of res.body.items) {
-    console.log(` ∙ ${deployment.metadata.name}`);
-  }
-}, 5000);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
