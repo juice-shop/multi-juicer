@@ -47,10 +47,16 @@ async function createTeam(req, res, next) {
     `Started JuiceShop Instance for "${team}". StartUp Time: ${differenceMs.toLocaleString()}ms`
   );
 
-  res.json({
-    message: 'Create Instance.',
-    passcode,
-  });
+  res
+    .cookie('balancer', `t-${team}`, {
+      signed: true,
+      httpOnly: true,
+    })
+    .status(200)
+    .json({
+      message: 'Create Instance.',
+      passcode,
+    });
 }
 
 module.exports.createTeam = createTeam;

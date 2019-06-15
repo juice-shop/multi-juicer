@@ -1,5 +1,5 @@
 const { getJuiceShopInstanceForTeamname } = require('../kubernetes/kubernetes');
-
+const bcrypt = require('bcryptjs');
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
@@ -7,12 +7,30 @@ const { getJuiceShopInstanceForTeamname } = require('../kubernetes/kubernetes');
  */
 async function checkIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
+  const { passcode } = req.body;
+
   try {
     const { body: deployment } = await getJuiceShopInstanceForTeamname(team);
 
-    return res.status(401).json({
-      message: 'Team requires authentication to join.',
-    });
+    const { passcode: passcodeHash } = deployment.metadata.labels;
+
+    if (
+      passcode === undefined ||
+      !(await bcrypt.compare(passcode, passcodeHash))
+    ) {
+      return res.status(401).json({
+        message: 'Team requires authentication to join.',
+      });
+    }
+
+    // Set cookie, (join team)
+    res
+      .cookie('balancer', `t-${team}`, {
+        signed: true,
+        httpOnly: true,
+      })
+      .status(200)
+      .send();
   } catch (error) {
     if (
       error.response.body.message ===
