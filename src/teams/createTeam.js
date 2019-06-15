@@ -1,17 +1,22 @@
 const bcrypt = require('bcryptjs');
 const cryptoRandomString = require('crypto-random-string');
+
+const redis = require('../redis');
 const {
   createDeploymentForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
 } = require('../kubernetes/kubernetes');
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 const createPasscode = async () => {
-  const passcode = cryptoRandomString({ length: 6 }).toUpperCase();
+  const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
+  const hash = await bcrypt.hash(passcode, 12);
 
   return {
     passcode,
-    passcodeHash: await bcrypt.hash(passcode),
+    passcodeHash: hash,
   };
 };
 
@@ -21,42 +26,57 @@ const createPasscode = async () => {
  * @param {import("express").NextFunction} next
  */
 async function createTeam(req, res, next) {
-  const { team } = req.params;
+  try {
+    const { team } = req.params;
 
-  const { passcode, passcodeHash } = await createPasscode();
+    console.info('Creating Passcode');
 
-  const startTime = new Date();
-  await createDeploymentForTeam({ team, passcodeHash });
+    const { passcode, passcodeHash } = await createPasscode();
 
-  for (const _ of Array.from({ length: 100 })) {
-    const res = await getJuiceShopInstanceForTeamname(team);
+    await redis.set(`t-${team}-passcode`, passcodeHash);
 
-    if (res.body.status.availableReplicas === 1) {
-      break;
+    console.info('Created Passcode');
+
+    const startTime = new Date();
+    await createDeploymentForTeam({ team, passcode });
+
+    console.info('Creating Deployment');
+
+    for (const _ of Array.from({ length: 100 })) {
+      const res = await getJuiceShopInstanceForTeamname(team);
+
+      if (res.body.status.availableReplicas === 1) {
+        break;
+      }
+
+      await sleep(250);
     }
 
-    await sleep(250);
+    console.info('Deployment ready');
+
+    const endTime = new Date();
+    const differenceMs = endTime.getTime() - startTime.getTime();
+
+    await createServiceForTeam(team);
+
+    console.log(
+      `Started JuiceShop Instance for "${team}". StartUp Time: ${differenceMs.toLocaleString()}ms`
+    );
+
+    res
+      .cookie('balancer', `t-${team}`, {
+        signed: true,
+        httpOnly: true,
+      })
+      .status(200)
+      .json({
+        message: 'Create Instance.',
+        passcode,
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send();
   }
-
-  const endTime = new Date();
-  const differenceMs = endTime.getTime() - startTime.getTime();
-
-  await createServiceForTeam(team);
-
-  console.log(
-    `Started JuiceShop Instance for "${team}". StartUp Time: ${differenceMs.toLocaleString()}ms`
-  );
-
-  res
-    .cookie('balancer', `t-${team}`, {
-      signed: true,
-      httpOnly: true,
-    })
-    .status(200)
-    .json({
-      message: 'Create Instance.',
-      passcode,
-    });
 }
 
 module.exports.createTeam = createTeam;

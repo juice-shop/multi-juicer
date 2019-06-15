@@ -6,14 +6,13 @@ kc.loadFromCluster();
 const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
-const createDeploymentForTeam = ({ team, passcodeHash }) =>
+const createDeploymentForTeam = ({ team }) =>
   k8sAppsApi.createNamespacedDeployment('default', {
     metadata: {
       name: `t-${team}-juiceshop`,
       labels: {
         app: 'juice-shop',
         team,
-        passcode: passcodeHash,
       },
     },
     spec: {
