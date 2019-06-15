@@ -15,9 +15,8 @@ const { createTeam } = require('./teams/createTeam');
 app.use(express.json());
 app.use(cookieParser('askdbakhdajhvdsjavjdsgv'));
 
-app.get('/balancer/', (req, res) => res.send(`<h1>JuiceBalancer 🎉🎢🚀</h1>`));
-
 app.post('/balancer/teams/:team/join', checkIfTeamAlreadyExists, createTeam);
+app.use('/balancer', express.static('public'));
 
 // Redirect users without a balancer token to the start page
 app.use((req, res, next) => {
@@ -43,5 +42,3 @@ app.use((req, res) => {
 });
 
 app.listen(port, () => console.log(`JuiceBalancer listening on port ${port}!`));
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
