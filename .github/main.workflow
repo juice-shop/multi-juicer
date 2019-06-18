@@ -18,6 +18,6 @@ action "Login to Docker Registry" {
 
 action "Push Image" {
   uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  needs = ["Login to Docker Registry"]
+  needs = ["Build Image", "Login to Docker Registry"]
   args = "push docker.pkg.github.com/j12934/juice-balancer-v2/balancer"
 }
