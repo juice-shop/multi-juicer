@@ -34,6 +34,7 @@ app.use((req, res) => {
     res,
     {
       target: `http://${teamname}-juiceshop.default.svc:3000`,
+      ws: true,
     },
     err => {
       console.error(`Failed to proxy request to ${req.url} with error: `, err);
