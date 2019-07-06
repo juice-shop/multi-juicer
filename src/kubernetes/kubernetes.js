@@ -34,7 +34,7 @@ const createDeploymentForTeam = ({ team }) =>
           containers: [
             {
               name: 'juice-shop',
-              image: 'bkimminich/juice-shop:v8.7.1',
+              image: 'bkimminich/juice-shop:v8.7.2',
               ports: [
                 {
                   containerPort: 3000,
