@@ -12,8 +12,9 @@
 # Why individual deployments not [insert k8 type here]
 
 We need the ability to delete team specific deployment directly. This is the most important reason.
- Deployment scale down randomly. 
- StatefulSets scale down in reverse order. 
+
+ - Deployment scale down randomly. 
+ - StatefulSets scale down in reverse order. 
  
 other reasons:
  - ability to give custom team specific labels / annotations.
