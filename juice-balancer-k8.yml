@@ -7,10 +7,10 @@ metadata:
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']
-    verbs: ['create', 'list']
+    verbs: ['get', 'create', 'list']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['services']
-    verbs: ['create']
+    verbs: ['get', 'create']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
