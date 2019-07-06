@@ -12,7 +12,7 @@ const {
 } = require('./teams/checkIfTeamAlreadyExists');
 const { createTeam } = require('./teams/createTeam');
 
-app.use(express.json());
+app.use('/balancer', express.json());
 app.use(cookieParser('askdbakhdajhvdsjavjdsgv'));
 
 app.post('/balancer/teams/:team/join', checkIfTeamAlreadyExists, createTeam);
