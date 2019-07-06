@@ -40,6 +40,15 @@ const createDeploymentForTeam = ({ team }) =>
                   containerPort: 3000,
                 },
               ],
+
+              livenessProbe: {
+                httpGet: {
+                  path: '/rest/admin/application-version',
+                  port: 3000,
+                },
+                initialDelaySeconds: 10,
+                periodSeconds: 5,
+              },
             },
           ],
         },
