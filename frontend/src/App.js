@@ -207,13 +207,22 @@ const CharDisplay = styled.span`
   display: inline-block;
 `;
 
+const CenteredContent = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+`;
+
 function PasscodeDisplay({ passcode = '' }) {
   return (
-    <div>
-      {passcode.split('').map((char, index) => {
-        return <CharDisplay offset={index === 4}>{char}</CharDisplay>;
-      })}
-    </div>
+    <CenteredContent>
+      <div>
+        <Label>Passcode</Label>
+        {passcode.split('').map((char, index) => {
+          return <CharDisplay offset={index === 4}>{char}</CharDisplay>;
+        })}
+      </div>
+    </CenteredContent>
   );
 }
 
@@ -252,7 +261,6 @@ const CreatedConfirm = withRouter(({ location, match }) => {
             display below.
           </p>
 
-          <Label style={{ marginTop: '16px' }}>Passcode</Label>
           <PasscodeDisplay passcode={passcode} />
         </BodyCard>
 
