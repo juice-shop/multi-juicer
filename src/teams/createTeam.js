@@ -29,29 +29,17 @@ async function createTeam(req, res, next) {
   try {
     const { team } = req.params;
 
-    console.info('Creating Passcode');
-
     const { passcode, passcodeHash } = await createPasscode();
-
     await redis.set(`t-${team}-passcode`, passcodeHash);
-
-    console.info('Created Passcode');
 
     const startTime = new Date();
     await createDeploymentForTeam({ team, passcode });
 
-    console.info('Creating Deployment');
+    console.info(`Creating JuiceShop Deployment for team ${team}`);
 
     for (const _ of Array.from({ length: 100 })) {
       const res = await getJuiceShopInstanceForTeamname(team);
-
-      const {
-        availableReplicas,
-        readyReplicas,
-        updatedReplicas,
-      } = res.body.status;
-
-      console.log({ availableReplicas, readyReplicas, updatedReplicas });
+      const { readyReplicas } = res.body.status;
 
       if (readyReplicas === 1) {
         break;
@@ -60,15 +48,13 @@ async function createTeam(req, res, next) {
       await sleep(250);
     }
 
-    console.info('Deployment ready');
-
     const endTime = new Date();
     const differenceMs = endTime.getTime() - startTime.getTime();
 
     await createServiceForTeam(team);
 
     console.log(
-      `Started JuiceShop Instance for "${team}". StartUp Time: ${differenceMs.toLocaleString()}ms`
+      `Created JuiceShop Deployment for "${team}". StartUp Time: ${differenceMs.toLocaleString()}ms`
     );
 
     res
