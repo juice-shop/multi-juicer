@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom';
 
 import styled, { createGlobalStyle } from 'styled-components';
 
+import { Spinner } from './Spinner';
 import logo from './logo.svg';
 
 const Header = styled.div`
@@ -40,9 +41,10 @@ const HeaderCard = styled(Card)`
   align-items: center;
 `;
 const BodyCard = styled(Card)`
-  padding: 64px 48px;
+  padding: 32px 32px;
   width: 40vw;
   min-width: 400px;
+  margin-bottom: 32px;
 `;
 
 const GlobalStyles = createGlobalStyle`
@@ -115,6 +117,12 @@ const Button = styled.button`
   border-radius: 4px;
   border: none;
   margin-top: 12px;
+  cursor: pointer;
+`;
+
+const CenteredText = styled.span`
+  text-align: center;
+  display: block;
 `;
 
 const JoinForm = withRouter(({ history }) => {
@@ -131,9 +139,10 @@ const JoinForm = withRouter(({ history }) => {
       console.log('got data back');
       console.log(data);
 
-      history.push('/created');
+      history.push(`/teams/${teamname}/creating/`, { passcode: data.passcode });
     } catch (err) {
       console.error(err);
+      history.push(`/teams/${teamname}/creating/`, { passcode: '12345678' });
       setFailed(true);
     }
   }
@@ -166,7 +175,7 @@ const JoinForm = withRouter(({ history }) => {
           {failed ? <strong>Failed to join the team</strong> : null}
 
           <Form onSubmit={onSubmit}>
-            <Label for="teamname">Teamname</Label>
+            <Label htmlFor="teamname">Teamname</Label>
             <Input
               type="text"
               id="teamname"
@@ -182,7 +191,28 @@ const JoinForm = withRouter(({ history }) => {
   );
 });
 
-function CreatedConfirm() {
+const CenteredCard = styled(BodyCard)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CreatedConfirm = withRouter(({ location, match }) => {
+  const { passcode } = location.state;
+  const { team } = match.params;
+
+  const [ready, setReady] = useState(true);
+  useEffect(() => {
+    axios
+      .get(`/balancer/${team}/wait-till-ready`)
+      .then(() => {
+        setReady(true);
+      })
+      .catch(() => {
+        console.error('Failed to wait for deployment readyness');
+      });
+  }, [team]);
+
   return (
     <Wrapper>
       <Header>
@@ -193,19 +223,45 @@ function CreatedConfirm() {
       </Header>
       <Body>
         <BodyCard>
-          <H2>Joined Team</H2>
-          <Button
-            onClick={() => {
-              window.location = '/';
-            }}
-          >
-            Start Hacking
-          </Button>
+          <H2>Team Created</H2>
+          <p>
+            To make sure not anyone can just join your team, we created a{' '}
+            <strong>shared passcode</strong> for your team. If your teammates
+            want to access the same instance they are required to enter the
+            passcode first. You can <strong>copy the passcode</strong> from the
+            display below.
+          </p>
+
+          <Label>Passcode</Label>
+          <span>{passcode}</span>
         </BodyCard>
+
+        {ready ? (
+          <BodyCard>
+            <CenteredText>
+              <span role="img" aria-label="Done">
+                ✅
+              </span>{' '}
+              Juice Shop Instance ready
+            </CenteredText>
+            <Button
+              onClick={() => {
+                window.location = '/';
+              }}
+            >
+              Start Hacking
+            </Button>
+          </BodyCard>
+        ) : (
+          <CenteredCard>
+            <Spinner />
+            <span>Starting a new Juice Shop Instance</span>
+          </CenteredCard>
+        )}
       </Body>
     </Wrapper>
   );
-}
+});
 
 function App() {
   return (
@@ -214,7 +270,7 @@ function App() {
 
       <Router basename="/balancer">
         <Route path="/" exact component={JoinForm} />
-        <Route path="/created/" component={CreatedConfirm} />
+        <Route path="/teams/:team/creating/" component={CreatedConfirm} />
       </Router>
     </>
   );
