@@ -11,15 +11,12 @@ async function checkIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
-  console.info('Checking if team already exists');
+  console.info(`Checking if team ${team} already has a JuiceShop Deployment`);
 
   try {
-    console.info('Checking if deployment is there');
-
     const { body: deployment } = await getJuiceShopInstanceForTeamname(team);
 
-    console.log('deployment');
-    console.log({ deployment });
+    console.log(`Team ${team} already has a JuiceShop Deployment.`);
 
     const passcodeHash = await redis.get(`t-${team}-passcode`);
 
@@ -38,13 +35,16 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       .status(200)
       .send();
   } catch (error) {
-    console.warn('encountered error while checking for existing deployment');
     if (
       error.response.body.message ===
       `deployments.apps "t-${team}-juiceshop" not found`
     ) {
+      console.log(`Team ${team} doesn't have a JuiceShop Deployment yet.`);
       return next();
     } else {
+      console.error(
+        'encountered unkown error while checking for existing deployment'
+      );
       console.error(error);
       return res.status(500).send(`Unkown error code: "${error.body.message}"`);
     }
