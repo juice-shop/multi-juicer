@@ -7,16 +7,13 @@ const port = 3000;
 
 const proxy = httpProxy.createProxyServer();
 
-const {
-  checkIfTeamAlreadyExists,
-} = require('./teams/checkIfTeamAlreadyExists');
-const { createTeam } = require('./teams/createTeam');
+const teamRoutes = require('./teams/');
 
-app.use('/balancer', express.json());
-app.use(cookieParser('askdbakhdajhvdsjavjdsgv'));
-
-app.post('/balancer/teams/:team/join', checkIfTeamAlreadyExists, createTeam);
 app.use('/balancer', express.static('public'));
+app.use(cookieParser('askdbakhdajhvdsjavjdsgv'));
+app.use('/balancer', express.json());
+
+app.use('/balancer/teams', teamRoutes);
 
 // Redirect users without a balancer token to the start page
 app.use((req, res, next) => {
@@ -37,7 +34,9 @@ app.use((req, res) => {
       ws: true,
     },
     err => {
-      console.error(`Failed to proxy request to ${req.url} with error: `, err);
+      console.error(
+        `PROXY_FAIL: ${req.method.toLocaleUpperCase()} ${req.path}`
+      );
     }
   );
 });
