@@ -79,30 +79,12 @@ async function createTeam(req, res, next) {
 
     await redis.set(`t-${team}-passcode`, hash);
 
-    const startTime = new Date();
+    console.info(`Creating JuiceShop Deployment for team "${team}"`);
+
     await createDeploymentForTeam({ team, passcode });
-
-    console.info(`Creating JuiceShop Deployment for team ${team}`);
-
-    for (const _ of Array.from({ length: 100 })) {
-      const res = await getJuiceShopInstanceForTeamname(team);
-      const { readyReplicas } = res.body.status;
-
-      if (readyReplicas === 1) {
-        break;
-      }
-
-      await sleep(250);
-    }
-
-    const endTime = new Date();
-    const differenceMs = endTime.getTime() - startTime.getTime();
-
     await createServiceForTeam(team);
 
-    console.log(
-      `Created JuiceShop Deployment for "${team}". StartUp Time: ${differenceMs.toLocaleString()}ms`
-    );
+    console.log(`Created JuiceShop Deployment for team "${team}"`);
 
     res
       .cookie('balancer', `t-${team}`, {
@@ -117,6 +99,34 @@ async function createTeam(req, res, next) {
   } catch (error) {
     console.error(error);
     res.status(500).send();
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+async function awaitReadyness(req, res, next) {
+  const { team } = req.params;
+
+  try {
+    for (const _ of Array.from({ length: 60 })) {
+      const res = await getJuiceShopInstanceForTeamname(team);
+      const { readyReplicas } = res.body.status;
+
+      if (readyReplicas === 1) {
+        return res.status(200).send();
+      }
+
+      await sleep(1000);
+    }
+
+    console.error(`Waiting for deployment of team "${team}" timed out`);
+    res.status(500);
+  } catch (error) {
+    console.error(`Failed to wait for teams "${team}" deployment to get ready`);
+    res.status(500);
   }
 }
 
@@ -139,6 +149,12 @@ router.post(
   validator.body(bodySchema),
   checkIfTeamAlreadyExists,
   createTeam
+);
+
+router.post(
+  '/:team/wait-till-ready',
+  validator.params(paramsSchema),
+  awaitReadyness
 );
 
 module.exports = router;
