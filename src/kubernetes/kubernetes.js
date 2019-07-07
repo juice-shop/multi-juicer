@@ -45,8 +45,9 @@ const createDeploymentForTeam = ({ team }) =>
                   path: '/rest/admin/application-version',
                   port: 3000,
                 },
-                initialDelaySeconds: 10,
-                periodSeconds: 5,
+                initialDelaySeconds: 5,
+                periodSeconds: 2,
+                failureThreshold: 10,
               },
               livenessProbe: {
                 httpGet: {
@@ -54,7 +55,7 @@ const createDeploymentForTeam = ({ team }) =>
                   port: 3000,
                 },
                 initialDelaySeconds: 30,
-                periodSeconds: 5,
+                periodSeconds: 15,
               },
             },
           ],
