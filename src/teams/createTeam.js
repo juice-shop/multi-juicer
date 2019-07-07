@@ -45,7 +45,15 @@ async function createTeam(req, res, next) {
     for (const _ of Array.from({ length: 100 })) {
       const res = await getJuiceShopInstanceForTeamname(team);
 
-      if (res.body.status.availableReplicas === 1) {
+      const {
+        availableReplicas,
+        readyReplicas,
+        updatedReplicas,
+      } = res.body.status;
+
+      console.log({ availableReplicas, readyReplicas, updatedReplicas });
+
+      if (readyReplicas === 1) {
         break;
       }
 
