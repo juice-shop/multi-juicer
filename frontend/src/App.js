@@ -197,6 +197,26 @@ const CenteredCard = styled(BodyCard)`
   align-items: center;
 `;
 
+const CharDisplay = styled.span`
+  font-family: monospace;
+  padding: 12px 8px;
+  background-color: #d8d8d8;
+  border-radius: 4px;
+  margin-right: 8px;
+  margin-left: ${props => (props.offset ? '8px' : '0')};
+  display: inline-block;
+`;
+
+function PasscodeDisplay({ passcode = '' }) {
+  return (
+    <div>
+      {passcode.split('').map((char, index) => {
+        return <CharDisplay offset={index === 4}>{char}</CharDisplay>;
+      })}
+    </div>
+  );
+}
+
 const CreatedConfirm = withRouter(({ location, match }) => {
   const { passcode } = location.state;
   const { team } = match.params;
@@ -232,8 +252,8 @@ const CreatedConfirm = withRouter(({ location, match }) => {
             display below.
           </p>
 
-          <Label>Passcode</Label>
-          <span>{passcode}</span>
+          <Label style={{ marginTop: '16px' }}>Passcode</Label>
+          <PasscodeDisplay passcode={passcode} />
         </BodyCard>
 
         {ready ? (
