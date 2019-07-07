@@ -2,6 +2,9 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const cryptoRandomString = require('crypto-random-string');
 
+const Joi = require('@hapi/joi');
+const validator = require('express-joi-validation').createValidator();
+
 const router = express.Router();
 
 const redis = require('../redis');
@@ -117,6 +120,25 @@ async function createTeam(req, res, next) {
   }
 }
 
-router.post('/:team/join', checkIfTeamAlreadyExists, createTeam);
+const paramsSchema = Joi.object({
+  team: Joi.string()
+    .required()
+    .alphanum()
+    .max(16),
+});
+const bodySchema = Joi.object({
+  team: Joi.string()
+    .optional()
+    .regex(/^\d*$/)
+    .length(8),
+});
+
+router.post(
+  '/:team/join',
+  validator.params(paramsSchema),
+  validator.body(bodySchema),
+  checkIfTeamAlreadyExists,
+  createTeam
+);
 
 module.exports = router;
