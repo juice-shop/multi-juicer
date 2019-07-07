@@ -93,7 +93,7 @@ async function createTeam(req, res, next) {
       })
       .status(200)
       .json({
-        message: 'Create Instance.',
+        message: 'Created Instance',
         passcode,
       });
   } catch (error) {
@@ -137,9 +137,10 @@ const paramsSchema = Joi.object({
     .max(16),
 });
 const bodySchema = Joi.object({
-  team: Joi.string()
+  passcode: Joi.string()
     .optional()
-    .regex(/^\d*$/)
+    .alphanum()
+    .uppercase()
     .length(8),
 });
 
