@@ -233,7 +233,7 @@ const CreatedConfirm = withRouter(({ location, match }) => {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     axios
-      .get(`/balancer/${team}/wait-till-ready`)
+      .get(`/balancer/teams/${team}/wait-till-ready`)
       .then(() => {
         setReady(true);
       })
