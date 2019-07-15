@@ -34,6 +34,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: juice-balancer
+  labels:
+    app: 'juice-balancer'
+    tier: 'frontend'
 spec:
   selector:
     matchLabels:
@@ -47,23 +50,32 @@ spec:
       containers:
         - name: juice-balancer
           image: j12934/juice-balancer
+          env:
+            - name: NAMESPACE
+              value: default
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
+              name: web
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: juice-balancer
+  labels:
+    app: 'juice-balancer'
 spec:
   selector:
     app: juice-balancer
   ports:
     - port: 3000
+      name: web
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: juice-balancer-redis
+  labels:
+    app: 'juice-balancer'
 spec:
   selector:
     matchLabels:
@@ -82,13 +94,17 @@ spec:
             - myredispassword
           ports:
             - containerPort: 6379
+              name: redis
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: juice-balancer-redis
+  labels:
+    app: 'juice-balancer'
 spec:
   selector:
     app: juice-balancer-redis
   ports:
     - port: 6379
+      name: redis
