@@ -1,0 +1,8 @@
+{
+  "port": 3000,
+  "namespace": "default",
+  "redis": {
+    "host": "juice-balancer-redis",
+    "password": "myredispassword"
+  }
+}

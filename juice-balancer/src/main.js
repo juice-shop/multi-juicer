@@ -1,9 +1,9 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const httpProxy = require('http-proxy');
+const config = require('./config');
 
 const app = express();
-const port = 3000;
 
 const proxy = httpProxy.createProxyServer();
 
@@ -23,8 +23,6 @@ app.use((req, res, next) => {
   return next();
 });
 
-const NAMESPACE = process.env['NAMESPACE'] || 'default';
-
 app.use((req, res) => {
   const teamname = req.signedCookies['balancer'];
 
@@ -32,7 +30,7 @@ app.use((req, res) => {
     req,
     res,
     {
-      target: `http://${teamname}-juiceshop.${NAMESPACE}.svc:3000`,
+      target: `http://${teamname}-juiceshop.${config.namespace}.svc:3000`,
       ws: true,
     },
     err => {
@@ -43,4 +41,6 @@ app.use((req, res) => {
   );
 });
 
-app.listen(port, () => console.log(`JuiceBalancer listening on port ${port}!`));
+app.listen(config.port, () =>
+  console.log(`JuiceBalancer listening on port ${config.port}!`)
+);

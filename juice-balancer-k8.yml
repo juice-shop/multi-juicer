@@ -26,6 +26,21 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: juice-balancer-config
+data:
+  config.json: |
+    {
+      "port": 3000,
+      "namespace": "default",
+      "redis": {
+        "host": "juice-balancer-redis",
+        "password": "myredispassword"
+      }
+    }
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: juice-balancer
@@ -50,12 +65,16 @@ spec:
       containers:
         - name: juice-balancer
           image: j12934/juice-balancer
-          env:
-            - name: NAMESPACE
-              value: default
           ports:
             - containerPort: 3000
               name: web
+          volumeMounts:
+            - name: config-volume
+              mountPath: /home/app/config/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: juice-balancer-config
 ---
 apiVersion: v1
 kind: Service
