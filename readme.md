@@ -2,13 +2,13 @@
 
 Running CTFs or Security Trainings with OWASP Juice Shop by creating a seperate Juice Shop instance for every participant / team. Juicy CTF mainly consists of acustom loadbalancer identifing the user by a cookie and sending the traffic further along to the correct Juice Shop instance.
 
-## Instalation
+## Installation
 
 ```sh
 helm install ...
 ```
 
-### Deinstalation
+### Deinstallation
 
 ```sh
 helm delete ...
