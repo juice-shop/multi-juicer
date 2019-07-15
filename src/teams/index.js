@@ -110,10 +110,12 @@ async function createTeam(req, res, next) {
 async function awaitReadyness(req, res, next) {
   const { team } = req.params;
 
+  console.log(`Awaiting readyness of JuiceShop Deployment for team "${team}"`);
+
   try {
     for (const _ of Array.from({ length: 60 })) {
-      const res = await getJuiceShopInstanceForTeamname(team);
-      const { readyReplicas } = res.body.status;
+      const { body } = await getJuiceShopInstanceForTeamname(team);
+      const { readyReplicas } = body.status;
 
       if (readyReplicas === 1) {
         return res.status(200).send();
@@ -126,6 +128,7 @@ async function awaitReadyness(req, res, next) {
     res.status(500);
   } catch (error) {
     console.error(`Failed to wait for teams "${team}" deployment to get ready`);
+    console.error(error);
     res.status(500);
   }
 }
@@ -152,7 +155,7 @@ router.post(
   createTeam
 );
 
-router.post(
+router.get(
   '/:team/wait-till-ready',
   validator.params(paramsSchema),
   awaitReadyness
