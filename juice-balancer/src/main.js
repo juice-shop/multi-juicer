@@ -10,7 +10,7 @@ const proxy = httpProxy.createProxyServer();
 const teamRoutes = require('./teams/');
 
 app.use('/balancer', express.static('public'));
-app.use(cookieParser('askdbakhdajhvdsjavjdsgv'));
+app.use(cookieParser(config.cookieParser.secret));
 app.use('/balancer', express.json());
 
 app.use('/balancer/teams', teamRoutes);

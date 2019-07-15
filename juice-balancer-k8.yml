@@ -37,6 +37,9 @@ data:
       "redis": {
         "host": "juice-balancer-redis",
         "password": "myredispassword"
+      },
+      "cookieParser": {
+        "secret": "askdbakhdajhvdsjavjdsgv"
       }
     }
 ---
