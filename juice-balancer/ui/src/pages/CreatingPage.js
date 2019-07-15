@@ -49,6 +49,35 @@ const CenteredContent = styled.div`
   margin-top: 16px;
 `;
 
+function InstanceStatusDisplay({ ready }) {
+  if (ready) {
+    return (
+      <BodyCard>
+        <CenteredText>
+          <span role="img" aria-label="Done">
+            ✅
+          </span>{' '}
+          Juice Shop Instance ready
+        </CenteredText>
+        <Button
+          onClick={() => {
+            window.location = '/';
+          }}
+        >
+          Start Hacking
+        </Button>
+      </BodyCard>
+    );
+  } else {
+    return (
+      <CenteredCard>
+        <Spinner />
+        <span>Starting a new Juice Shop Instance</span>
+      </CenteredCard>
+    );
+  }
+}
+
 export const CreatingPage = withRouter(({ location, match }) => {
   const { passcode } = location.state;
   const { team } = match.params;
@@ -80,29 +109,7 @@ export const CreatingPage = withRouter(({ location, match }) => {
 
           <PasscodeDisplay passcode={passcode} />
         </BodyCard>
-
-        {ready ? (
-          <BodyCard>
-            <CenteredText>
-              <span role="img" aria-label="Done">
-                ✅
-              </span>{' '}
-              Juice Shop Instance ready
-            </CenteredText>
-            <Button
-              onClick={() => {
-                window.location = '/';
-              }}
-            >
-              Start Hacking
-            </Button>
-          </BodyCard>
-        ) : (
-          <CenteredCard>
-            <Spinner />
-            <span>Starting a new Juice Shop Instance</span>
-          </CenteredCard>
-        )}
+        <InstanceStatusDisplay ready={ready} />
       </>
     </Layout>
   );
