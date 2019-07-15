@@ -8,7 +8,7 @@ workflow "Build docker image" {
 
 action "Build Image" {
   uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  args = "build -t docker.pkg.github.com/j12934/juice-balancer-v2/balancer ./juice-balancer/"
+  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/balancer ./juice-balancer/"
 }
 
 action "Login to Docker Registry" {
