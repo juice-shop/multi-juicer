@@ -1,7 +1,7 @@
 workflow "Build docker image" {
   resolves = [
     "Login to Docker Registry",
-    "Push Image",
+    "Build Image",
   ]
   on = "push"
 }
