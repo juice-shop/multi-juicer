@@ -1,3 +1,1 @@
-# Juicy CTF
-
-![Juice CTF Cover](./cover.svg)
+![Juicy CTF, Multi User Juice Shop Plattform](./cover.svg)
