@@ -6,8 +6,10 @@ kc.loadFromCluster();
 const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
+const NAMESPACE = process.env['NAMESPACE'] || 'default';
+
 const createDeploymentForTeam = ({ team }) =>
-  k8sAppsApi.createNamespacedDeployment('default', {
+  k8sAppsApi.createNamespacedDeployment(NAMESPACE, {
     metadata: {
       name: `t-${team}-juiceshop`,
       labels: {
@@ -65,7 +67,7 @@ const createDeploymentForTeam = ({ team }) =>
   });
 
 const createServiceForTeam = teamname =>
-  k8sCoreApi.createNamespacedService('default', {
+  k8sCoreApi.createNamespacedService(NAMESPACE, {
     metadata: {
       name: `t-${teamname}-juiceshop`,
       labels: {
@@ -88,7 +90,7 @@ const createServiceForTeam = teamname =>
 
 const getJuiceShopInstances = () =>
   k8sAppsApi.listNamespacedDeployment(
-    'default',
+    NAMESPACE,
     true,
     undefined,
     undefined,
@@ -97,7 +99,7 @@ const getJuiceShopInstances = () =>
   );
 
 const getJuiceShopInstanceForTeamname = teamname =>
-  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, 'default');
+  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, NAMESPACE);
 
 module.exports.createDeploymentForTeam = createDeploymentForTeam;
 module.exports.createServiceForTeam = createServiceForTeam;
