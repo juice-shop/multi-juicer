@@ -55,5 +55,6 @@ export const BodyCard = styled(Card)`
   padding: 32px 32px;
   width: 40vw;
   min-width: 400px;
+  max-width: 650px;
   margin-bottom: 32px;
 `;
