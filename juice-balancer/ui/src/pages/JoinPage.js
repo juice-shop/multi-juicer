@@ -12,9 +12,16 @@ export const JoinPage = withRouter(({ history }) => {
 
   async function sendJoinRequest() {
     try {
-      const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
-        passcode,
-      });
+      const { data } = await axios.post(
+        `/balancer/teams/${teamname}/join`,
+        {
+          passcode,
+        },
+        {
+          // Wait at most 3 minutes before timing out
+          timeout: 3 * 60 * 1000,
+        }
+      );
 
       console.log('got data back');
       console.log(data);

@@ -113,7 +113,7 @@ async function awaitReadyness(req, res, next) {
   console.log(`Awaiting readyness of JuiceShop Deployment for team "${team}"`);
 
   try {
-    for (const _ of Array.from({ length: 60 })) {
+    for (const _ of Array.from({ length: 3 * 60 })) {
       const { body } = await getJuiceShopInstanceForTeamname(team);
       const { readyReplicas } = body.status;
 
