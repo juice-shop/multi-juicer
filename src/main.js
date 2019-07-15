@@ -23,6 +23,8 @@ app.use((req, res, next) => {
   return next();
 });
 
+const NAMESPACE = process.env['NAMESPACE'] || 'default';
+
 app.use((req, res) => {
   const teamname = req.signedCookies['balancer'];
 
@@ -30,7 +32,7 @@ app.use((req, res) => {
     req,
     res,
     {
-      target: `http://${teamname}-juiceshop.default.svc:3000`,
+      target: `http://${teamname}-juiceshop.${NAMESPACE}.svc:3000`,
       ws: true,
     },
     err => {
