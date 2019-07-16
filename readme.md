@@ -26,7 +26,7 @@ There are some special requirements which we didn't find to be easily solved wit
 - The load balancers cookie must be save and not easy to spoof to access another instance.
 - Handling starting of new instances.
 
-If you have awesome ideas on how to overcome these issues without a custom load balancer, please write us, we'd love to here from you!
+If you have awesome ideas on how to overcome these issues without a custom load balancer, please write us, we'd love to hear from you!
 
 ### Why a seperate kubernetes deployment for every team?
 
