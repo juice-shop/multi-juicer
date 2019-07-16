@@ -26,11 +26,18 @@ export const JoinPage = withRouter(({ history }) => {
       console.log('got data back');
       console.log(data);
 
-      history.push(`/teams/${teamname}/creating/`, { passcode: data.passcode });
-    } catch (err) {
-      console.error(err);
-      history.push(`/teams/${teamname}/creating/`, { passcode: '12345678' });
-      setFailed(true);
+      history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode });
+    } catch (error) {
+      if (
+        error.response.status === 401 &&
+        error.response.data.message === 'Team requires authentication to join'
+      ) {
+        history.push(`/teams/${teamname}/joining/`);
+      } else {
+        console.error('Unkown error while trying to join a team!');
+        console.error(error);
+        setFailed(true);
+      }
     }
   }
 

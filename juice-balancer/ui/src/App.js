@@ -2,13 +2,15 @@ import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import { JoinPage } from './pages/JoinPage';
-import { CreatingPage } from './pages/CreatingPage';
+import { JoiningPage } from './pages/JoiningPage';
+import { JoinedPage } from './pages/JoinedPage';
 
 function App() {
   return (
     <Router basename="/balancer">
       <Route path="/" exact component={JoinPage} />
-      <Route path="/teams/:team/creating/" component={CreatingPage} />
+      <Route path="/teams/:team/joining/" component={JoiningPage} />
+      <Route path="/teams/:team/joined/" component={JoinedPage} />
     </Router>
   );
 }

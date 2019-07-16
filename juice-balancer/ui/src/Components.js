@@ -13,6 +13,12 @@ export const H2 = styled.h2`
   margin-bottom: 24px;
 `;
 
+export const H3 = styled.h2`
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0;
+`;
+
 export const Input = styled.input`
   background-color: #d8d8d8;
   border: none;
@@ -33,7 +39,7 @@ export const Form = styled.form`
 
 export const Button = styled.button`
   background-color: #cf3a23;
-  padding: 12px;
+  padding: 12px 32px;
   font-size: 14px;
   font-weight: 600;
   color: #fff;
@@ -45,6 +51,13 @@ export const Button = styled.button`
   cursor: pointer;
 `;
 
+export const SecondaryButton = styled(Button)`
+  margin: 0;
+  width: auto;
+  background-color: #d8d8d8;
+  color: #232323;
+`;
+
 export const Card = styled.div`
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.4) 1px 1px 4px 0px;
@@ -52,7 +65,7 @@ export const Card = styled.div`
 `;
 
 export const BodyCard = styled(Card)`
-  padding: 32px 32px;
+  padding: 32px;
   width: 40vw;
   min-width: 400px;
   max-width: 650px;
