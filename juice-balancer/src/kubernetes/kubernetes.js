@@ -1,14 +1,13 @@
-const k8s = require('@kubernetes/client-node');
-
-const kc = new k8s.KubeConfig();
+import { KubeConfig, AppsV1Api, CoreV1Api } from '@kubernetes/client-node';
+const kc = new KubeConfig();
 kc.loadFromCluster();
 
-const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
-const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
+const k8sAppsApi = kc.makeApiClient(AppsV1Api);
+const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
-const config = require('../config');
+import config from '../config';
 
-const createDeploymentForTeam = ({ team }) =>
+export const createDeploymentForTeam = ({ team }) =>
   k8sAppsApi.createNamespacedDeployment(config.namespace, {
     metadata: {
       name: `t-${team}-juiceshop`,
@@ -66,7 +65,7 @@ const createDeploymentForTeam = ({ team }) =>
     },
   });
 
-const createServiceForTeam = teamname =>
+export const createServiceForTeam = teamname =>
   k8sCoreApi.createNamespacedService(config.namespace, {
     metadata: {
       name: `t-${teamname}-juiceshop`,
@@ -88,7 +87,7 @@ const createServiceForTeam = teamname =>
     },
   });
 
-const getJuiceShopInstances = () =>
+export const getJuiceShopInstances = () =>
   k8sAppsApi.listNamespacedDeployment(
     config.namespace,
     true,
@@ -98,13 +97,8 @@ const getJuiceShopInstances = () =>
     'app=juice-shop'
   );
 
-const getJuiceShopInstanceForTeamname = teamname =>
+export const getJuiceShopInstanceForTeamname = teamname =>
   k8sAppsApi.readNamespacedDeployment(
     `t-${teamname}-juiceshop`,
     config.namespace
   );
-
-module.exports.createDeploymentForTeam = createDeploymentForTeam;
-module.exports.createServiceForTeam = createServiceForTeam;
-module.exports.getJuiceShopInstances = getJuiceShopInstances;
-module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;

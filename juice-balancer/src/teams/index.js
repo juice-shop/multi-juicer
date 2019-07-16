@@ -1,18 +1,20 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const cryptoRandomString = require('crypto-random-string');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import cryptoRandomString from 'crypto-random-string';
 
-const Joi = require('@hapi/joi');
-const validator = require('express-joi-validation').createValidator();
+import Joi from '@hapi/joi';
+import expressJoiValidation from 'express-joi-validation';
+
+const validator = expressJoiValidation.createValidator();
 
 const router = express.Router();
 
-const redis = require('../redis');
-const {
+import redis from '../redis';
+import {
   createDeploymentForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
-} = require('../kubernetes/kubernetes');
+} from '../kubernetes/kubernetes';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -164,4 +166,4 @@ router.get(
   awaitReadyness
 );
 
-module.exports = router;
+export default router;

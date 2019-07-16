@@ -1,4 +1,4 @@
-const Redis = require('ioredis');
-const config = require('./config');
+import Redis from 'ioredis';
+import config from './config';
 
-module.exports = new Redis(config.redis);
+export default new Redis(config.redis);

@@ -15,6 +15,7 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.4",
     "crypto-random-string": "^3.0.0",
+    "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-joi-validation": "^2.0.0",
     "http-proxy": "^1.17.0",

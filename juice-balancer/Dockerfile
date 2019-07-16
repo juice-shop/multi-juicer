@@ -21,4 +21,4 @@ COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
 COPY --from=ui --chown=app:app /home/app/build/ ./public/
 USER app
 EXPOSE 8080
-CMD ["node", "/home/app/src/main.js"]
+CMD ["node", "/home/app/src/index.js"]

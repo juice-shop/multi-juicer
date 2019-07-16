@@ -1,13 +1,14 @@
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const httpProxy = require('http-proxy');
-const config = require('./config');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import httpProxy from 'http-proxy';
+
+import config from './config';
 
 const app = express();
 
 const proxy = httpProxy.createProxyServer();
 
-const teamRoutes = require('./teams/');
+import teamRoutes from './teams/';
 
 app.use('/balancer', express.static('public'));
 app.use(cookieParser(config.cookieParser.secret));
