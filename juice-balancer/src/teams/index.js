@@ -34,20 +34,23 @@ async function checkIfTeamAlreadyExists(req, res, next) {
 
     const passcodeHash = await redis.get(`t-${team}-passcode`);
 
-    if (passcode === undefined || bcrypt.compare(passcode, passcodeHash)) {
-      return res.status(401).json({
-        message: 'Team requires authentication to join',
-      });
+    if (
+      passcode !== undefined &&
+      (await bcrypt.compare(passcode, passcodeHash))
+    ) {
+      // Set cookie, (join team)
+      return res
+        .cookie('balancer', `t-${team}`, {
+          signed: true,
+          httpOnly: true,
+        })
+        .status(200)
+        .send();
     }
 
-    // Set cookie, (join team)
-    res
-      .cookie('balancer', `t-${team}`, {
-        signed: true,
-        httpOnly: true,
-      })
-      .status(200)
-      .send();
+    return res.status(401).json({
+      message: 'Team requires authentication to join',
+    });
   } catch (error) {
     if (
       error.response.body.message ===
