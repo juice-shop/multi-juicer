@@ -1,7 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 
-import config from './config';
+import { get } from './config';
 
 const app = express();
 
@@ -11,7 +11,7 @@ import proxyRoutes from './proxy/proxy';
 import redis from './redis';
 
 app.use('/balancer', express.static('public'));
-app.use(cookieParser(config.cookieParser.secret));
+app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());
 
 app.use('/balancer/teams', teamRoutes);
@@ -19,8 +19,8 @@ app.use('/balancer/admin', adminRoutes);
 
 app.use(proxyRoutes);
 
-const server = app.listen(config.port, () =>
-  console.log(`JuiceBalancer listening on port ${config.port}!`)
+const server = app.listen(get('port'), () =>
+  console.log(`JuiceBalancer listening on port ${get('port')}!`)
 );
 
 process.on('SIGTERM', () => {

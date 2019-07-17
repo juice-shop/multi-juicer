@@ -1,4 +1,8 @@
 import Redis from 'ioredis';
-import config from './config';
+import { get } from './config';
 
-export default new Redis(config.redis);
+export default new Redis({
+  host: get('redis.host'),
+  port: get('redis.port'),
+  password: get('redis.password'),
+});

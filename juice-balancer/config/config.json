@@ -3,7 +3,8 @@
   "namespace": "default",
   "redis": {
     "host": "juice-balancer-redis",
-    "password": "myredispassword"
+    "password": "myredispassword",
+    "port": 6379
   },
   "cookieParser": {
     "secret": "askdbakhdajhvdsjavjdsgv"

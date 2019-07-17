@@ -4,7 +4,7 @@ import httpProxy from 'http-proxy';
 const proxy = httpProxy.createProxyServer();
 
 import redis from '../redis';
-import config from '../config';
+import { get } from '../config';
 
 const router = express.Router();
 
@@ -56,7 +56,7 @@ function proxyTrafficToJuiceShop(req, res) {
     req,
     res,
     {
-      target: `http://${teamname}-juiceshop.${config.namespace}.svc:3000`,
+      target: `http://${teamname}-juiceshop.${get('namespace')}.svc:3000`,
       ws: true,
     },
     () => {

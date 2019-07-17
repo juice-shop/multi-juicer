@@ -5,10 +5,10 @@ kc.loadFromCluster();
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
-import config from '../config';
+import { get } from '../config';
 
 export const createDeploymentForTeam = ({ team }) =>
-  k8sAppsApi.createNamespacedDeployment(config.namespace, {
+  k8sAppsApi.createNamespacedDeployment(get('namespace'), {
     metadata: {
       name: `t-${team}-juiceshop`,
       labels: {
@@ -66,7 +66,7 @@ export const createDeploymentForTeam = ({ team }) =>
   });
 
 export const createServiceForTeam = teamname =>
-  k8sCoreApi.createNamespacedService(config.namespace, {
+  k8sCoreApi.createNamespacedService(get('namespace'), {
     metadata: {
       name: `t-${teamname}-juiceshop`,
       labels: {
@@ -89,7 +89,7 @@ export const createServiceForTeam = teamname =>
 
 export const getJuiceShopInstances = () =>
   k8sAppsApi.listNamespacedDeployment(
-    config.namespace,
+    get('namespace'),
     true,
     undefined,
     undefined,
@@ -98,4 +98,4 @@ export const getJuiceShopInstances = () =>
   );
 
 export const getJuiceShopInstanceForTeamname = teamname =>
-  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, config.namespace);
+  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, get('namespace'));
