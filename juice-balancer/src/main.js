@@ -19,6 +19,13 @@ app.use('/balancer/admin', adminRoutes);
 
 app.use(proxyRoutes);
 
-app.listen(config.port, () =>
+const server = app.listen(config.port, () =>
   console.log(`JuiceBalancer listening on port ${config.port}!`)
 );
+
+process.on('SIGTERM', () => {
+  console.log('Recieved "SIGTERM" Signal shutting down.');
+  server.close();
+  redis.disconnect();
+  process.exit(0);
+});
