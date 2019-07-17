@@ -32,19 +32,12 @@ async function updateLastConnectTimestamp(req, res, next) {
   const teamname = req.signedCookies['balancer'];
 
   if (connectionCache.has(teamname)) {
-    console.log('Has in Memory Connenction Cache for User');
-    const timeDifference = currentTime - connectionCache.get('teamname');
-    if (timeDifference < 10000) {
-      console.log(
-        `Time Difference > 10s: updating redis entry for "${teamname}-last-request"`
-      );
+    const timeDifference = currentTime - connectionCache.get(teamname);
+    if (timeDifference > 10000) {
       await redis.set(`${teamname}-last-request`, currentTime);
       connectionCache.set(teamname, currentTime);
     }
   } else {
-    console.log(
-      `No Entry: creating / updating redis entry for "${teamname}-last-request"`
-    );
     await redis.set(`${teamname}-last-request`, currentTime);
     connectionCache.set(teamname, currentTime);
   }
