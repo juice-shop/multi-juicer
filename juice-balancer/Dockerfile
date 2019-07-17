@@ -16,9 +16,9 @@ FROM node:10-alpine
 RUN addgroup -S app && adduser app -S -G app
 WORKDIR /home/app/
 COPY --chown=app:app ./config config/
-COPY --chown=app:app ./src src/
 COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
 COPY --from=ui --chown=app:app /home/app/build/ ./public/
+COPY --chown=app:app ./src src/
 USER app
 EXPOSE 8080
 CMD ["node", "/home/app/src/index.js"]
