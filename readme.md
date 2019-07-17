@@ -1,6 +1,8 @@
 ![Juicy CTF, Multi User Juice Shop Plattform](./cover.svg)
 
-Running CTFs or Security Trainings with OWASP Juice Shop by creating a seperate Juice Shop instance for every participant / team. Juicy CTF mainly consists of a custom load balancer identifing the user by a cookie and sending their traffic further along to the correct Juice Shop instance.
+Running CTFs or Security Trainings with OWASP Juice Shop by creating a seperate Juice Shop instance for every participant / team. Juicy CTF mainly consists of a custom load balancer (dubbed "JuiceBalancer"), which identifies the user by a cookie and sending their traffic further along to the correct Juice Shop instance. If a user registers newly the JuiceBalancer will spin up a new Juice Shop Instance using the kubernetes api.
+
+![Juicy CTF, High Level Achitecture Diagramm](./high-level-achitecture.svg)
 
 ## Installation
 
