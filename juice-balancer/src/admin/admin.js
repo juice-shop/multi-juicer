@@ -9,9 +9,8 @@ import redis from '../redis';
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
  */
-async function listInstances(req, res, next) {
+async function listInstances(req, res) {
   const {
     body: { items: instances },
   } = await getJuiceShopInstances();
@@ -20,13 +19,10 @@ async function listInstances(req, res, next) {
   const teamTimestampEntryName = teams.map(team => `t-${team}-last-request`);
 
   const lastConnectTimestamps = await redis.mget(teamTimestampEntryName);
-  const timeStampsAsMap = lastConnectTimestamps.reduce(
-    (map, timeStamp, index) => {
-      map.set(teams[index], timeStamp);
-      return map;
-    },
-    new Map()
-  );
+  const timeStampsAsMap = lastConnectTimestamps.reduce((map, timeStamp, index) => {
+    map.set(teams[index], timeStamp);
+    return map;
+  }, new Map());
 
   return res.json({
     instances: instances.map(instance => {

@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "module": "main.js",
   "scripts": {
+    "lint": "eslint --config .eslintrc src/**",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -22,6 +24,9 @@
     "ioredis": "^4.10.0"
   },
   "devDependencies": {
-    "@types/hapi__joi": "^15.0.2"
+    "@types/hapi__joi": "^15.0.2",
+    "eslint": "^6.0.1",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.18.2"
   }
 }

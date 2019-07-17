@@ -36,10 +36,7 @@ async function checkIfTeamAlreadyExists(req, res, next) {
 
     const passcodeHash = await redis.get(`t-${team}-passcode`);
 
-    if (
-      passcode !== undefined &&
-      (await bcrypt.compare(passcode, passcodeHash))
-    ) {
+    if (passcode !== undefined && (await bcrypt.compare(passcode, passcodeHash))) {
       // Set cookie, (join team)
       return res
         .cookie('balancer', `t-${team}`, {
@@ -54,16 +51,11 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       message: 'Team requires authentication to join',
     });
   } catch (error) {
-    if (
-      error.response.body.message ===
-      `deployments.apps "t-${team}-juiceshop" not found`
-    ) {
+    if (error.response.body.message === `deployments.apps "t-${team}-juiceshop" not found`) {
       console.log(`Team ${team} doesn't have a JuiceShop deployment yet`);
       return next();
     } else {
-      console.error(
-        'Encountered unkown error while checking for existing JuiceShop deployment'
-      );
+      console.error('Encountered unkown error while checking for existing JuiceShop deployment');
       console.error(error);
       return res.status(500).send(`Unkown error code: "${error.body.message}"`);
     }
@@ -73,9 +65,8 @@ async function checkIfTeamAlreadyExists(req, res, next) {
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
  */
-async function createTeam(req, res, next) {
+async function createTeam(req, res) {
   try {
     const { team } = req.params;
 
@@ -110,15 +101,14 @@ async function createTeam(req, res, next) {
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
  */
-async function awaitReadyness(req, res, next) {
+async function awaitReadyness(req, res) {
   const { team } = req.params;
 
   console.log(`Awaiting readyness of JuiceShop Deployment for team "${team}"`);
 
   try {
-    for (const _ of Array.from({ length: 3 * 60 })) {
+    for (let i = 0; i < 180; i++) {
       const { body } = await getJuiceShopInstanceForTeamname(team);
       const { readyReplicas } = body.status;
 
@@ -160,10 +150,6 @@ router.post(
   createTeam
 );
 
-router.get(
-  '/:team/wait-till-ready',
-  validator.params(paramsSchema),
-  awaitReadyness
-);
+router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadyness);
 
 export default router;

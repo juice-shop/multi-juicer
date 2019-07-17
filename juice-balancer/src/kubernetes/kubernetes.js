@@ -98,7 +98,4 @@ export const getJuiceShopInstances = () =>
   );
 
 export const getJuiceShopInstanceForTeamname = teamname =>
-  k8sAppsApi.readNamespacedDeployment(
-    `t-${teamname}-juiceshop`,
-    config.namespace
-  );
+  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, config.namespace);

@@ -59,10 +59,8 @@ function proxyTrafficToJuiceShop(req, res) {
       target: `http://${teamname}-juiceshop.${config.namespace}.svc:3000`,
       ws: true,
     },
-    err => {
-      console.error(
-        `PROXY_FAIL: ${req.method.toLocaleUpperCase()} ${req.path}`
-      );
+    () => {
+      console.error(`PROXY_FAIL: ${req.method.toLocaleUpperCase()} ${req.path}`);
     }
   );
 }
