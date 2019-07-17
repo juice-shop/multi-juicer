@@ -1,0 +1,45 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: 'juice-balancer'
+  labels:
+    app: 'juice-balancer'
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: 'juice-balancer'
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: 'juice-balancer'
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: juice-balancer
+      containers:
+        - name: juice-balancer
+          image: j12934/juice-balancer
+          ports:
+            - name: http
+              containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /balancer/
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /balancer/
+              port: http
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-redis
+                  key: redis-password
+          volumeMounts:
+            - name: config-volume
+              mountPath: /home/app/config/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: juice-balancer-config

@@ -1,0 +1,5 @@
+juiceBalancer:
+
+redis:
+  cluster:
+    slaveCount: 1

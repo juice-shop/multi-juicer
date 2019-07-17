@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: juice-balancer-config
+data:
+  config.json: |
+    {
+      "port": 3000,
+      "namespace": {{ .Release.Namespace | quote }},
+      "redis": {
+        "host": "{{ .Release.Name}}-redis-master",
+        "port": 6379
+      },
+      "cookieParser": {
+        {{- if .Values.password }}
+        "secret": {{ .Values.juiceBalancer.cookieParserSecret | quote }}
+        {{- else }}
+        "secret": {{ randAlphaNum 24 | quote }}
+        {{- end }}
+      }
+    }
