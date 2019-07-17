@@ -22,32 +22,24 @@ async function listInstances(req, res, next) {
   const lastConnectTimestamps = await redis.mget(teamTimestampEntryName);
   const timeStampsAsMap = lastConnectTimestamps.reduce(
     (map, timeStamp, index) => {
-      console.log('adding timestamp to map');
-      console.log({ team: teams[index], timeStamp });
       map.set(teams[index], timeStamp);
       return map;
     },
     new Map()
   );
 
-  console.log({ teams, lastConnectTimestamps, timeStampsAsMap });
-
-  const response = {
+  return res.json({
     instances: instances.map(instance => {
       const team = instance.metadata.labels.team;
       return {
         team,
         name: instance.metadata.name,
         ready: instance.status.availableReplicas === 1,
-        createdAt: instance.metadata.creationTimestamp,
+        createdAt: instance.metadata.creationTimestamp.getTime(),
         lastConnect: timeStampsAsMap.get(team),
       };
     }),
-  };
-
-  console.log({ response });
-
-  res.json(response);
+  });
 }
 
 router.get('/all', listInstances);
