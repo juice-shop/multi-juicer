@@ -18,7 +18,7 @@ async function listInstances(req, res) {
   const teams = instances.map(instance => instance.metadata.labels.team);
   const teamTimestampEntryName = teams.map(team => `t-${team}-last-request`);
 
-  const lastConnectTimestamps = await redis.mget(teamTimestampEntryName);
+  const lastConnectTimestamps = teams.length > 0 ? await redis.mget(teamTimestampEntryName) : [];
   const timeStampsAsMap = lastConnectTimestamps.reduce((map, timeStamp, index) => {
     map.set(teams[index], timeStamp);
     return map;
