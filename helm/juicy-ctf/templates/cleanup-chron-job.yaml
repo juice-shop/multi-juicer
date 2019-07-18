@@ -1,8 +1,6 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  labels:
-    job-name: 'cleanup-job'
   name: 'cleanup-job'
 spec:
   schedule: '0 * * * *'
@@ -12,7 +10,6 @@ spec:
         metadata:
           labels:
             name: 'cleanup-job'
-            job-name: 'cleanup-job'
         spec:
           serviceAccountName: 'juice-cleaner'
           containers:
