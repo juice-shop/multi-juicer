@@ -8,7 +8,6 @@ const fetchConfigValue = name => {
     .map(string => string.toUpperCase())
     .join('_');
 
-  console.log(`Config "${name}": "${process.env[envVarName] || lodashGet(config, name)}"`);
   return process.env[envVarName] || lodashGet(config, name);
 };
 
