@@ -36,6 +36,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-redis
                   key: redis-password
+            - name: COOKIEPARSER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: juice-balancer-secret
+                  key: cookieParserSecret
           volumeMounts:
             - name: config-volume
               mountPath: /home/app/config/
