@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: juice-cleaner
+rules:
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'delete', 'list']
+  - apiGroups: [''] # "" indicates the core API group
+    resources: ['services']
+    verbs: ['get', 'delete']
