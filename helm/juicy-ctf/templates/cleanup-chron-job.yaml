@@ -19,7 +19,7 @@ spec:
                 - name: NAMESPACE
                   value: {{ .Release.Namespace | quote }}
                 - name: MAX_INACTIVE_DURATION
-                  value: '30m'
+                  value: '3d'
                 - name: REDIS_HOST
                   value: '{{ .Release.Name }}-redis-master'
                 - name: REDIS_PORT
