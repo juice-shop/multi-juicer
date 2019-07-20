@@ -14,7 +14,7 @@ action "Build Balacer" {
     DOCKER_REGISTRY_URL = "docker.pkg.github.com"
     DOCKER_NAMESPACE = "j12934/juicy-ctf"
   }
-  args = "./balancer/"
+  args = "./juice-balancer/"
 }
 
 action "Build Cleaner" {
