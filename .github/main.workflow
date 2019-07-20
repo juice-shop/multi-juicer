@@ -17,24 +17,24 @@ action "Login to Github Docker Registry" {
 
 action "Build Balancer Image" {
   uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/balancer ./juice-balancer/"
+  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/balancer:latest ./juice-balancer/"
   needs = ["Login to Github Docker Registry"]
 }
 
 action "Push Balancer Image" {
   uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
   needs = ["Build Balancer Image"]
-  args = "push docker.pkg.github.com/j12934/juicy-ctf/balancer"
+  args = "push docker.pkg.github.com/j12934/juicy-ctf/balancer:latest"
 }
 
 action "Build Cleaner Image" {
   uses = "actions/docker/cli@86ff551d26008267bb89ac11198ba7f1d807b699"
   needs = ["Login to Github Docker Registry"]
-  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/cleaner ./cleaner/"
+  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/cleaner:latest ./cleaner/"
 }
 
 action "Push Cleaner Image" {
   uses = "actions/docker/cli@86ff551d26008267bb89ac11198ba7f1d807b699"
-  args = "push docker.pkg.github.com/j12934/juicy-ctf/cleaner"
+  args = "push docker.pkg.github.com/j12934/juicy-ctf/cleaner:latest"
   needs = ["Build Cleaner Image"]
 }
