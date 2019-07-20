@@ -3,6 +3,8 @@ kind: RoleBinding
 metadata:
   name: juice-balancer
   namespace: {{ .Release.Namespace | quote }}
+  labels:
+    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
 subjects:
   - kind: ServiceAccount
     name: juice-balancer # Name is case sensitive

@@ -1,5 +1,40 @@
-juiceBalancer: {}
+imagePullPolicy: Always
+nodeSelector: {}
+
+balancer:
+  repository: j12934/juice-balancer
+  tag: latest
+  replicas: 1
+  resources:
+    requests:
+      memory: 256Mi
+    limits:
+      memory: 256Mi
+  affinity: {}
+  tolerations: []
 
 redis:
+  # OpenShifts Default Security Context makes trouble with the security context
+  # of the redis chart. Uncomment the next two lines to have it run on OpenShift.
+  # securityContext:
+  #   enabled: false
   cluster:
     slaveCount: 1
+
+# Deletes unused JuiceShop instances after a configuable period of inactivity
+juiceShopCleanup:
+  repository: j12934/juice-balancer
+  tag: latest
+  enabled: true
+  gracePeriod: 3d
+  # cron in which the clean up job is run
+  # defaults to once in an hour
+  # change this if your grace period if shorter than 1 hour
+  cron: '0 * * * *'
+  resources:
+    requests:
+      memory: 256Mi
+    limits:
+      memory: 256Mi
+  affinity: {}
+  tolerations: []

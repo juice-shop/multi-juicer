@@ -1,25 +1,28 @@
+{{- if .Values.juiceShopCleanup.enabled -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: 'cleanup-job'
 spec:
-  schedule: '0 * * * *'
+  schedule: {{ .Values.juiceShopCleanup.cron }}
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
             name: 'cleanup-job'
+            helm.sh/chart: {{ include "juicy-ctf.chart" . }}
         spec:
           serviceAccountName: 'juice-cleaner'
           containers:
-            - image: 'j12934/juice-cleaner'
+            - image: '{{ .Values.juiceShopCleanup.repository }}:{{ .Values.juiceShopCleanup.tag }}'
+              imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
               name: 'cleanup-job'
               env:
                 - name: NAMESPACE
                   value: {{ .Release.Namespace | quote }}
                 - name: MAX_INACTIVE_DURATION
-                  value: '3d'
+                  value: {{ .Values.juiceShopCleanup.gracePeriod }}
                 - name: REDIS_HOST
                   value: '{{ .Release.Name }}-redis-master'
                 - name: REDIS_PORT
@@ -30,3 +33,16 @@ spec:
                       name: '{{ .Release.Name }}-redis'
                       key: redis-password
           restartPolicy: Never
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.juiceShopCleanup.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.juiceShopCleanup.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

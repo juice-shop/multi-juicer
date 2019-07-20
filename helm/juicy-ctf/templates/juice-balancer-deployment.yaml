@@ -4,6 +4,7 @@ metadata:
   name: 'juice-balancer'
   labels:
     app: 'juice-balancer'
+    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
 spec:
   selector:
     matchLabels:
@@ -18,7 +19,8 @@ spec:
       serviceAccountName: juice-balancer
       containers:
         - name: juice-balancer
-          image: j12934/juice-balancer
+          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag }}'
+          imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           ports:
             - name: http
               containerPort: 3000
@@ -44,7 +46,21 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /home/app/config/
+          resources:
+            {{- toYaml .Values.balancer.resources | nindent 12 }}
       volumes:
         - name: config-volume
           configMap:
             name: juice-balancer-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
