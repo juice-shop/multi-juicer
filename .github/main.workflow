@@ -1,12 +1,12 @@
 workflow "Build docker image" {
   resolves = [
-    "Build Balacer",
     "Build Cleaner",
+    "Build Balancer",
   ]
   on = "push"
 }
 
-action "Build Balacer" {
+action "Build Balancer" {
   uses = "pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9"
   secrets = ["DOCKER_PASSWORD", "DOCKER_USERNAME"]
   env = {
