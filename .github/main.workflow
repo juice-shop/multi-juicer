@@ -1,40 +1,29 @@
 workflow "Build docker image" {
   resolves = [
-    "Build Balancer Image",
-    "Push Balancer Image",
-    "Push Cleaner Image",
+    "Build Cleaner",
+    "Build Balancer",
   ]
   on = "push"
 }
 
-action "Login to Github Docker Registry" {
-  uses = "actions/docker/login@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
+action "Build Balancer" {
+  uses = "pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9"
+  secrets = ["DOCKER_PASSWORD", "DOCKER_USERNAME"]
   env = {
+    DOCKER_IMAGE_NAME = "balancer"
     DOCKER_REGISTRY_URL = "docker.pkg.github.com"
+    DOCKER_NAMESPACE = "j12934/juicy-ctf"
   }
+  args = "./juice-balancer/"
 }
 
-action "Build Balancer Image" {
-  uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/balancer:latest ./juice-balancer/"
-  needs = ["Login to Github Docker Registry"]
-}
-
-action "Push Balancer Image" {
-  uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
-  needs = ["Build Balancer Image"]
-  args = "push docker.pkg.github.com/j12934/juicy-ctf/balancer:latest"
-}
-
-action "Build Cleaner Image" {
-  uses = "actions/docker/cli@86ff551d26008267bb89ac11198ba7f1d807b699"
-  needs = ["Login to Github Docker Registry"]
-  args = "build -t docker.pkg.github.com/j12934/juicy-ctf/cleaner:latest ./cleaner/"
-}
-
-action "Push Cleaner Image" {
-  uses = "actions/docker/cli@86ff551d26008267bb89ac11198ba7f1d807b699"
-  args = "push docker.pkg.github.com/j12934/juicy-ctf/cleaner:latest"
-  needs = ["Build Cleaner Image"]
+action "Build Cleaner" {
+  uses = "pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9"
+  secrets = ["DOCKER_PASSWORD", "DOCKER_USERNAME"]
+  env = {
+    DOCKER_IMAGE_NAME = "cleaner"
+    DOCKER_REGISTRY_URL = "docker.pkg.github.com"
+    DOCKER_NAMESPACE = "j12934/juicy-ctf"
+  }
+  args = "./cleaner/"
 }
