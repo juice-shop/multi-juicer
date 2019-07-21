@@ -11,7 +11,8 @@ data:
       "namespace": {{ .Release.Namespace | quote }},
       "redis": {
         "host": "{{ .Release.Name}}-redis-master",
-        "port": 6379
+        "port": 6379,
+        "redis-secret-name": "{{ .Release.Name}}-ctf-redis"
       },
       "cookieParser": {}
     }

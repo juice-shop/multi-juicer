@@ -4,7 +4,8 @@
   "redis": {
     "host": "juice-balancer-redis",
     "password": "myredispassword",
-    "port": 6379
+    "port": 6379,
+    "redis-secret-name": "juicy-ctf-redis"
   },
   "cookieParser": {
     "secret": "askdbakhdajhvdsjavjdsgv"

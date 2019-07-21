@@ -59,6 +59,29 @@ export const createDeploymentForTeam = ({ team }) =>
                 periodSeconds: 15,
               },
             },
+            {
+              name: 'progress-watchdog',
+              image: 'j12934/progress-watchdog',
+              env: [
+                {
+                  name: 'REDIS_PASSWORD',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'juicy-ctf-redis',
+                      key: 'redis-password',
+                    },
+                  },
+                },
+                {
+                  name: 'REDIS_HOST',
+                  value: get('redis.host'),
+                },
+                {
+                  name: 'REDIS_PORT',
+                  value: `${get('redis.port')}`,
+                },
+              ],
+            },
           ],
         },
       },
