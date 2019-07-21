@@ -12,6 +12,9 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/juice-balancer-config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/juice-balancer-secret.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: 'juice-balancer'
         app.kubernetes.io/instance: {{ .Release.Name }}
