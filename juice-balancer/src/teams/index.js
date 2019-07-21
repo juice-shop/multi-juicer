@@ -15,6 +15,7 @@ import {
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
 } from '../kubernetes/kubernetes';
+import { logger } from '../logger';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -27,12 +28,12 @@ async function checkIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
-  console.info(`Checking if team ${team} already has a JuiceShop Deployment`);
+  logger.info(`Checking if team ${team} already has a JuiceShop Deployment`);
 
   try {
     await getJuiceShopInstanceForTeamname(team);
 
-    console.log(`Team ${team} already has a JuiceShop deployment`);
+    logger.info(`Team ${team} already has a JuiceShop deployment`);
 
     const passcodeHash = await redis.get(`t-${team}-passcode`);
 
@@ -52,11 +53,11 @@ async function checkIfTeamAlreadyExists(req, res, next) {
     });
   } catch (error) {
     if (error.response.body.message === `deployments.apps "t-${team}-juiceshop" not found`) {
-      console.log(`Team ${team} doesn't have a JuiceShop deployment yet`);
+      logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
       return next();
     } else {
-      console.error('Encountered unkown error while checking for existing JuiceShop deployment');
-      console.error(error);
+      logger.error('Encountered unkown error while checking for existing JuiceShop deployment');
+      logger.error(error);
       return res.status(500).send(`Unkown error code: "${error.body.message}"`);
     }
   }
@@ -76,12 +77,12 @@ async function createTeam(req, res) {
     await redis.set(`t-${team}-passcode`, hash);
     await redis.set(`t-${team}-last-request`, new Date().getDate());
 
-    console.info(`Creating JuiceShop Deployment for team "${team}"`);
+    logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
     await createDeploymentForTeam({ team, passcode });
     await createServiceForTeam(team);
 
-    console.log(`Created JuiceShop Deployment for team "${team}"`);
+    logger.info(`Created JuiceShop Deployment for team "${team}"`);
 
     res
       .cookie('balancer', `t-${team}`, {
@@ -94,7 +95,8 @@ async function createTeam(req, res) {
         passcode,
       });
   } catch (error) {
-    console.error(error);
+    logger.error(`Error while creating deployment or service for team ${team}`);
+    logger.error(error);
     res.status(500).send();
   }
 }
@@ -106,7 +108,7 @@ async function createTeam(req, res) {
 async function awaitReadyness(req, res) {
   const { team } = req.params;
 
-  console.log(`Awaiting readyness of JuiceShop Deployment for team "${team}"`);
+  logger.info(`Awaiting readyness of JuiceShop Deployment for team "${team}"`);
 
   try {
     for (let i = 0; i < 180; i++) {
@@ -114,17 +116,19 @@ async function awaitReadyness(req, res) {
       const { readyReplicas } = body.status;
 
       if (readyReplicas === 1) {
+        logger.info(`JuiceShop Deployment for team "${team} ready"`);
+
         return res.status(200).send();
       }
 
       await sleep(1000);
     }
 
-    console.error(`Waiting for deployment of team "${team}" timed out`);
+    logger.error(`Waiting for deployment of team "${team}" timed out`);
     res.status(500);
   } catch (error) {
-    console.error(`Failed to wait for teams "${team}" deployment to get ready`);
-    console.error(error);
+    logger.error(`Failed to wait for teams "${team}" deployment to get ready`);
+    logger.error(error);
     res.status(500);
   }
 }

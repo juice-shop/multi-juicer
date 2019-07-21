@@ -5,6 +5,7 @@ const proxy = httpProxy.createProxyServer();
 
 import redis from '../redis';
 import { get } from '../config';
+import { logger } from '../logger';
 
 const router = express.Router();
 
@@ -51,6 +52,7 @@ async function updateLastConnectTimestamp(req, res, next) {
  */
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.signedCookies['balancer'];
+  logger.debug(`Proxing request ${req.method.toLocaleUpperCase()} ${req.path}`);
 
   proxy.web(
     req,
@@ -59,8 +61,14 @@ function proxyTrafficToJuiceShop(req, res) {
       target: `http://${teamname}-juiceshop.${get('namespace')}.svc:3000`,
       ws: true,
     },
-    () => {
-      console.error(`PROXY_FAIL: ${req.method.toLocaleUpperCase()} ${req.path}`);
+    error => {
+      logger.warn(`Proxy fail "${error.code}" for: ${req.method.toLocaleUpperCase()} ${req.path}`);
+
+      if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
+        logger.error(error);
+      } else {
+        logger.debug(error);
+      }
     }
   );
 }
