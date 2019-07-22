@@ -20,7 +20,10 @@ export const InstanceStatusCard = ({ teamname }) => {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     axios
-      .get(`/balancer/teams/${teamname}/wait-till-ready`)
+      .get(`/balancer/teams/${teamname}/wait-till-ready`, {
+        // Wait at most 3 minutes before timing out
+        timeout: 3 * 60 * 1000,
+      })
       .then(() => {
         setReady(true);
       })
