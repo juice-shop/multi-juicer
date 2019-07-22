@@ -80,6 +80,10 @@ export const createDeploymentForTeam = ({ team }) =>
                   name: 'REDIS_PORT',
                   value: `${get('redis.port')}`,
                 },
+                {
+                  name: 'TEAMNAME',
+                  value: team,
+                },
               ],
             },
           ],
