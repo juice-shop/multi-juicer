@@ -24,7 +24,7 @@
     "extends": "react-app"
   },
   "homepage": "/balancer/",
-  "proxy": "https://juice-balancer-jannik-test.cloudapps.iterashift.com",
+  "proxy": "https://juicy-ctf.cloudapps.iterashift.com",
   "browserslist": {
     "production": [
       ">0.2%",
