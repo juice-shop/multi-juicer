@@ -65,9 +65,9 @@ function proxyTrafficToJuiceShop(req, res) {
       logger.warn(`Proxy fail "${error.code}" for: ${req.method.toLocaleUpperCase()} ${req.path}`);
 
       if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
-        logger.error(error);
+        logger.error(error.message);
       } else {
-        logger.debug(error);
+        logger.debug(error.message);
       }
     }
   );
