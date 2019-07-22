@@ -36,9 +36,7 @@ export const JoiningPage = withRouter(({ history, match }) => {
         <H2>Joining Team {team}</H2>
 
         {failed ? (
-          <strong>
-            Failed to join the team. Are you sure the passcode is correct?
-          </strong>
+          <strong>Failed to join the team. Are you sure the passcode is correct?</strong>
         ) : null}
 
         <Form onSubmit={onSubmit}>
@@ -47,6 +45,8 @@ export const JoiningPage = withRouter(({ history, match }) => {
             type="password"
             id="passcode"
             name="passcode"
+            minLength="8"
+            maxLength="8"
             value={passcode}
             onChange={({ target }) => setPasscode(target.value)}
           />

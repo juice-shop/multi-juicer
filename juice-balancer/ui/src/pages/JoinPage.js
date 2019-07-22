@@ -12,16 +12,9 @@ export const JoinPage = withRouter(({ history }) => {
 
   async function sendJoinRequest() {
     try {
-      const { data } = await axios.post(
-        `/balancer/teams/${teamname}/join`,
-        {
-          passcode,
-        },
-        {
-          // Wait at most 3 minutes before timing out
-          timeout: 3 * 60 * 1000,
-        }
-      );
+      const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
+        passcode,
+      });
 
       console.log('got data back');
       console.log(data);
@@ -51,12 +44,11 @@ export const JoinPage = withRouter(({ history }) => {
       <BodyCard>
         <H2>Getting Started</H2>
         <p>
-          Chose a <strong>teamname</strong> so that we will be able to recognise
-          you back.
+          Chose a <strong>teamname</strong> so that we will be able to recognise you back.
         </p>
         <p>
-          If you want to <strong>team up</strong> with other people you can join
-          up under the same teamname.
+          If you want to <strong>team up</strong> with other people you can join up under the same
+          teamname.
         </p>
 
         {failed ? <strong>Failed to join the team</strong> : null}
@@ -68,6 +60,9 @@ export const JoinPage = withRouter(({ history }) => {
             id="teamname"
             name="teamname"
             value={teamname}
+            title="Teamnames must consist of lowercase letter, number or '-'"
+            pattern="^[a-z0-9]([-a-z0-9])+[a-z0-9]$"
+            maxLength="16"
             onChange={({ target }) => setTeamname(target.value)}
           />
           <Button type="submit">Create / Join Team</Button>
