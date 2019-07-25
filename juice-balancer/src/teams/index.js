@@ -68,9 +68,8 @@ async function checkIfTeamAlreadyExists(req, res, next) {
  * @param {import("express").Response} res
  */
 async function createTeam(req, res) {
+  const { team } = req.params;
   try {
-    const { team } = req.params;
-
     const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
     const hash = await bcrypt.hash(passcode, 12);
 
