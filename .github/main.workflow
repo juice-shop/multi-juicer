@@ -1,12 +1,12 @@
-workflow "Build docker image" {
+workflow "Build docker images" {
   resolves = [
-    "Build Cleaner",
-    "Build Balancer",
+    "Build'n Push Balancer",
+    "Build'n Push Cleaner",
   ]
   on = "push"
 }
 
-action "Build Balancer" {
+action "Build'n Push Balancer" {
   uses = "pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9"
   secrets = ["DOCKER_PASSWORD", "DOCKER_USERNAME"]
   env = {
@@ -17,7 +17,7 @@ action "Build Balancer" {
   args = "./juice-balancer/"
 }
 
-action "Build Cleaner" {
+action "Build'n Push Cleaner" {
   uses = "pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9"
   secrets = ["DOCKER_PASSWORD", "DOCKER_USERNAME"]
   env = {
