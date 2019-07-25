@@ -33,11 +33,13 @@ export const PasscodeDisplayCard = ({ passcode = '' }) => {
       <CenteredContent>
         <div>
           <Label>Passcode</Label>
-          {passcode.split('').map((char, index) => (
-            <CharDisplay addOffset={index === 4} key={index}>
-              {char}
-            </CharDisplay>
-          ))}
+          <span data-test-id="passcode-display">
+            {passcode.split('').map((char, index) => (
+              <CharDisplay addOffset={index === 4} key={index}>
+                {char}
+              </CharDisplay>
+            ))}
+          </span>
         </div>
       </CenteredContent>
     </BodyCard>

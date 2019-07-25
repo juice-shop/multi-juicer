@@ -58,6 +58,7 @@ export const JoinPage = withRouter(({ history }) => {
           <Input
             type="text"
             id="teamname"
+            data-test-id="teamname-input"
             name="teamname"
             value={teamname}
             title="Teamnames must consist of lowercase letter, number or '-'"
@@ -65,7 +66,9 @@ export const JoinPage = withRouter(({ history }) => {
             maxLength="16"
             onChange={({ target }) => setTeamname(target.value)}
           />
-          <Button type="submit">Create / Join Team</Button>
+          <Button data-test-id="create-join-team-button" type="submit">
+            Create / Join Team
+          </Button>
         </Form>
       </BodyCard>
     </Layout>

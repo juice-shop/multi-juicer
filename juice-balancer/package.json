@@ -11,6 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "proxy": "https://juicy-ctf.cloudapps.iterashift.com/",
   "dependencies": {
     "@hapi/joi": "^15.1.0",
     "@kubernetes/client-node": "^0.10.0",

@@ -45,12 +45,15 @@ export const JoiningPage = withRouter(({ history, match }) => {
             type="password"
             id="passcode"
             name="passcode"
+            data-test-id="passcode-input"
             minLength="8"
             maxLength="8"
             value={passcode}
             onChange={({ target }) => setPasscode(target.value)}
           />
-          <Button type="submit">Join Team</Button>
+          <Button data-test-id="join-team-button" type="submit">
+            Join Team
+          </Button>
         </Form>
       </BodyCard>
     </Layout>

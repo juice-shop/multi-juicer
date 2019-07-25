@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { BodyCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
 
+const LinkButton = Button.withComponent('a');
+
 const CenteredText = styled.span`
   text-align: center;
   display: block;
@@ -39,22 +41,18 @@ export const InstanceStatusCard = ({ teamname }) => {
           <span role="img" aria-label="Done">
             ✅
           </span>{' '}
-          Juice Shop Instance ready
+          <span data-test-id="instance-status">Juice Shop Instance ready</span>
         </CenteredText>
-        <Button
-          onClick={() => {
-            window.location = '/';
-          }}
-        >
+        <LinkButton data-test-id="start-hacking-button" href="/">
           Start Hacking
-        </Button>
+        </LinkButton>
       </BodyCard>
     );
   } else {
     return (
       <CenteredCard>
         <Spinner />
-        <span>Starting a new Juice Shop Instance</span>
+        <span data-test-id="instance-status">Starting a new Juice Shop Instance</span>
       </CenteredCard>
     );
   }

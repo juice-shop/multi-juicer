@@ -49,6 +49,8 @@ export const Button = styled.button`
   border: none;
   margin-top: 12px;
   cursor: pointer;
+  text-align: center;
+  text-decoration: none;
 `;
 
 export const SecondaryButton = styled(Button)`
