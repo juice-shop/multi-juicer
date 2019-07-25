@@ -24,11 +24,10 @@ export const PasscodeDisplayCard = ({ passcode = '' }) => {
     <BodyCard>
       <H2>Team Created</H2>
       <p>
-        To make sure not anyone can just join your team, we created a{' '}
-        <strong>shared passcode</strong> for your team. If your teammates want
-        to access the same instance they are required to enter the passcode
-        first. You can <strong>copy the passcode</strong> from the display
-        below.
+        To make sure not just anyone can join your team, we created a{' '}
+        <strong>shared passcode</strong> for your team. If your teammates want to access the same
+        instance they are required to enter the passcode first. You can{' '}
+        <strong>copy the passcode</strong> from the display below.
       </p>
 
       <CenteredContent>
