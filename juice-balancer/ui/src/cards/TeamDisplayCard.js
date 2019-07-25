@@ -7,6 +7,10 @@ const TeamDisplayCardWrapper = styled(BodyCard)`
   display: flex;
   padding: 16px 32px;
   align-items: center;
+
+  @media (max-width: 1280px) {
+    padding: 12px 16px;
+  }
 `;
 
 const AstronautIcon = styled.img`

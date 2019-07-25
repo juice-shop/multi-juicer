@@ -7,10 +7,15 @@ import { Card, H1 } from './Components';
 
 const Header = styled.div`
   background-color: #cf3a23;
-  height: 128px;
+  min-height: 128px;
   display: flex;
   justify-content: center;
   position: relative;
+  margin-bottom: 64px;
+
+  @media (max-width: 1280px) {
+    min-height: 64px;
+  }
 `;
 
 const Logo = styled.img`
@@ -26,12 +31,16 @@ const HeaderCard = styled(Card)`
   padding: 36px 0;
   height: 96px;
   width: 50vw;
-  min-width: 500px;
   position: absolute;
   bottom: -48px;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 640px) {
+    min-width: 80vw;
+    min-width: 344px;
+  }
 `;
 
 const GlobalStyles = createGlobalStyle`
@@ -44,6 +53,7 @@ const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background-color: #f9fbfc;
   }
 `;
 
@@ -56,7 +66,6 @@ const Wrapper = styled.div`
 
 const Body = styled.div`
   flex-grow: 1;
-  background-color: #f9fbfc;
   display: flex;
   flex-direction: column;
   align-items: center;

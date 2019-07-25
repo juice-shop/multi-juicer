@@ -51,6 +51,10 @@ export const Button = styled.button`
   cursor: pointer;
   text-align: center;
   text-decoration: none;
+
+  @media (max-width: 640px) {
+    padding: 8px 12px;
+  }
 `;
 
 export const SecondaryButton = styled(Button)`
@@ -72,4 +76,14 @@ export const BodyCard = styled(Card)`
   min-width: 400px;
   max-width: 650px;
   margin-bottom: 32px;
+
+  @media (max-width: 1280px) {
+    min-width: 328px;
+  }
+
+  @media (min-width: 1280px) {
+    width: 45vw;
+    margin: 8px 0;
+    padding: 24px;
+  }
 `;
