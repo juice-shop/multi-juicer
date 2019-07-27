@@ -21,6 +21,18 @@ function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
   return next();
 }
 
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+function redirectAdminTrafficToBalancerPage(req, res, next) {
+  if (req.signedCookies[get('cookieParser.cookieName')] === `t-${get('admin.username')}`) {
+    return res.redirect('/balancer/');
+  }
+  return next();
+}
+
 const connectionCache = new Map();
 
 /**
@@ -75,6 +87,7 @@ function proxyTrafficToJuiceShop(req, res) {
 
 router.use(
   redirectJuiceShopTrafficWithoutBalancerCookies,
+  redirectAdminTrafficToBalancerPage,
   updateLastConnectTimestamp,
   proxyTrafficToJuiceShop
 );
