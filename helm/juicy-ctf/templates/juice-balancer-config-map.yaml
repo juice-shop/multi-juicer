@@ -14,5 +14,10 @@ data:
         "port": 6379,
         "redis-secret-name": "{{ .Release.Name}}-ctf-redis"
       },
-      "cookieParser": {}
+      "cookieParser": {
+        "cookieName": "balancer"
+      },
+      "admin": {
+        "username": "admin"
+      }
     }

@@ -46,6 +46,11 @@ spec:
                 secretKeyRef:
                   name: juice-balancer-secret
                   key: cookieParserSecret
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: juice-balancer-secret
+                  key: adminPassword
           volumeMounts:
             - name: config-volume
               mountPath: /home/app/config/

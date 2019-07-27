@@ -5,12 +5,29 @@ const router = express.Router();
 import { getJuiceShopInstances } from '../kubernetes/kubernetes';
 
 import redis from '../redis';
+import { get } from '../config';
+import { logger } from '../logger';
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+function ensureAdminLogin(req, res, next) {
+  logger.debug('Running admin check');
+  if (req.signedCookies[get('cookieParser.cookieName')] === `t-${get('admin.username')}`) {
+    logger.debug('Admin check succeded');
+    return next();
+  }
+  return res.status(401).send();
+}
 
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
 async function listInstances(req, res) {
+  logger.debug('Running list all');
   const {
     body: { items: instances },
   } = await getJuiceShopInstances();
@@ -38,5 +55,6 @@ async function listInstances(req, res) {
   });
 }
 
+router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
 export default router;

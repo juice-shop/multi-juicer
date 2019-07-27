@@ -7,7 +7,12 @@
     "port": 6379,
     "redis-secret-name": "juicy-ctf-redis"
   },
+  "admin": {
+    "username": "admin",
+    "password": "sooperDooperPassword"
+  },
   "cookieParser": {
+    "cookieName": "balancer",
     "secret": "askdbakhdajhvdsjavjdsgv"
   }
 }

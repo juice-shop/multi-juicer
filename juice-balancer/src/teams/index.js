@@ -16,8 +16,42 @@ import {
   getJuiceShopInstanceForTeamname,
 } from '../kubernetes/kubernetes';
 import { logger } from '../logger';
+import { get } from '../config';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+async function interceptAdminLogin(req, res, next) {
+  const { team } = req.params;
+  const { passcode } = req.body;
+
+  logger.debug(
+    `Checking if team "${team}:${passcode}" is the admin "${get('admin.username')}:${get(
+      'admin.password'
+    )}"`
+  );
+
+  if (team === get('admin.username') && passcode === get('admin.password')) {
+    return res
+      .cookie(get('cookieParser.cookieName'), `t-${team}`, {
+        signed: true,
+        httpOnly: true,
+      })
+      .json({
+        message: 'Signed in as admin',
+      });
+  } else if (team === get('admin.username')) {
+    return res.status(401).json({
+      message: 'Team requires authentication to join',
+    });
+  }
+
+  return next();
+}
 
 /**
  * @param {import("express").Request} req
@@ -40,7 +74,7 @@ async function checkIfTeamAlreadyExists(req, res, next) {
     if (passcode !== undefined && (await bcrypt.compare(passcode, passcodeHash))) {
       // Set cookie, (join team)
       return res
-        .cookie('balancer', `t-${team}`, {
+        .cookie(get('cookieParser.cookieName'), `t-${team}`, {
           signed: true,
           httpOnly: true,
         })
@@ -84,7 +118,7 @@ async function createTeam(req, res) {
     logger.info(`Created JuiceShop Deployment for team "${team}"`);
 
     res
-      .cookie('balancer', `t-${team}`, {
+      .cookie(get('cookieParser.cookieName'), `t-${team}`, {
         signed: true,
         httpOnly: true,
       })
@@ -150,6 +184,7 @@ router.post(
   '/:team/join',
   validator.params(paramsSchema),
   validator.body(bodySchema),
+  interceptAdminLogin,
   checkIfTeamAlreadyExists,
   createTeam
 );
