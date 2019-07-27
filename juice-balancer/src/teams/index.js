@@ -108,7 +108,7 @@ async function createTeam(req, res) {
     const hash = await bcrypt.hash(passcode, 12);
 
     await redis.set(`t-${team}-passcode`, hash);
-    await redis.set(`t-${team}-last-request`, new Date().getDate());
+    await redis.set(`t-${team}-last-request`, new Date().getTime());
 
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
