@@ -2,7 +2,12 @@
 
 Running CTFs and Security Trainings with OWASP Juice Shop is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time. Instructing everybody how to start their own Juice Shop on their own machine works ok, but takes away too much valuable time.
 
-JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster. JuicyCTF runs on kubernetes, dynamically creates new Juice Shop instances when they are required and cleans up old instances which haven't been used recently.
+JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster, giving you the tools to run events without the need for local Juice Shop instances.
+
+    - dynamically create new Juice Shop instances when needed
+    - runs on a single domain, comes with a loadbalancer sending the traffic to the participants Juice Shop instance
+    - backup and autoapply challenge progress in case of Juice Shop container restarts
+    - cleanup unused instances
 
 ![Juicy CTF, High Level Achitecture Diagramm](./high-level-achitecture.svg)
 
