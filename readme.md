@@ -1,6 +1,8 @@
 ![Juicy CTF, Multi User Juice Shop Plattform](./cover.svg)
 
-Running CTFs or Security Trainings with OWASP Juice Shop by creating a seperate Juice Shop instance for every participant / team. Juicy CTF mainly consists of a custom load balancer (dubbed "JuiceBalancer"), which identifies the user by a cookie and sending their traffic further along to the correct Juice Shop instance. If a user registers newly the JuiceBalancer will spin up a new Juice Shop Instance using the kubernetes api.
+Running CTFs and Security Trainings with OWASP Juice Shop is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time. Instructing everybody how to start their own Juice Shop on their own machine works ok, but takes away too much valuable time.
+
+JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster. JuicyCTF runs on kubernetes, dynamically creates new Juice Shop instances when they are required and cleans up old instances which haven't been used recently.
 
 ![Juicy CTF, High Level Achitecture Diagramm](./high-level-achitecture.svg)
 
@@ -22,7 +24,7 @@ kubectl delete deployment --selector app=juice-shop && kubectl delete service --
 
 ### Why a custom LoadBalancer?
 
-There are some special requirements which we didn't find to be easily solved with any prebuild load balancer:
+There are some special requirements which we didn't find to be easily solved with any pre build load balancer:
 
 - Restricting the number of users for a deployment to only the members of a certain team.
 - The load balancers cookie must be save and not easy to spoof to access another instance.
@@ -30,14 +32,14 @@ There are some special requirements which we didn't find to be easily solved wit
 
 If you have awesome ideas on how to overcome these issues without a custom load balancer, please write us, we'd love to hear from you!
 
-### Why a seperate kubernetes deployment for every team?
+### Why a separate kubernetes deployment for every team?
 
 There are some pretty good reasons for this:
 
-- The ability delete the instances of a team separatly. Scaling down safely, without removing instances of active teams, is really tricky with a scaled deployment. You can only choose the desired scale not which pods to keep and which to throw away.
+- The ability delete the instances of a team separately. Scaling down safely, without removing instances of active teams, is really tricky with a scaled deployment. You can only choose the desired scale not which pods to keep and which to throw away.
 - To ensure that pods are still properly associated with teams after a pod gets recreated. This is a non problem with separate deployment and really hard with scaled deployments.
-- The ability to embed the teamname in the deployment name. This seems like a stupid reason but make debugging SOOO much easier, with just using `kubectl`.
+- The ability to embed the team name in the deployment name. This seems like a stupid reason but make debugging SOOO much easier, with just using `kubectl`.
 
-### Did somebody acutally ask any of these questions?
+### Did somebody actually ask any of these questions?
 
 No 😉
