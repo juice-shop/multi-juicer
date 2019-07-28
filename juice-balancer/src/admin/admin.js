@@ -49,7 +49,7 @@ async function listInstances(req, res) {
         name: instance.metadata.name,
         ready: instance.status.availableReplicas === 1,
         createdAt: instance.metadata.creationTimestamp.getTime(),
-        lastConnect: timeStampsAsMap.get(team),
+        lastConnect: parseInt(timeStampsAsMap.get(team), 10),
       };
     }),
   });
