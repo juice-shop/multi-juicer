@@ -4,19 +4,25 @@ import axios from 'axios';
 
 import { Layout } from '../Layout';
 
+function fetchAdminData() {
+  return axios.get(`/balancer/admin/all`).then(({ data }) => {
+    return data;
+  });
+}
+
 export const AdminPage = withRouter(() => {
-  let [teams, setTeams] = useState([]);
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`/balancer/admin/all`)
-      .then(({ data }) => {
-        setTeams(data.instances);
-      })
-      .catch(() => {
-        console.error('Failed to fetch current teams');
-      });
-  });
+    const interval = setInterval(async () => {
+      const { instances } = await fetchAdminData();
+      setTeams(instances);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <Layout>
