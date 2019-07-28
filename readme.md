@@ -15,15 +15,22 @@ What it does:
 
 ## Installation
 
+To install JuicyCTF you'll need [helm](https://helm.sh).
+
+If you aren't familiar with helm, try out the helm 3 alpha.
+It's easier to install and use, as it doesn't require am installation on the kubernetes cluster to work.
+
 ```sh
-helm install ...
+git clone git@github.com:J12934/juicy-ctf.git
+# The first juicy-ctf part is the release name, safe to change to whatever you like.
+helm install juicy-ctf ./helm/juicy-ctf/
 ```
 
 ### Deinstallation
 
 ```sh
-helm delete ...
-# Also delete all Juice Shop Deployments
+helm delete juicy-ctf
+# Also delete all Juice Shop Deployments which still exist
 kubectl delete deployment --selector app=juice-shop && kubectl delete service --selector app=juice-shop
 ```
 
