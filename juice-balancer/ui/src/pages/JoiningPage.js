@@ -12,10 +12,14 @@ export const JoiningPage = withRouter(({ history, match }) => {
 
   async function sendJoinRequest() {
     try {
-      await axios.post(`/balancer/teams/${team}/join`, {
+      const res = await axios.post(`/balancer/teams/${team}/join`, {
         passcode,
       });
 
+      if (res.data.message === 'Signed in as admin') {
+        history.push(`/admin`);
+        return;
+      }
       history.push(`/teams/${team}/joined/`);
     } catch (error) {
       console.error('Unkown error while trying to join a team!');
