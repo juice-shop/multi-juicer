@@ -1,10 +1,10 @@
-FROM node:10-alpine as build
+FROM node:12-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
 RUN npm ci --production
 
-FROM node:10-alpine as ui
+FROM node:12-alpine as ui
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
@@ -12,7 +12,7 @@ RUN npm ci
 COPY ui/ ./
 RUN npm run build
 
-FROM node:10-alpine
+FROM node:12-alpine
 RUN addgroup -S app && adduser app -S -G app
 WORKDIR /home/app/
 COPY --chown=app:app ./config config/
