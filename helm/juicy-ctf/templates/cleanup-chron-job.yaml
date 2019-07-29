@@ -5,6 +5,8 @@ metadata:
   name: 'cleanup-job'
 spec:
   schedule: {{ .Values.juiceShopCleanup.cron }}
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
   jobTemplate:
     spec:
       template:
