@@ -1,6 +1,7 @@
 ![Juicy CTF, Multi User Juice Shop Plattform](./cover.svg)
 
-Running CTFs and Security Trainings with OWASP Juice Shop is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time. Instructing everybody how to start their own Juice Shop on their own machine works ok, but takes away too much valuable time.
+Running CTFs and Security Trainings with OWASP Juice Shop is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
+Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
 JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster, giving you the tools to run events without the need for local Juice Shop instances.
 
