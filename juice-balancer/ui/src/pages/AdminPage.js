@@ -4,20 +4,19 @@ import axios from 'axios';
 
 import { Layout } from '../Layout';
 
-function fetchAdminData() {
-  return axios.get(`/balancer/admin/all`).then(({ data }) => {
-    return data;
-  });
-}
-
 export const AdminPage = withRouter(() => {
   const [teams, setTeams] = useState([]);
 
+  function updateAdminData() {
+    return axios.get(`/balancer/admin/all`).then(({ data }) => {
+      setTeams(data.instances);
+    });
+  }
+
   useEffect(() => {
-    const interval = setInterval(async () => {
-      const { instances } = await fetchAdminData();
-      setTeams(instances);
-    }, 5000);
+    updateAdminData();
+
+    const interval = setInterval(updateAdminData, 5000);
 
     return () => {
       clearInterval(interval);
