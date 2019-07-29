@@ -1,5 +1,8 @@
 # Example Setup with digital ocean
 
+WARNING the Ressources created in this guid will cost about \$45.00/month.
+Make sure to delete the ressoruces as described in Step 5 Deinstallation when you do not need them anymore.
+
 ## Prerequisites
 
 This example expects you to have the following cli tools setup.
@@ -28,10 +31,11 @@ git clone git@github.com:J12934/juicy-ctf.git
 cd juicy-ctf/helm/juicy-ctf
 
 # First we'll need to fetch the charts JuicyCTF depends on
-helm dependency update ./
+helm dependency update ./juicy-ctf/helm/juicy-ctf/
 
 # Now we can install the helm chart
-helm install juicy-ctf ./
+# The first juicy-ctf part is the release name, safe to change to whatever you like, but the exmaples in the guide are written for 'juicy-ctf'
+helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -65,4 +69,39 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 
 ## Step 4. Add a LoadBalancer to expose the app to the world
 
-TODO
+DigitalOcean lets you create a DigitalOcean Loadbalancer to expose your kubernetesdeployment without having to setup the whole kubernetes ingress stuff. This makes it especially easy if you also manage your domains in digitalocean as digitalocean will also be able to provide you with the tls certificates.
+
+```bash
+
+# Get you digitalocean cert id
+doctl compute certificate list
+
+# Will currently fail as the repo is private, just copy it from repo 🤷
+wget https://github.com/J12934/juicy-ctf/raw/master/example/digital-ocean/do-lb.yaml
+
+# Edit the cert id in do-lb.yaml to the cert id of your domain
+vim do-lb.yaml
+
+# Create the loadbalancer
+# This might take a couple of minutes
+kubectl create -f do-lb.yaml
+
+# If it takes longer than a few minutes take a detailed look at the laodbalancer
+kubectl describe services juicy-ctf-loadbalancer
+```
+
+## Step 5. Deinstallation
+
+```bash
+helm delete juicy-ctf
+# helm will not delete the persistent volumes for redis!
+# these cost $1.60/month ($0.10/GB/month)
+# delete them by running:
+kubectl delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
+
+# Delete the loadbalancer
+kubectl delete -f do-lb.yaml
+
+# Delete the kubernetes cluster
+doctl kubernetes cluster delete juicy-k8s
+```
