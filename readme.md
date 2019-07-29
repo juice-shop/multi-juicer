@@ -23,8 +23,13 @@ It's easier to install and use, as it doesn't require am installation on the kub
 
 ```sh
 git clone git@github.com:J12934/juicy-ctf.git
+
+# First we'll need to fetch the charts JuicyCTF depends on
+helm dependency update ./juicy-ctf/helm/juicy-ctf/
+
+# Now we can install the helm chart
 # The first juicy-ctf part is the release name, safe to change to whatever you like.
-helm install juicy-ctf ./helm/juicy-ctf/
+helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 ```
 
 ### Deinstallation
