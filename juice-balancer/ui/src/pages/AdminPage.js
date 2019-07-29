@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
+import DataTable from 'react-data-table-component';
+import neatime from 'neatime';
 
 import { Layout } from '../Layout';
+import { BodyCard } from '../Components';
 
-export const AdminPage = withRouter(() => {
+const BigBodyCard = styled(BodyCard)`
+  width: 60vw;
+  max-width: 850px;
+`;
+
+export default withRouter(() => {
   const [teams, setTeams] = useState([]);
 
   function updateAdminData() {
@@ -23,28 +32,44 @@ export const AdminPage = withRouter(() => {
     };
   }, []);
 
+  const columns = [
+    {
+      name: 'Teamname',
+      selector: 'team',
+      sortable: true,
+    },
+    {
+      name: 'Ready',
+      selector: 'ready',
+      sortable: true,
+      right: true,
+      format: ready => (ready ? '✅' : '❌'),
+    },
+    {
+      name: 'Created',
+      selector: 'createdAt',
+      sortable: true,
+      format: ({ createdAt }) => neatime(new Date(createdAt)),
+    },
+    {
+      name: 'Last Used',
+      selector: 'lastConnect',
+      sortable: true,
+      format: ({ lastConnect }) => neatime(new Date(lastConnect)),
+    },
+  ];
+
   return (
     <Layout>
-      <table>
-        <thead>
-          <td>Name</td>
-          <td>Ready</td>
-          <td>CreatedAt</td>
-          <td>LastConnect</td>
-        </thead>
-        <tbody>
-          {teams.map(team => {
-            return (
-              <tr key={team.name}>
-                <td>{team.name}</td>
-                <td>{team.ready ? '✅' : '❌'}</td>
-                <td>{new Date(team.createdAt).toLocaleString()}</td>
-                <td>{new Date(team.lastConnect).toLocaleString()}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <BigBodyCard>
+        <DataTable
+          title="Active Teams"
+          defaultSortField="lastConnect"
+          defaultSortAsc={false}
+          columns={columns}
+          data={teams}
+        />
+      </BigBodyCard>
     </Layout>
   );
 });
