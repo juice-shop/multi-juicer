@@ -28,7 +28,6 @@ kubectl config current-context
 ```bash
 # We'll need to clone this git repo for the moment, as the helm chart isnt pushed to any registry
 git clone git@github.com:J12934/juicy-ctf.git
-cd juicy-ctf/helm/juicy-ctf
 
 # First we'll need to fetch the charts JuicyCTF depends on
 helm dependency update ./juicy-ctf/helm/juicy-ctf/
@@ -76,15 +75,13 @@ DigitalOcean lets you create a DigitalOcean Loadbalancer to expose your kubernet
 # Get you digitalocean cert id
 doctl compute certificate list
 
-# Will currently fail as the repo is private, just copy it from repo 🤷
-wget https://github.com/J12934/juicy-ctf/raw/master/example/digital-ocean/do-lb.yaml
-
+# We got a example loadbalancer yaml for this example in the repository
 # Edit the cert id in do-lb.yaml to the cert id of your domain
-vim do-lb.yaml
+vim juicy-ctf/example/digital-ocean/do-lb.yaml
 
 # Create the loadbalancer
 # This might take a couple of minutes
-kubectl create -f do-lb.yaml
+kubectl create -f juicy-ctf/example/digital-ocean/do-lb.yaml
 
 # If it takes longer than a few minutes take a detailed look at the laodbalancer
 kubectl describe services juicy-ctf-loadbalancer
@@ -100,7 +97,7 @@ helm delete juicy-ctf
 kubectl delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
 
 # Delete the loadbalancer
-kubectl delete -f do-lb.yaml
+kubectl delete -f juicy-ctf/example/digital-ocean/do-lb.yaml
 
 # Delete the kubernetes cluster
 doctl kubernetes cluster delete juicy-k8s
