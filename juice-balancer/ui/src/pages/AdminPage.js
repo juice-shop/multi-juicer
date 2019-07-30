@@ -43,7 +43,7 @@ export default withRouter(() => {
       selector: 'ready',
       sortable: true,
       right: true,
-      format: ready => (ready ? '✅' : '❌'),
+      format: ({ ready }) => (ready ? '✅' : '❌'),
     },
     {
       name: 'Created',
