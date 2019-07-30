@@ -169,8 +169,8 @@ async function awaitReadyness(req, res) {
 const paramsSchema = Joi.object({
   team: Joi.string()
     .required()
-    .alphanum()
-    .max(16),
+    .max(16)
+    .regex(/^[a-z0-9]([-a-z0-9])+[a-z0-9]$/),
 });
 const bodySchema = Joi.object({
   passcode: Joi.string()
