@@ -23,10 +23,10 @@ redis:
 
 # Deletes unused JuiceShop instances after a configuable period of inactivity
 juiceShopCleanup:
-  repository: j12934/juice-balancer
+  repository: j12934/juice-cleaner
   tag: latest
   enabled: true
-  gracePeriod: 3d
+  gracePeriod: 1d
   # cron in which the clean up job is run
   # defaults to once in an hour
   # change this if your grace period if shorter than 1 hour
