@@ -1,23 +1,30 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
 import { Layout } from '../Layout';
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
+
+const messages = defineMessages({
+  teamnameValidationConstraints: {
+    id: 'teamname_validation_constraints',
+    defaultMessage: "Teamnames must consist of lowercase letter, number or '-'",
+  },
+});
 
 export const JoinPage = withRouter(({ history }) => {
   const [teamname, setTeamname] = useState('');
   const [failed, setFailed] = useState(false);
   const passcode = undefined;
 
+  const { formatMessage } = useIntl();
+
   async function sendJoinRequest() {
     try {
       const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
         passcode,
       });
-
-      console.log('got data back');
-      console.log(data);
 
       history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode });
     } catch (error) {
@@ -27,8 +34,6 @@ export const JoinPage = withRouter(({ history }) => {
       ) {
         history.push(`/teams/${teamname}/joining/`);
       } else {
-        console.error('Unkown error while trying to join a team!');
-        console.error(error);
         setFailed(true);
       }
     }
@@ -42,32 +47,45 @@ export const JoinPage = withRouter(({ history }) => {
   return (
     <Layout>
       <BodyCard>
-        <H2>Getting Started</H2>
-        <p>
-          Chose a <strong>teamname</strong> so that we will be able to recognise you back.
-        </p>
-        <p>
-          If you want to <strong>team up</strong> with other people you can join up under the same
-          teamname.
-        </p>
+        <H2>
+          <FormattedMessage id="getting_started" defaultMessage="Getting Started" />
+        </H2>
 
-        {failed ? <strong>Failed to join the team</strong> : null}
+        <FormattedMessage
+          id="getting_started_text"
+          defaultMessage={`
+            Chose a <strong>teamname</strong> so that we will be able to recognise you back.
+            If you want to <strong>team up</strong> with other people you can join up under the same teamname.
+          `}
+          values={{
+            strong: msg => <strong>{msg}</strong>,
+          }}
+        />
+
+        {failed ? (
+          <FormattedMessage
+            id="join_failed_text"
+            defaultMessage="Failed to create / join the team"
+          />
+        ) : null}
 
         <Form onSubmit={onSubmit}>
-          <Label htmlFor="teamname">Teamname</Label>
+          <Label htmlFor="teamname">
+            <FormattedMessage id="teamname" defaultMessage="Teamname" />
+          </Label>
           <Input
             type="text"
             id="teamname"
             data-test-id="teamname-input"
             name="teamname"
             value={teamname}
-            title="Teamnames must consist of lowercase letter, number or '-'"
+            title={formatMessage(messages.teamnameValidationConstraints)}
             pattern="^[a-z0-9]([-a-z0-9])+[a-z0-9]$"
             maxLength="16"
             onChange={({ target }) => setTeamname(target.value)}
           />
           <Button data-test-id="create-join-team-button" type="submit">
-            Create / Join Team
+            <FormattedMessage id="create_or_join_team_label" defaultMessage="Create / Join Team" />
           </Button>
         </Form>
       </BodyCard>
