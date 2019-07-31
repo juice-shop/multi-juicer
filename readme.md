@@ -19,7 +19,7 @@ What it does:
 To install JuicyCTF you'll need [helm](https://helm.sh).
 
 If you aren't familiar with helm, try out the helm 3 alpha.
-It's easier to install and use, as it doesn't require am installation on the kubernetes cluster to work.
+It's easier to install and use, as it doesn't require an installation on the kubernetes cluster to work.
 
 ```sh
 git clone git@github.com:J12934/juicy-ctf.git
