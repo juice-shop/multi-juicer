@@ -33,7 +33,7 @@ it('can create a new team', () => {
   cy.contains('Welcome to OWASP Juice Shop');
 });
 
-it('can join a existing team', () => {
+it('can join an existing team', () => {
   cy.server();
   cy.route('/balancer/teams/*/wait-till-ready').as('awaitStartup');
 
@@ -75,4 +75,29 @@ it('can join a existing team', () => {
       cy.contains('Logged in as');
       cy.contains('team43');
     });
+});
+
+it('can login as admin', () => {
+  cy.server();
+
+  cy.visit('/balancer');
+
+  cy.contains('Juicy CTF');
+
+  cy.get('[data-test-id="teamname-input"]')
+    .type('admin')
+    .should('have.value', 'admin');
+
+  cy.get('[data-test-id="create-join-team-button"]').click();
+
+  cy.url().should('include', '/balancer/teams/admin/joining/');
+
+  cy.get('[data-test-id="passcode-input"]')
+    .type(Cypress.env('ADMIN_PASSWORD'))
+    .should('have.value', 'ADMIN_PASSWORD');
+  cy.get('[data-test-id="join-team-button"]').click();
+
+  cy.url().should('include', '/balancer/admin');
+
+  cy.contains('Active Teams');
 });
