@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { withRouter } from 'react-router-dom';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
-import neatime from 'neatime';
+import { FormattedRelative, defineMessages, injectIntl } from 'react-intl';
 
 import { Layout } from '../Layout';
 import { BodyCard } from '../Components';
@@ -13,8 +12,33 @@ const BigBodyCard = styled(BodyCard)`
   max-width: 850px;
 `;
 
-export default withRouter(() => {
+const messages = defineMessages({
+  tableHeader: {
+    id: 'admin_table.table_header',
+    defaultMessage: 'Active Teams',
+  },
+  teamname: {
+    id: 'admin_table.teamname',
+    defaultMessage: 'Teamname',
+  },
+  ready: {
+    id: 'admin_table.ready',
+    defaultMessage: 'Ready',
+  },
+  created: {
+    id: 'admin_table.created',
+    defaultMessage: 'Created',
+  },
+  lastUsed: {
+    id: 'admin_table.lastUsed',
+    defaultMessage: 'Last Used',
+  },
+});
+
+export default injectIntl(({ intl }) => {
   const [teams, setTeams] = useState([]);
+
+  const { formatMessage, formatDate } = intl;
 
   function updateAdminData() {
     return axios.get(`/balancer/admin/all`).then(({ data }) => {
@@ -34,28 +58,40 @@ export default withRouter(() => {
 
   const columns = [
     {
-      name: 'Teamname',
+      name: formatMessage(messages.teamname),
       selector: 'team',
       sortable: true,
     },
     {
-      name: 'Ready',
+      name: formatMessage(messages.ready),
       selector: 'ready',
       sortable: true,
       right: true,
       format: ({ ready }) => (ready ? '✅' : '❌'),
     },
     {
-      name: 'Created',
+      name: formatMessage(messages.created),
       selector: 'createdAt',
       sortable: true,
-      format: ({ createdAt }) => neatime(new Date(createdAt)),
+      format: ({ createdAt }) => {
+        return (
+          <span title={createdAt}>
+            <FormattedRelative value={createdAt} />
+          </span>
+        );
+      },
     },
     {
-      name: 'Last Used',
+      name: formatMessage(messages.lastUsed),
       selector: 'lastConnect',
       sortable: true,
-      format: ({ lastConnect }) => neatime(new Date(lastConnect)),
+      format: ({ lastConnect }) => {
+        return (
+          <span title={formatDate(lastConnect)}>
+            <FormattedRelative value={lastConnect} />
+          </span>
+        );
+      },
     },
   ];
 
@@ -63,7 +99,7 @@ export default withRouter(() => {
     <Layout>
       <BigBodyCard>
         <DataTable
-          title="Active Teams"
+          title={formatMessage(messages.tableHeader)}
           defaultSortField="lastConnect"
           defaultSortAsc={false}
           columns={columns}
