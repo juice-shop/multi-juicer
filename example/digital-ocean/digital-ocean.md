@@ -1,6 +1,6 @@
 # Example Setup with digital ocean
 
-WARNING the Ressources created in this guid will cost about \$45.00/month.
+**WARNING:** The Ressources created in this guid will cost about \$45.00/month.
 Make sure to delete the ressoruces as described in Step 5 Deinstallation when you do not need them anymore.
 
 ## Prerequisites
