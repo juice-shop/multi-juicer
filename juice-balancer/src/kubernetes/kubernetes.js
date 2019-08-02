@@ -124,5 +124,26 @@ export const getJuiceShopInstances = () =>
     'app=juice-shop'
   );
 
+export const deletePodForTeam = async team => {
+  const res = await k8sCoreApi.listNamespacedPod(
+    get('namespace'),
+    true,
+    undefined,
+    undefined,
+    undefined,
+    `team=${team}`
+  );
+
+  const pods = res.body.items;
+
+  if (pods.length !== 1) {
+    throw new Error(`Unexpected number of pods ${pods.length}`);
+  }
+
+  const podname = pods[0].metadata.name;
+
+  await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
+};
+
 export const getJuiceShopInstanceForTeamname = teamname =>
   k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, get('namespace'));

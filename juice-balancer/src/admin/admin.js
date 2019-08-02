@@ -2,7 +2,7 @@ import express from 'express';
 
 const router = express.Router();
 
-import { getJuiceShopInstances } from '../kubernetes/kubernetes';
+import { getJuiceShopInstances, deletePodForTeam } from '../kubernetes/kubernetes';
 
 import redis from '../redis';
 import { get } from '../config';
@@ -55,6 +55,25 @@ async function listInstances(req, res) {
   });
 }
 
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+async function restartInstance(req, res) {
+  try {
+    const teamname = req.params.team;
+    logger.info(`Deleting deployment for team: "${teamname}"`);
+
+    await deletePodForTeam(teamname);
+
+    res.send();
+  } catch (error) {
+    logger.error(error);
+    res.status(500).send();
+  }
+}
+
 router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
+router.post('/teams/:team/restart', restartInstance);
 export default router;
