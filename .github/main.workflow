@@ -2,6 +2,7 @@ workflow "Build docker images" {
   resolves = [
     "Build'n Push Balancer",
     "Build'n Push Cleaner",
+    "Build'n Push ProgressWatchDog",
   ]
   on = "push"
 }
@@ -24,4 +25,14 @@ action "Build'n Push Cleaner" {
     DOCKER_IMAGE_NAME = "juice-cleaner"
   }
   args = "./cleaner/"
+}
+
+action "Build'n Push ProgressWatchDog" {
+  uses = "pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9"
+  secrets = ["DOCKER_PASSWORD", "DOCKER_USERNAME"]
+  env = {
+    DOCKER_NAMESPACE = "iteratec"
+    DOCKER_IMAGE_NAME = "juice-progress-watchdog"
+  }
+  args = "./progress-watchdog/"
 }
