@@ -2,7 +2,7 @@ imagePullPolicy: Always
 nodeSelector: {}
 
 balancer:
-  repository: j12934/juice-balancer
+  repository: iteratec/juice-balancer
   tag: latest
   replicas: 1
   resources:
@@ -23,7 +23,7 @@ redis:
 
 # Deletes unused JuiceShop instances after a configuable period of inactivity
 juiceShopCleanup:
-  repository: j12934/juice-cleaner
+  repository: iteratec/juice-cleaner
   tag: latest
   enabled: true
   gracePeriod: 1d

@@ -61,7 +61,7 @@ export const createDeploymentForTeam = ({ team }) =>
             },
             {
               name: 'progress-watchdog',
-              image: 'j12934/progress-watchdog',
+              image: 'iteratec/juice-progress-watchdog',
               env: [
                 {
                   name: 'REDIS_PASSWORD',
