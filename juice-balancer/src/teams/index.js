@@ -14,6 +14,7 @@ import {
   createDeploymentForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
+  getJuiceShopInstances,
 } from '../kubernetes/kubernetes';
 import { logger } from '../logger';
 import { get } from '../config';
@@ -94,6 +95,38 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       logger.error(error);
       return res.status(500).send(`Unkown error code: "${error.body.message}"`);
     }
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
+  const maxInstances = get('maxJuiceShopInstances');
+
+  // If max instances is set to negative numbers it's not capped
+  if (maxInstances < 0) {
+    logger.debug(`Skipping max instance check, max instances is set to "${maxInstances}"`);
+    return next();
+  }
+
+  try {
+    const response = await getJuiceShopInstances();
+
+    const instances = response.body.items;
+
+    logger.info(`Reached ${instances.length}/${maxInstances} instances`);
+    if (instances.length >= maxInstances) {
+      logger.error('Max instance count reached');
+      return res.status(500).send('Reached Maximum Instance Count. Find a Admin to handle this.');
+    }
+    next();
+  } catch (error) {
+    logger.error('Failed to check max instances');
+    logger.error(error.message);
+    next();
   }
 }
 
@@ -186,6 +219,7 @@ router.post(
   validator.body(bodySchema),
   interceptAdminLogin,
   checkIfTeamAlreadyExists,
+  checkIfMaxJuiceShopInstancesIsReached,
   createTeam
 );
 

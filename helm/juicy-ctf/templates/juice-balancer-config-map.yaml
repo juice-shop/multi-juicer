@@ -9,6 +9,8 @@ data:
     {
       "port": 3000,
       "namespace": {{ .Release.Namespace | quote }},
+      "deploymentContext": {{ .Release.Name | quote }},
+      "maxJuiceShopInstances": {{ .Values.juiceShop.maxInstances}},
       "redis": {
         "host": "{{ .Release.Name}}-redis-master",
         "port": 6379,

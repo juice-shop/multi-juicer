@@ -14,6 +14,7 @@ export const createDeploymentForTeam = ({ team }) =>
       labels: {
         app: 'juice-shop',
         team,
+        'deployment-context': get('deploymentContext'),
       },
     },
     spec: {
@@ -21,6 +22,7 @@ export const createDeploymentForTeam = ({ team }) =>
         matchLabels: {
           app: 'juice-shop',
           team,
+          'deployment-context': get('deploymentContext'),
         },
       },
       template: {
@@ -28,6 +30,7 @@ export const createDeploymentForTeam = ({ team }) =>
           labels: {
             app: 'juice-shop',
             team,
+            'deployment-context': get('deploymentContext'),
           },
         },
         spec: {
@@ -99,12 +102,14 @@ export const createServiceForTeam = teamname =>
       labels: {
         app: 'juice-shop',
         team: teamname,
+        'deployment-context': get('deploymentContext'),
       },
     },
     spec: {
       selector: {
         app: 'juice-shop',
         team: teamname,
+        'deployment-context': get('deploymentContext'),
       },
       ports: [
         {
@@ -115,14 +120,18 @@ export const createServiceForTeam = teamname =>
   });
 
 export const getJuiceShopInstances = () =>
-  k8sAppsApi.listNamespacedDeployment(
-    get('namespace'),
-    true,
-    undefined,
-    undefined,
-    undefined,
-    'app=juice-shop'
-  );
+  k8sAppsApi
+    .listNamespacedDeployment(
+      get('namespace'),
+      true,
+      undefined,
+      undefined,
+      undefined,
+      `app=juice-shop,deployment-context=${get('deploymentContext')}`
+    )
+    .catch(error => {
+      throw new Error(error.response.body.message);
+    });
 
 export const deletePodForTeam = async team => {
   const res = await k8sCoreApi.listNamespacedPod(
@@ -131,7 +140,7 @@ export const deletePodForTeam = async team => {
     undefined,
     undefined,
     undefined,
-    `team=${team}`
+    `app=juice-shop,team=${team},deployment-context=${get('deploymentContext')}`
   );
 
   const pods = res.body.items;
