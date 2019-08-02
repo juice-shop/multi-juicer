@@ -64,10 +64,14 @@ export const JoinPage = injectIntl(
           />
 
           {failed ? (
-            <FormattedMessage
-              id="join_failed_text"
-              defaultMessage="Failed to create / join the team"
-            />
+            <p>
+              <strong>
+                <FormattedMessage
+                  id="join_failed_text"
+                  defaultMessage="Failed to create / join the team"
+                />
+              </strong>
+            </p>
           ) : null}
 
           <Form onSubmit={onSubmit}>
