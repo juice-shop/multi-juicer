@@ -5,7 +5,11 @@ import DataTable from 'react-data-table-component';
 import { FormattedRelative, defineMessages, injectIntl } from 'react-intl';
 
 import { Layout } from '../Layout';
-import { BodyCard } from '../Components';
+import { BodyCard, SecondaryButton } from '../Components';
+
+const SmallSecondary = styled(SecondaryButton)`
+  padding: 8px;
+`;
 
 const BigBodyCard = styled(BodyCard)`
   width: 60vw;
@@ -33,7 +37,24 @@ const messages = defineMessages({
     id: 'admin_table.lastUsed',
     defaultMessage: 'Last Used',
   },
+  actions: {
+    id: 'admin_table.actions',
+    defaultMessage: 'Actions',
+  },
 });
+
+function RestartInstanceButton({ team }) {
+  const [restarting, setRestarting] = useState(false);
+
+  const restart = event => {
+    event.preventDefault();
+    setRestarting(true);
+    axios.post(`/balancer/admin/teams/${team}/restart`).finally(() => setRestarting(false));
+  };
+  return (
+    <SmallSecondary onClick={restart}>{restarting ? 'Restarting...' : 'Restart'}</SmallSecondary>
+  );
+}
 
 export default injectIntl(({ intl }) => {
   const [teams, setTeams] = useState([]);
@@ -92,6 +113,15 @@ export default injectIntl(({ intl }) => {
           </span>
         );
       },
+    },
+    {
+      name: formatMessage(messages.actions),
+      selector: 'actions',
+      cell: ({ team }) => {
+        return <RestartInstanceButton team={team} />;
+      },
+      ignoreRowClick: true,
+      button: true,
     },
   ];
 
