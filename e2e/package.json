@@ -8,8 +8,8 @@
     "cypress:run": "cypress run"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "iteratec GmbH",
+  "license": "Apache-2.0",
   "devDependencies": {
     "cypress": "^3.4.0"
   }

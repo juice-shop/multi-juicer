@@ -7,8 +7,8 @@
     "test": "jest",
     "lint": "eslint src/"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "iteratec GmbH",
+  "license": "Apache-2.0",
   "dependencies": {
     "@kubernetes/client-node": "^0.10.2",
     "esm": "^3.2.25",

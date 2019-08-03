@@ -9,8 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "iteratec GmbH",
+  "license": "Apache-2.0",
   "proxy": "https://juicy-ctf.cloudapps.iterashift.com/",
   "dependencies": {
     "@hapi/joi": "^15.1.0",
