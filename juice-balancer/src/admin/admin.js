@@ -1,12 +1,12 @@
-import express from 'express';
+const express = require('express');
 
 const router = express.Router();
 
-import { getJuiceShopInstances, deletePodForTeam } from '../kubernetes/kubernetes';
+const { getJuiceShopInstances, deletePodForTeam } = require('../kubernetes/kubernetes');
 
-import redis from '../redis';
-import { get } from '../config';
-import { logger } from '../logger';
+const redis = require('../redis');
+const { get } = require('../config');
+const { logger } = require('../logger');
 
 /**
  * @param {import("express").Request} req
@@ -76,4 +76,4 @@ async function restartInstance(req, res) {
 router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
 router.post('/teams/:team/restart', restartInstance);
-export default router;
+module.exports = router;

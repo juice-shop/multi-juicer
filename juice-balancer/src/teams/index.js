@@ -1,23 +1,23 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import cryptoRandomString from 'crypto-random-string';
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const cryptoRandomString = require('crypto-random-string');
 
-import Joi from '@hapi/joi';
-import expressJoiValidation from 'express-joi-validation';
+const Joi = require('@hapi/joi');
+const expressJoiValidation = require('express-joi-validation');
 
 const validator = expressJoiValidation.createValidator();
 
 const router = express.Router();
 
-import redis from '../redis';
-import {
+const redis = require('../redis');
+const {
   createDeploymentForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
-} from '../kubernetes/kubernetes';
-import { logger } from '../logger';
-import { get } from '../config';
+} = require('../kubernetes/kubernetes');
+const { logger } = require('../logger');
+const { get } = require('../config');
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -225,4 +225,4 @@ router.post(
 
 router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadyness);
 
-export default router;
+module.exports = router;

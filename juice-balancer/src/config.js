@@ -1,6 +1,6 @@
-import config from '../config/config.json';
-import { default as lodashGet } from 'lodash/get';
-import memoize from 'lodash/memoize';
+const config = require('../config/config.json');
+const lodashGet = require('lodash/get');
+const memoize = require('lodash/memoize');
 
 const fetchConfigValue = name => {
   const envVarName = name
@@ -11,4 +11,5 @@ const fetchConfigValue = name => {
   return process.env[envVarName] || lodashGet(config, name);
 };
 
-export const get = memoize(fetchConfigValue);
+const get = memoize(fetchConfigValue);
+module.exports.get = get;

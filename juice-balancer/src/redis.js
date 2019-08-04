@@ -1,6 +1,6 @@
-import Redis from 'ioredis';
-import { get } from './config';
-import { logger } from './logger';
+const Redis = require('ioredis');
+const { get } = require('./config');
+const { logger } = require('./logger');
 
 const redis = new Redis({
   host: get('redis.host'),
@@ -12,4 +12,4 @@ redis.on('error', error => {
   logger.error(`ioredis: ${error.message}`);
 });
 
-export default redis;
+module.exports = redis;

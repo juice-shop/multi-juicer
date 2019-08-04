@@ -1,13 +1,13 @@
-import { KubeConfig, AppsV1Api, CoreV1Api } from '@kubernetes/client-node';
+const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
-import { get } from '../config';
+const { get } = require('../config');
 
-export const createDeploymentForTeam = ({ team }) =>
+const createDeploymentForTeam = ({ team }) =>
   k8sAppsApi.createNamespacedDeployment(get('namespace'), {
     metadata: {
       name: `t-${team}-juiceshop`,
@@ -94,8 +94,9 @@ export const createDeploymentForTeam = ({ team }) =>
       },
     },
   });
+module.exports.createDeploymentForTeam = createDeploymentForTeam;
 
-export const createServiceForTeam = teamname =>
+const createServiceForTeam = teamname =>
   k8sCoreApi.createNamespacedService(get('namespace'), {
     metadata: {
       name: `t-${teamname}-juiceshop`,
@@ -118,8 +119,9 @@ export const createServiceForTeam = teamname =>
       ],
     },
   });
+module.exports.createServiceForTeam = createServiceForTeam;
 
-export const getJuiceShopInstances = () =>
+const getJuiceShopInstances = () =>
   k8sAppsApi
     .listNamespacedDeployment(
       get('namespace'),
@@ -132,8 +134,9 @@ export const getJuiceShopInstances = () =>
     .catch(error => {
       throw new Error(error.response.body.message);
     });
+module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
-export const deletePodForTeam = async team => {
+const deletePodForTeam = async team => {
   const res = await k8sCoreApi.listNamespacedPod(
     get('namespace'),
     true,
@@ -153,6 +156,8 @@ export const deletePodForTeam = async team => {
 
   await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
 };
+module.exports.deletePodForTeam = deletePodForTeam;
 
-export const getJuiceShopInstanceForTeamname = teamname =>
+const getJuiceShopInstanceForTeamname = teamname =>
   k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, get('namespace'));
+module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;

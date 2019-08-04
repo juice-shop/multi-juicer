@@ -1,11 +1,11 @@
-import express from 'express';
-import httpProxy from 'http-proxy';
+const express = require('express');
+const httpProxy = require('http-proxy');
 
 const proxy = httpProxy.createProxyServer();
 
-import redis from '../redis';
-import { get } from '../config';
-import { logger } from '../logger';
+const redis = require('../redis');
+const { get } = require('../config');
+const { logger } = require('../logger');
 
 const router = express.Router();
 
@@ -92,4 +92,4 @@ router.use(
   proxyTrafficToJuiceShop
 );
 
-export default router;
+module.exports = router;

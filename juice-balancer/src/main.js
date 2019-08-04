@@ -1,15 +1,15 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
+const express = require('express');
+const cookieParser = require('cookie-parser');
 
-import { get } from './config';
+const { get } = require('./config');
 
 const app = express();
 
-import teamRoutes from './teams/';
-import adminRoutes from './admin/admin';
-import proxyRoutes from './proxy/proxy';
-import redis from './redis';
-import { logger } from './logger';
+const teamRoutes = require('./teams/');
+const adminRoutes = require('./admin/admin');
+const proxyRoutes = require('./proxy/proxy');
+const redis = require('./redis');
+const { logger } = require('./logger');
 
 app.use('/balancer', express.static('public'));
 app.use(cookieParser(get('cookieParser.secret')));
