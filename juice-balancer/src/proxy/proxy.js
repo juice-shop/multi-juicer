@@ -15,7 +15,8 @@ const router = express.Router();
  * @param {import("express").NextFunction} next
  */
 function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
-  if (req.custom.teamname === undefined) {
+  if (req.teamname === undefined) {
+    logger.debug('got request without team in proxy. redirecting to /balancer/');
     return res.redirect('/balancer/');
   }
   return next();
@@ -27,7 +28,8 @@ function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 function redirectAdminTrafficToBalancerPage(req, res, next) {
-  if (req.custom.teamname === `t-${get('admin.username')}`) {
+  if (req.teamname === `t-${get('admin.username')}`) {
+    logger.debug('got admin request in proxy. redirecting to /balancer/');
     return res.redirect('/balancer/');
   }
   return next();
@@ -42,7 +44,7 @@ const connectionCache = new Map();
  */
 async function updateLastConnectTimestamp(req, res, next) {
   const currentTime = new Date().getTime();
-  const teamname = req.custom.teamname;
+  const teamname = req.teamname;
 
   if (connectionCache.has(teamname)) {
     const timeDifference = currentTime - connectionCache.get(teamname);
@@ -63,7 +65,7 @@ async function updateLastConnectTimestamp(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 function proxyTrafficToJuiceShop(req, res) {
-  const teamname = req.custom.teamname;
+  const teamname = req.teamname;
   logger.debug(`Proxing request ${req.method.toLocaleUpperCase()} ${req.path}`);
 
   proxy.web(

@@ -13,17 +13,14 @@ app.use('/balancer', express.static(process.env['NODE_ENV'] === 'test' ? 'ui/bui
 app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());
 
-app.use((req, res) => {
+app.use((req, res, next) => {
   const teamname =
     process.env['NODE_ENV'] === 'test'
       ? req.cookies[get('cookieParser.cookieName')]
       : req.signedCookies[get('cookieParser.cookieName')];
 
   req.teamname = teamname;
-});
-
-app.use(req => {
-  console.log(`Req Teamname: ${req.teamname}`);
+  next();
 });
 
 app.use('/balancer/teams', teamRoutes);
