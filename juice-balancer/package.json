@@ -6,7 +6,7 @@
   "module": "main.js",
   "scripts": {
     "lint": "eslint --config .eslintrc src/**",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test DEBUG=true jest"
   },
   "keywords": [],
   "author": "iteratec GmbH",
@@ -32,10 +32,14 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
+    "jest-date-mock": "^1.0.7",
     "prettier": "^1.18.2",
     "supertest": "^4.0.2"
   },
   "jest": {
+    "setupFiles": [
+      "jest-date-mock"
+    ],
     "testPathIgnorePatterns": [
       "ui/.*"
     ]

@@ -1,3 +1,9 @@
+const webProxy = jest.fn((req, res) => res.send('proxied'));
+
 module.exports = {
-  web: jest.fn(),
+  createProxyServer() {
+    return {
+      web: webProxy,
+    };
+  },
 };
