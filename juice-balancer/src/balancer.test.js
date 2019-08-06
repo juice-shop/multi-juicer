@@ -3,7 +3,7 @@ jest.mock('./kubernetes/kubernetes');
 jest.mock('http-proxy');
 
 const redis = require('./redis');
-const app = require('./main');
+const app = require('./app');
 const { advanceBy, advanceTo, clear } = require('jest-date-mock');
 
 const request = require('supertest');

@@ -2,7 +2,7 @@ const { get } = require('./config');
 const redis = require('./redis');
 const { logger } = require('./logger');
 
-const app = require('./main.js');
+const app = require('./app.js');
 
 const server = app.listen(get('port'), () =>
   logger.info(`JuiceBalancer listening on port ${get('port')}!`)
