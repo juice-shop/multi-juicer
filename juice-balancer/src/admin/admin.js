@@ -15,7 +15,7 @@ const { logger } = require('../logger');
  */
 function ensureAdminLogin(req, res, next) {
   logger.debug('Running admin check');
-  if (req.custom.teamname === `t-${get('admin.username')}`) {
+  if (req.teamname === `t-${get('admin.username')}`) {
     logger.debug('Admin check succeded');
     return next();
   }
