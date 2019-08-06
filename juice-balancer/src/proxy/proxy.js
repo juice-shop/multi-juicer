@@ -15,7 +15,7 @@ const router = express.Router();
  * @param {import("express").NextFunction} next
  */
 function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
-  if (req.signedCookies[get('cookieParser.cookieName')] === undefined) {
+  if (req.custom.teamname === undefined) {
     return res.redirect('/balancer/');
   }
   return next();
@@ -27,7 +27,7 @@ function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 function redirectAdminTrafficToBalancerPage(req, res, next) {
-  if (req.signedCookies[get('cookieParser.cookieName')] === `t-${get('admin.username')}`) {
+  if (req.custom.teamname === `t-${get('admin.username')}`) {
     return res.redirect('/balancer/');
   }
   return next();
@@ -42,7 +42,7 @@ const connectionCache = new Map();
  */
 async function updateLastConnectTimestamp(req, res, next) {
   const currentTime = new Date().getTime();
-  const teamname = req.signedCookies[get('cookieParser.cookieName')];
+  const teamname = req.custom.teamname;
 
   if (connectionCache.has(teamname)) {
     const timeDifference = currentTime - connectionCache.get(teamname);
@@ -63,7 +63,7 @@ async function updateLastConnectTimestamp(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 function proxyTrafficToJuiceShop(req, res) {
-  const teamname = req.signedCookies[get('cookieParser.cookieName')];
+  const teamname = req.custom.teamname;
   logger.debug(`Proxing request ${req.method.toLocaleUpperCase()} ${req.path}`);
 
   proxy.web(

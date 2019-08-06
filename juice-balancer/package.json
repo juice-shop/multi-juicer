@@ -6,7 +6,7 @@
   "module": "main.js",
   "scripts": {
     "lint": "eslint --config .eslintrc src/**",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test jest"
   },
   "keywords": [],
   "author": "iteratec GmbH",
@@ -27,8 +27,17 @@
   },
   "devDependencies": {
     "@types/hapi__joi": "^15.0.2",
+    "cookie": "^0.4.0",
+    "cookie-signature": "^1.1.0",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.0",
-    "prettier": "^1.18.2"
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "ui/.*"
+    ]
   }
 }
