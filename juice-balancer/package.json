@@ -1,9 +1,8 @@
 {
-  "name": "juice-balancer-v2",
+  "name": "juice-balancer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "module": "main.js",
+  "description": "Run Capture the Flags and Security Trainings with OWASP Juice Shop",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint --config .eslintrc src/**",
     "test": "NODE_ENV=test DEBUG=true jest"
