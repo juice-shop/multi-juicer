@@ -6,15 +6,13 @@
     "jest": true
   },
   "parserOptions": {
-    "ecmaVersion": 2018,
-    "sourceType": "module"
+    "ecmaVersion": 2018
   },
   "extends": "eslint:recommended",
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
     "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single"],
     "semi": ["error", "always"],
     "no-console": "off"
   }
