@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { BodyCard, SecondaryButton, H3 } from '../Components';
 import astronout from './astronaut.svg';
 
+import { FormattedMessage } from 'react-intl';
+
 const TeamDisplayCardWrapper = styled(BodyCard)`
   display: flex;
   padding: 16px 32px;
@@ -37,10 +39,14 @@ export const TeamDisplayCard = ({ teamname }) => {
     <TeamDisplayCardWrapper>
       <AstronautIcon />
       <TeamDisplayTextWrapper>
-        <Subtitle>Logged in as</Subtitle>
+        <Subtitle>
+          <FormattedMessage id="logged_in_as" defaultMessage="Logged in as" />
+        </Subtitle>
         <H3>{teamname}</H3>
       </TeamDisplayTextWrapper>
-      <SecondaryButton>Logout</SecondaryButton>
+      <SecondaryButton>
+        <FormattedMessage id="log_out" defaultMessage="Log Out" />
+      </SecondaryButton>
     </TeamDisplayCardWrapper>
   );
 };

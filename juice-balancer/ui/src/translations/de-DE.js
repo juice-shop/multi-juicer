@@ -13,4 +13,13 @@ export default {
     'Es konnte dem team nicht beigetreten werden. Bist du dir sicher das das Passwort richtig ist?',
   team_passcode: 'Team Passwort',
   join_team: 'Team Beitreten',
+  logged_in_as: 'Eingelogged als',
+  log_out: 'Ausloggen',
+  team_created: 'Team Erstellt',
+  passcode_explanation:
+    'Um sicherzustellen das nicht jeder einfach deinem Team beitrten kann, haben wir ein passwort erstellt das du mit deinem Teammitgliedern teilen kannst. Deine Teammitglieder brauchen das gleiche Passwort um dem Team beizutreten. Du kannst das Passwort von unten kopieren.',
+  passcode: 'Passwort',
+  instance_status_ready: 'Juice Shop Instanz Bereit',
+  instance_status_start_hacking: 'Fang an zu Hacken',
+  instance_status_starting: 'Juice Shop Instanz startet',
 };

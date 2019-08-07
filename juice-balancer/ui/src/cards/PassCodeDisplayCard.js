@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { BodyCard, H2, Label } from '../Components';
 
@@ -22,17 +23,21 @@ const CenteredContent = styled.div`
 export const PasscodeDisplayCard = ({ passcode = '' }) => {
   return (
     <BodyCard>
-      <H2>Team Created</H2>
+      <H2>
+        <FormattedMessage id="team_created" defaultMessage="Team Created" />
+      </H2>
       <p>
-        To make sure not just anyone can join your team, we created a{' '}
-        <strong>shared passcode</strong> for your team. If your teammates want to access the same
-        instance they are required to enter the passcode first. You can{' '}
-        <strong>copy the passcode</strong> from the display below.
+        <FormattedMessage
+          id="passcode_explanation"
+          defaultMessage="To make sure not just anyone can join your team, we created a shared passcode for your team. If your teammates want to access the same instance they are required to enter the passcode first. You can copy the passcode from the display below."
+        />
       </p>
 
       <CenteredContent>
         <div>
-          <Label>Passcode</Label>
+          <Label>
+            <FormattedMessage id="passcode" defaultMessage="Passcode" />
+          </Label>
           <span data-test-id="passcode-display">
             {passcode.split('').map((char, index) => (
               <CharDisplay addOffset={index === 4} key={index}>
