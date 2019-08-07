@@ -3,7 +3,7 @@ export default [
     flag: '🇬🇧',
     name: 'English',
     key: 'en',
-    messageLoader: () => Promise.resolve({}),
+    messageLoader: () => Promise.resolve({ default: {} }),
   },
   {
     flag: '🇩🇪',

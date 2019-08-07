@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { IntlProvider, addLocaleData } from 'react-intl';
@@ -14,9 +14,12 @@ import { Footer } from './Footer';
 
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 
-for (const tranlation of translations) {
+for (const translation of translations) {
+  if (translation.key === 'en') {
+    continue;
+  }
   addLocaleData({
-    locale: tranlation.key,
+    locale: translation.key,
     parentLocale: 'en',
   });
 }
@@ -26,6 +29,11 @@ const LoadingPage = () => <Spinner />;
 function App() {
   const [locale, setLocale] = useState('en');
   const [messages, setMessages] = useState({});
+
+  const navigatorLocale = navigator.language;
+  useEffect(() => {
+    setLocale(navigatorLocale);
+  }, [navigatorLocale]);
 
   const switchLanguage = async ({ key, messageLoader }) => {
     const messages = (await messageLoader).default;
@@ -38,7 +46,7 @@ function App() {
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
       <>
         <Router basename="/balancer">
-          <Layout footer={<Footer switchLanguage={switchLanguage} />}>
+          <Layout footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}>
             <Suspense fallback={<LoadingPage />}>
               <Switch>
                 <Route path="/" exact component={JoinPage} />
