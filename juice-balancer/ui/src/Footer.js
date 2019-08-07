@@ -16,6 +16,7 @@ const LanguageSwitchButton = styled.button`
 const LanguageSelectionButton = styled(LanguageSwitchButton)`
   margin-bottom: 8px;
   font-size: 14px;
+  font-weight: ${props => (props.showAsActive ? '600' : 'initial')};
 `;
 
 const LangPopupWrapper = styled.div`
@@ -27,7 +28,7 @@ const LangPopupWrapper = styled.div`
   overflow-y: scroll;
 `;
 
-export const Footer = ({ switchLanguage }) => {
+export const Footer = ({ switchLanguage, selectedLocale }) => {
   return (
     <Popup
       contentStyle={{
