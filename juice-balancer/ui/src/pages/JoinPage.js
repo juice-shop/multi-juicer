@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
 import { Layout } from '../Layout';
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
+import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
+import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
@@ -14,9 +16,19 @@ const messages = defineMessages({
 });
 
 export const JoinPage = injectIntl(
-  withRouter(({ history, intl }) => {
+  withRouter(({ history, intl, location }) => {
     const [teamname, setTeamname] = useState('');
     const [failed, setFailed] = useState(false);
+    const queryParams = new URLSearchParams(location.search);
+
+    const queryMessage = queryParams.get('msg');
+    const queryTeamname = queryParams.get('teamname');
+    useEffect(() => {
+      if (queryMessage === 'instance-not-found') {
+        setTeamname(queryTeamname);
+      }
+    }, [queryMessage, queryTeamname]);
+
     const passcode = undefined;
 
     const { formatMessage } = intl;
@@ -47,6 +59,11 @@ export const JoinPage = injectIntl(
 
     return (
       <Layout>
+        {queryMessage === 'instance-restarting' ? (
+          <InstanceRestartingCard teamname={queryTeamname} />
+        ) : null}
+        {queryMessage === 'instance-not-found' ? <InstanceNotFoundCard /> : null}
+
         <BodyCard>
           <H2>
             <FormattedMessage id="getting_started" defaultMessage="Getting Started" />
