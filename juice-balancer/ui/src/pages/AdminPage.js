@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
-import { FormattedRelative, defineMessages, injectIntl } from 'react-intl';
+import { FormattedRelative, defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import { BodyCard, SecondaryButton } from '../Components';
 
@@ -40,6 +40,10 @@ const messages = defineMessages({
     id: 'admin_table.actions',
     defaultMessage: 'Actions',
   },
+  noContent: {
+    id: 'admin_table.noActiveTeams',
+    defaultMessage: 'No active teams',
+  },
 });
 
 function RestartInstanceButton({ team }) {
@@ -51,7 +55,13 @@ function RestartInstanceButton({ team }) {
     axios.post(`/balancer/admin/teams/${team}/restart`).finally(() => setRestarting(false));
   };
   return (
-    <SmallSecondary onClick={restart}>{restarting ? 'Restarting...' : 'Restart'}</SmallSecondary>
+    <SmallSecondary onClick={restart}>
+      {restarting ? (
+        <FormattedMessage id="admin_table.restarting" defaultMessage="Restarting..." />
+      ) : (
+        <FormattedMessage id="admin_table.restart" defaultMessage="Restart" />
+      )}
+    </SmallSecondary>
   );
 }
 
@@ -128,6 +138,7 @@ export default injectIntl(({ intl }) => {
     <BigBodyCard>
       <DataTable
         title={formatMessage(messages.tableHeader)}
+        noDataComponent={formatMessage(messages.noContent)}
         defaultSortField="lastConnect"
         defaultSortAsc={false}
         columns={columns}
