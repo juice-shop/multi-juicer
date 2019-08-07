@@ -30,7 +30,7 @@
     "cookie-signature": "^1.1.0",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.0",
-    "jest": "^24.8.0",
+    "jest": "^24.7.1",
     "jest-date-mock": "^1.0.7",
     "prettier": "^1.18.2",
     "supertest": "^4.0.2"
