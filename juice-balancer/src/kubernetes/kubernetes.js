@@ -39,6 +39,12 @@ const createDeploymentForTeam = ({ team }) =>
             {
               name: 'juice-shop',
               image: 'bkimminich/juice-shop:snapshot',
+              env: [
+                {
+                  name: 'NODE_ENV',
+                  value: 'juicy-ctf',
+                },
+              ],
               ports: [
                 {
                   containerPort: 3000,
@@ -61,6 +67,13 @@ const createDeploymentForTeam = ({ team }) =>
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
+              volumeMounts: [
+                {
+                  name: 'juice-shop-config',
+                  mountPath: '/juice-shop/config/juicy-ctf.yaml',
+                  subPath: 'juicy-ctf.yaml',
+                },
+              ],
             },
             {
               name: 'progress-watchdog',
@@ -88,6 +101,14 @@ const createDeploymentForTeam = ({ team }) =>
                   value: team,
                 },
               ],
+            },
+          ],
+          volumes: [
+            {
+              name: 'juice-shop-config',
+              configMap: {
+                name: 'juice-shop-config',
+              },
             },
           ],
         },

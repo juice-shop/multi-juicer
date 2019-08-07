@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: juice-shop-config
+  labels:
+    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
+data:
+  juicy-ctf.yaml: |-
+{{ .Values.juiceShop.config | indent 4 }}

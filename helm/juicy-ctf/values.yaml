@@ -15,7 +15,18 @@ balancer:
 
 juiceShop:
   # Set to -1 to remove the max Juice Shop instance cap
-  maxInstances: 100
+  maxInstances: 10
+  # Specify a custom Juice Shop config
+  config: |
+    application:
+      logo: JuiceShopCTF_Logo.png
+      favicon: favicon_ctf.ico
+      # showChallengeHints: false
+      showVersionNumber: false
+      # showHackingInstructor: false
+      gitHubRibbon: false
+    ctf:
+      # showFlagsInNotifications: true
 
 redis:
   # OpenShifts Default Security Context makes trouble with the security context
