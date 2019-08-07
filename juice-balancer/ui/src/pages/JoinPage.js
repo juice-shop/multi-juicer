@@ -3,7 +3,6 @@ import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
-import { Layout } from '../Layout';
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
 import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
@@ -58,7 +57,7 @@ export const JoinPage = injectIntl(
     }
 
     return (
-      <Layout>
+      <>
         {queryMessage === 'instance-restarting' ? (
           <InstanceRestartingCard teamname={queryTeamname} />
         ) : null}
@@ -114,7 +113,7 @@ export const JoinPage = injectIntl(
             </Button>
           </Form>
         </BodyCard>
-      </Layout>
+      </>
     );
   })
 );

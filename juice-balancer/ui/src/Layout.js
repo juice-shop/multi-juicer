@@ -72,7 +72,19 @@ const Body = styled.div`
   justify-content: center;
 `;
 
-export function Layout({ children }) {
+const BodyWrapper = styled.div`
+  flex-grow: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Footer = styled.div`
+  flex-grow: 1;
+`;
+
+export function Layout({ children, footer }) {
   return (
     <>
       <GlobalStyles />
@@ -83,7 +95,10 @@ export function Layout({ children }) {
             <H1>Juicy CTF</H1>
           </HeaderCard>
         </Header>
-        <Body>{children}</Body>
+        <Body>
+          <BodyWrapper>{children}</BodyWrapper>
+          <Footer>{footer}</Footer>
+        </Body>
       </Wrapper>
     </>
   );

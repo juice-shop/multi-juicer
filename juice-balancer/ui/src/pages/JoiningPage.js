@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 
-import { Layout } from '../Layout';
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 
 export const JoiningPage = withRouter(({ history, match }) => {
@@ -35,31 +34,29 @@ export const JoiningPage = withRouter(({ history, match }) => {
   }
 
   return (
-    <Layout>
-      <BodyCard>
-        <H2>Joining Team {team}</H2>
+    <BodyCard>
+      <H2>Joining Team {team}</H2>
 
-        {failed ? (
-          <strong>Failed to join the team. Are you sure the passcode is correct?</strong>
-        ) : null}
+      {failed ? (
+        <strong>Failed to join the team. Are you sure the passcode is correct?</strong>
+      ) : null}
 
-        <Form onSubmit={onSubmit}>
-          <Label htmlFor="passcode">Team Passcode</Label>
-          <Input
-            type="password"
-            id="passcode"
-            name="passcode"
-            data-test-id="passcode-input"
-            minLength="8"
-            maxLength="8"
-            value={passcode}
-            onChange={({ target }) => setPasscode(target.value)}
-          />
-          <Button data-test-id="join-team-button" type="submit">
-            Join Team
-          </Button>
-        </Form>
-      </BodyCard>
-    </Layout>
+      <Form onSubmit={onSubmit}>
+        <Label htmlFor="passcode">Team Passcode</Label>
+        <Input
+          type="password"
+          id="passcode"
+          name="passcode"
+          data-test-id="passcode-input"
+          minLength="8"
+          maxLength="8"
+          value={passcode}
+          onChange={({ target }) => setPasscode(target.value)}
+        />
+        <Button data-test-id="join-team-button" type="submit">
+          Join Team
+        </Button>
+      </Form>
+    </BodyCard>
   );
 });

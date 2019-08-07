@@ -4,7 +4,6 @@ import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import { FormattedRelative, defineMessages, injectIntl } from 'react-intl';
 
-import { Layout } from '../Layout';
 import { BodyCard, SecondaryButton } from '../Components';
 
 const SmallSecondary = styled(SecondaryButton)`
@@ -126,16 +125,14 @@ export default injectIntl(({ intl }) => {
   ];
 
   return (
-    <Layout>
-      <BigBodyCard>
-        <DataTable
-          title={formatMessage(messages.tableHeader)}
-          defaultSortField="lastConnect"
-          defaultSortAsc={false}
-          columns={columns}
-          data={teams}
-        />
-      </BigBodyCard>
-    </Layout>
+    <BigBodyCard>
+      <DataTable
+        title={formatMessage(messages.tableHeader)}
+        defaultSortField="lastConnect"
+        defaultSortAsc={false}
+        columns={columns}
+        data={teams}
+      />
+    </BigBodyCard>
   );
 });
