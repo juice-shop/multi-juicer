@@ -180,5 +180,10 @@ const deletePodForTeam = async team => {
 module.exports.deletePodForTeam = deletePodForTeam;
 
 const getJuiceShopInstanceForTeamname = teamname =>
-  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, get('namespace'));
+  k8sAppsApi.readNamespacedDeployment(`t-${teamname}-juiceshop`, get('namespace')).then(res => {
+    return {
+      readyReplicas: res.body.status.readyReplicas,
+      availableReplicas: res.body.status.availableReplicas,
+    };
+  });
 module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;

@@ -178,8 +178,7 @@ async function awaitReadyness(req, res) {
 
   try {
     for (let i = 0; i < 180; i++) {
-      const { body } = await getJuiceShopInstanceForTeamname(team);
-      const { readyReplicas } = body.status;
+      const { readyReplicas } = await getJuiceShopInstanceForTeamname(team);
 
       if (readyReplicas === 1) {
         logger.info(`JuiceShop Deployment for team "${team} ready"`);

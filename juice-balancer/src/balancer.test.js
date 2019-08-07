@@ -2,11 +2,12 @@ jest.mock('./redis');
 jest.mock('./kubernetes/kubernetes');
 jest.mock('http-proxy');
 
+const { advanceBy, advanceTo, clear } = require('jest-date-mock');
+const request = require('supertest');
+
 const redis = require('./redis');
 const app = require('./app');
-const { advanceBy, advanceTo, clear } = require('jest-date-mock');
-
-const request = require('supertest');
+const { getJuiceShopInstanceForTeamname } = require('./kubernetes/kubernetes');
 
 afterAll(async () => {
   await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
@@ -15,6 +16,7 @@ afterAll(async () => {
 beforeEach(() => {
   clear();
   redis.set.mockClear();
+  getJuiceShopInstanceForTeamname.mockClear();
 });
 
 test('/balancer/ should return the balancer ui', async () => {
@@ -54,8 +56,6 @@ test('should set the last-connect timestamp when a new team gets proxied the fir
     .expect('proxied');
 
   expect(redis.set).toHaveBeenCalledWith('t-team-last-connect-test-last-request', 1555555555555);
-
-  clear();
 });
 
 test('should update the last-connect timestamp on requests at most every 10sec', async () => {
@@ -98,6 +98,36 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     't-team-update-last-connect-test-last-request',
     1000000010001
   );
+});
 
-  clear();
+test('should redirect to /balancer/ when the instance is currently restarting', async () => {
+  getJuiceShopInstanceForTeamname.mockReturnValue({ readyReplicas: 0 });
+
+  await request(app)
+    .get('/rest/admin/application-version')
+    .set('Cookie', ['balancer=t-restarting-instance'])
+    .send()
+    .expect(302)
+    .then(res => {
+      expect(res.header.location).toBe(
+        '/balancer/?msg=instance-restarting&teamname=restarting-instance'
+      );
+    });
+});
+
+test('should redirect to /balancer/ when the instance is not existing', async () => {
+  getJuiceShopInstanceForTeamname.mockImplementation(() => {
+    throw new Error();
+  });
+
+  await request(app)
+    .get('/rest/admin/application-version')
+    .set('Cookie', ['balancer=t-missing-instance'])
+    .send()
+    .expect(302)
+    .then(res => {
+      expect(res.header.location).toBe(
+        '/balancer/?msg=instance-not-found&teamname=missing-instance'
+      );
+    });
 });

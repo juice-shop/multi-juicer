@@ -6,6 +6,7 @@ const proxy = httpProxy.createProxyServer();
 const redis = require('../redis');
 const { get } = require('../config');
 const { logger } = require('../logger');
+const { getJuiceShopInstanceForTeamname } = require('../kubernetes/kubernetes');
 
 const router = express.Router();
 
@@ -30,12 +31,44 @@ function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
 function redirectAdminTrafficToBalancerPage(req, res, next) {
   if (req.teamname === `t-${get('admin.username')}`) {
     logger.debug('got admin request in proxy. redirecting to /balancer/');
-    return res.redirect('/balancer/');
+    return res.redirect('/balancer/?msg=logged-as-admin');
   }
   return next();
 }
 
 const connectionCache = new Map();
+
+/**
+ * Checks at most every 10sec if the deployment the traffic should go to is ready.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+async function checkIfInstanceIsUp(req, res, next) {
+  const wrappedTeamname = req.teamname;
+  // Omit the inital "t-" part.
+  const teamname = wrappedTeamname.substring(2);
+
+  const currentTime = new Date().getTime();
+  if (connectionCache.has(teamname) && currentTime - connectionCache.get(teamname) < 10000) {
+    return next();
+  }
+
+  try {
+    const { readyReplicas } = await getJuiceShopInstanceForTeamname(teamname);
+
+    if (readyReplicas === 1) {
+      return next();
+    }
+
+    logger.warn(`Tried to proxy for team ${teamname}, but no ready instance found.`);
+    return res.redirect(`/balancer/?msg=instance-restarting&teamname=${teamname}`);
+  } catch (error) {
+    logger.warn(`Could not find instance for team: '${teamname}'`);
+    res.redirect(`/balancer/?msg=instance-not-found&teamname=${teamname}`);
+  }
+}
 
 /**
  * @param {import("express").Request} req
@@ -90,6 +123,7 @@ function proxyTrafficToJuiceShop(req, res) {
 router.use(
   redirectJuiceShopTrafficWithoutBalancerCookies,
   redirectAdminTrafficToBalancerPage,
+  checkIfInstanceIsUp,
   updateLastConnectTimestamp,
   proxyTrafficToJuiceShop
 );
