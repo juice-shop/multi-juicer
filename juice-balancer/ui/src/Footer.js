@@ -1,6 +1,7 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import translations from './translations';
 
@@ -41,7 +42,9 @@ export const Footer = ({ switchLanguage }) => {
           <span role="img" aria-label="globe">
             🌍
           </span>{' '}
-          <span>Change Language</span>
+          <span>
+            <FormattedMessage id="change_language" defaultMessage="Change Language" />
+          </span>
         </LanguageSwitchButton>
       }
       position="top center"
@@ -50,7 +53,8 @@ export const Footer = ({ switchLanguage }) => {
         {translations.map(translation => {
           return (
             <LanguageSelectionButton
-              key={translation.key}
+              key={`translation-${translation.key}`}
+              showAsActive={selectedLocale === translation.key}
               onClick={() =>
                 switchLanguage({
                   key: translation.key,
