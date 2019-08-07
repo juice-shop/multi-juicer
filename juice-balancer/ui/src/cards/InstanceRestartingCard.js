@@ -3,7 +3,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
-import { BodyCard, Button } from '../Components';
+import { BodyCard, CenteredCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
 
 const LinkButton = Button.withComponent('a');
@@ -11,12 +11,6 @@ const LinkButton = Button.withComponent('a');
 const CenteredText = styled.span`
   text-align: center;
   display: block;
-`;
-
-const CenteredCard = styled(BodyCard)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 export const InstanceRestartingCard = ({ teamname }) => {

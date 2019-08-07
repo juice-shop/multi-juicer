@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
-import { BodyCard } from '../Components';
+import { CenteredCard } from '../Components';
 
 import warning from './warning.svg';
 
@@ -14,12 +14,6 @@ const WarningIcon = styled.img`
 WarningIcon.defaultProps = {
   src: warning,
 };
-
-const CenteredCard = styled(BodyCard)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 
 export const InstanceNotFoundCard = () => {
   return (

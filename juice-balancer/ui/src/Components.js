@@ -87,3 +87,9 @@ export const BodyCard = styled(Card)`
     padding: 24px;
   }
 `;
+
+export const CenteredCard = styled(BodyCard)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
