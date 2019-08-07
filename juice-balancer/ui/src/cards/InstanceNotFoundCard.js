@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { BodyCard } from '../Components';
 
@@ -25,7 +26,10 @@ export const InstanceNotFoundCard = () => {
     <CenteredCard>
       <WarningIcon />
       <span data-test-id="instance-not-found">
-        Could not find the instance for the team. You can recreate it by logging back in.
+        <FormattedMessage
+          id="instance_status_not_found"
+          defaultMessage="Could not find the instance for the team. You can recreate it by logging back in."
+        />
       </span>
     </CenteredCard>
   );

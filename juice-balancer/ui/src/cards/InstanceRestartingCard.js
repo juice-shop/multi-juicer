@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { BodyCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
@@ -41,10 +42,18 @@ export const InstanceRestartingCard = ({ teamname }) => {
           <span role="img" aria-label="Done">
             ✅
           </span>{' '}
-          <span data-test-id="instance-status">Juice Shop Instance ready again</span>
+          <span data-test-id="instance-status">
+            <FormattedMessage
+              id="instance_status_restarted"
+              defaultMessage="Juice Shop Instance ready again"
+            />
+          </span>
         </CenteredText>
         <LinkButton data-test-id="start-hacking-button" href="/">
-          Get back to Hacking
+          <FormattedMessage
+            id="instance_status_back_to_hacking"
+            defaultMessage="Get back to Hacking"
+          />
         </LinkButton>
       </BodyCard>
     );
@@ -53,7 +62,10 @@ export const InstanceRestartingCard = ({ teamname }) => {
       <CenteredCard>
         <Spinner />
         <span data-test-id="instance-status">
-          Juice Shop Instance is currently restarting. It should be ready in a couple of seconds.
+          <FormattedMessage
+            id="instance_status_restarting"
+            defaultMessage="Juice Shop Instance is currently restarting. It should be ready in a couple of seconds."
+          />
         </span>
       </CenteredCard>
     );
