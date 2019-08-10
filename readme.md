@@ -32,13 +32,13 @@ helm dependency update ./juicy-ctf/helm/juicy-ctf/
 helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 ```
 
-### Example Installations at Cloud Providers
+### Installation Guides for specific Cloud Providers
 
-We got some more complete guides on how to set up a kubernetes cluster with JuicyCTF on some popular cloud providers:
+Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with JuicyCTF installed for some specific Cloud providers.
 
-- [Digital Ocean](./examples/digital-ocean/digital-ocean.md)
-- [\[WIP\] AWS](./examples/aws/aws.md)
-- [\[WIP\] Azure](./examples/azure/azure.md)
+- [Digital Ocean](./guides/digital-ocean/digital-ocean.md)
+- [\[WIP\] AWS](./guides/aws/aws.md)
+- [\[WIP\] Azure](./guides/azure/azure.md)
 
 ### Deinstallation
 
