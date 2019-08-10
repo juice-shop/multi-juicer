@@ -1,11 +1,11 @@
-![Juicy CTF, Multi User Juice Shop Plattform](./cover.svg)
+![Juicy CTF, Multi User Juice Shop Platform](./cover.svg)
 
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
 JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster, giving you the tools to run events without the need for local Juice Shop instances.
 
-What it does:
+**What it does:**
 
 - dynamically create new Juice Shop instances when needed
 - runs on a single domain, comes with a loadbalancer sending the traffic to the participants Juice Shop instance
@@ -16,10 +16,10 @@ What it does:
 
 ## Installation
 
-To install JuicyCTF you'll need [helm](https://helm.sh).
+JuicyCTF runs on kubernetes, to install it you'll need [helm](https://helm.sh).
 
 If you aren't familiar with helm, try out the helm 3 alpha.
-It's easier to install and use, as it doesn't require an installation on the kubernetes cluster to work.
+It's easier to install and easier to use. It's pretty stable, and it doesn't have a server side component anymore but simply runs on your local machine.
 
 ```sh
 git clone git@github.com:J12934/juicy-ctf.git
