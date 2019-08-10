@@ -21,6 +21,13 @@ const { get } = require('../config');
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+const cookieSettings = {
+  signed: true,
+  httpOnly: true,
+  sameSite: 'strict',
+  secure: get('cookieParser.secure'),
+};
+
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
@@ -39,8 +46,7 @@ async function interceptAdminLogin(req, res, next) {
   if (team === get('admin.username') && passcode === get('admin.password')) {
     return res
       .cookie(get('cookieParser.cookieName'), `t-${team}`, {
-        signed: true,
-        httpOnly: true,
+        ...cookieSettings,
       })
       .json({
         message: 'Signed in as admin',
@@ -76,9 +82,7 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       // Set cookie, (join team)
       return res
         .cookie(get('cookieParser.cookieName'), `t-${team}`, {
-          signed: true,
-          httpOnly: true,
-          sameSite: 'strict',
+          ...cookieSettings,
         })
         .status(200)
         .send();
@@ -153,9 +157,7 @@ async function createTeam(req, res) {
 
     res
       .cookie(get('cookieParser.cookieName'), `t-${team}`, {
-        signed: true,
-        httpOnly: true,
-        sameSite: 'strict',
+        ...cookieSettings,
       })
       .status(200)
       .json({
@@ -208,9 +210,7 @@ function logout(req, res) {
   return res
     .cookie(get('cookieParser.cookieName'), {
       expires: new Date(0),
-      signed: true,
-      httpOnly: true,
-      sameSite: 'strict',
+      ...cookieSettings,
     })
     .send();
 }

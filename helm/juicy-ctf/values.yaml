@@ -2,6 +2,11 @@ imagePullPolicy: Always
 nodeSelector: {}
 
 balancer:
+  cookie:
+    # SET THIS TO TRUE IF IN PRODUCTION
+    secure: false
+    # If secure is set to true change the name to __Secure-balancer
+    name: balancer
   repository: iteratec/juice-balancer
   tag: latest
   replicas: 1

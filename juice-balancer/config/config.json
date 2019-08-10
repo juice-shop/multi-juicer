@@ -15,7 +15,8 @@
   },
   "cookieParser": {
     "cookieName": "balancer",
-    "secret": "askdbakhdajhvdsjavjdsgv"
+    "secret": "askdbakhdajhvdsjavjdsgv",
+    "secure": false
   },
   "juiceShop": {
     "image": "bkimminich/juice-shop",

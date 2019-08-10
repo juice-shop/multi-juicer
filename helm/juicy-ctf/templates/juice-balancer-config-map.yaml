@@ -17,7 +17,8 @@ data:
         "redis-secret-name": "{{ .Release.Name}}-ctf-redis"
       },
       "cookieParser": {
-        "cookieName": "balancer"
+        "cookieName": {{ .Values.balancer.cookie.name | quote }},
+        "secure": {{ .Values.balancer.cookie.secure }}
       },
       "admin": {
         "username": "admin"
