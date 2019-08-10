@@ -30,7 +30,7 @@ jobs:
         with:
           args: ./cleaner/
   balancer:
-    name: balancer
+    name: Balancer
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
