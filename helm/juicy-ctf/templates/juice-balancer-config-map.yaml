@@ -21,5 +21,11 @@ data:
       },
       "admin": {
         "username": "admin"
+      },
+      "juiceShop": {
+        "image": {{ .Values.juiceShop.image | quote }},
+        "tag": {{ .Values.juiceShop.tag | quote }},
+        "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
+        "resources": {{ .Values.juiceShop.resources | toJson }}
       }
     }

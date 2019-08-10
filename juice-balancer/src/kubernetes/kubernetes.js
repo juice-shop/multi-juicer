@@ -38,7 +38,9 @@ const createDeploymentForTeam = ({ team }) =>
           containers: [
             {
               name: 'juice-shop',
-              image: 'bkimminich/juice-shop:snapshot',
+              image: `${get('juiceShop.image')}:${get('juiceShop.tag')}`,
+              imagePullPolicy: get('juiceShop.imagePullPolicy'),
+              resources: get('juiceShop.resources'),
               env: [
                 {
                   name: 'NODE_ENV',
@@ -115,6 +117,7 @@ const createDeploymentForTeam = ({ team }) =>
       },
     },
   });
+
 module.exports.createDeploymentForTeam = createDeploymentForTeam;
 
 const createServiceForTeam = teamname =>

@@ -16,5 +16,20 @@
   "cookieParser": {
     "cookieName": "balancer",
     "secret": "askdbakhdajhvdsjavjdsgv"
+  },
+  "juiceShop": {
+    "image": "bkimminich/juice-shop",
+    "tag": "snapshot",
+    "imagePullPolicy": "IfNotPresent",
+    "resources:": {
+      "requests": {
+        "memory": "256Mi",
+        "cpu": "200m"
+      },
+      "limits": {
+        "memory": "256Mi",
+        "cpu": "200m"
+      }
+    }
   }
 }

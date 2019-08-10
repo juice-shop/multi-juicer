@@ -16,6 +16,16 @@ balancer:
 juiceShop:
   # Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
+  # Juice Shop Image to use
+  image: bkimminich/juice-shop
+  tag: snapshot
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 200m
+    limits:
+      memory: 256Mi
+      cpu: 200m
   # Specify a custom Juice Shop config
   # See the JuiceShop Config Docs for more detail: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/customization.html#yaml-configuration-file
   config: |
