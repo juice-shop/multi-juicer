@@ -32,7 +32,7 @@ helm dependency update ./juicy-ctf/helm/juicy-ctf/
 helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 ```
 
-## Example Installations at Cloud Providers
+### Example Installations at Cloud Providers
 
 We got some more complete guides on how to set up a kubernetes cluster with JuciyCTF on some popular cloud providers:
 
