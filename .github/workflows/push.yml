@@ -1,5 +1,5 @@
 on: push
-name: 'JuicyCTF CI/CD'
+name: 'CI'
 jobs:
   progressWatchDog:
     name: ProgressWatchDog
