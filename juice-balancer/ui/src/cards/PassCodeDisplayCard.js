@@ -14,6 +14,21 @@ const CharDisplay = styled.span`
   display: inline-block;
 `;
 
+const PasscodeDisplayWrapper = styled.div``;
+
+const FakePasscodeDisplay = styled.span`
+  ${PasscodeDisplayWrapper}:hover & {
+    display: none;
+  }
+`;
+
+const PasscodeDisplay = styled.span`
+  display: none;
+  ${PasscodeDisplayWrapper}:hover & {
+    display: block;
+  }
+`;
+
 const CenteredContent = styled.div`
   display: flex;
   justify-content: center;
@@ -38,13 +53,22 @@ export const PasscodeDisplayCard = ({ passcode = '' }) => {
           <Label>
             <FormattedMessage id="passcode" defaultMessage="Passcode" />
           </Label>
-          <span data-test-id="passcode-display">
-            {passcode.split('').map((char, index) => (
-              <CharDisplay addOffset={index === 4} key={index}>
-                {char}
-              </CharDisplay>
-            ))}
-          </span>
+          <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
+            <FakePasscodeDisplay>
+              {'●●●●●●●●'.split('').map((char, index) => (
+                <CharDisplay addOffset={index === 4} key={index} aria-hidden="true">
+                  {char}
+                </CharDisplay>
+              ))}
+            </FakePasscodeDisplay>
+            <PasscodeDisplay data-test-id="passcode-display">
+              {passcode.split('').map((char, index) => (
+                <CharDisplay addOffset={index === 4} key={index}>
+                  {char}
+                </CharDisplay>
+              ))}
+            </PasscodeDisplay>
+          </PasscodeDisplayWrapper>
         </div>
       </CenteredContent>
     </BodyCard>
