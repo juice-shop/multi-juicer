@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BodyCard, SecondaryButton, H3 } from '../Components';
-import astronout from './astronaut.svg';
+import astronaut from './astronaut.svg';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -21,7 +21,7 @@ const AstronautIcon = styled.img`
   margin-right: 12px;
 `;
 AstronautIcon.defaultProps = {
-  src: astronout,
+  src: astronaut,
 };
 
 const TeamDisplayTextWrapper = styled.div`

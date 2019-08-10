@@ -71,7 +71,7 @@ export const JoinPage = injectIntl(
           <FormattedMessage
             id="getting_started_text"
             defaultMessage={`
-              Choose a teamname so that we will be able to recognise you back.
+              Choose a teamname so that we will be able to recognize you back.
               If you want to team up with other people you can join up under the same teamname.
             `}
             values={{

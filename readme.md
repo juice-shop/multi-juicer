@@ -9,10 +9,10 @@ What it does:
 
 - dynamically create new Juice Shop instances when needed
 - runs on a single domain, comes with a loadbalancer sending the traffic to the participants Juice Shop instance
-- backup and autoapply challenge progress in case of Juice Shop container restarts
+- backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
-![Juicy CTF, High Level Achitecture Diagramm](./high-level-achitecture.svg)
+![Juicy CTF, High Level Architecture Diagram](./high-level-architecture.svg)
 
 ## Installation
 

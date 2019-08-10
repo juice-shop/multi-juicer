@@ -25,7 +25,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
         setReady(true);
       })
       .catch(() => {
-        console.error('Failed to wait for deployment readyness');
+        console.error('Failed to wait for deployment readiness');
       });
   }, [teamname]);
 

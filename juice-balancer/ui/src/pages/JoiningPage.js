@@ -22,7 +22,7 @@ export const JoiningPage = withRouter(({ history, match }) => {
       }
       history.push(`/teams/${team}/joined/`);
     } catch (error) {
-      console.error('Unkown error while trying to join a team!');
+      console.error('Unknown error while trying to join a team!');
       console.error(error);
       setFailed(true);
     }

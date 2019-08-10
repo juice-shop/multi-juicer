@@ -1,6 +1,6 @@
 # Example Setup with AWS
 
-**WARNING:** The Ressources created in this guid will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the ressoruces as described in Step 5 Deinstallation when you do not need them anymore.
+**WARNING:** The resources created in this guide will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ This example expects you to have the following cli tools setup.
 4. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos)
 
 ```sh
-# First we'll need a cluser, you can create one using the DigitalOcean cli.
+# First we'll need a cluster, you can create one using the DigitalOcean cli.
 # This will take a couple of minutes
 eksctl create cluster \
 --name juicy-ctf \
@@ -32,21 +32,21 @@ kubectl config current-context
 ## Step 2. Installing JuicyCTF via helm
 
 ```sh
-# We'll need to clone this git repo for the moment, as the helm chart isnt pushed to any registry
+# We'll need to clone this git repo for the moment, as the helm chart isn't pushed to any registry
 git clone git@github.com:J12934/juicy-ctf.git
 
 # First we'll need to fetch the charts JuicyCTF depends on
 helm dependency update ./juicy-ctf/helm/juicy-ctf/
 
 # Now we can install the helm chart
-# The first juicy-ctf part is the release name, safe to change to whatever you like, but the exmaples in the guide are written for 'juicy-ctf'
+# The first juicy-ctf part is the release name, safe to change to whatever you like, but the examples in the guide are written for 'juicy-ctf'
 helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
 # This should show you three pods a juice-balancer pod and two redis pods
-# Wait untill all 3 pods are ready
+# Wait until all 3 pods are ready
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -75,7 +75,7 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 ## Step 4. Add Ingress to expose the app to the world
 
 AWS let's you create LoadBalancer by adding a new ingress config to you cluster.
-To set this up follow the **To deploy the ALB Ingress Controller to an Amazon EKS cluster** guide on https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html closely. This will walk you throght setting up and configuring the ingress.
+To set this up follow the **To deploy the ALB Ingress Controller to an Amazon EKS cluster** guide on https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html closely. This will walk you through setting up and configuring the ingress.
 
 After you have set that up we can now create a ingress config for our the JuicyCTF Stack.
 
