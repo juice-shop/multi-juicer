@@ -91,9 +91,9 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
       return next();
     } else {
-      logger.error('Encountered unkown error while checking for existing JuiceShop deployment');
+      logger.error('Encountered unknown error while checking for existing JuiceShop deployment');
       logger.error(error);
-      return res.status(500).send(`Unkown error code: "${error.body.message}"`);
+      return res.status(500).send(`Unknown error code: "${error.body.message}"`);
     }
   }
 }
@@ -174,14 +174,14 @@ async function createTeam(req, res) {
 async function awaitReadyness(req, res) {
   const { team } = req.params;
 
-  logger.info(`Awaiting readyness of JuiceShop Deployment for team "${team}"`);
+  logger.info(`Awaiting readiness of JuiceShop Deployment for team "${team}"`);
 
   try {
     for (let i = 0; i < 180; i++) {
       const { readyReplicas } = await getJuiceShopInstanceForTeamname(team);
 
       if (readyReplicas === 1) {
-        logger.info(`JuiceShop Deployment for team "${team} ready"`);
+        logger.info(`JuiceShop Deployment for team "${team}" ready`);
 
         return res.status(200).send();
       }
