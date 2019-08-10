@@ -66,7 +66,7 @@ kubectl delete deployment --selector app=juice-shop && kubectl delete service --
 To be on the safe side calculate with:
 
 - _1GB memory overhead_, for the balancer, redis & co
-- _250MB \* Number of participants_, for the individual JuiceShop Instances
+- _250MB \* number of participants_, for the individual JuiceShop Instances
 
 ### How many users can JuicyCTF handle?
 
