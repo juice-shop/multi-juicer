@@ -8,7 +8,7 @@ JuicyCTF gives you the ability to run separate Juice Shop instances for every pa
 **What it does:**
 
 - dynamically create new Juice Shop instances when needed
-- runs on a single domain, comes with a loadbalancer sending the traffic to the participants Juice Shop instance
+- runs on a single domain, comes with a LoadBalancer sending the traffic to the participants Juice Shop instance
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
@@ -40,7 +40,7 @@ Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it ea
 - [\[WIP\] AWS](./guides/aws/aws.md)
 - [\[WIP\] Azure](./guides/azure/azure.md)
 
-### Customizing / Adjusting the setup
+### Customizing / Adjusting the Setup
 
 You got some options on how to setup the stack, with some option to customize the JuiceShop instances to your own liking.
 You can find the default config values under: [helm/juicy-ctf/values.yaml](./helm/juicy-ctf/values.yaml)
