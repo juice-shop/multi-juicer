@@ -34,6 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - name: 'Install & Build BalancerUI'
+        run: |
+          cd juice-balancer/ui
+          npm ci
+          npm run build
       - name: Install Balancer
         run: |
           cd juice-balancer
