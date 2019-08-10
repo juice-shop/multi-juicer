@@ -1,5 +1,7 @@
 # [WIP] Example Setup with Microsoft Azure
 
+**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/J12934/juicy-ctf/issues/16
+
 **WARNING:** The resources created in this guid will cost about \$??/month.
 Make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
