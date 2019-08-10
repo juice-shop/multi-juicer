@@ -70,9 +70,11 @@ To be on the safe side calculate with:
 
 ### How many users can JuicyCTF handle?
 
-The is no real fixed limit. (Even thought you can configure one 😉)
-The custom LoadBalancer through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
+There is no real fixed limit. (Even thought you can configure one 😉)
+The custom LoadBalancer, through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
 You can also attach a [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to automatically scale the LoadBalancer.
+
+When scaling up, also keep an eye on the redis instance. Make sure it is still able to handle the load.
 
 ### Why a custom LoadBalancer?
 
