@@ -78,6 +78,7 @@ async function checkIfTeamAlreadyExists(req, res, next) {
         .cookie(get('cookieParser.cookieName'), `t-${team}`, {
           signed: true,
           httpOnly: true,
+          sameSite: 'strict',
         })
         .status(200)
         .send();
@@ -154,6 +155,7 @@ async function createTeam(req, res) {
       .cookie(get('cookieParser.cookieName'), `t-${team}`, {
         signed: true,
         httpOnly: true,
+        sameSite: 'strict',
       })
       .status(200)
       .json({
@@ -198,6 +200,21 @@ async function awaitReadyness(req, res) {
   }
 }
 
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+function logout(req, res) {
+  return res
+    .cookie(get('cookieParser.cookieName'), {
+      expires: new Date(0),
+      signed: true,
+      httpOnly: true,
+      sameSite: 'strict',
+    })
+    .send();
+}
+
 const paramsSchema = Joi.object({
   team: Joi.string()
     .required()
@@ -211,6 +228,8 @@ const bodySchema = Joi.object({
     .uppercase()
     .length(8),
 });
+
+router.post('/logout', logout);
 
 router.post(
   '/:team/join',

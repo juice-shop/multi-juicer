@@ -6,6 +6,7 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
 import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
+import { TeamDisplayCard } from '../cards/TeamDisplayCard';
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
@@ -62,6 +63,9 @@ export const JoinPage = injectIntl(
           <InstanceRestartingCard teamname={queryTeamname} />
         ) : null}
         {queryMessage === 'instance-not-found' ? <InstanceNotFoundCard /> : null}
+        {queryMessage === 'logged-in' && queryTeamname ? (
+          <TeamDisplayCard teamname={queryTeamname} />
+        ) : null}
 
         <BodyCard>
           <H2>

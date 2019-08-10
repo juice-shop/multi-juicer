@@ -46,9 +46,7 @@ const connectionCache = new Map();
  * @param {import("express").NextFunction} next
  */
 async function checkIfInstanceIsUp(req, res, next) {
-  const wrappedTeamname = req.teamname;
-  // Omit the inital "t-" part.
-  const teamname = wrappedTeamname.substring(2);
+  const teamname = req.cleanedTeamname;
 
   const currentTime = new Date().getTime();
   if (connectionCache.has(teamname) && currentTime - connectionCache.get(teamname) < 10000) {

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { FormattedMessage } from 'react-intl';
+import { withRouter } from 'react-router-dom';
+
 import { BodyCard, SecondaryButton, H3 } from '../Components';
 import astronaut from './astronaut.svg';
-
-import { FormattedMessage } from 'react-intl';
 
 const TeamDisplayCardWrapper = styled(BodyCard)`
   display: flex;
@@ -34,6 +36,17 @@ const Subtitle = styled.span`
   font-weight: 300;
 `;
 
+const LogoutButton = withRouter(({ history }) => {
+  function logout() {
+    axios.post('/balancer/teams/logout').then(() => history.push('/'));
+  }
+  return (
+    <SecondaryButton onClick={logout}>
+      <FormattedMessage id="log_out" defaultMessage="Log Out" />
+    </SecondaryButton>
+  );
+});
+
 export const TeamDisplayCard = ({ teamname }) => {
   return (
     <TeamDisplayCardWrapper>
@@ -44,9 +57,7 @@ export const TeamDisplayCard = ({ teamname }) => {
         </Subtitle>
         <H3>{teamname}</H3>
       </TeamDisplayTextWrapper>
-      <SecondaryButton>
-        <FormattedMessage id="log_out" defaultMessage="Log Out" />
-      </SecondaryButton>
+      <LogoutButton />
     </TeamDisplayCardWrapper>
   );
 };
