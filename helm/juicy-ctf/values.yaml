@@ -17,6 +17,7 @@ juiceShop:
   # Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
   # Specify a custom Juice Shop config
+  # See the JuiceShop Config Docs for more detail: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/customization.html#yaml-configuration-file
   config: |
     application:
       logo: JuiceShopCTF_Logo.png
@@ -28,13 +29,15 @@ juiceShop:
     ctf:
       # showFlagsInNotifications: true
 
+# Config for the redis deployment
+# This is using: https://hub.helm.sh/charts/stable/redis
 redis:
+  cluster:
+    slaveCount: 1
   # OpenShifts Default Security Context makes trouble with the security context
   # of the redis chart. Uncomment the next two lines to have it run on OpenShift.
   # securityContext:
   #   enabled: false
-  cluster:
-    slaveCount: 1
 
 # Deletes unused JuiceShop instances after a configuable period of inactivity
 juiceShopCleanup:
