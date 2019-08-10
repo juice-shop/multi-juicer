@@ -50,6 +50,19 @@ kubectl delete deployment --selector app=juice-shop && kubectl delete service --
 
 ## FAQ
 
+### How much resources will the cluster require?
+
+To be on the safe side calculate with:
+
+- _1GB memory overhead_, for the balancer, redis & co
+- _250MB \* Number of participants_, for the individual JuiceShop Instances
+
+### How many users can JuicyCTF handle?
+
+The is no real fixed limit. (Even thought you can configure one 😉)
+The custom LoadBalancer through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
+You can also attach a [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to automatically scale the LoadBalancer.
+
 ### Why a custom LoadBalancer?
 
 There are some special requirements which we didn't find to be easily solved with any pre build load balancer:
