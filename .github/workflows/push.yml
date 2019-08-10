@@ -20,6 +20,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - name: Install Balancer
+        run: |
+          cd cleaner
+          npm ci
+      - name: Run Linter
+        run: |
+          cd cleaner
+          npm run lint
+      - name: Test Balancer
+        run: |
+          cd cleaner
+          npm test -- --ci --color --verbose
       - name: Build'n Push Cleaner
         uses: pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9
         env:
