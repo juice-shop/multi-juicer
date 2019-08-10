@@ -40,6 +40,17 @@ Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it ea
 - [\[WIP\] AWS](./guides/aws/aws.md)
 - [\[WIP\] Azure](./guides/azure/azure.md)
 
+### Customizing / Adjusting the setup
+
+You got some options on how to setup the stack, with some option to customize the JuiceShop instances to your own liking.
+You can find the default config values under: [helm/juicy-ctf/values.yaml](./helm/juicy-ctf/values.yaml)
+
+Download & Save the file and tell helm to use your config file over the default by running:
+
+```sh
+helm install -f values.yaml juicy-ctf ./juicy-ctf/helm/juicy-ctf/
+```
+
 ### Deinstallation
 
 ```sh
