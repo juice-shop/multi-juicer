@@ -14,7 +14,7 @@ This example expects you to have the following cli tools setup.
 ## Step 1. Starting the cluster
 
 ```bash
-#First we'll need a cluser, you can create one using the DigitalOcean cli.
+# First we'll need a cluser, you can create one using the DigitalOcean cli.
 # This will take a couple of minutes
 doctl kubernetes cluster create juicy-k8s
 
