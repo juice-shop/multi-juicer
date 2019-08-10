@@ -1,4 +1,4 @@
-# Example Setup with Microsoft Azure
+# [WIP] Example Setup with Microsoft Azure
 
 **WARNING:** The resources created in this guid will cost about \$??/month.
 Make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.

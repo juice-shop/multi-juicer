@@ -1,4 +1,4 @@
-# Example Setup with AWS
+# [WIP] Example Setup with AWS
 
 **WARNING:** The resources created in this guide will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
@@ -73,6 +73,9 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 ```
 
 ## Step 4. Add Ingress to expose the app to the world
+
+**WARNING:** I, as a AWS Noob, haven't yet figured out how to get it working correctly.
+The Guide below shows **how I thing it should work** but it doesn't. At least not for me. If you are a AWS Pro please please send me a message / open up an issue / pull request correcting this section.
 
 AWS let's you create LoadBalancer by adding a new ingress config to you cluster.
 To set this up follow the **To deploy the ALB Ingress Controller to an Amazon EKS cluster** guide on https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html closely. This will walk you through setting up and configuring the ingress.
