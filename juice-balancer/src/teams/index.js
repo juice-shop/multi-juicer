@@ -87,7 +87,7 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       message: 'Team requires authentication to join',
     });
   } catch (error) {
-    if (error.response.body.message === `deployments.apps "t-${team}-juiceshop" not found`) {
+    if (error.message === `deployments.apps "t-${team}-juiceshop" not found`) {
       logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
       return next();
     } else {
