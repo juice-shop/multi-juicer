@@ -16,7 +16,7 @@ const router = express.Router();
  * @param {import("express").NextFunction} next
  */
 function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
-  if (req.teamname === undefined) {
+  if (!req.teamname) {
     logger.debug('got request without team in proxy. redirecting to /balancer/');
     return res.redirect('/balancer/');
   }
