@@ -68,7 +68,7 @@ test('returns a 500 error code when kubernetes returns a unexpected error code w
     .expect(500);
 });
 
-test('returns requires authentication response when the deployment exists but no passcode was provided', async () => {
+test('requires authentication response when the deployment exists but no passcode was provided', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {};
   });
@@ -79,7 +79,7 @@ test('returns requires authentication response when the deployment exists but no
     .expect(401);
 });
 
-test('returns requires authentication when the passcode is incorrect', async () => {
+test('requires authentication when the passcode is incorrect', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {};
   });
