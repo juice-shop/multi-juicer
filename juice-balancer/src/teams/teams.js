@@ -180,7 +180,7 @@ async function createTeam(req, res) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-async function awaitReadyness(req, res) {
+async function awaitReadiness(req, res) {
   const { team } = req.params;
 
   logger.info(`Awaiting readiness of JuiceShop Deployment for team "${team}"`);
@@ -246,6 +246,6 @@ router.post(
   createTeam
 );
 
-router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadyness);
+router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadiness);
 
 module.exports = router;
