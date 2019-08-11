@@ -32,7 +32,7 @@ app.get('/balancer/', (req, res, next) => {
   if (!req.teamname) {
     return next();
   }
-  return res.redirect(`/balancer/?msg=logged-in&teamname=${req.teamname}`);
+  return res.redirect(`/balancer/?msg=logged-in&teamname=${req.cleanedTeamname}`);
 });
 
 app.use('/balancer', express.static(process.env['NODE_ENV'] === 'test' ? 'ui/build/' : 'public'));
