@@ -97,8 +97,8 @@ async function checkIfTeamAlreadyExists(req, res, next) {
       return next();
     } else {
       logger.error('Encountered unknown error while checking for existing JuiceShop deployment');
-      logger.error(error);
-      return res.status(500).send(`Unknown error code: "${error.body.message}"`);
+      logger.error(error.message);
+      return res.status(500).send(`Unknown error while looking for an existing instance."`);
     }
   }
 }
