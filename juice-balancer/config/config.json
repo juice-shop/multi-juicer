@@ -11,7 +11,7 @@
   },
   "admin": {
     "username": "admin",
-    "password": "sooperDooperPassword"
+    "password": "12345678"
   },
   "cookieParser": {
     "cookieName": "balancer",
@@ -22,6 +22,7 @@
     "image": "bkimminich/juice-shop",
     "tag": "snapshot",
     "imagePullPolicy": "IfNotPresent",
+    "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
     "resources:": {
       "requests": {
         "memory": "256Mi",

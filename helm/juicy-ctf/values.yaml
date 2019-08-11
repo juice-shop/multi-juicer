@@ -27,6 +27,10 @@ juiceShop:
   # Juice Shop Image to use
   image: bkimminich/juice-shop
   tag: snapshot
+  # Change the key when hosting a CTF event
+  # This key gets used to generate the challenge flags
+  # See: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/ctf.html#overriding-the-ctfkey
+  ctfKey: 'zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr'
   resources:
     requests:
       memory: 200Mi
@@ -34,8 +38,9 @@ juiceShop:
     limits:
       memory: 200Mi
       cpu: 200m
-  # Specify a custom Juice Shop config
+  # Specify a custom Juice Shop config.yaml
   # See the JuiceShop Config Docs for more detail: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/customization.html#yaml-configuration-file
+  # See example customizations: https://github.com/bkimminich/juice-shop/tree/master/config
   config: |
     application:
       logo: JuiceShopCTF_Logo.png

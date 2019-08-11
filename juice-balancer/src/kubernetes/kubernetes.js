@@ -47,6 +47,10 @@ const createDeploymentForTeam = ({ team }) =>
                     name: 'NODE_ENV',
                     value: 'juicy-ctf',
                   },
+                  {
+                    name: 'CTF_KEY',
+                    value: get('juiceShop.ctfKey'),
+                  },
                 ],
                 ports: [
                   {
