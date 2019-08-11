@@ -36,6 +36,28 @@ describe('teamname validation', () => {
   });
 });
 
+describe('passcode validation', () => {
+  test.each([
+    ['12345678', true],
+    ['ABCDEFGH', true],
+    ['12abCD34', true],
+    ['te++am12', false],
+    ['123456789', false],
+    ['1234567', false],
+  ])('passcode "%s" should pass validation: %p', async (passcode, shouldPassValidation) => {
+    getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+      return {};
+    });
+    // lowered salt to keep hashing quick
+    redis.get.mockReturnValue(bcrypt.hashSync('foo', 2));
+
+    await request(app)
+      .post(`/balancer/teams/teamname/join`, {})
+      .send({ passcode })
+      .expect(shouldPassValidation ? 401 : 400);
+  });
+});
+
 test('returns a 500 error code when kubernetes returns a unexpected error code while looking for existing deployments', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(() => {
     throw new Error(`kubernetes cluster is on burning. Evacuate immediately!`);
@@ -61,7 +83,7 @@ test('returns requires authentication when the passcode is incorrect', async () 
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {};
   });
-  redis.get.mockReturnValue(bcrypt.hashSync('12345678'));
+  redis.get.mockReturnValue(bcrypt.hashSync('12345678', 2));
 
   await request(app)
     .post('/balancer/teams/team42/join')
@@ -73,7 +95,7 @@ test('joins team when the passcode is correct and the instance exists', async ()
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {};
   });
-  redis.get.mockReturnValue(bcrypt.hashSync('12345678'));
+  redis.get.mockReturnValue(bcrypt.hashSync('12345678', 2));
 
   await request(app)
     .post('/balancer/teams/team42/join')
