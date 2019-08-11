@@ -30,3 +30,11 @@ Create chart name and version as used by the chart label.
 {{- define "juicy-ctf.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "juicy-ctf.cookieName" -}}
+{{- if .Values.balancer.cookie.secure -}}
+{{- printf "__Secure-%s" .Values.balancer.cookie.name -}}
+{{- else -}}
+{{- printf "%s" .Values.balancer.cookie.name -}}
+{{- end -}}
+{{- end -}}

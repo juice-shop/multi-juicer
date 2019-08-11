@@ -4,8 +4,9 @@ nodeSelector: {}
 balancer:
   cookie:
     # SET THIS TO TRUE IF IN PRODUCTION
+    # Sets secure Flag in cookie
     secure: false
-    # If secure is set to true change the name to __Secure-balancer
+    # If secure is set to true the cookie name will automatically be prefixed with "__Secure-"
     name: balancer
   repository: iteratec/juice-balancer
   tag: latest
