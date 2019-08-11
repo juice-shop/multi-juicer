@@ -5,7 +5,7 @@ kc.loadFromCluster();
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
-const { get } = require('../config');
+const { get } = require('./config');
 
 const createDeploymentForTeam = ({ team }) =>
   k8sAppsApi

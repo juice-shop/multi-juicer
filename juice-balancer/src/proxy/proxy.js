@@ -6,7 +6,7 @@ const proxy = httpProxy.createProxyServer();
 const redis = require('../redis');
 const { get } = require('../config');
 const { logger } = require('../logger');
-const { getJuiceShopInstanceForTeamname } = require('../kubernetes/kubernetes');
+const { getJuiceShopInstanceForTeamname } = require('../kubernetes');
 
 const router = express.Router();
 

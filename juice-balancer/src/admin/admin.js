@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const { getJuiceShopInstances, deletePodForTeam } = require('../kubernetes/kubernetes');
+const { getJuiceShopInstances, deletePodForTeam } = require('../kubernetes');
 
 const redis = require('../redis');
 const { get } = require('../config');

@@ -15,7 +15,7 @@ const {
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
-} = require('../kubernetes/kubernetes');
+} = require('../kubernetes');
 const { logger } = require('../logger');
 const { get } = require('../config');
 
