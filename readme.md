@@ -19,7 +19,7 @@ JuicyCTF gives you the ability to run separate Juice Shop instances for every pa
 JuicyCTF runs on kubernetes, to install it you'll need [helm](https://helm.sh).
 
 If you aren't familiar with helm, try out the helm 3 alpha.
-It's easier to install and easier to use. It's pretty stable, and it doesn't have a server side component anymore but simply runs on your local machine.
+It's easier to install and easier to use. It's pretty stable, and it doesn't have a server side component anymore. It just runs on your local machine.
 
 ```sh
 git clone git@github.com:J12934/juicy-ctf.git
