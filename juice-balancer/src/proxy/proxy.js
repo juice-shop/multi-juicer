@@ -17,7 +17,7 @@ const router = express.Router();
  */
 function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
   if (!req.teamname) {
-    logger.debug('got request without team in proxy. redirecting to /balancer/');
+    logger.debug('Got request without team cookie in proxy. Redirecting to /balancer/');
     return res.redirect('/balancer/');
   }
   return next();
@@ -30,7 +30,7 @@ function redirectJuiceShopTrafficWithoutBalancerCookies(req, res, next) {
  */
 function redirectAdminTrafficToBalancerPage(req, res, next) {
   if (req.teamname === `t-${get('admin.username')}`) {
-    logger.debug('got admin request in proxy. redirecting to /balancer/');
+    logger.debug('Got admin request in proxy. Redirecting to /balancer/');
     return res.redirect('/balancer/?msg=logged-as-admin');
   }
   return next();
