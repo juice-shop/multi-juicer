@@ -5,7 +5,7 @@ const myFormat = winston.format.printf(({ level, message, timestamp }) => {
 });
 
 const logger = winston.createLogger({
-  level: process.env['DEBUG'] ? 'debug' : 'info',
+  level: process.env['NODE_ENV'] !== 'production' ? 'debug' : 'info',
   format: winston.format.combine(winston.format.timestamp(), myFormat),
   transports: [new winston.transports.Console()],
 });
