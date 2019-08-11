@@ -72,7 +72,7 @@ test('requires authentication response when the deployment exists but no passcod
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {};
   });
-  redis.get.mockReturnValue(bcrypt.hashSync('foo'));
+  redis.get.mockReturnValue(bcrypt.hashSync('foo', 2));
 
   await request(app)
     .post('/balancer/teams/team42/join', {})
