@@ -1,4 +1,4 @@
-![Juicy CTF, Multi User Juice Shop Platform](./cover.svg)
+![JuicyCTF, Multi User Juice Shop Platform](./cover.svg)
 
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
@@ -12,7 +12,7 @@ JuicyCTF gives you the ability to run separate Juice Shop instances for every pa
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
-![Juicy CTF, High Level Architecture Diagram](./high-level-architecture.svg)
+![JuicyCTF, High Level Architecture Diagram](./high-level-architecture.svg)
 
 ## Installation
 
