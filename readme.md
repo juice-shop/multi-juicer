@@ -3,7 +3,7 @@
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
-JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster, to run events without the need for local Juice Shop instances.
+JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
 
 **What it does:**
 
