@@ -85,7 +85,9 @@ async function checkIfTeamAlreadyExists(req, res, next) {
           ...cookieSettings,
         })
         .status(200)
-        .send();
+        .send({
+          message: 'Joined Team',
+        });
     }
 
     return res.status(401).json({
