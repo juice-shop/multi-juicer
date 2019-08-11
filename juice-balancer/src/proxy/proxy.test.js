@@ -1,13 +1,13 @@
-jest.mock('./redis');
-jest.mock('./kubernetes/kubernetes');
+jest.mock('../redis');
+jest.mock('../kubernetes/kubernetes');
 jest.mock('http-proxy');
 
 const { advanceBy, advanceTo, clear } = require('jest-date-mock');
 const request = require('supertest');
 
-const redis = require('./redis');
-const app = require('./app');
-const { getJuiceShopInstanceForTeamname } = require('./kubernetes/kubernetes');
+const redis = require('../redis');
+const app = require('../app');
+const { getJuiceShopInstanceForTeamname } = require('../kubernetes/kubernetes');
 
 afterAll(async () => {
   await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
