@@ -94,7 +94,9 @@ async function checkIfTeamAlreadyExists(req, res, next) {
     } else {
       logger.error('Encountered unknown error while checking for existing JuiceShop deployment');
       logger.error(error.message);
-      return res.status(500).send(`Unknown error while looking for an existing instance."`);
+      return res
+        .status(500)
+        .send({ message: `Unknown error while looking for an existing instance."` });
     }
   }
 }
@@ -166,7 +168,7 @@ async function createTeam(req, res) {
   } catch (error) {
     logger.error(`Error while creating deployment or service for team ${team}`);
     logger.error(error.message);
-    res.status(500).send();
+    res.status(500).send({ message: 'Failed to Create Instance' });
   }
 }
 
@@ -193,11 +195,11 @@ async function awaitReadiness(req, res) {
     }
 
     logger.error(`Waiting for deployment of team "${team}" timed out`);
-    res.status(500);
+    res.status(500).send({ message: 'Waiting for Deployment Readiness Timed Out' });
   } catch (error) {
     logger.error(`Failed to wait for teams "${team}" deployment to get ready`);
     logger.error(error);
-    res.status(500);
+    res.status(500).send({ message: 'Failed to Wait For Deployment Readiness' });
   }
 }
 
@@ -222,7 +224,6 @@ const paramsSchema = Joi.object({
 });
 const bodySchema = Joi.object({
   passcode: Joi.string()
-    .optional()
     .alphanum()
     .uppercase()
     .length(8),
