@@ -6,7 +6,7 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const redis = require('../redis');
 const app = require('../app');
-const { getJuiceShopInstanceForTeamname } = require('../kubernetes');
+const { getJuiceShopInstanceForTeamname, getJuiceShopInstances } = require('../kubernetes');
 
 afterAll(async () => {
   await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
@@ -16,6 +16,9 @@ beforeEach(() => {
   redis.set.mockClear();
   redis.get.mockClear();
   getJuiceShopInstanceForTeamname.mockClear();
+  getJuiceShopInstances.mockImplementation(async () => {
+    return { body: { items: [] } };
+  });
 });
 
 test('returns a 500 error code when kubernetes returns a unexpected error code while looking for existing deployments', async () => {
@@ -63,5 +66,21 @@ test('joins team when the passcode is correct and the instance exists', async ()
     .expect(200)
     .then(({ body }) => {
       expect(body.message).toBe('Joined Team');
+    });
+});
+
+test('create team fails when max instances is reached', async () => {
+  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+    throw new Error(`deployments.apps "t-team42-juiceshop" not found`);
+  });
+  getJuiceShopInstances.mockImplementation(async () => {
+    return { body: { items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } };
+  });
+
+  await request(app)
+    .post('/balancer/teams/team42/join')
+    .expect(500)
+    .then(({ body }) => {
+      expect(body.message).toBe('Reached Maximum Instance Count');
     });
 });

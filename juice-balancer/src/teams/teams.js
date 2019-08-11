@@ -127,7 +127,10 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
     logger.info(`Reached ${instances.length}/${maxInstances} instances`);
     if (instances.length >= maxInstances) {
       logger.error('Max instance count reached');
-      return res.status(500).send('Reached Maximum Instance Count. Find a Admin to handle this.');
+      return res.status(500).send({
+        message: 'Reached Maximum Instance Count',
+        description: ' Find a Admin to handle this.',
+      });
     }
     next();
   } catch (error) {
@@ -168,7 +171,7 @@ async function createTeam(req, res) {
       });
   } catch (error) {
     logger.error(`Error while creating deployment or service for team ${team}`);
-    logger.error(error);
+    logger.error(error.message);
     res.status(500).send();
   }
 }
