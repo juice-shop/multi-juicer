@@ -5,7 +5,7 @@ const { get } = require('./config');
 
 const app = express();
 
-const teamRoutes = require('./teams');
+const teamRoutes = require('./teams/teams');
 const adminRoutes = require('./admin/admin');
 const proxyRoutes = require('./proxy/proxy');
 
