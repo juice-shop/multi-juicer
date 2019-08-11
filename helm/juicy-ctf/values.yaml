@@ -14,8 +14,10 @@ balancer:
   resources:
     requests:
       memory: 256Mi
+      cpu: 400m
     limits:
       memory: 256Mi
+      cpu: 400m
   affinity: {}
   tolerations: []
 
@@ -27,10 +29,10 @@ juiceShop:
   tag: snapshot
   resources:
     requests:
-      memory: 256Mi
+      memory: 200Mi
       cpu: 200m
     limits:
-      memory: 256Mi
+      memory: 200Mi
       cpu: 200m
   # Specify a custom Juice Shop config
   # See the JuiceShop Config Docs for more detail: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/customization.html#yaml-configuration-file

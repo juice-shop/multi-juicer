@@ -3,7 +3,7 @@
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
-JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster, giving you the tools to run events without the need for local Juice Shop instances.
+JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central cluster, to run events without the need for local Juice Shop instances.
 
 **What it does:**
 
@@ -40,7 +40,7 @@ Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it ea
 - [\[WIP\] AWS](./guides/aws/aws.md)
 - [\[WIP\] Azure](./guides/azure/azure.md)
 
-### Customizing / Adjusting the Setup
+### Customizing the Setup
 
 You got some options on how to setup the stack, with some option to customize the JuiceShop instances to your own liking.
 You can find the default config values under: [helm/juicy-ctf/values.yaml](./helm/juicy-ctf/values.yaml)
@@ -61,12 +61,14 @@ kubectl delete deployment --selector app=juice-shop && kubectl delete service --
 
 ## FAQ
 
-### How much resources will the cluster require?
+### How much compute resources will the cluster require?
 
 To be on the safe side calculate with:
 
-- _1GB memory overhead_, for the balancer, redis & co
-- _250MB \* number of participants_, for the individual JuiceShop Instances
+- _1GB memory & 1CPU overhead_, for the balancer, redis & co
+- _200MB & 0.2CPU \* number of participants_, for the individual JuiceShop Instances
+
+The numbers above reflect the default resource limits. These can be tweaked, see: [Customizing the Setup](#customizing-the-setup)
 
 ### How many users can JuicyCTF handle?
 
