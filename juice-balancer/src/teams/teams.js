@@ -37,12 +37,6 @@ async function interceptAdminLogin(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
-  logger.debug(
-    `Checking if team "${team}:${passcode}" is the admin "${get('admin.username')}:${get(
-      'admin.password'
-    )}"`
-  );
-
   if (team === get('admin.username') && passcode === get('admin.password')) {
     return res
       .cookie(get('cookieParser.cookieName'), `t-${team}`, {
