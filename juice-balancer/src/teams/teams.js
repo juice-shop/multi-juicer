@@ -19,6 +19,8 @@ const {
 const { logger } = require('../logger');
 const { get } = require('../config');
 
+const BCRYPT_ROUNDS = process.env['NODE_ENV'] === 'production' ? 12 : 2;
+
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const cookieSettings = {
@@ -144,7 +146,7 @@ async function createTeam(req, res) {
   const { team } = req.params;
   try {
     const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
-    const hash = await bcrypt.hash(passcode, 12);
+    const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
 
     await redis.set(`t-${team}-passcode`, hash);
     await redis.set(`t-${team}-last-request`, new Date().getTime());

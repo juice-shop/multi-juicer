@@ -6,7 +6,12 @@ const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const redis = require('../redis');
 const app = require('../app');
-const { getJuiceShopInstanceForTeamname, getJuiceShopInstances } = require('../kubernetes');
+const {
+  getJuiceShopInstanceForTeamname,
+  getJuiceShopInstances,
+  createDeploymentForTeam,
+  createServiceForTeam,
+} = require('../kubernetes');
 
 afterAll(async () => {
   await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
@@ -120,4 +125,24 @@ test('create team fails when max instances is reached', async () => {
     .then(({ body }) => {
       expect(body.message).toBe('Reached Maximum Instance Count');
     });
+});
+
+test('create team creates a instance for team via k8s service', async () => {
+  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+    throw new Error(`deployments.apps "t-team42-juiceshop" not found`);
+  });
+
+  let passcode = null;
+
+  await request(app)
+    .post('/balancer/teams/team42/join')
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.message).toBe('Created Instance');
+      expect(body.passcode).toMatch(/[a-zA-Z0-9]{7}/);
+      passcode = body.passcode;
+    });
+
+  expect(createDeploymentForTeam).toBeCalledWith({ team: 'team42', passcode });
+  expect(createServiceForTeam).toBeCalledWith('team42');
 });
