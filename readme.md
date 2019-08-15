@@ -99,3 +99,7 @@ There are some pretty good reasons for this:
 ### Did somebody actually ask any of these questions?
 
 No 😉
+
+## Talk with Us!
+
+You can reach us in the `#project-juiceshop` channel of the OWASP Slack Workspace. We'd love to hear any feedback or usage reports you got. If you are not already in the OWASP Slack Workspace, you can join via [this link](http://owaspslack.com/)
