@@ -1,6 +1,6 @@
 # [WIP] Example Setup with AWS
 
-**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/J12934/juicy-ctf/issues/15
+**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/juicy-ctf/issues/15
 
 **WARNING:** The resources created in this guide will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
@@ -35,7 +35,7 @@ kubectl config current-context
 
 ```sh
 # We'll need to clone this git repo for the moment, as the helm chart isn't pushed to any registry
-git clone git@github.com:J12934/juicy-ctf.git
+git clone git@github.com:iteratec/juicy-ctf.git
 
 # First we'll need to fetch the charts JuicyCTF depends on
 helm dependency update ./juicy-ctf/helm/juicy-ctf/

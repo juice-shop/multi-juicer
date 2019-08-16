@@ -27,7 +27,7 @@ kubectl config current-context
 
 ```bash
 # We'll need to clone this git repo for the moment, as the helm chart isn't pushed to any registry
-git clone git@github.com:J12934/juicy-ctf.git
+git clone git@github.com:iteratec/juicy-ctf.git
 
 # First we'll need to fetch the charts JuicyCTF depends on
 helm dependency update ./juicy-ctf/helm/juicy-ctf/

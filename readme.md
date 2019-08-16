@@ -22,7 +22,7 @@ If you aren't familiar with helm, try out the helm 3 alpha.
 It's easier to install and easier to use. It's pretty stable, and it doesn't have a server side component anymore. It just runs on your local machine.
 
 ```sh
-git clone git@github.com:J12934/juicy-ctf.git
+git clone git@github.com:iteratec/juicy-ctf.git
 
 # First we'll need to fetch the charts JuicyCTF depends on
 helm dependency update ./juicy-ctf/helm/juicy-ctf/
