@@ -7,8 +7,8 @@
 This example expects you to have the following prerequisites.
 
 1. A running OpenShift Cluster
-2. [oc OpenShift CLI](https://github.com/openshift/origin/releases)
-3. [helm](https://helm.sh) helm3 recommended, to avoid tiller headache
+2. [oc](https://github.com/openshift/origin/releases), OpenShift CLI
+3. [helm](https://helm.sh), helm3 recommended, to avoid tiller headache
 
 ## Step 1. Log into the OpenShift cluster
 
