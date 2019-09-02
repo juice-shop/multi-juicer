@@ -37,6 +37,7 @@ helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with JuicyCTF installed for some specific Cloud providers.
 
 - [Digital Ocean](./guides/digital-ocean/digital-ocean.md)
+- [OpenShift](./guides/openshift/openshift.md)
 - [\[WIP\] AWS](./guides/aws/aws.md)
 - [\[WIP\] Azure](./guides/azure/azure.md)
 
