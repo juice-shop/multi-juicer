@@ -1,4 +1,6 @@
-# Example Setup with Digital Ocean
+# Example Setup with OpenShift
+
+**NOTE:** This Guide was tested with OpenShift 3.11, if this doesn't work with newer OpenShift versions please open up an issue. Thank you! 👏
 
 ## Prerequisites
 
