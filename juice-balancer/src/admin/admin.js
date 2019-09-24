@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const { getJuiceShopInstances, deletePodForTeam } = require('../kubernetes');
+const { getJuiceShopInstances, deletePodForTeam, deleteDeploymentForTeam, deleteServiceForTeam} = require('../kubernetes');
 
 const redis = require('../redis');
 const { get } = require('../config');
@@ -92,8 +92,8 @@ async function deleteInstance(req, res) {
   }
 }
 
-router.delete('/teams/:team/delete', deleteInstance);
 router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
 router.post('/teams/:team/restart', restartInstance);
+router.delete('/teams/:team/delete', deleteInstance);
 module.exports = router;

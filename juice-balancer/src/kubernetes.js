@@ -173,10 +173,13 @@ const getJuiceShopInstances = () =>
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
 const deleteDeploymentForTeam = async team => {
-  await k8sCoreApi.deleteNamespacedDeployment(
+  await k8sAppsApi.deleteNamespacedDeployment(
     `t-${team}-juiceshop`,
     get('namespace')
   )
+  .catch(error => {
+    throw new Error(error.response.body.message);
+  });
 }
 module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
 
@@ -185,6 +188,9 @@ const deleteServiceForTeam = async team => {
     `t-${team}-juiceshop`,
     get('namespace')
   )
+  .catch(error => {
+    throw new Error(error.response.body.message);
+  });
 }
 module.exports.deleteServiceForTeam = deleteServiceForTeam;
 
