@@ -172,6 +172,22 @@ const getJuiceShopInstances = () =>
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
+const deleteDeploymentForTeam = async team => {
+  await k8sCoreApi.deleteNamespacedDeployment(
+    `t-${team}-juiceshop`,
+    get('namespace')
+  )
+}
+module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
+
+const deleteServiceForTeam = async team => {
+  await k8sCoreApi.deleteNamespacedService(
+    `t-${team}-juiceshop`,
+    get('namespace')
+  )
+}
+module.exports.deleteServiceForTeam = deleteServiceForTeam;
+
 const deletePodForTeam = async team => {
   const res = await k8sCoreApi.listNamespacedPod(
     get('namespace'),

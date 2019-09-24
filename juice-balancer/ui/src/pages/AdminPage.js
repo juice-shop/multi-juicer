@@ -65,6 +65,25 @@ function RestartInstanceButton({ team }) {
   );
 }
 
+function DeleteInstanceButton({ team }) {
+  const [deleting, setDeleting] = useState(false);
+
+  const remove = event => {
+    event.preventDefault();
+    setDeleting(true);
+    axios.delete(`/balancer/admin/teams/${team}/delete`).finally(() => setDeleting(false));
+  };
+  return (
+    <SmallSecondary onClick={remove}>
+      {deleting ? (
+        <FormattedMessage id="admin_table.deleting" defaultMessage="Deleting..." />
+      ) : (
+        <FormattedMessage id="admin_table.delete" defaultMessage="Delete" />
+      )}
+    </SmallSecondary>
+  );
+}
+
 export default injectIntl(({ intl }) => {
   const [teams, setTeams] = useState([]);
 
@@ -127,7 +146,7 @@ export default injectIntl(({ intl }) => {
       name: formatMessage(messages.actions),
       selector: 'actions',
       cell: ({ team }) => {
-        return <RestartInstanceButton team={team} />;
+      return [<DeleteInstanceButton team={team} />,<RestartInstanceButton team={team} />];
       },
       ignoreRowClick: true,
       button: true,

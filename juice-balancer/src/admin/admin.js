@@ -73,6 +73,26 @@ async function restartInstance(req, res) {
   }
 }
 
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+async function deleteInstance(req, res) {
+  try {
+    const teamname = req.params.team;
+    logger.info(`Deleting deployment for team: "${teamname}"`);
+
+    await deleteDeploymentForTeam(teamname)
+    await deleteServiceForTeam(teamname)
+
+    res.send();
+  } catch (error) {
+    logger.error(error);
+    res.status(500).send();
+  }
+}
+
+router.delete('/teams/:team/delete', deleteInstance);
 router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
 router.post('/teams/:team/restart', restartInstance);
