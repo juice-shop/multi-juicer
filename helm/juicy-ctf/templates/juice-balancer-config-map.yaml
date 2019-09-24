@@ -28,6 +28,7 @@ data:
         "tag": {{ .Values.juiceShop.tag | quote }},
         "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
         "ctfKey": {{ .Values.juiceShop.ctfKey | quote }},
+        "nodeEnv": {{ .Values.juiceShop.nodeEnv | quote }}}
         "resources": {{ .Values.juiceShop.resources | toJson }}
       }
     }

@@ -31,6 +31,7 @@ juiceShop:
   # This key gets used to generate the challenge flags
   # See: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/ctf.html#overriding-the-ctfkey
   ctfKey: 'zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr'
+  nodeEnv: 'juicy-ctf'
   resources:
     requests:
       memory: 200Mi
