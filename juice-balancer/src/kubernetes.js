@@ -45,7 +45,7 @@ const createDeploymentForTeam = ({ team }) =>
                 env: [
                   {
                     name: 'NODE_ENV',
-                    value: 'juicy-ctf',
+                    value: get('juiceShop.nodeEnv'),
                   },
                   {
                     name: 'CTF_KEY',
