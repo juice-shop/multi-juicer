@@ -11,4 +11,11 @@ export default [
     key: 'de-DE',
     messageLoader: () => import('./de-DE'),
   },
+  {
+    flag: '🇳🇱',
+    name: 'Dutch',
+    key: 'nl-NL',
+    messageLoader: () => import('./nl-NL'),
+  },
 ];
+
