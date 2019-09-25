@@ -2,7 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
-const { getJuiceShopInstances, deletePodForTeam, deleteDeploymentForTeam, deleteServiceForTeam} = require('../kubernetes');
+const {
+  getJuiceShopInstances,
+  deletePodForTeam,
+  deleteDeploymentForTeam,
+  deleteServiceForTeam,
+} = require('../kubernetes');
 
 const redis = require('../redis');
 const { get } = require('../config');
@@ -82,8 +87,8 @@ async function deleteInstance(req, res) {
     const teamname = req.params.team;
     logger.info(`Deleting deployment for team: "${teamname}"`);
 
-    await deleteDeploymentForTeam(teamname)
-    await deleteServiceForTeam(teamname)
+    await deleteDeploymentForTeam(teamname);
+    await deleteServiceForTeam(teamname);
 
     res.send();
   } catch (error) {

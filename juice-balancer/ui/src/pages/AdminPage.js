@@ -146,7 +146,7 @@ export default injectIntl(({ intl }) => {
       name: formatMessage(messages.actions),
       selector: 'actions',
       cell: ({ team }) => {
-      return [<DeleteInstanceButton team={team} />,<RestartInstanceButton team={team} />];
+        return [<DeleteInstanceButton team={team} />, <RestartInstanceButton team={team} />];
       },
       ignoreRowClick: true,
       button: true,
