@@ -1,7 +1,7 @@
 export default {
   getting_started_text:
     'Kies een teamnaam zodat we je kunnen herkennen. Als je wilt samenwerken met andere personen dan kan je meedoen onder dezelfde teamnaam.',
-  getting_started: "Beginnen",
+  getting_started: "Starten",
   join_failed_text: 'Het team kan niet hersteld of bereikt worden.',
   teamname: 'Teamnaam',
   teamname_validation_constraints:
@@ -28,7 +28,7 @@ export default {
   'admin_table.created': 'Aangemaakt',
   'admin_table.lastUsed': 'Laatst gebruikt',
   'admin_table.actions': 'Acties',
-  'admin_table.noActiveTeams': 'Geen geactiveerde teams',
+  'admin_table.noActiveTeams': 'Geen actieve teams',
   'admin_table.restarting': 'Wordt nu opnieuw gestart',
   'admin_table.restart': 'Herstarten',
 };
