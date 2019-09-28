@@ -1,5 +1,5 @@
 on: [push, release]
-name: 'CI'
+name: 'Publish Docker Images'
 jobs:
   progressWatchDog:
     name: ProgressWatchDog
