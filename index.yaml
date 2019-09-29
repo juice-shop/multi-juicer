@@ -1,0 +1,79 @@
+apiVersion: v1
+entries:
+  juicy-ctf:
+  - apiVersion: v1
+    appVersion: 1.2.1
+    created: "2019-09-29T21:54:32.144494+02:00"
+    dependencies:
+    - name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 8.1.4
+    description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
+      Juice Shop
+    digest: 7c43ff95edbf91ed86424c6845085986ccf543bbc33c833f8138441192dbc71b
+    name: juicy-ctf
+    type: application
+    urls:
+    - juicy-ctf-1.2.1.tgz
+    version: 1.2.1
+  - apiVersion: v1
+    appVersion: 1.2.0
+    created: "2019-09-29T21:54:32.139924+02:00"
+    dependencies:
+    - name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 8.1.4
+    description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
+      Juice Shop
+    digest: 773ed2baaf5318b9945449e73a8244960753cac7c80bc885102e685b42b339c7
+    name: juicy-ctf
+    type: application
+    urls:
+    - juicy-ctf-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v1
+    appVersion: 1.0.0
+    created: "2019-09-29T21:54:32.136905+02:00"
+    dependencies:
+    - name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 8.1.4
+    description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
+      Juice Shop
+    digest: 48eb8c808d799d1c81a0229c814040ca85d5f4fd347cfbb952cfffb76efbd188
+    name: juicy-ctf
+    type: application
+    urls:
+    - juicy-ctf-1.1.1.tgz
+    version: 1.1.1
+  - apiVersion: v1
+    appVersion: 1.0.0
+    created: "2019-09-29T21:54:32.133936+02:00"
+    dependencies:
+    - name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 8.1.4
+    description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
+      Juice Shop
+    digest: e4dbbd6f4419ab026a66b11f7470b2274344eeed1a15116e084b64718f067c07
+    name: juicy-ctf
+    type: application
+    urls:
+    - juicy-ctf-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v1
+    appVersion: 1.0.0
+    created: "2019-09-29T21:54:32.129+02:00"
+    dependencies:
+    - name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 8.1.4
+    description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
+      Juice Shop
+    digest: 0dd1e72bafc3e889275ff5de805a295546ba91ba7efc5d2c433f69e0f483872a
+    name: juicy-ctf
+    type: application
+    urls:
+    - juicy-ctf-1.0.0.tgz
+    version: 1.0.0
+generated: "2019-09-29T21:54:32.125251+02:00"
