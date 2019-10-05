@@ -24,25 +24,18 @@ oc new-project juicy-ctf
 ## Step 2. Installing JuicyCTF via helm
 
 ```bash
-# We'll need to clone this git repo for the moment, as the helm chart isn't pushed to any registry
-git clone git@github.com:iteratec/juicy-ctf.git
-
-# First we'll need to fetch the charts JuicyCTF depends on
-helm dependency update ./juicy-ctf/helm/juicy-ctf/
+# You'll need to add the juicy-ctf helm repo to your helm repos
+helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 
 # Before we can install the cluster we need to change one config option, which clashes with OpenShifts security context
 # For that download the OpenShift overrides config file
 wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/openshift/openshift-helm-overrides.yaml
 
-# Now we can install the helm chart
-# The first juicy-ctf part is the release name, safe to change to whatever you like, but the examples in the guide are written for 'juicy-ctf'
-helm install juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
+# for helm 2
+helm install juicy-ctf/juicy-ctf --name juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
 
-# kubernetes will now spin up the pods
-# to verify every thing is starting up, run:
-kubectl get pods
-# This should show you three pods a juice-balancer pod and two redis pods
-# Wait until all 3 pods are ready
+# for helm 3
+helm install juicy-ctf juicy-ctf/juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
 ```
 
 ## Step 3. Verify the app is running correctly

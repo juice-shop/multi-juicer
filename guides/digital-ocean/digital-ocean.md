@@ -26,15 +26,14 @@ kubectl config current-context
 ## Step 2. Installing JuicyCTF via helm
 
 ```bash
-# We'll need to clone this git repo for the moment, as the helm chart isn't pushed to any registry
-git clone git@github.com:iteratec/juicy-ctf.git
+# You'll need to add the juicy-ctf helm repo to your helm repos
+helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 
-# First we'll need to fetch the charts JuicyCTF depends on
-helm dependency update ./juicy-ctf/helm/juicy-ctf/
+# for helm 2
+helm install juicy-ctf/juicy-ctf --name juicy-ctf
 
-# Now we can install the helm chart
-# The first juicy-ctf part is the release name, safe to change to whatever you like, but the examples in the guide are written for 'juicy-ctf'
-helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
+# for helm 3
+helm install juicy-ctf juicy-ctf/juicy-ctf
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -77,11 +76,12 @@ doctl compute certificate list
 
 # We got a example loadbalancer yaml for this example in the repository
 # Edit the cert id in do-lb.yaml to the cert id of your domain
-vim juicy-ctf/example/digital-ocean/do-lb.yaml
+wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/digital-ocean/do-lb.yaml
+vim do-lb.yaml
 
 # Create the loadbalancer
 # This might take a couple of minutes
-kubectl create -f juicy-ctf/example/digital-ocean/do-lb.yaml
+kubectl create -f do-lb.yaml
 
 # If it takes longer than a few minutes take a detailed look at the loadbalancer
 kubectl describe services juicy-ctf-loadbalancer
@@ -97,7 +97,7 @@ helm delete juicy-ctf
 kubectl delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
 
 # Delete the loadbalancer
-kubectl delete -f juicy-ctf/example/digital-ocean/do-lb.yaml
+kubectl delete -f do-lb.yaml
 
 # Delete the kubernetes cluster
 doctl kubernetes cluster delete juicy-k8s
