@@ -3,17 +3,17 @@ entries:
   juicy-ctf:
   - apiVersion: v1
     appVersion: 1.3.0
-    created: "2019-10-05T19:55:49.30021991Z"
+    created: "2019-10-05T19:56:01.160351974Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
-    digest: 56ed5939efd5191d0990534a2f73bfd19283726cd0b329cf922e9b3493a034c1
+    digest: 2902885d1a1ea1750dca978882c3b1100c2b7db9e3870a6b7d355862d85564a1
     name: juicy-ctf
     urls:
     - juicy-ctf-1.3.0.tgz
     version: 1.3.0
   - apiVersion: v1
     appVersion: 1.2.1
-    created: "2019-10-05T19:55:49.299752412Z"
+    created: "2019-10-05T19:56:01.159878973Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: f0210a86153ddbd5ecc4b66191681e58301cab1810acc664ca811d792af0f0db
@@ -23,7 +23,7 @@ entries:
     version: 1.2.1
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2019-10-05T19:55:49.299418514Z"
+    created: "2019-10-05T19:56:01.159463472Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 773ed2baaf5318b9945449e73a8244960753cac7c80bc885102e685b42b339c7
@@ -33,7 +33,7 @@ entries:
     version: 1.2.0
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2019-10-05T19:55:49.297757923Z"
+    created: "2019-10-05T19:56:01.157542269Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 48eb8c808d799d1c81a0229c814040ca85d5f4fd347cfbb952cfffb76efbd188
@@ -43,7 +43,7 @@ entries:
     version: 1.1.1
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2019-10-05T19:55:49.296076032Z"
+    created: "2019-10-05T19:56:01.154991364Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: e4dbbd6f4419ab026a66b11f7470b2274344eeed1a15116e084b64718f067c07
@@ -53,7 +53,7 @@ entries:
     version: 1.1.0
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2019-10-05T19:55:49.293538045Z"
+    created: "2019-10-05T19:56:01.153342761Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 0dd1e72bafc3e889275ff5de805a295546ba91ba7efc5d2c433f69e0f483872a
@@ -61,4 +61,4 @@ entries:
     urls:
     - juicy-ctf-1.0.0.tgz
     version: 1.0.0
-generated: "2019-10-05T19:55:49.290997358Z"
+generated: "2019-10-05T19:56:01.150680057Z"
