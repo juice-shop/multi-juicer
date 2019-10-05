@@ -24,10 +24,10 @@ It's easier to install and easier to use. It's pretty stable, and it doesn't hav
 ```sh
 helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 
-# helm 2
+# for helm <= 2
 helm install juicy-ctf/juicy-ctf --name juicy-ctf
 
-# helm 3
+# for helm >= 3
 helm install juicy-ctf juicy-ctf/juicy-ctf
 ```
 

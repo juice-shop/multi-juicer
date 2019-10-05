@@ -31,10 +31,10 @@ helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 # For that download the OpenShift overrides config file
 wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/openshift/openshift-helm-overrides.yaml
 
-# for helm 2
+# for helm <= 2
 helm install juicy-ctf/juicy-ctf --name juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
 
-# for helm 3
+# for helm >= 3
 helm install juicy-ctf juicy-ctf/juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
 ```
 

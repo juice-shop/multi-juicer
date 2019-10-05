@@ -29,10 +29,10 @@ kubectl config current-context
 # You'll need to add the juicy-ctf helm repo to your helm repos
 helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 
-# for helm 2
+# for helm <= 2
 helm install juicy-ctf/juicy-ctf --name juicy-ctf
 
-# for helm 3
+# for helm >= 3
 helm install juicy-ctf juicy-ctf/juicy-ctf
 
 # kubernetes will now spin up the pods
