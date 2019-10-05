@@ -34,15 +34,14 @@ kubectl config current-context
 ## Step 2. Installing JuicyCTF via helm
 
 ```sh
-# We'll need to clone this git repo for the moment, as the helm chart isn't pushed to any registry
-git clone git@github.com:iteratec/juicy-ctf.git
+# You'll need to add the juicy-ctf helm repo to your helm repos
+helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 
-# First we'll need to fetch the charts JuicyCTF depends on
-helm dependency update ./juicy-ctf/helm/juicy-ctf/
+# for helm <= 2
+helm install juicy-ctf/juicy-ctf --name juicy-ctf
 
-# Now we can install the helm chart
-# The first juicy-ctf part is the release name, safe to change to whatever you like, but the examples in the guide are written for 'juicy-ctf'
-helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
+# for helm >= 3
+helm install juicy-ctf juicy-ctf/juicy-ctf
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -86,7 +85,8 @@ After you have set that up we can now create a ingress config for our the JuicyC
 
 ```sh
 # create the ingress for the JuiceBalancer service
-kubectl apply -f juicy-ctf/examples/aws/aws-ingress.yaml
+wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/aws/aws-ingress.yaml
+kubectl apply -f aws-ingress.yaml
 ```
 
 ## Step 5. Deinstallation
@@ -99,7 +99,7 @@ helm delete juicy-ctf
 kubectl delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
 
 # Delete the loadbalancer
-kubectl delete -f juicy-ctf/examples/aws/aws-ingress.yaml
+kubectl delete -f aws-ingress.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster juicy-ctf

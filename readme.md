@@ -22,14 +22,13 @@ If you aren't familiar with helm, try out the helm 3 beta.
 It's easier to install and easier to use. It's pretty stable, and it doesn't have a server side component anymore. It just runs on your local machine.
 
 ```sh
-git clone git@github.com:iteratec/juicy-ctf.git
+helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
 
-# First we'll need to fetch the charts JuicyCTF depends on
-helm dependency update ./juicy-ctf/helm/juicy-ctf/
+# for helm <= 2
+helm install juicy-ctf/juicy-ctf --name juicy-ctf
 
-# Now we can install the helm chart
-# The first juicy-ctf part is the release name, safe to change to whatever you like.
-helm install juicy-ctf ./juicy-ctf/helm/juicy-ctf/
+# for helm >= 3
+helm install juicy-ctf juicy-ctf/juicy-ctf
 ```
 
 ### Installation Guides for specific Cloud Providers

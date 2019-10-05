@@ -1,6 +1,16 @@
-on: [push, release]
+on: [release]
 name: 'Publish Docker Images'
 jobs:
+  helmRelease:
+    name: 'Package Helm Chart'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: J12934/helm-gh-pages-action@v1.0.0
+        with:
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+          charts-folder: helm
+          deploy-branch: gh-pages
   progressWatchDog:
     name: ProgressWatchDog
     runs-on: ubuntu-latest
