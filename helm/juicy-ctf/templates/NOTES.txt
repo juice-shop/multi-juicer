@@ -1,0 +1,12 @@
+JuicyCTF deployed! 🎉🥳
+
+JuicyCTF doesn't come with a default way to expose it to the world.
+You can find guides for specific cloud providers here: https://github.com/iteratec/juicy-ctf/tree/master/guides
+
+To test it locally run:
+$ kubectl port-forward service/juice-balancer 3000:3000
+You'll then be able to access the JuiceBalancer in your browser under http://localhost:3000
+
+To administrate the cluster you can log into the JuiceBalancer with the admin account:
+Username: admin
+Password: ${kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode}
