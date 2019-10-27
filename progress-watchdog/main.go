@@ -78,13 +78,13 @@ func main() {
 		currentContinueCode := getCurrentContinueCode()
 
 		if lastContinueCode == nil && currentContinueCode == nil {
-			log.Warning("Failed to fecth both current and cached contrinue code")
+			log.Warning("Failed to fetch both current and cached continue code")
 		} else if lastContinueCode == nil && currentContinueCode != nil {
 			log.Debug("Did not find a cached continue code.")
 			log.Debug("Last continue code was nil. This should only happen once per team.")
 			cacheContinueCode(client, teamname, *currentContinueCode)
 		} else if currentContinueCode == nil {
-			log.Debug("Could not get current continue code. Juice Shop might be down. Sleeping and tretrying in 5 sec")
+			log.Debug("Could not get current continue code. Juice Shop might be down. Sleeping and retrying in 5 sec")
 		} else {
 			log.Debug("Checking Difference between continue code")
 			if *lastContinueCode != *currentContinueCode {
