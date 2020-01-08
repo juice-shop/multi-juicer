@@ -51,6 +51,10 @@ spec:
                 secretKeyRef:
                   name: juice-balancer-secret
                   key: adminPassword
+            - name: BALANCER_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
           volumeMounts:
             - name: config-volume
               mountPath: /home/app/config/
