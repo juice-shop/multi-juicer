@@ -13,7 +13,7 @@ spec:
         metadata:
           labels:
             name: 'cleanup-job'
-            helm.sh/chart: {{ include "juicy-ctf.chart" . }}
+            helm.sh/chart: {{ include "multi-juicer.chart" . }}
         spec:
           serviceAccountName: 'juice-cleaner'
           containers:

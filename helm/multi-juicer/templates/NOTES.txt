@@ -1,7 +1,7 @@
-JuicyCTF deployed! 🎉🥳
+MultiJuicer deployed! 🎉🥳
 
-JuicyCTF doesn't come with a default way to expose it to the world.
-You can find guides for specific cloud providers here: https://github.com/iteratec/juicy-ctf/tree/master/guides
+MultiJuicer doesn't come with a default way to expose it to the world.
+You can find guides for specific cloud providers here: https://github.com/iteratec/multi-juicer/tree/master/guides
 
 To test it locally run:
 $ kubectl port-forward service/juice-balancer 3000:3000

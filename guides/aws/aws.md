@@ -1,6 +1,6 @@
 # [WIP] Example Setup with AWS
 
-**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/juicy-ctf/issues/15
+**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/multi-juicer/issues/15
 
 **WARNING:** The resources created in this guide will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
@@ -17,7 +17,7 @@ This example expects you to have the following cli tools setup.
 # First we'll need a cluster, you can create one using the DigitalOcean cli.
 # This will take a couple of minutes
 eksctl create cluster \
---name juicy-ctf \
+--name multi-juicer \
 --version 1.13 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
@@ -27,21 +27,21 @@ eksctl create cluster \
 --node-ami auto
 
 # After completion verify that your kubectl context has been updated:
-# Should print something like: Administrator@juicy-ctf.eu-central-1.eksctl.io
+# Should print something like: Administrator@multi-juicer.eu-central-1.eksctl.io
 kubectl config current-context
 ```
 
-## Step 2. Installing JuicyCTF via helm
+## Step 2. Installing MultiJuicer via helm
 
 ```sh
-# You'll need to add the juicy-ctf helm repo to your helm repos
-helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
+# You'll need to add the multi-juicer helm repo to your helm repos
+helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
 # for helm <= 2
-helm install juicy-ctf/juicy-ctf --name juicy-ctf
+helm install multi-juicer/multi-juicer --name multi-juicer
 
 # for helm >= 3
-helm install juicy-ctf juicy-ctf/juicy-ctf
+helm install multi-juicer multi-juicer/multi-juicer
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -60,7 +60,7 @@ This step is optional, but helpful to catch errors quicker.
 kubectl port-forward service/juice-balancer 3000:3000
 
 # Open up your browser for localhost:3000
-# You should be able to see the JuicyCTF Balancer UI
+# You should be able to see the MultiJuicer Balancer UI
 
 # Try to create a team and see if everything works correctly
 # You should be able to access a JuiceShop instances after a few seconds after creating a team,
@@ -81,26 +81,26 @@ The Guide below shows **how I thing it should work** but it doesn't. At least no
 AWS let's you create LoadBalancer by adding a new ingress config to you cluster.
 To set this up follow the **To deploy the ALB Ingress Controller to an Amazon EKS cluster** guide on https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html closely. This will walk you through setting up and configuring the ingress.
 
-After you have set that up we can now create a ingress config for our the JuicyCTF Stack.
+After you have set that up we can now create a ingress config for our the MultiJuicer Stack.
 
 ```sh
 # create the ingress for the JuiceBalancer service
-wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/aws/aws-ingress.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
 kubectl apply -f aws-ingress.yaml
 ```
 
 ## Step 5. Deinstallation
 
-helm delete juicy-ctf
+helm delete multi-juicer
 
 ```sh
 # helm will not delete the persistent volumes for redis!
 # delete them by running:
-kubectl delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
+kubectl delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
 # Delete the loadbalancer
 kubectl delete -f aws-ingress.yaml
 
 # Delete the kubernetes cluster
-eksctl delete cluster juicy-ctf
+eksctl delete cluster multi-juicer
 ```

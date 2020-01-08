@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "iteratec GmbH",
   "license": "Apache-2.0",
-  "proxy": "https://juicy-ctf.cloudapps.iterashift.com/",
+  "proxy": "https://multi-juicer.cloudapps.iterashift.com/",
   "dependencies": {
     "@hapi/joi": "^15.1.0",
     "@kubernetes/client-node": "^0.10.0",

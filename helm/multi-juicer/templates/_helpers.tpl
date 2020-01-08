@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "juicy-ctf.name" -}}
+{{- define "multi-juicer.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "juicy-ctf.fullname" -}}
+{{- define "multi-juicer.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,11 +27,11 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "juicy-ctf.chart" -}}
+{{- define "multi-juicer.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "juicy-ctf.cookieName" -}}
+{{- define "multi-juicer.cookieName" -}}
 {{- if .Values.balancer.cookie.secure -}}
 {{- printf "__Secure-%s" .Values.balancer.cookie.name -}}
 {{- else -}}

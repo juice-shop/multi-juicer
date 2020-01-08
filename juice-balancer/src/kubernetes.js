@@ -97,8 +97,8 @@ const createDeploymentForTeam = async ({ team }) =>
                 volumeMounts: [
                   {
                     name: 'juice-shop-config',
-                    mountPath: '/juice-shop/config/juicy-ctf.yaml',
-                    subPath: 'juicy-ctf.yaml',
+                    mountPath: '/juice-shop/config/multi-juicer.yaml',
+                    subPath: 'multi-juicer.yaml',
                   },
                 ],
               },
@@ -110,7 +110,7 @@ const createDeploymentForTeam = async ({ team }) =>
                     name: 'REDIS_PASSWORD',
                     valueFrom: {
                       secretKeyRef: {
-                        name: 'juicy-ctf-redis',
+                        name: 'multi-juicer-redis',
                         key: 'redis-password',
                       },
                     },

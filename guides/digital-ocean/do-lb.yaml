@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: juicy-ctf-loadbalancer
+  name: multi-juicer-loadbalancer
   annotations:
     # availible annotations to configure do loadbalancer: https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/annotations.md
     service.beta.kubernetes.io/do-loadbalancer-protocol: 'http2'
@@ -13,7 +13,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app.kubernetes.io/instance: juicy-ctf
+    app.kubernetes.io/instance: multi-juicer
     app.kubernetes.io/name: juice-balancer
   ports:
     - name: http

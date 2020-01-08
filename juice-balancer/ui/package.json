@@ -27,7 +27,7 @@
     "extends": "react-app"
   },
   "homepage": "/balancer/",
-  "proxy": "https://juicy-ctf.cloudapps.iterashift.com",
+  "proxy": "https://multi-juicer.cloudapps.iterashift.com",
   "browserslist": {
     "production": [
       ">0.2%",

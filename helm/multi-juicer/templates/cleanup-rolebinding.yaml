@@ -1,14 +1,16 @@
+{{- if .Values.juiceShopCleanup.enabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: juice-balancer
+  name: juice-cleaner
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
+    helm.sh/chart: {{ include "multi-juicer.chart" . }}
 subjects:
   - kind: ServiceAccount
-    name: juice-balancer # Name is case sensitive
+    name: juice-cleaner # Name is case sensitive
 roleRef:
   kind: Role
-  name: juice-balancer
+  name: juice-cleaner
   apiGroup: rbac.authorization.k8s.io
+{{- end }}

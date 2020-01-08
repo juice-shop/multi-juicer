@@ -23,17 +23,17 @@ doctl kubernetes cluster create juicy-k8s
 kubectl config current-context
 ```
 
-## Step 2. Installing JuicyCTF via helm
+## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the juicy-ctf helm repo to your helm repos
-helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
+# You'll need to add the multi-juicer helm repo to your helm repos
+helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
 # for helm <= 2
-helm install juicy-ctf/juicy-ctf --name juicy-ctf
+helm install multi-juicer/multi-juicer --name multi-juicer
 
 # for helm >= 3
-helm install juicy-ctf juicy-ctf/juicy-ctf
+helm install multi-juicer multi-juicer/multi-juicer
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -52,7 +52,7 @@ This step is optional, but helpful to catch errors quicker.
 kubectl port-forward service/juice-balancer 3000:3000
 
 # Open up your browser for localhost:3000
-# You should be able to see the JuicyCTF Balancer UI
+# You should be able to see the MultiJuicer Balancer UI
 
 # Try to create a team and see if everything works correctly
 # You should be able to access a JuiceShop instances after a few seconds after creating a team,
@@ -76,7 +76,7 @@ doctl compute certificate list
 
 # We got a example loadbalancer yaml for this example in the repository
 # Edit the cert id in do-lb.yaml to the cert id of your domain
-wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/digital-ocean/do-lb.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/digital-ocean/do-lb.yaml
 vim do-lb.yaml
 
 # Create the loadbalancer
@@ -84,17 +84,17 @@ vim do-lb.yaml
 kubectl create -f do-lb.yaml
 
 # If it takes longer than a few minutes take a detailed look at the loadbalancer
-kubectl describe services juicy-ctf-loadbalancer
+kubectl describe services multi-juicer-loadbalancer
 ```
 
 ## Step 5. Deinstallation
 
 ```bash
-helm delete juicy-ctf
+helm delete multi-juicer
 # helm will not delete the persistent volumes for redis!
 # these cost $1.60/month ($0.10/GB/month)
 # delete them by running:
-kubectl delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
+kubectl delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
 # Delete the loadbalancer
 kubectl delete -f do-lb.yaml
