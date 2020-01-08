@@ -7,7 +7,17 @@ const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
 const { get } = require('./config');
 
-const createDeploymentForTeam = ({ team }) =>
+const lodashGet = require('lodash/get');
+const once = require('lodash/once');
+
+// Gets the Deployment uid for the JuiceBalancer
+// This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
+const getJuiceBalancerDeploymentUid = once(async () => {
+  const deployment = await k8sAppsApi.readNamespacedDeployment('juice-balancer', get('namespace'));
+  return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
+});
+
+const createDeploymentForTeam = async ({ team }) =>
   k8sAppsApi
     .createNamespacedDeployment(get('namespace'), {
       metadata: {
@@ -17,6 +27,16 @@ const createDeploymentForTeam = ({ team }) =>
           team,
           'deployment-context': get('deploymentContext'),
         },
+        ownerReferences: [
+          {
+            apiVersion: 'apps/v1',
+            blockOwnerDeletion: true,
+            controller: true,
+            kind: 'Deployment',
+            name: 'juice-balancer',
+            uid: await getJuiceBalancerDeploymentUid(),
+          },
+        ],
       },
       spec: {
         selector: {
@@ -128,7 +148,7 @@ const createDeploymentForTeam = ({ team }) =>
 
 module.exports.createDeploymentForTeam = createDeploymentForTeam;
 
-const createServiceForTeam = teamname =>
+const createServiceForTeam = async teamname =>
   k8sCoreApi
     .createNamespacedService(get('namespace'), {
       metadata: {
@@ -138,6 +158,16 @@ const createServiceForTeam = teamname =>
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
+        ownerReferences: [
+          {
+            apiVersion: 'apps/v1',
+            blockOwnerDeletion: true,
+            controller: true,
+            kind: 'Deployment',
+            name: 'juice-balancer',
+            uid: await getJuiceBalancerDeploymentUid(),
+          },
+        ],
       },
       spec: {
         selector: {
