@@ -14,6 +14,8 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
+> **Note:** This project was called JuicyCTF until recently. This was changed to avoid confusions with the [juice-shop-ctf](https://github.com/bkimminich/juice-shop-ctf) project.
+
 ![MultiJuicer, High Level Architecture Diagram](./high-level-architecture.svg)
 
 ## Installation
