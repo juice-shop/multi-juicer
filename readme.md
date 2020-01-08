@@ -55,8 +55,6 @@ helm install -f values.yaml juicy-ctf ./juicy-ctf/helm/juicy-ctf/
 
 ```sh
 helm delete juicy-ctf
-# Also delete all Juice Shop Deployments which still exist
-kubectl delete deployment --selector app=juice-shop && kubectl delete service --selector app=juice-shop
 ```
 
 ## FAQ
