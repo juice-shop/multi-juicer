@@ -1,5 +1,7 @@
 ![MultiJuicer, Multi User Juice Shop Platform](./cover.svg)
 
+> **Warning:** We are in the middle of renaming the Project from JuicyCTF to MultiJuicer. You might find / encounter some problems until the migration is completed.
+
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
