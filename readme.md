@@ -7,14 +7,14 @@ Instructing everybody how to start Juice Shop on their own machine works ok, but
 
 MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
 
+> **Note:** This project was called JuicyCTF until recently. This was changed to avoid confusions with the [juice-shop-ctf](https://github.com/bkimminich/juice-shop-ctf) project.
+
 **What it does:**
 
 - dynamically create new Juice Shop instances when needed
 - runs on a single domain, comes with a LoadBalancer sending the traffic to the participants Juice Shop instance
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
-
-> **Note:** This project was called JuicyCTF until recently. This was changed to avoid confusions with the [juice-shop-ctf](https://github.com/bkimminich/juice-shop-ctf) project.
 
 ![MultiJuicer, High Level Architecture Diagram](./high-level-architecture.svg)
 
