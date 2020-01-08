@@ -17,7 +17,7 @@ export default {
   log_out: 'Ausloggen',
   team_created: 'Team Erstellt',
   passcode_explanation:
-    'Um sicherzustellen das nicht jeder einfach deinem Team beitrten kann, haben wir ein Passwort erstellt das du mit deinem Teammitgliedern teilen kannst. Deine Teammitglieder brauchen das gleiche Passwort um dem Team beizutreten. Du kannst das Passwort von unten kopieren.',
+    'Um sicherzustellen das nicht jeder einfach deinem Team beitreten kann, haben wir ein Passwort erstellt das du mit deinem Teammitgliedern teilen kannst. Deine Teammitglieder brauchen das gleiche Passwort um dem Team beizutreten. Du kannst das Passwort von unten kopieren.',
   passcode: 'Passwort',
   instance_status_ready: 'Juice Shop Instanz Bereit',
   instance_status_start_hacking: 'Anfangen zu Hacken',
