@@ -92,7 +92,7 @@ export function Layout({ children, footer }) {
         <Header>
           <HeaderCard>
             <Logo alt="CTF Logo" />
-            <H1>JuicyCTF</H1>
+            <H1>MultiJuicer</H1>
           </HeaderCard>
         </Header>
         <Body>

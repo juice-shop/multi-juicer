@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: juice-balancer-config
   labels:
-    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
+    helm.sh/chart: {{ include "multi-juicer.chart" . }}
 data:
   config.json: |
     {
@@ -17,7 +17,7 @@ data:
         "redis-secret-name": "{{ .Release.Name}}-ctf-redis"
       },
       "cookieParser": {
-        "cookieName": {{ include "juicy-ctf.cookieName" . | quote }},
+        "cookieName": {{ include "multi-juicer.cookieName" . | quote }},
         "secure": {{ .Values.balancer.cookie.secure }}
       },
       "admin": {

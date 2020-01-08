@@ -4,7 +4,7 @@ metadata:
   name: 'juice-balancer'
   labels:
     app: 'juice-balancer'
-    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
+    helm.sh/chart: {{ include "multi-juicer.chart" . }}
 spec:
   selector:
     matchLabels:

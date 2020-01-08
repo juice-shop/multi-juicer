@@ -52,8 +52,8 @@ juiceShop:
     ctf:
       # showFlagsInNotifications: true
   # Specify a custom NODE_ENV for JuiceShop.
-  # If value is changed to something other than 'juicy-ctf' it's not possible to set a custom config.
-  nodeEnv: 'juicy-ctf'
+  # If value is changed to something other than 'multi-juicer' it's not possible to set a custom config.
+  nodeEnv: 'multi-juicer'
 
 # Config for the redis deployment
 # This is using: https://hub.helm.sh/charts/stable/redis

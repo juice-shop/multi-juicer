@@ -1,9 +1,13 @@
-![JuicyCTF, Multi User Juice Shop Platform](./cover.svg)
+![MultiJuicer, Multi User Juice Shop Platform](./cover.svg)
+
+> **Warning:** We are in the middle of renaming the Project from JuicyCTF to MultiJuicer. You might find / encounter some problems until the migration is completed.
 
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
-JuicyCTF gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
+MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
+
+> **Note:** This project was called JuicyCTF until recently. This was changed to avoid confusions with the [juice-shop-ctf](https://github.com/bkimminich/juice-shop-ctf) project.
 
 **What it does:**
 
@@ -12,28 +16,28 @@ JuicyCTF gives you the ability to run separate Juice Shop instances for every pa
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
-![JuicyCTF, High Level Architecture Diagram](./high-level-architecture.svg)
+![MultiJuicer, High Level Architecture Diagram](./high-level-architecture.svg)
 
 ## Installation
 
-JuicyCTF runs on kubernetes, to install it you'll need [helm](https://helm.sh).
+MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh).
 
 If you aren't familiar with helm, try out the helm 3 beta.
 It's easier to install and easier to use. It's pretty stable, and it doesn't have a server side component anymore. It just runs on your local machine.
 
 ```sh
-helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
+helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
 # for helm <= 2
-helm install juicy-ctf/juicy-ctf --name juicy-ctf
+helm install multi-juicer/multi-juicer --name multi-juicer
 
 # for helm >= 3
-helm install juicy-ctf juicy-ctf/juicy-ctf
+helm install multi-juicer multi-juicer/multi-juicer
 ```
 
 ### Installation Guides for specific Cloud Providers
 
-Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with JuicyCTF installed for some specific Cloud providers.
+Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with MultiJuicer installed for some specific Cloud providers.
 
 - [Digital Ocean](./guides/digital-ocean/digital-ocean.md)
 - [OpenShift](./guides/openshift/openshift.md)
@@ -43,18 +47,18 @@ Generally JuicyCTF runs on pretty much any kubernetes cluster, but to make it ea
 ### Customizing the Setup
 
 You got some options on how to setup the stack, with some option to customize the JuiceShop instances to your own liking.
-You can find the default config values under: [helm/juicy-ctf/values.yaml](./helm/juicy-ctf/values.yaml)
+You can find the default config values under: [helm/multi-juicer/values.yaml](./helm/multi-juicer/values.yaml)
 
 Download & Save the file and tell helm to use your config file over the default by running:
 
 ```sh
-helm install -f values.yaml juicy-ctf ./juicy-ctf/helm/juicy-ctf/
+helm install -f values.yaml multi-juicer ./multi-juicer/helm/multi-juicer/
 ```
 
 ### Deinstallation
 
 ```sh
-helm delete juicy-ctf
+helm delete multi-juicer
 ```
 
 ## FAQ
@@ -68,7 +72,7 @@ To be on the safe side calculate with:
 
 The numbers above reflect the default resource limits. These can be tweaked, see: [Customizing the Setup](#customizing-the-setup)
 
-### How many users can JuicyCTF handle?
+### How many users can MultiJuicer handle?
 
 There is no real fixed limit. (Even thought you can configure one 😉)
 The custom LoadBalancer, through which all traffic for the individual Instances flows, can be replicated as much as you'd like.

@@ -1,4 +1,4 @@
-module github.com/iteratec/juicy-ctf/progress-watchdog
+module github.com/iteratec/multi-juicer/progress-watchdog
 
 go 1.12
 

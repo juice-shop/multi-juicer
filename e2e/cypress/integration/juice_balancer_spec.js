@@ -6,7 +6,7 @@ it('can create a new team', () => {
 
   cy.visit('/balancer');
 
-  cy.contains('JuicyCTF');
+  cy.contains('MultiJuicer');
 
   cy.get('[data-test-id="teamname-input"]')
     .type('team42')
@@ -39,7 +39,7 @@ it('can join an existing team', () => {
 
   // First Person creating Instance (very simmilar to previous test case)
   cy.visit('/balancer');
-  cy.contains('JuicyCTF');
+  cy.contains('MultiJuicer');
   cy.get('[data-test-id="teamname-input"]')
     .type('team43')
     .should('have.value', 'team43');
@@ -60,7 +60,7 @@ it('can join an existing team', () => {
 
       // Second team trying to join in
       cy.visit('/balancer');
-      cy.contains('JuicyCTF');
+      cy.contains('MultiJuicer');
       cy.get('[data-test-id="teamname-input"]').type('team43');
       cy.get('[data-test-id="create-join-team-button"]').click();
 
@@ -82,7 +82,7 @@ it('can login as admin', () => {
 
   cy.visit('/balancer');
 
-  cy.contains('JuicyCTF');
+  cy.contains('MultiJuicer');
 
   cy.get('[data-test-id="teamname-input"]')
     .type('admin')

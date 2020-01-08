@@ -17,25 +17,25 @@ This example expects you to have the following prerequisites.
 # You can copy the login command including your token from the web ui
 oc login https://console.openshift.example.com --token=****
 
-# Create a new project to hold the juicy-ctf resources
-oc new-project juicy-ctf
+# Create a new project to hold the multi-juicer resources
+oc new-project multi-juicer
 ```
 
-## Step 2. Installing JuicyCTF via helm
+## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the juicy-ctf helm repo to your helm repos
-helm repo add juicy-ctf https://iteratec.github.io/juicy-ctf/
+# You'll need to add the multi-juicer helm repo to your helm repos
+helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
 # Before we can install the cluster we need to change one config option, which clashes with OpenShifts security context
 # For that download the OpenShift overrides config file
-wget https://raw.githubusercontent.com/iteratec/juicy-ctf/master/guides/openshift/openshift-helm-overrides.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/openshift/openshift-helm-overrides.yaml
 
 # for helm <= 2
-helm install juicy-ctf/juicy-ctf --name juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
+helm install multi-juicer/multi-juicer --name multi-juicer -f openshift-helm-overrides.yaml ./multi-juicer/helm/multi-juicer/
 
 # for helm >= 3
-helm install juicy-ctf juicy-ctf/juicy-ctf -f openshift-helm-overrides.yaml ./juicy-ctf/helm/juicy-ctf/
+helm install multi-juicer multi-juicer/multi-juicer -f openshift-helm-overrides.yaml ./multi-juicer/helm/multi-juicer/
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -48,7 +48,7 @@ This step is optional, but helpful to catch errors quicker.
 oc port-forward service/juice-balancer 3000:3000
 
 # Open up your browser for localhost:3000
-# You should be able to see the JuicyCTF Balancer UI
+# You should be able to see the MultiJuicer Balancer UI
 
 # Try to create a team and see if everything works correctly
 # You should be able to access a JuiceShop instances after a few seconds after creating a team,
@@ -69,16 +69,16 @@ OpenShift lets you create routes to expose your app to the internet.
 # Create the route.
 # Make sure to adjust the hostname to match the one of your org.
 # You can also perform this step easily via the OpenShift web ui.
-oc create route edge juice-balancer --service juice-balancer --hostname juicy-ctf.cloudapps.example.com
+oc create route edge juice-balancer --service juice-balancer --hostname multi-juicer.cloudapps.example.com
 ```
 
 ## Step 4. Deinstallation
 
 ```bash
-helm delete juicy-ctf
+helm delete multi-juicer
 # helm will not delete the persistent volumes for redis!
 # delete them by running:
-oc delete persistentvolumeclaims redis-data-juicy-ctf-redis-master-0 redis-data-juicy-ctf-redis-slave-0
+oc delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
 # Delete the route
 oc delete route edge juice-balancer

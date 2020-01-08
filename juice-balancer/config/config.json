@@ -1,13 +1,13 @@
 {
   "port": 3000,
   "namespace": "default",
-  "deploymentContext": "juicy-ctf",
+  "deploymentContext": "multi-juicer",
   "maxJuiceShopInstances": 10,
   "redis": {
     "host": "juice-balancer-redis",
     "password": "myredispassword",
     "port": 6379,
-    "redis-secret-name": "juicy-ctf-redis"
+    "redis-secret-name": "multi-juicer-redis"
   },
   "admin": {
     "username": "admin",
@@ -23,7 +23,7 @@
     "tag": "snapshot",
     "imagePullPolicy": "IfNotPresent",
     "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
-    "nodeEnv": "juicy-ctf",
+    "nodeEnv": "multi-juicer",
     "resources:": {
       "requests": {
         "memory": "256Mi",

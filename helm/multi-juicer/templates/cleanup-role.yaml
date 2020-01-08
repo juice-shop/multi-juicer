@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   name: juice-cleaner
   labels:
-    helm.sh/chart: {{ include "juicy-ctf.chart" . }}
+    helm.sh/chart: {{ include "multi-juicer.chart" . }}
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']
