@@ -21,7 +21,7 @@
     "express-joi-validation": "^2.0.0",
     "http-proxy": "^1.17.0",
     "ioredis": "^4.10.0",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "winston": "^3.2.1"
   },
   "devDependencies": {
