@@ -18,7 +18,7 @@ This example expects you to have the following cli tools setup.
 # This will take a couple of minutes
 eksctl create cluster \
 --name multi-juicer \
---version 1.13 \
+--version 1.14 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
 --nodes 2 \
@@ -88,7 +88,8 @@ Next, we will integrate Kubernetes with AWS, allowing the Kubernetes to provisio
 
 ```sh
 #Associate IAM OIDC Provider
-wget https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/cluster-iam.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/cluster-iam.yaml
+#Edit line 15 - Place the ARN of the policy you created in the attachPolicyARNs field
 eksctl utils associate-iam-oidc-provider --config-file=cluster-iam.yaml --approve
 
 #Create Kubernetes Service Account and bind it to Ingress Controller
@@ -99,7 +100,6 @@ eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --overr
 
 #Create Ingress Controller
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/alb-ingress-controller.yaml
-#Edit line 15 - Place the ARN of the policy you created in the attachPolicyARNs field
 kubectl apply -f alb-ingress-controller.yaml
 ```
 
