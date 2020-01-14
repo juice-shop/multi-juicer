@@ -105,6 +105,7 @@ const createDeploymentForTeam = async ({ team }) =>
               {
                 name: 'progress-watchdog',
                 image: 'iteratec/juice-progress-watchdog',
+                imagePullPolicy: get('juiceShop.imagePullPolicy'),
                 env: [
                   {
                     name: 'REDIS_PASSWORD',
