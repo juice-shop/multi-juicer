@@ -209,7 +209,7 @@ kubectl apply -f external-dns.yaml
 
 ## Step 3. Installing MultiJuicer via helm
 
-**NOTE: To make this work with the ALB Ingress Controller override the values.yaml balancer.type to 'NodePort'.
+**NOTE: To make this work with the ALB Ingress Controller, override the values.yaml balancer.type to 'NodePort'.
 
 ```sh
 # You'll need to add the multi-juicer helm repo to your helm repos
