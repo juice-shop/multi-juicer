@@ -31,10 +31,9 @@ eksctl create cluster \
 kubectl config current-context
 ```
 
-## Step 2. Prepare EKS for ALB and externalDNS
+## Step 2. Prepare EKS for ALB Ingress Controller and External DNS (Route 53)
 
-Before running the following commands make sure that the EKS worker nodes have been associated with the relevant IAM roles
-to be able to create and delete Route53 and ALB resources.
+The EKS worker nodes need to be associated with the following IAM roles to be able to create and delete Route53 and ALB resources.
 
 Further information can be found here: 
 - https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/controller/setup
