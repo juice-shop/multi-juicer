@@ -20,6 +20,9 @@ balancer:
       cpu: 400m
   affinity: {}
   tolerations: []
+  # Default is 'ClusterIP', set to 'NodePort' for AWS ALB Ingress Controller
+  # See: https://kubernetes.io/docs/concepts/services-networking/service/
+  type: ClusterIP
 
 juiceShop:
   # Set to -1 to remove the max Juice Shop instance cap

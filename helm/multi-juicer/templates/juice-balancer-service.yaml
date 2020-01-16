@@ -12,3 +12,4 @@ spec:
   ports:
     - port: 3000
       name: web
+  type: {{ .Values.balancer.type}}

@@ -209,21 +209,17 @@ kubectl apply -f external-dns.yaml
 
 ## Step 3. Installing MultiJuicer via helm
 
-**NOTE: To make this work with the ALB Ingress Controller the following needs to be added to the helm/multi-juicer/templates/juice-balancer-service.yaml**
-```sh
-  type: NodePort
-```
-**Currently this requires manually downloading the helm chart, updating the file as above and applying.**
+**NOTE: To make this work with the ALB Ingress Controller override the values.yaml balancer.type to 'NodePort'.
 
 ```sh
 # You'll need to add the multi-juicer helm repo to your helm repos
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
 # for helm <= 2
-helm install multi-juicer/multi-juicer --name multi-juicer
+helm install multi-juicer/multi-juicer --name multi-juicer --set balancer.type=NodePort
 
 # for helm >= 3
-helm install multi-juicer multi-juicer/multi-juicer
+helm install multi-juicer multi-juicer/multi-juicer --set balancer.type=NodePort
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
