@@ -6,6 +6,9 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: Name=juice-balancer-ingress-sg
+    alb.ingress.kubernetes.io/inbound-cidrs: 0.0.0.0./0 # update with comma separated list of CIDRs for more targetted Security Group config
+    external-dns.alpha.kubernetes.io/hostname: multi-juicer.mycustomroute53.hosted.zone. # update this with your Route53 zone
   labels:
     app: juice-balancer-ingress
 spec:

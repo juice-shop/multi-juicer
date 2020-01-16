@@ -50,6 +50,15 @@ kubectl get pods
 # Wait until all 3 pods are ready
 ```
 
+
+**NOTE: To make this work with the ALB Ingress Controller the following needs to be added to the helm/multi-juicer/templates/juice-balancer-service.yaml**
+
+```sh
+  type: NodePort
+```
+
+**Currently this requires manually downloading the helm chart, updating the file as above and applying.**
+
 ## Step 3. Verify the app is running correctly
 
 This step is optional, but helpful to catch errors quicker.
@@ -73,19 +82,189 @@ kubectl port-forward service/juice-balancer 3000:3000
 kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
-## Step 4. Add Ingress to expose the app to the world
+## Step 4. Build and configure ALB Ingress Controller and external-dns
 
-**WARNING:** I, as a AWS Noob, haven't yet figured out how to get it working correctly.
-The Guide below shows **how I thing it should work** but it doesn't. At least not for me. If you are a AWS Pro please please send me a message / open up an issue / pull request correcting this section.
+Before running the following commands make sure that the EKS worker nodes have the relevant IAM roles associated with the 
+cluster otherwise EKS will not be able to create and delete Route53 and ALB resources.
 
-AWS let's you create LoadBalancer by adding a new ingress config to you cluster.
-To set this up follow the **To deploy the ALB Ingress Controller to an Amazon EKS cluster** guide on https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html closely. This will walk you through setting up and configuring the ingress.
+**Further information can be found here: https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html**
 
-After you have set that up we can now create a ingress config for our the MultiJuicer Stack.
+> ALBIngressControllerIAMPolicy
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "acm:DescribeCertificate",
+        "acm:ListCertificates",
+        "acm:GetCertificate"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateTags",
+        "ec2:DeleteTags",
+        "ec2:DeleteSecurityGroup",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeTags",
+        "ec2:DescribeVpcs",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:ModifyNetworkInterfaceAttribute",
+        "ec2:RevokeSecurityGroupIngress"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:AddListenerCertificates",
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:CreateLoadBalancer",
+        "elasticloadbalancing:CreateRule",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:DeleteLoadBalancer",
+        "elasticloadbalancing:DeleteRule",
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+        "elasticloadbalancing:DescribeRules",
+        "elasticloadbalancing:DescribeSSLPolicies",
+        "elasticloadbalancing:DescribeTags",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:DescribeTargetGroupAttributes",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:ModifyListener",
+        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+        "elasticloadbalancing:ModifyRule",
+        "elasticloadbalancing:ModifyTargetGroup",
+        "elasticloadbalancing:ModifyTargetGroupAttributes",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:RemoveListenerCertificates",
+        "elasticloadbalancing:RemoveTags",
+        "elasticloadbalancing:SetIpAddressType",
+        "elasticloadbalancing:SetSecurityGroups",
+        "elasticloadbalancing:SetSubnets",
+        "elasticloadbalancing:SetWebACL"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateServiceLinkedRole",
+        "iam:GetServerCertificate",
+        "iam:ListServerCertificates"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "waf-regional:GetWebACLForResource",
+        "waf-regional:GetWebACL",
+        "waf-regional:AssociateWebACL",
+        "waf-regional:DisassociateWebACL"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "tag:GetResources",
+        "tag:TagResources"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "waf:GetWebACL"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
 
+
+> Route53IAMPolicy
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ListHostedZones",
+                "route53:ListResourceRecordSets"
+            ],
+            "Resource": ["*"]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": ["*"]
+        }
+    ]
+}
+```
+
+Create the service account, cluster role, and cluster role binding for the ALB Ingress Controller.
 ```sh
-# create the ingress for the JuiceBalancer service
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.3/docs/examples/rbac-role.yaml
+```
+
+Download the AWS ALB Ingress Controller Daemon Set config yaml.
+```sh
+wget https://github.com/kubernetes-sigs/aws-alb-ingress-controller/raw/master/docs/examples/alb-ingress-controller.yaml
+```
+
+Edit alb-ingress-controller.yaml and update with your `cluster-name`, `aws-vpc-id` and `region`.  
+Now deploy ALB Ingress Controller Daemon Set.
+```sh
+kubectl apply -f alb-ingress-controller.yaml
+```
+Download the AWS external-dns Daemon Set config yaml.
+```sh
+wget https://github.com/kubernetes-sigs/aws-alb-ingress-controller/raw/master/docs/examples/external-dns.yaml
+```
+
+Edit external-dns.yaml and update with your `domain-filter` (i.e. your Route53 Hosted Zone) and `txt-owner-id` (optional). 
+Now deploy external-dns Daemon Set.
+```sh
+kubectl apply -f external-dns.yaml
+```
+
+After you have set that up we can now create a ingress config for our MultiJuicer Stack.
+
+Download the MultiJuicer Ingress controller 
+```sh
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
+```
+
+Edit aws-ingress.yaml and update the `external-dns.alpha.kubernetes.io/hostname` (i.e. your Route53 Hosted Zone FQDN) 
+and `alb.ingress.kubernetes.io/inbound-cidrs` (optional Security Group lockdown). Now deploy the ALB Ingress controller.
+```sh
 kubectl apply -f aws-ingress.yaml
 ```
 
