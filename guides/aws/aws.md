@@ -1,6 +1,4 @@
-# [WIP] Example Setup with AWS
-
-**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/multi-juicer/issues/15
+# Example Setup with AWS
 
 **WARNING:** The resources created in this guide will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
@@ -14,11 +12,11 @@ This example expects you to have the following cli tools setup.
 4. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos)
 
 ```sh
-# First we'll need a cluster, you can create one using the DigitalOcean cli.
+# First we'll need a cluster, you can create one using the eksctl cli.
 # This will take a couple of minutes
 eksctl create cluster \
 --name multi-juicer \
---version 1.13 \
+--version 1.14 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
 --nodes 2 \
@@ -75,31 +73,51 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 
 ## Step 4. Add Ingress to expose the app to the world
 
-**WARNING:** I, as a AWS Noob, haven't yet figured out how to get it working correctly.
-The Guide below shows **how I thing it should work** but it doesn't. At least not for me. If you are a AWS Pro please please send me a message / open up an issue / pull request correcting this section.
+First, we need to create an iam policy which gives permissions to create the load balancer.
 
-AWS let's you create LoadBalancer by adding a new ingress config to you cluster.
-To set this up follow the **To deploy the ALB Ingress Controller to an Amazon EKS cluster** guide on https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html closely. This will walk you through setting up and configuring the ingress.
+```sh
+#Take note of the ARN of the Policy
+aws iam create-policy \
+--policy-name ALBIngressControllerIAMPolicy \
+--policy-document https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/iam-policy.json
+```
+
+Next, we will integrate Kubernetes with AWS, allowing the Kubernetes to provision an Application load balancer on our behalf.
+
+```sh
+#Associate IAM OIDC Provider
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/cluster-iam.yaml
+#Edit line 15 - Place the ARN of the policy you created in the attachPolicyARNs field and update your aws region in the metadata section.
+eksctl utils associate-iam-oidc-provider --config-file=cluster-iam.yaml --approve
+
+#Create Kubernetes Service Account and bind it to Ingress Controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
+
+#Create IAM Role to attach to Service Account
+eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts
+
+#Create Ingress Controller
+kubectl apply -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/alb-ingress-controller.yaml
+```
 
 After you have set that up we can now create a ingress config for our the MultiJuicer Stack.
 
 ```sh
 # create the ingress for the JuiceBalancer service
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
-kubectl apply -f aws-ingress.yaml
+kubectl apply -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
 ```
 
 ## Step 5. Deinstallation
 
-helm delete multi-juicer
-
 ```sh
+helm delete multi-juicer
 # helm will not delete the persistent volumes for redis!
 # delete them by running:
 kubectl delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
-# Delete the loadbalancer
-kubectl delete -f aws-ingress.yaml
+# Delete the ingress setup
+kubectl delete -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer

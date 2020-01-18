@@ -1,0 +1,15 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+    name: multi-juicer
+    region: ap-southeast-1
+
+iam:
+    withOIDC: true
+    serviceAccounts:
+    - metadata:
+        name: alb-ingress-controller
+        namespace: kube-system
+      attachPolicyARNs:
+      - ""
