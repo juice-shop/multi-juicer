@@ -89,7 +89,7 @@ Next, we will integrate Kubernetes with AWS, allowing the Kubernetes to provisio
 ```sh
 #Associate IAM OIDC Provider
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/cluster-iam.yaml
-#Edit line 15 - Place the ARN of the policy you created in the attachPolicyARNs field
+#Edit line 15 - Place the ARN of the policy you created in the attachPolicyARNs field and update your aws region in the metadata section.
 eksctl utils associate-iam-oidc-provider --config-file=cluster-iam.yaml --approve
 
 #Create Kubernetes Service Account and bind it to Ingress Controller
