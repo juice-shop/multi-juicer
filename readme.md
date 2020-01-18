@@ -41,8 +41,8 @@ Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it
 
 - [Digital Ocean](./guides/digital-ocean/digital-ocean.md)
 - [OpenShift](./guides/openshift/openshift.md)
+- [Azure](./guides/azure/azure.md)
 - [\[WIP\] AWS](./guides/aws/aws.md)
-- [\[WIP\] Azure](./guides/azure/azure.md)
 
 ### Customizing the Setup
 
