@@ -99,16 +99,14 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingre
 eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts
 
 #Create Ingress Controller
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/alb-ingress-controller.yaml
-kubectl apply -f alb-ingress-controller.yaml
+kubectl apply -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/alb-ingress-controller.yaml
 ```
 
 After you have set that up we can now create a ingress config for our the MultiJuicer Stack.
 
 ```sh
 # create the ingress for the JuiceBalancer service
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
-kubectl apply -f aws-ingress.yaml
+kubectl apply -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
 ```
 
 ## Step 5. Deinstallation
