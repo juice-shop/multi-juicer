@@ -117,8 +117,9 @@ helm delete multi-juicer
 # delete them by running:
 kubectl delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
-# Delete the loadbalancer
-kubectl delete -f aws-ingress.yaml
+# Delete the ingress setup
+kubectl delete -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer
