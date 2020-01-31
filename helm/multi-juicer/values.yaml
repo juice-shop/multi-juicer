@@ -75,6 +75,8 @@ juiceShopCleanup:
   # defaults to once in an hour
   # change this if your grace period if shorter than 1 hour
   cron: '0 * * * *'
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
   resources:
     requests:
       memory: 256Mi
