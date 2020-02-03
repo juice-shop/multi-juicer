@@ -108,7 +108,7 @@ export const InstanceStatusCard = ({ teamname }) => {
               ❌
             </span>{' '}
             <FormattedMessage
-              id="instance_status_starting"
+              id="instance_status_timed_out"
               defaultMessage="Instance starting timed out!"
             />
           </span>
