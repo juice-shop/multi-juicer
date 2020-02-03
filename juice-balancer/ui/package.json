@@ -4,6 +4,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "axios": "^0.19.0",
+    "promise-retry": "^1.1.1",
     "react": "^16.8.6",
     "react-data-table-component": "^3.0.1",
     "react-dom": "^16.8.6",
@@ -13,7 +14,7 @@
     "styled-components": "^4.3.1"
   },
   "devDependencies": {
-    "react-scripts": "3.0.1",
+    "react-scripts": "^3.3.1",
     "source-map-explorer": "^2.0.1"
   },
   "scripts": {
