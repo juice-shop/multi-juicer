@@ -11,10 +11,7 @@ categories:
       - 'bugfix'
       - 'bug'
   - title: '📚 Docs'
-    labels:
-      - 'fix'
-      - 'bugfix'
-      - 'bug'
+    label: 'documentation'
   - title: '🌐 I18N'
     label: 'i18n'
   - title: '🧰 Maintenance'
