@@ -17,135 +17,142 @@ const getJuiceBalancerDeploymentUid = once(async () => {
   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
 });
 
-const createDeploymentForTeam = async ({ team }) =>
-  k8sAppsApi
-    .createNamespacedDeployment(get('namespace'), {
-      metadata: {
-        name: `t-${team}-juiceshop`,
-        labels: {
+const createDeploymentForTeam = async ({ team, passcodeHash }) => {
+  const deploymentConfig = {
+    metadata: {
+      name: `t-${team}-juiceshop`,
+      labels: {
+        app: 'juice-shop',
+        team,
+        'deployment-context': get('deploymentContext'),
+      },
+      annotations: {
+        'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
+        'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
+        'multi-juicer.iteratec.dev/passcode': passcodeHash,
+        'multi-juicer.iteratec.dev/challengesSolved': '0',
+      },
+      ownerReferences: [
+        {
+          apiVersion: 'apps/v1',
+          blockOwnerDeletion: true,
+          controller: true,
+          kind: 'Deployment',
+          name: 'juice-balancer',
+          uid: await getJuiceBalancerDeploymentUid(),
+        },
+      ],
+    },
+    spec: {
+      selector: {
+        matchLabels: {
           app: 'juice-shop',
           team,
           'deployment-context': get('deploymentContext'),
         },
-        ownerReferences: [
-          {
-            apiVersion: 'apps/v1',
-            blockOwnerDeletion: true,
-            controller: true,
-            kind: 'Deployment',
-            name: 'juice-balancer',
-            uid: await getJuiceBalancerDeploymentUid(),
-          },
-        ],
       },
-      spec: {
-        selector: {
-          matchLabels: {
+      template: {
+        metadata: {
+          labels: {
             app: 'juice-shop',
             team,
             'deployment-context': get('deploymentContext'),
           },
         },
-        template: {
-          metadata: {
-            labels: {
-              app: 'juice-shop',
-              team,
-              'deployment-context': get('deploymentContext'),
-            },
-          },
-          spec: {
-            automountServiceAccountToken: false,
-            containers: [
-              {
-                name: 'juice-shop',
-                image: `${get('juiceShop.image')}:${get('juiceShop.tag')}`,
-                imagePullPolicy: get('juiceShop.imagePullPolicy'),
-                resources: get('juiceShop.resources'),
-                env: [
-                  {
-                    name: 'NODE_ENV',
-                    value: get('juiceShop.nodeEnv'),
-                  },
-                  {
-                    name: 'CTF_KEY',
-                    value: get('juiceShop.ctfKey'),
-                  },
-                ],
-                ports: [
-                  {
-                    containerPort: 3000,
-                  },
-                ],
-                readinessProbe: {
-                  httpGet: {
-                    path: '/rest/admin/application-version',
-                    port: 3000,
-                  },
-                  initialDelaySeconds: 5,
-                  periodSeconds: 2,
-                  failureThreshold: 10,
+        spec: {
+          automountServiceAccountToken: false,
+          containers: [
+            {
+              name: 'juice-shop',
+              image: `${get('juiceShop.image')}:${get('juiceShop.tag')}`,
+              imagePullPolicy: get('juiceShop.imagePullPolicy'),
+              resources: get('juiceShop.resources'),
+              env: [
+                {
+                  name: 'NODE_ENV',
+                  value: get('juiceShop.nodeEnv'),
                 },
-                livenessProbe: {
-                  httpGet: {
-                    path: '/rest/admin/application-version',
-                    port: 3000,
-                  },
-                  initialDelaySeconds: 30,
-                  periodSeconds: 15,
+                {
+                  name: 'CTF_KEY',
+                  value: get('juiceShop.ctfKey'),
                 },
-                volumeMounts: [
-                  {
-                    name: 'juice-shop-config',
-                    mountPath: '/juice-shop/config/multi-juicer.yaml',
-                    subPath: 'multi-juicer.yaml',
-                  },
-                ],
+              ],
+              ports: [
+                {
+                  containerPort: 3000,
+                },
+              ],
+              readinessProbe: {
+                httpGet: {
+                  path: '/rest/admin/application-version',
+                  port: 3000,
+                },
+                initialDelaySeconds: 5,
+                periodSeconds: 2,
+                failureThreshold: 10,
               },
-              {
-                name: 'progress-watchdog',
-                image: 'iteratec/juice-progress-watchdog',
-                imagePullPolicy: get('juiceShop.imagePullPolicy'),
-                env: [
-                  {
-                    name: 'REDIS_PASSWORD',
-                    valueFrom: {
-                      secretKeyRef: {
-                        name: 'multi-juicer-redis',
-                        key: 'redis-password',
-                      },
+              livenessProbe: {
+                httpGet: {
+                  path: '/rest/admin/application-version',
+                  port: 3000,
+                },
+                initialDelaySeconds: 30,
+                periodSeconds: 15,
+              },
+              volumeMounts: [
+                {
+                  name: 'juice-shop-config',
+                  mountPath: '/juice-shop/config/multi-juicer.yaml',
+                  subPath: 'multi-juicer.yaml',
+                },
+              ],
+            },
+            {
+              name: 'progress-watchdog',
+              image: 'iteratec/juice-progress-watchdog',
+              imagePullPolicy: get('juiceShop.imagePullPolicy'),
+              env: [
+                {
+                  name: 'REDIS_PASSWORD',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'multi-juicer-redis',
+                      key: 'redis-password',
                     },
                   },
-                  {
-                    name: 'REDIS_HOST',
-                    value: get('redis.host'),
-                  },
-                  {
-                    name: 'REDIS_PORT',
-                    value: `${get('redis.port')}`,
-                  },
-                  {
-                    name: 'TEAMNAME',
-                    value: team,
-                  },
-                ],
-              },
-            ],
-            volumes: [
-              {
-                name: 'juice-shop-config',
-                configMap: {
-                  name: 'juice-shop-config',
                 },
+                {
+                  name: 'REDIS_HOST',
+                  value: get('redis.host'),
+                },
+                {
+                  name: 'REDIS_PORT',
+                  value: `${get('redis.port')}`,
+                },
+                {
+                  name: 'TEAMNAME',
+                  value: team,
+                },
+              ],
+            },
+          ],
+          volumes: [
+            {
+              name: 'juice-shop-config',
+              configMap: {
+                name: 'juice-shop-config',
               },
-            ],
-          },
+            },
+          ],
         },
       },
-    })
-    .catch(error => {
-      throw new Error(error.response.body.message);
-    });
+    },
+  };
+
+  return k8sAppsApi.createNamespacedDeployment(get('namespace'), deploymentConfig).catch(error => {
+    throw new Error(error.response.body.message);
+  });
+};
 
 module.exports.createDeploymentForTeam = createDeploymentForTeam;
 
@@ -254,3 +261,23 @@ const getJuiceShopInstanceForTeamname = teamname =>
       throw new Error(error.response.body.message);
     });
 module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;
+
+const updateLastRequestTimestampForTeam = ({ teamname }) => {
+  const headers = { 'content-type': 'application/strategic-merge-patch+json' };
+  return k8sAppsApi.patchNamespacedDeployment(
+    `${teamname}-juiceshop`,
+    get('namespace'),
+    {
+      metadata: {
+        annotations: {
+          'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
+          'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
+        },
+      },
+    },
+    undefined,
+    undefined,
+    { headers }
+  );
+};
+module.exports.updateLastRequestTimestampForTeam = updateLastRequestTimestampForTeam;

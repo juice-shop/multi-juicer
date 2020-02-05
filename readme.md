@@ -93,6 +93,15 @@ There are some pretty good reasons for this:
 - To ensure that pods are still properly associated with teams after a pod gets recreated. This is a non problem with separate deployment and really hard with scaled deployments.
 - The ability to embed the team name in the deployment name. This seems like a stupid reason but make debugging SOOO much easier, with just using `kubectl`.
 
+### How to manage JuiceShop easily using `kubectl`?
+
+You can list all JuiceShops with relevant information using the custom-columns feature of kubectl.
+You'll need to down load the juiceShop.txt from the repository first:
+
+```bash
+kubectl get -l app=juice-shop -o custom-columns-file=juiceShop.txt deployments
+```
+
 ### Did somebody actually ask any of these questions?
 
 No 😉

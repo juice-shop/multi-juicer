@@ -153,7 +153,7 @@ async function createTeam(req, res) {
 
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
-    await createDeploymentForTeam({ team, passcode });
+    await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 
     logger.info(`Created JuiceShop Deployment for team "${team}"`);
