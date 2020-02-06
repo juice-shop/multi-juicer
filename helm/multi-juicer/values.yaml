@@ -59,6 +59,13 @@ juiceShop:
 progressWatchdog:
   repository: iteratec/juice-progress-watchdog
   tag: latest
+  resources:
+    requests:
+      memory: 48Mi
+      cpu: 20m
+    limits:
+      memory: 48Mi
+      cpu: 20m
 
 # Deletes unused JuiceShop instances after a configuable period of inactivity
 juiceShopCleanup:
