@@ -9,7 +9,6 @@ const validator = expressJoiValidation.createValidator();
 
 const router = express.Router();
 
-const redis = require('../redis');
 const {
   createDeploymentForTeam,
   createServiceForTeam,
@@ -68,11 +67,9 @@ async function checkIfTeamAlreadyExists(req, res, next) {
   logger.info(`Checking if team ${team} already has a JuiceShop Deployment`);
 
   try {
-    await getJuiceShopInstanceForTeamname(team);
+    const { passcodeHash } = await getJuiceShopInstanceForTeamname(team);
 
     logger.info(`Team ${team} already has a JuiceShop deployment`);
-
-    const passcodeHash = await redis.get(`t-${team}-passcode`);
 
     if (passcode !== undefined && (await bcrypt.compare(passcode, passcodeHash))) {
       // Set cookie, (join team)
@@ -147,9 +144,6 @@ async function createTeam(req, res) {
   try {
     const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
     const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
-
-    await redis.set(`t-${team}-passcode`, hash);
-    await redis.set(`t-${team}-last-request`, new Date().getTime());
 
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 

@@ -255,6 +255,7 @@ const getJuiceShopInstanceForTeamname = teamname =>
       return {
         readyReplicas: res.body.status.readyReplicas,
         availableReplicas: res.body.status.availableReplicas,
+        passcodeHash: res.body.metadata.annotations['multi-juicer.iteratec.dev/passcode'],
       };
     })
     .catch(error => {
@@ -262,7 +263,7 @@ const getJuiceShopInstanceForTeamname = teamname =>
     });
 module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;
 
-const updateLastRequestTimestampForTeam = ({ teamname }) => {
+const updateLastRequestTimestampForTeam = teamname => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };
   return k8sAppsApi.patchNamespacedDeployment(
     `${teamname}-juiceshop`,
