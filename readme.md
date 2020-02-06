@@ -62,7 +62,7 @@ helm delete multi-juicer
 
 To be on the safe side calculate with:
 
-- _1GB memory & 1CPU overhead_, for the balancer, redis & co
+- _1GB memory & 1CPU overhead_, for the balancer & co
 - _200MB & 0.2CPU \* number of participants_, for the individual JuiceShop Instances
 
 The numbers above reflect the default resource limits. These can be tweaked, see: [Customizing the Setup](#customizing-the-setup)
@@ -72,8 +72,6 @@ The numbers above reflect the default resource limits. These can be tweaked, see
 There is no real fixed limit. (Even thought you can configure one 😉)
 The custom LoadBalancer, through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
 You can also attach a [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to automatically scale the LoadBalancer.
-
-When scaling up, also keep an eye on the redis instance. Make sure it is still able to handle the load.
 
 ### Why a custom LoadBalancer?
 
