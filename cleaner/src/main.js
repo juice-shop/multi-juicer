@@ -51,7 +51,6 @@ async function main() {
 
   for (const instance of instances.body.items) {
     const instanceName = instance.metadata.name;
-    const teamname = instance.metadata.labels.team;
     const lastConnectTimestamps = parseInt(
       instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
       10
