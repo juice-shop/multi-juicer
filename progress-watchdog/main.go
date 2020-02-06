@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/op/go-logging"
+	"github.com/speps/go-hashids"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -214,25 +215,45 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continueCode string) {
 	log.Debugf("Updating continue-code of team '%s' to '%s'", teamname, continueCode)
 
+	challengeCount, err := ParseContinueCode(continueCode)
+	if err != nil {
+		log.Warningf("Could not decode continueCode '%s'", continueCode)
+	}
+
 	diff := UpdateProgressDeploymentDiff{
 		Metadata: UpdateProgressDeploymentMetadata{
 			Annotations: UpdateProgressDeploymentDiffAnnotations{
 				ContinueCode:     continueCode,
-				ChallengesSolved: "42",
+				ChallengesSolved: fmt.Sprintf("%d", challengeCount),
 			},
 		},
 	}
 
 	jsonBytes, err := json.Marshal(diff)
 	if err != nil {
-		panic("could not encode json")
+		panic("Could not encode json, to update continueCode and challengeSolved count on deployment")
 	}
-	log.Debug("Json patch")
-	log.Debug(string(jsonBytes))
 
 	_, err = clientset.AppsV1().Deployments("default").Patch(fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes)
 	if err != nil {
+		log.Errorf("Failed to path new continue code into deployment for team %s", teamname)
 		log.Error(err)
-		panic("could not patch deployment")
 	}
+}
+
+// ParseContinueCode returns the number of challenges solved by this continue code
+func ParseContinueCode(continueCode string) (int, error) {
+	hd := hashids.NewData()
+	hd.Salt = "this is my salt"
+	hd.MinLength = 60
+	hd.Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+
+	hashIDClient, _ := hashids.NewWithData(hd)
+	decoded, err := hashIDClient.DecodeWithError(continueCode)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return len(decoded), nil
 }
