@@ -31,6 +31,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
         'multi-juicer.iteratec.dev/passcode': passcodeHash,
         'multi-juicer.iteratec.dev/challengesSolved': '0',
+        'multi-juicer.iteratec.dev/continueCode': '',
       },
       ownerReferences: [
         {
@@ -104,34 +105,6 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'juice-shop-config',
                   mountPath: '/juice-shop/config/multi-juicer.yaml',
                   subPath: 'multi-juicer.yaml',
-                },
-              ],
-            },
-            {
-              name: 'progress-watchdog',
-              image: 'iteratec/juice-progress-watchdog',
-              imagePullPolicy: get('juiceShop.imagePullPolicy'),
-              env: [
-                {
-                  name: 'REDIS_PASSWORD',
-                  valueFrom: {
-                    secretKeyRef: {
-                      name: 'multi-juicer-redis',
-                      key: 'redis-password',
-                    },
-                  },
-                },
-                {
-                  name: 'REDIS_HOST',
-                  value: get('redis.host'),
-                },
-                {
-                  name: 'REDIS_PORT',
-                  value: `${get('redis.port')}`,
-                },
-                {
-                  name: 'TEAMNAME',
-                  value: team,
                 },
               ],
             },

@@ -1,4 +1,3 @@
-jest.mock('../redis');
 jest.mock('../kubernetes');
 jest.mock('http-proxy');
 
