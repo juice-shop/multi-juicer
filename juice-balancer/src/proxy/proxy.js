@@ -84,10 +84,10 @@ async function updateLastConnectTimestamp(req, res, next) {
       const timeDifference = currentTime - connectionCache.get(teamname);
       if (timeDifference > 10000) {
         connectionCache.set(teamname, currentTime);
-        await updateLastRequestTimestampForTeam({ teamname });
+        await updateLastRequestTimestampForTeam(teamname);
       }
     } else {
-      await updateLastRequestTimestampForTeam({ teamname });
+      await updateLastRequestTimestampForTeam(teamname);
 
       connectionCache.set(teamname, currentTime);
     }
