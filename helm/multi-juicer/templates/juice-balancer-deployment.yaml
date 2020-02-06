@@ -36,11 +36,6 @@ spec:
               path: /balancer/
               port: http
           env:
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-redis
-                  key: redis-password
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
