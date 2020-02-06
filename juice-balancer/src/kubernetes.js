@@ -278,6 +278,8 @@ const updateLastRequestTimestampForTeam = teamname => {
     },
     undefined,
     undefined,
+    undefined,
+    undefined,
     { headers }
   );
 };
