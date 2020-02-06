@@ -44,7 +44,10 @@ async function listInstances(req, res) {
         name: instance.metadata.name,
         ready: instance.status.availableReplicas === 1,
         createdAt: instance.metadata.creationTimestamp.getTime(),
-        lastConnect: parseInt(instance.metadata.annotations.lastRequest, 10),
+        lastConnect: parseInt(
+          instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
+          10
+        ),
       };
     }),
   });
