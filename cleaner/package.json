@@ -10,13 +10,12 @@
   "author": "iteratec GmbH",
   "license": "Apache-2.0",
   "dependencies": {
-    "@kubernetes/client-node": "^0.10.2",
-    "ioredis": "^4.11.2"
+    "@kubernetes/client-node": "^0.11.1"
   },
   "devDependencies": {
-    "eslint": "^6.0.1",
-    "eslint-plugin-prettier": "^3.1.0",
-    "jest": "^24.8.0",
-    "prettier": "^1.18.2"
+    "eslint": "^6.8.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1"
   }
 }
