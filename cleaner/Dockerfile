@@ -10,5 +10,4 @@ WORKDIR /home/app/
 COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
 COPY --chown=app:app ./src src/
 USER app
-EXPOSE 8080
 CMD ["node", "/home/app/src/main.js"]
