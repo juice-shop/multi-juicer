@@ -55,15 +55,10 @@ juiceShop:
   # If value is changed to something other than 'multi-juicer' it's not possible to set a custom config.
   nodeEnv: 'multi-juicer'
 
-# Config for the redis deployment
-# This is using: https://hub.helm.sh/charts/stable/redis
-redis:
-  cluster:
-    slaveCount: 1
-  # OpenShifts Default Security Context makes trouble with the security context
-  # of the redis chart. Uncomment the next two lines to have it run on OpenShift.
-  # securityContext:
-  #   enabled: false
+# Deletes unused JuiceShop instances after a configuable period of inactivity
+progressWatchdog:
+  repository: iteratec/juice-progress-watchdog
+  tag: latest
 
 # Deletes unused JuiceShop instances after a configuable period of inactivity
 juiceShopCleanup:
