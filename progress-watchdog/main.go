@@ -3,19 +3,18 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/op/go-logging"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/rest"
 )
 
 var log = logging.MustGetLogger("ProgressWatchdog")
@@ -35,38 +34,17 @@ type ProgressUpdateJobs struct {
 	LastContinueCode string
 }
 
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
-}
-
 func main() {
 	logBackend := logging.NewLogBackend(os.Stdout, "", 0)
 
 	logFormatter := logging.NewBackendFormatter(logBackend, format)
 	logBackendLeveled := logging.AddModuleLevel(logBackend)
-	logBackendLeveled.SetLevel(logging.DEBUG, "")
+	logBackendLeveled.SetLevel(logging.INFO, "")
 
 	log.SetBackend(logBackendLeveled)
 	logging.SetBackend(logBackendLeveled, logFormatter)
 
-	// config, err := rest.InClusterConfig()
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-
-	var kubeconfig *string
-	if home := homeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	config, err := rest.InClusterConfig()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -79,6 +57,7 @@ func main() {
 
 	progressUpdateJobs := make(chan ProgressUpdateJobs)
 
+	// Start 10 workers which fetch and update continue codes based on the `progressUpdateJobs` queue / channel
 	for i := 0; i < 10; i++ {
 		go workOnProgressUpdates(progressUpdateJobs, clientset)
 	}
@@ -141,7 +120,7 @@ func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clients
 			if lastContinueCode != *currentContinueCode {
 				log.Debugf("Continue codes differ (last vs current): (%s vs %s)", lastContinueCode, *currentContinueCode)
 				log.Debug("Applying cached continue code")
-				log.Infof("Found new continue Code for Team '%s'", job.Teamname)
+				log.Infof("Found new continue Code for Team '%s', updating now", job.Teamname)
 				applyContinueCode(job.Teamname, lastContinueCode)
 				log.Debug("ReFetching current continue code")
 				currentContinueCode = getCurrentContinueCode(job.Teamname)
@@ -216,21 +195,24 @@ func applyContinueCode(teamname, continueCode string) {
 	defer res.Body.Close()
 }
 
+// UpdateProgressDeploymentDiff contains only the parts of the deployment we are interessted in updating
 type UpdateProgressDeploymentDiff struct {
 	Metadata UpdateProgressDeploymentMetadata `json:"metadata"`
 }
 
+// UpdateProgressDeploymentMetadata a shim of the k8s metadata object containing only annotations
 type UpdateProgressDeploymentMetadata struct {
 	Annotations UpdateProgressDeploymentDiffAnnotations `json:"annotations"`
 }
 
+// UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
 type UpdateProgressDeploymentDiffAnnotations struct {
 	ContinueCode     string `json:"multi-juicer.iteratec.dev/continueCode"`
 	ChallengesSolved string `json:"multi-juicer.iteratec.dev/challengesSolved"`
 }
 
 func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continueCode string) {
-	log.Infof("Updating continue-code of team '%s' to '%s'", teamname, continueCode)
+	log.Debugf("Updating continue-code of team '%s' to '%s'", teamname, continueCode)
 
 	diff := UpdateProgressDeploymentDiff{
 		Metadata: UpdateProgressDeploymentMetadata{
