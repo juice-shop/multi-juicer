@@ -3,12 +3,6 @@
   "namespace": "default",
   "deploymentContext": "multi-juicer",
   "maxJuiceShopInstances": 10,
-  "redis": {
-    "host": "juice-balancer-redis",
-    "password": "myredispassword",
-    "port": 6379,
-    "redis-secret-name": "multi-juicer-redis"
-  },
   "admin": {
     "username": "admin",
     "password": "12345678"
