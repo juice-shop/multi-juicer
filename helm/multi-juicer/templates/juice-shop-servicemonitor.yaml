@@ -1,0 +1,15 @@
+{{- if and .Values.balancer.metrics.enabled .Values.balancer.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: juice-shops
+spec:
+  targetLabels:
+    - team
+  selector:
+    matchLabels:
+      app: juice-shop
+      deployment-context: {{ .Release.Name | quote }}
+  endpoints:
+    - targetPort: 3000
+{{- end }}

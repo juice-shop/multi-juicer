@@ -1,0 +1,21 @@
+{{- if and .Values.balancer.metrics.enabled .Values.balancer.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: juice-balancer
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: 'juice-balancer'
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - port: http
+      path: '/balancer/metrics'
+      basicAuth:
+        username:
+          name: juice-balancer-secret
+          key: metricsBasicAuthUsername
+        password:
+          name: juice-balancer-secret
+          key: metricsBasicAuthPassword
+{{- end }}

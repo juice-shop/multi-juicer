@@ -1,9 +1,24 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
+const promClient = require('prom-client');
+const basicAuth = require('basic-auth-connect');
+
 const { get } = require('./config');
 
 const app = express();
+
+if (get('metrics.enabled')) {
+  promClient.collectDefaultMetrics();
+  app.get(
+    '/balancer/metrics',
+    basicAuth(get('metrics.basicAuth.username'), get('metrics.basicAuth.password')),
+    (req, res) => {
+      res.set('Content-Type', promClient.register.contentType);
+      res.end(promClient.register.metrics());
+    }
+  );
+}
 
 const teamRoutes = require('./teams/teams');
 const adminRoutes = require('./admin/admin');

@@ -18,6 +18,11 @@ data:
       "admin": {
         "username": "admin"
       },
+  {{- if .Values.balancer.metrics.enabled }}
+      "metrics": {
+        "enabled": true
+      },
+  {{- end }}
       "juiceShop": {
         "image": {{ .Values.juiceShop.image | quote }},
         "tag": {{ .Values.juiceShop.tag | quote }},
