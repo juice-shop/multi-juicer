@@ -48,7 +48,7 @@ juiceShop:
       # showChallengeHints: false
       showVersionNumber: false
       # showHackingInstructor: false
-      gitHubRibbon: false
+      showGitHubLinks: false
     ctf:
       # showFlagsInNotifications: true
   # Specify a custom NODE_ENV for JuiceShop.
