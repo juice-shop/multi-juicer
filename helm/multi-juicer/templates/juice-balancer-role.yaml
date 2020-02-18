@@ -8,7 +8,7 @@ metadata:
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']
-    verbs: ['get', 'create', 'list', 'delete']
+    verbs: ['get', 'create', 'list', 'delete', 'patch']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['services']
     verbs: ['get', 'create', 'delete']
