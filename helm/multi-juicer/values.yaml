@@ -9,7 +9,7 @@ balancer:
     # If secure is set to true the cookie name will automatically be prefixed with "__Secure-"
     name: balancer
   repository: iteratec/juice-balancer
-  tag: v9.3.1
+  tag: latest
   replicas: 1
   resources:
     requests:
@@ -26,7 +26,7 @@ juiceShop:
   maxInstances: 10
   # Juice Shop Image to use
   image: bkimminich/juice-shop
-  tag: latest
+  tag: v9.3.1
   # Change the key when hosting a CTF event
   # This key gets used to generate the challenge flags
   # See: https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part1/ctf.html#overriding-the-ctfkey
