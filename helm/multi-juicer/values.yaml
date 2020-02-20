@@ -9,7 +9,7 @@ balancer:
     # If secure is set to true the cookie name will automatically be prefixed with "__Secure-"
     name: balancer
   repository: iteratec/juice-balancer
-  tag: latest
+  tag: v9.3.1
   replicas: 1
   resources:
     requests:
