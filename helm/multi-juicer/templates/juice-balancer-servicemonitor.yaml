@@ -9,7 +9,7 @@ spec:
       app.kubernetes.io/name: 'juice-balancer'
       app.kubernetes.io/instance: {{ .Release.Name }}
   endpoints:
-    - port: http
+    - port: web
       path: '/balancer/metrics'
       basicAuth:
         username:
