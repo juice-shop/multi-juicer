@@ -14,7 +14,7 @@ if (get('metrics.enabled')) {
 
   promClient.register.setDefaultLabels({ app: 'multijuicer' });
 
-  const httpRequestsMetric = new Prometheus.Counter({
+  const httpRequestsMetric = new promClient.Counter({
     name: 'http_requests_count',
     help: 'Total HTTP request count grouped by status code.',
     labelNames: ['status_code'],
