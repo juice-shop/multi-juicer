@@ -46,6 +46,18 @@ spec:
                 secretKeyRef:
                   name: juice-balancer-secret
                   key: adminPassword
+            {{- if .Values.balancer.metrics.enabled }}
+            - name: METRICS_BASICAUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: juice-balancer-secret
+                  key: metricsBasicAuthUsername
+            - name: METRICS_BASICAUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: juice-balancer-secret
+                  key: metricsBasicAuthPassword
+            {{- end }}
           volumeMounts:
             - name: config-volume
               mountPath: /home/app/config/

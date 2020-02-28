@@ -12,6 +12,13 @@
     "secret": "askdbakhdajhvdsjavjdsgv",
     "secure": false
   },
+  "metrics": {
+    "enabled": false,
+    "basicAuth": {
+      "username": "prometheus-scraper",
+      "password": "ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"
+    }
+  },
   "juiceShop": {
     "image": "bkimminich/juice-shop",
     "tag": "snapshot",

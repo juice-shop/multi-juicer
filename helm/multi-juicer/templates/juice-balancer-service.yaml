@@ -3,7 +3,8 @@ kind: Service
 metadata:
   name: juice-balancer
   labels:
-    app: 'juice-balancer'
+    app.kubernetes.io/name: 'juice-balancer'
+    app.kubernetes.io/instance: {{ .Release.Name }}
     helm.sh/chart: {{ include "multi-juicer.chart" . }}
 spec:
   selector:
