@@ -24,6 +24,10 @@ balancer:
     # enables prometheus metrics for the balancer
     # if set to true you should change the prometheus-scraper password
     enabled: false
+    dashboards:
+      # if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true)
+      # These will automatically be imported by Grafana when using the grafana helm chart, see: https://github.com/helm/charts/tree/master/stable/grafana#sidecar-for-dashboards
+      enabled: false
     serviceMonitor:
       # if true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true)
       # this will also deploy a servicemonitor which monitors metrics from the juiceshop instances
