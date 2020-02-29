@@ -11,6 +11,17 @@ balancer:
   repository: iteratec/juice-balancer
   tag: latest
   replicas: 1
+  service:
+    # Kubernetes service type
+    type: ClusterIP
+    # internal cluster service IP
+    clusterIP: null
+    # IP address to assign to load balancer (if supported)
+    loadBalancerIP: null
+    # list of IP CIDRs allowed access to lb (if supported)
+    loadBalancerSourceRanges: null
+    # IP address to assign to load balancer (if supported)
+    externalIPs: null
   resources:
     requests:
       memory: 256Mi
