@@ -3,7 +3,6 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
 
 grafana:
-  adminPassword: "glaucoma-coupling-usurious-crayfish-dugout-acuity"
   sidecar:
     dashboards:
       searchNamespace: ALL

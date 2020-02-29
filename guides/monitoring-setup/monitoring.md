@@ -4,6 +4,8 @@ This is a short and temporary guide on how to install MultiJuicer together with 
 
 This Guide is considered temporary as it is intended to be replaced by fully featured Terraform Modules which will install everything for you 🚀
 
+The default admin password for the Grafana Setup is: `prom-operator`. You can overwrite this by adding `set="grafana.adminPassword=yourPasswordHere"` to the helm install command for the prometheus-operator.
+
 ```sh
 # Install Prometheus, Grafana & Grafana Loki
 
