@@ -1,7 +1,0 @@
-# This file only overrides default option enabled in the chart which clashes with the OpenShift security context
-# For the full config file check: https://github.com/iteratec/multi-juicer/blob/master/helm/multi-juicer/values.yaml
-redis:
-  # OpenShifts Default Security Context makes trouble with the security context
-  # of the redis chart.
-  securityContext:
-    enabled: false

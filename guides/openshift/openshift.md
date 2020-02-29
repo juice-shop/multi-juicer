@@ -27,15 +27,11 @@ oc new-project multi-juicer
 # You'll need to add the multi-juicer helm repo to your helm repos
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
-# Before we can install the cluster we need to change one config option, which clashes with OpenShifts security context
-# For that download the OpenShift overrides config file
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/openshift/openshift-helm-overrides.yaml
-
 # for helm <= 2
-helm install multi-juicer/multi-juicer --name multi-juicer -f openshift-helm-overrides.yaml ./multi-juicer/helm/multi-juicer/
+helm install multi-juicer/multi-juicer --name multi-juicer ./multi-juicer/helm/multi-juicer/
 
 # for helm >= 3
-helm install multi-juicer multi-juicer/multi-juicer -f openshift-helm-overrides.yaml ./multi-juicer/helm/multi-juicer/
+helm install multi-juicer multi-juicer/multi-juicer ./multi-juicer/helm/multi-juicer/
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -76,9 +72,6 @@ oc create route edge juice-balancer --service juice-balancer --hostname multi-ju
 
 ```bash
 helm delete multi-juicer
-# helm will not delete the persistent volumes for redis!
-# delete them by running:
-oc delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
 # Delete the route
 oc delete route edge juice-balancer
