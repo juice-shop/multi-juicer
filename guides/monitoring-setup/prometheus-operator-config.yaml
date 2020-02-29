@@ -1,0 +1,14 @@
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+grafana:
+  adminPassword: "glaucoma-coupling-usurious-crayfish-dugout-acuity"
+  sidecar:
+    dashboards:
+      searchNamespace: ALL
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: "http://loki:3100"
