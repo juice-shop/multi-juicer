@@ -62,7 +62,7 @@ helm delete multi-juicer
 
 To be on the safe side calculate with:
 
-- _1GB memory & 1CPU overhead_, for the balancer, redis & co
+- _1GB memory & 1CPU overhead_, for the balancer & co
 - _200MB & 0.2CPU \* number of participants_, for the individual JuiceShop Instances
 
 The numbers above reflect the default resource limits. These can be tweaked, see: [Customizing the Setup](#customizing-the-setup)
@@ -72,8 +72,6 @@ The numbers above reflect the default resource limits. These can be tweaked, see
 There is no real fixed limit. (Even thought you can configure one 😉)
 The custom LoadBalancer, through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
 You can also attach a [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to automatically scale the LoadBalancer.
-
-When scaling up, also keep an eye on the redis instance. Make sure it is still able to handle the load.
 
 ### Why a custom LoadBalancer?
 
@@ -92,6 +90,15 @@ There are some pretty good reasons for this:
 - The ability delete the instances of a team separately. Scaling down safely, without removing instances of active teams, is really tricky with a scaled deployment. You can only choose the desired scale not which pods to keep and which to throw away.
 - To ensure that pods are still properly associated with teams after a pod gets recreated. This is a non problem with separate deployment and really hard with scaled deployments.
 - The ability to embed the team name in the deployment name. This seems like a stupid reason but make debugging SOOO much easier, with just using `kubectl`.
+
+### How to manage JuiceShop easily using `kubectl`?
+
+You can list all JuiceShops with relevant information using the custom-columns feature of kubectl.
+You'll need to down load the juiceShop.txt from the repository first:
+
+```bash
+kubectl get -l app=juice-shop -o custom-columns-file=juiceShop.txt deployments
+```
 
 ### Did somebody actually ask any of these questions?
 

@@ -1,13 +1,14 @@
-jest.mock('../redis');
 jest.mock('../kubernetes');
 jest.mock('http-proxy');
 
 const { advanceBy, advanceTo, clear } = require('jest-date-mock');
 const request = require('supertest');
 
-const redis = require('../redis');
 const app = require('../app');
-const { getJuiceShopInstanceForTeamname } = require('../kubernetes');
+const {
+  getJuiceShopInstanceForTeamname,
+  updateLastRequestTimestampForTeam,
+} = require('../kubernetes');
 
 afterAll(async () => {
   await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
@@ -15,15 +16,15 @@ afterAll(async () => {
 
 beforeEach(() => {
   clear();
-  redis.set.mockClear();
   getJuiceShopInstanceForTeamname.mockClear();
+  updateLastRequestTimestampForTeam.mockClear();
 });
 
 test('/balancer/ should return the balancer ui', async () => {
   await request(app)
     .get('/balancer/')
-    .expect('Content-Type', /text\/html/)
-    .expect(200);
+    .expect(200)
+    .expect('Content-Type', /text\/html/);
 });
 
 test('should proxy requests going to JuiceShop when they got a team cookie', async () => {
@@ -55,7 +56,7 @@ test('should set the last-connect timestamp when a new team gets proxied the fir
     .expect(200)
     .expect('proxied');
 
-  expect(redis.set).toHaveBeenCalledWith('t-team-last-connect-test-last-request', 1555555555555);
+  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('t-team-last-connect-test');
 });
 
 test('should update the last-connect timestamp on requests at most every 10sec', async () => {
@@ -68,12 +69,9 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(redis.set).toHaveBeenCalledWith(
-    't-team-update-last-connect-test-last-request',
-    1000000000000
-  );
+  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('t-team-update-last-connect-test');
 
-  redis.set.mockClear();
+  updateLastRequestTimestampForTeam.mockClear();
 
   await request(app)
     .get('/rest/admin/application-version')
@@ -82,7 +80,7 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(redis.set).not.toHaveBeenCalled();
+  expect(updateLastRequestTimestampForTeam).not.toHaveBeenCalled();
 
   // Wait for >10s
   advanceBy(10 * 1000 + 1);
@@ -94,10 +92,7 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(redis.set).toHaveBeenCalledWith(
-    't-team-update-last-connect-test-last-request',
-    1000000010001
-  );
+  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('t-team-update-last-connect-test');
 });
 
 test('should redirect to /balancer/ when the instance is currently restarting', async () => {

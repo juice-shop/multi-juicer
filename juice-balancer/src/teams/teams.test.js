@@ -1,10 +1,8 @@
-jest.mock('../redis');
 jest.mock('../kubernetes');
 jest.mock('http-proxy');
 
 const request = require('supertest');
 const bcrypt = require('bcryptjs');
-const redis = require('../redis');
 const app = require('../app');
 const {
   getJuiceShopInstanceForTeamname,
@@ -18,8 +16,6 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
-  redis.set.mockClear();
-  redis.get.mockClear();
   getJuiceShopInstanceForTeamname.mockClear();
   getJuiceShopInstances.mockImplementation(async () => {
     return { body: { items: [] } };
@@ -51,10 +47,11 @@ describe('passcode validation', () => {
     ['1234567', false],
   ])('passcode "%s" should pass validation: %p', async (passcode, shouldPassValidation) => {
     getJuiceShopInstanceForTeamname.mockImplementation(async () => {
-      return {};
+      return {
+        // lowered salt to keep hashing quick
+        passcodeHash: bcrypt.hashSync('foo', 2),
+      };
     });
-    // lowered salt to keep hashing quick
-    redis.get.mockReturnValue(bcrypt.hashSync('foo', 2));
 
     await request(app)
       .post(`/balancer/teams/teamname/join`, {})
@@ -75,9 +72,11 @@ test('returns a 500 error code when kubernetes returns a unexpected error code w
 
 test('requires authentication response when the deployment exists but no passcode was provided', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
-    return {};
+    return {
+      // lowered salt to keep hashing quick
+      passcodeHash: bcrypt.hashSync('foo', 2),
+    };
   });
-  redis.get.mockReturnValue(bcrypt.hashSync('foo', 2));
 
   await request(app)
     .post('/balancer/teams/team42/join', {})
@@ -86,9 +85,11 @@ test('requires authentication response when the deployment exists but no passcod
 
 test('requires authentication when the passcode is incorrect', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
-    return {};
+    return {
+      // lowered salt to keep hashing quick
+      passcodeHash: bcrypt.hashSync('12345678', 2),
+    };
   });
-  redis.get.mockReturnValue(bcrypt.hashSync('12345678', 2));
 
   await request(app)
     .post('/balancer/teams/team42/join')
@@ -98,9 +99,10 @@ test('requires authentication when the passcode is incorrect', async () => {
 
 test('joins team when the passcode is correct and the instance exists', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
-    return {};
+    return {
+      passcodeHash: bcrypt.hashSync('12345678', 2),
+    };
   });
-  redis.get.mockReturnValue(bcrypt.hashSync('12345678', 2));
 
   await request(app)
     .post('/balancer/teams/team42/join')
@@ -143,6 +145,10 @@ test('create team creates a instance for team via k8s service', async () => {
       passcode = body.passcode;
     });
 
-  expect(createDeploymentForTeam).toBeCalledWith({ team: 'team42', passcode });
+  expect(createDeploymentForTeam).toHaveBeenCalled();
+
+  const createDeploymentForTeamCallArgs = createDeploymentForTeam.mock.calls[0][0];
+  expect(createDeploymentForTeamCallArgs.team).toBe('team42');
+  expect(bcrypt.compareSync(passcode, createDeploymentForTeamCallArgs.passcodeHash)).toBe(true);
   expect(createServiceForTeam).toBeCalledWith('team42');
 });

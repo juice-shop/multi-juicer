@@ -1,9 +1,42 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
+const promClient = require('prom-client');
+const basicAuth = require('basic-auth-connect');
+const onFinished = require('on-finished');
+
 const { get } = require('./config');
 
 const app = express();
+
+if (get('metrics.enabled')) {
+  promClient.collectDefaultMetrics();
+
+  promClient.register.setDefaultLabels({ app: 'multijuicer' });
+
+  const httpRequestsMetric = new promClient.Counter({
+    name: 'http_requests_count',
+    help: 'Total HTTP request count grouped by status code.',
+    labelNames: ['status_code'],
+  });
+
+  app.use((req, res, next) => {
+    onFinished(res, () => {
+      const statusCode = `${Math.floor(res.statusCode / 100)}XX`;
+      httpRequestsMetric.labels(statusCode).inc();
+    });
+    next();
+  });
+
+  app.get(
+    '/balancer/metrics',
+    basicAuth(get('metrics.basicAuth.username'), get('metrics.basicAuth.password')),
+    (req, res) => {
+      res.set('Content-Type', promClient.register.contentType);
+      res.end(promClient.register.metrics());
+    }
+  );
+}
 
 const teamRoutes = require('./teams/teams');
 const adminRoutes = require('./admin/admin');

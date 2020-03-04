@@ -3,10 +3,12 @@ const httpProxy = require('http-proxy');
 
 const proxy = httpProxy.createProxyServer();
 
-const redis = require('../redis');
 const { get } = require('../config');
 const { logger } = require('../logger');
-const { getJuiceShopInstanceForTeamname } = require('../kubernetes');
+const {
+  getJuiceShopInstanceForTeamname,
+  updateLastRequestTimestampForTeam,
+} = require('../kubernetes');
 
 const router = express.Router();
 
@@ -77,15 +79,22 @@ async function updateLastConnectTimestamp(req, res, next) {
   const currentTime = new Date().getTime();
   const teamname = req.teamname;
 
-  if (connectionCache.has(teamname)) {
-    const timeDifference = currentTime - connectionCache.get(teamname);
-    if (timeDifference > 10000) {
-      await redis.set(`${teamname}-last-request`, currentTime);
+  try {
+    if (connectionCache.has(teamname)) {
+      const timeDifference = currentTime - connectionCache.get(teamname);
+      if (timeDifference > 10000) {
+        connectionCache.set(teamname, currentTime);
+        await updateLastRequestTimestampForTeam(teamname);
+      }
+    } else {
+      await updateLastRequestTimestampForTeam(teamname);
+
       connectionCache.set(teamname, currentTime);
     }
-  } else {
-    await redis.set(`${teamname}-last-request`, currentTime);
-    connectionCache.set(teamname, currentTime);
+  } catch (error) {
+    logger.warn(`Failed to update lastRequest timestamp for team "${teamname}"`);
+    logger.warn(error.message);
+    logger.warn(JSON.stringify(error));
   }
   next();
 }

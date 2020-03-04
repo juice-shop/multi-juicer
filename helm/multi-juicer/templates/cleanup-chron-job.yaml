@@ -25,15 +25,6 @@ spec:
                   value: {{ .Release.Namespace | quote }}
                 - name: MAX_INACTIVE_DURATION
                   value: {{ .Values.juiceShopCleanup.gracePeriod }}
-                - name: REDIS_HOST
-                  value: '{{ .Release.Name }}-redis-master'
-                - name: REDIS_PORT
-                  value: '6379'
-                - name: REDIS_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: '{{ .Release.Name }}-redis'
-                      key: redis-password
           restartPolicy: Never
           {{- with .Values.nodeSelector }}
           nodeSelector:

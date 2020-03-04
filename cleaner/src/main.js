@@ -1,13 +1,6 @@
 const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
-const Redis = require('ioredis');
 
 const { parseTimeDurationString, msToHumanReadable } = require('./time');
-
-const redis = new Redis({
-  host: process.env['REDIS_HOST'],
-  port: process.env['REDIS_PORT'],
-  password: process.env['REDIS_PASSWORD'],
-});
 
 const Namespace = process.env['NAMESPACE'];
 
@@ -32,7 +25,7 @@ if (MaxInactiveDurationInMs === null) {
 
 async function main() {
   const counts = {
-    sucessful: {
+    successful: {
       deployments: 0,
       services: 0,
     },
@@ -58,11 +51,12 @@ async function main() {
 
   for (const instance of instances.body.items) {
     const instanceName = instance.metadata.name;
-    const teamname = instance.metadata.labels.team;
+    const lastConnectTimestamps = parseInt(
+      instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
+      10
+    );
 
     console.log(`Checking instance: "${instanceName}".`);
-
-    const lastConnectTimestamps = await redis.get(`t-${teamname}-last-request`);
 
     const currentTime = new Date().getTime();
 
@@ -76,7 +70,7 @@ async function main() {
       );
       try {
         await k8sAppsApi.deleteNamespacedDeployment(instanceName, Namespace);
-        counts.sucessful.deployments++;
+        counts.successful.deployments++;
       } catch (error) {
         counts.failed.deployments++;
         console.error(
@@ -86,7 +80,7 @@ async function main() {
       }
       try {
         await k8sCoreApi.deleteNamespacedService(instanceName, Namespace);
-        counts.sucessful.services++;
+        counts.successful.services++;
       } catch (error) {
         counts.failed.services++;
         console.error(`Failed to delete service: "${instanceName}" from namespace "${Namespace}"`);
@@ -108,17 +102,13 @@ main()
     console.log('Finished Juice Shop Instance Cleanup');
     console.log('');
     console.log('Successful deletions:');
-    console.log(`  Deployments: ${counts.sucessful.deployments}`);
-    console.log(`  Services: ${counts.sucessful.services}`);
+    console.log(`  Deployments: ${counts.successful.deployments}`);
+    console.log(`  Services: ${counts.successful.services}`);
     console.log('Failed deletions:');
     console.log(`  Deployments: ${counts.failed.deployments}`);
     console.log(`  Services: ${counts.failed.services}`);
-
-    redis.disconnect();
   })
   .catch(err => {
     console.error('Failed deletion tasks');
     console.error(err);
-
-    redis.disconnect();
   });

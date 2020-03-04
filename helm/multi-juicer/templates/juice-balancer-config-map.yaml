@@ -11,11 +11,6 @@ data:
       "namespace": {{ .Release.Namespace | quote }},
       "deploymentContext": {{ .Release.Name | quote }},
       "maxJuiceShopInstances": {{ .Values.juiceShop.maxInstances}},
-      "redis": {
-        "host": "{{ .Release.Name}}-redis-master",
-        "port": 6379,
-        "redis-secret-name": "{{ .Release.Name}}-ctf-redis"
-      },
       "cookieParser": {
         "cookieName": {{ include "multi-juicer.cookieName" . | quote }},
         "secure": {{ .Values.balancer.cookie.secure }}
@@ -23,6 +18,11 @@ data:
       "admin": {
         "username": "admin"
       },
+  {{- if .Values.balancer.metrics.enabled }}
+      "metrics": {
+        "enabled": true
+      },
+  {{- end }}
       "juiceShop": {
         "image": {{ .Values.juiceShop.image | quote }},
         "tag": {{ .Values.juiceShop.tag | quote }},

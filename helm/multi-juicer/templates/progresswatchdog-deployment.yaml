@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 'progress-watchdog'
+  labels:
+    app: 'progress-watchdog'
+    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: 'progress-watchdog'
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: 'progress-watchdog'
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: progress-watchdog
+      containers:
+        - name: progress-watchdog
+          image: '{{ .Values.progressWatchdog.repository }}:{{ .Values.progressWatchdog.tag }}'
+          imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.progressWatchdog.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

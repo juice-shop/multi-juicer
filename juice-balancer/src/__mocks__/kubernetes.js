@@ -7,4 +7,5 @@ module.exports = {
   })),
   getJuiceShopInstances: jest.fn(),
   deletePodForTeam: jest.fn(),
+  updateLastRequestTimestampForTeam: jest.fn(),
 };

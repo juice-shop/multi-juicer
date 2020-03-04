@@ -38,8 +38,8 @@ helm install multi-juicer multi-juicer/multi-juicer
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you three pods a juice-balancer pod and two redis pods
-# Wait until all 3 pods are ready
+# This should show you two pods a juice-balancer pod and a progress-watchdog pod
+# Wait until both pods are ready
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -91,10 +91,6 @@ kubectl describe services multi-juicer-loadbalancer
 
 ```bash
 helm delete multi-juicer
-# helm will not delete the persistent volumes for redis!
-# these cost $1.60/month ($0.10/GB/month)
-# delete them by running:
-kubectl delete persistentvolumeclaims redis-data-multi-juicer-redis-master-0 redis-data-multi-juicer-redis-slave-0
 
 # Delete the loadbalancer
 kubectl delete -f do-lb.yaml

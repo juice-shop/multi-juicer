@@ -1,5 +1,5 @@
 on: [push, pull_request]
-name: 'Run Tests'
+name: "Run Tests"
 jobs:
   cleaner:
     name: Cleaner
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: 'Install & Build BalancerUI'
+      - name: "Install & Build BalancerUI"
         run: |
           cd juice-balancer/ui
           npm ci
@@ -40,3 +40,13 @@ jobs:
         run: |
           cd juice-balancer
           npm test -- --ci --color --verbose
+  progressWatchdog:
+    name: ProgressWatchdog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: "Test ProgressWatchdog"
+        run: |
+          cd progress-watchdog
+          go vet
+          go test -cover

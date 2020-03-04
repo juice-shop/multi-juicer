@@ -38,8 +38,8 @@ helm install multi-juicer multi-juicer/multi-juicer
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you three pods a juice-balancer pod and two redis pods
-# Wait until all 3 pods are ready
+# This should show you two pods a juice-balancer pod and a progress-watchdog pod
+# Wait until both pods are ready
 ```
 
 ## Step 3. Verify the app is running correctly

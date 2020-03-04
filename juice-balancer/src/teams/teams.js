@@ -4,18 +4,30 @@ const cryptoRandomString = require('crypto-random-string');
 
 const Joi = require('@hapi/joi');
 const expressJoiValidation = require('express-joi-validation');
+const promClient = require('prom-client');
 
 const validator = expressJoiValidation.createValidator();
 
 const router = express.Router();
 
-const redis = require('../redis');
 const {
   createDeploymentForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
 } = require('../kubernetes');
+
+const loginCounter = new promClient.Counter({
+  name: 'multijuicer_logins',
+  help: 'Number of logins (including registrations, see label "type").',
+  labelNames: ['type', 'userType'],
+});
+const failedLoginCounter = new promClient.Counter({
+  name: 'multijuicer_failed_logins',
+  help: 'Number of failed logins, bad password (including admin logins, see label "type").',
+  labelNames: ['userType'],
+});
+
 const { logger } = require('../logger');
 const { get } = require('../config');
 
@@ -40,6 +52,7 @@ async function interceptAdminLogin(req, res, next) {
   const { passcode } = req.body;
 
   if (team === get('admin.username') && passcode === get('admin.password')) {
+    loginCounter.inc({ type: 'login', userType: 'admin' }, 1);
     return res
       .cookie(get('cookieParser.cookieName'), `t-${team}`, {
         ...cookieSettings,
@@ -48,6 +61,7 @@ async function interceptAdminLogin(req, res, next) {
         message: 'Signed in as admin',
       });
   } else if (team === get('admin.username')) {
+    failedLoginCounter.inc({ userType: 'admin' }, 1);
     return res.status(401).json({
       message: 'Team requires authentication to join',
     });
@@ -65,17 +79,16 @@ async function checkIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
-  logger.info(`Checking if team ${team} already has a JuiceShop Deployment`);
+  logger.debug(`Checking if team ${team} already has a JuiceShop Deployment`);
 
   try {
-    await getJuiceShopInstanceForTeamname(team);
+    const { passcodeHash } = await getJuiceShopInstanceForTeamname(team);
 
-    logger.info(`Team ${team} already has a JuiceShop deployment`);
-
-    const passcodeHash = await redis.get(`t-${team}-passcode`);
+    logger.debug(`Team ${team} already has a JuiceShop deployment`);
 
     if (passcode !== undefined && (await bcrypt.compare(passcode, passcodeHash))) {
       // Set cookie, (join team)
+      loginCounter.inc({ type: 'login', userType: 'user' }, 1);
       return res
         .cookie(get('cookieParser.cookieName'), `t-${team}`, {
           ...cookieSettings,
@@ -85,6 +98,8 @@ async function checkIfTeamAlreadyExists(req, res, next) {
           message: 'Joined Team',
         });
     }
+
+    failedLoginCounter.inc({ userType: 'user' }, 1);
 
     return res.status(401).json({
       message: 'Team requires authentication to join',
@@ -148,15 +163,14 @@ async function createTeam(req, res) {
     const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
     const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
 
-    await redis.set(`t-${team}-passcode`, hash);
-    await redis.set(`t-${team}-last-request`, new Date().getTime());
-
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
-    await createDeploymentForTeam({ team, passcode });
+    await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 
     logger.info(`Created JuiceShop Deployment for team "${team}"`);
+
+    loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
     res
       .cookie(get('cookieParser.cookieName'), `t-${team}`, {
