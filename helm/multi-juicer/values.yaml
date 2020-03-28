@@ -52,7 +52,7 @@ juiceShop:
   maxInstances: 10
   # Juice Shop Image to use
   image: bkimminich/juice-shop
-  tag: v10.0.0
+  tag: v10.1.0
   # Change the key when hosting a CTF event
   # This key gets used to generate the challenge flags
   # See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey
