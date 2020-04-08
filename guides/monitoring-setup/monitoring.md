@@ -16,6 +16,9 @@ kubectl create namespace monitoring
 echo "Installing prometheus-operator"
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/monitoring-setup/prometheus-operator-config.yaml
 
+# If you do not already have the stable helm repo installed you will have to add it:
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+
 helm --namespace monitoring upgrade --install prometheus stable/prometheus-operator --version 8.9.3 --values ./prometheus-operator-config.yaml
 
 echo "Installing loki"
