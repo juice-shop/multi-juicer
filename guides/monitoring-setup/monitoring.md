@@ -19,13 +19,13 @@ wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/monit
 # If you do not already have the stable helm repo installed you will have to add it:
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
-helm --namespace monitoring upgrade --install prometheus stable/prometheus-operator --version 8.9.3 --values ./prometheus-operator-config.yaml
+helm --namespace monitoring upgrade --install prometheus stable/prometheus-operator --version 8.12.12 --values ./prometheus-operator-config.yaml
 
 echo "Installing loki"
-helm --namespace monitoring upgrade --install loki loki/loki --version 0.25.1 --set="serviceMonitor.enabled=true"
+helm --namespace monitoring upgrade --install loki loki/loki --version 0.26.1 --set="serviceMonitor.enabled=true"
 
 echo "Installing loki/promtail"
-helm --namespace monitoring upgrade --install promtail loki/promtail --version 0.19.2 --set "loki.serviceName=loki" --set="serviceMonitor.enabled=true"
+helm --namespace monitoring upgrade --install promtail loki/promtail --version 0.20.1 --set "loki.serviceName=loki" --set="serviceMonitor.enabled=true"
 
 echo "Installing MultiJuicer"
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
