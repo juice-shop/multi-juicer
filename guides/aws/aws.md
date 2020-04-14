@@ -84,6 +84,8 @@ aws iam create-policy \
 
 Next, we will integrate Kubernetes with AWS, allowing the Kubernetes to provision an Application load balancer on our behalf.
 
+**IMPORTANT!** Note the second step requires modifying `cluster-iam.yaml`
+
 ```sh
 #Associate IAM OIDC Provider
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/cluster-iam.yaml
@@ -107,6 +109,34 @@ After you have set that up we can now create a ingress config for our the MultiJ
 kubectl apply -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
 ```
 
+You can get the LoadBalancer's DNS record either from the AWS console, or by running:
+```sh
+kubectl get ingress
+# Should print something like:
+# NAME                     HOSTS   ADDRESS                                                                       PORTS   AGE
+# juice-balancer-ingress   *       YOUR_DNS_RECORD_WILL_BE_HERE.elb.amazonaws.com   80      2m3s
+```
+
+Use `kubectl get pods`to see the pods you have successfully running, which should be similar to
+```sh
+kubectl get pods
+# NAME                                 READY   STATUS      RESTARTS   AGE
+# cleanup-job-ID-ID                    0/1     Completed   0          48m
+# juice-balancer-ID-ID                 1/1     Running     0          80m
+# progress-watchdog-ID-ID              1/1     Running     0          80m
+
+
+kubectl get pods -n kube-system
+# NAME                                      READY   STATUS    RESTARTS   AGE
+# alb-ingress-controller-ID-ID              1/1     Running   0          30s
+# aws-node-ID                               1/1     Running   0          59m
+# aws-node-ID                               1/1     Running   0          59m
+# coredns-ID-ID                             1/1     Running   0          65m
+# coredns-ID-ID                             1/1     Running   0          65m
+# kube-proxy-ID                             1/1     Running   0          59m
+# kube-proxy-ID                             1/1     Running   0          59m
+```
+
 ## Step 5. Deinstallation
 
 ```sh
@@ -119,3 +149,14 @@ kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingr
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer
 ```
+## Errors you might see
+
+```
+AWS::IAM::Role/Role1: CREATE_FAILED – "1 validation error detected: Value '' at 'policyArn' failed to satisfy constraint: Member must have length greater than or equal to 20 (Service: AmazonIdentityManagement; Status Code: 400; Error Code: ValidationError; Request ID: X)"
+```
+
+This error may occur when you don't update `cluster-iam.yaml` with your Region and Policy ARN.
+
+  - Update `cluster-iam.yaml`
+  - Run `eksctl delete iamserviceaccount --cluster=multi-juicer --name=alb-ingress-controller --namespace=kube-system` to delete the old account if it exists
+  - Run `eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts`
