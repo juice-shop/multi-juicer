@@ -3,10 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
+	"sort"
 	"time"
 
 	"github.com/op/go-logging"
@@ -24,7 +27,7 @@ var format = logging.MustStringFormatter(
 	`%{time:15:04:05.000} %{shortfunc}: %{level:.4s} %{message}`,
 )
 
-// ContinueCodePayload json format of the get continue code response
+// ContinueCodePayload json format of the get ContinueCode response
 type ContinueCodePayload struct {
 	ContinueCode string `json:"continueCode"`
 }
@@ -40,7 +43,7 @@ func main() {
 
 	logFormatter := logging.NewBackendFormatter(logBackend, format)
 	logBackendLeveled := logging.AddModuleLevel(logBackend)
-	logBackendLeveled.SetLevel(logging.INFO, "")
+	logBackendLeveled.SetLevel(logging.DEBUG, "")
 
 	log.SetBackend(logBackendLeveled)
 	logging.SetBackend(logBackendLeveled, logFormatter)
@@ -58,8 +61,11 @@ func main() {
 
 	progressUpdateJobs := make(chan ProgressUpdateJobs)
 
-	// Start 10 workers which fetch and update continue codes based on the `progressUpdateJobs` queue / channel
-	for i := 0; i < 10; i++ {
+	workerCount := 10
+	log.Infof("Starting ProgressWatchdog with %d worker go routines", workerCount)
+
+	// Start 10 workers which fetch and update ContinueCodes based on the `progressUpdateJobs` queue / channel
+	for i := 0; i < workerCount; i++ {
 		go workOnProgressUpdates(progressUpdateJobs, clientset)
 	}
 
@@ -104,52 +110,61 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clientset *kubernetes.Clientset) {
 	for job := range progressUpdateJobs {
 		log.Debugf("Running ProgressUpdateJob for team '%s'", job.Teamname)
-		log.Debug("Fetching cached continue code")
 		lastContinueCode := job.LastContinueCode
-		log.Debug("Fetching current continue code")
-		currentContinueCode := getCurrentContinueCode(job.Teamname)
+		log.Debug("Fetching current ContinueCode")
+		currentContinueCode, err := getCurrentContinueCode(job.Teamname)
 
-		if lastContinueCode == "" && currentContinueCode == nil {
-			log.Warning("Failed to fetch both current and cached continue code")
-		} else if lastContinueCode == "" && currentContinueCode != nil {
-			log.Debug("Did not find a cached continue code.")
-			log.Debug("Last continue code was nil. This should only happen once per team.")
-			cacheContinueCode(clientset, job.Teamname, *currentContinueCode)
-		} else if currentContinueCode == nil {
-			log.Debug("Could not get current continue code. Juice Shop might be down. Sleeping and retrying in 5 sec")
-		} else {
-			log.Debug("Checking Difference between continue code")
-			if lastContinueCode != *currentContinueCode {
-				log.Debugf("Continue codes differ (last vs current): (%s vs %s)", lastContinueCode, *currentContinueCode)
-				log.Debug("Applying cached continue code")
-				log.Infof("Found new continue Code for Team '%s', updating now", job.Teamname)
-				applyContinueCode(job.Teamname, lastContinueCode)
-				log.Debug("ReFetching current continue code")
-				currentContinueCode = getCurrentContinueCode(job.Teamname)
+		if err != nil {
+			log.Warningf("Failed to fetch ContinueCode for team '%s' from Juice Shop", job.Teamname)
+			log.Warning(err)
+			continue
+		}
 
-				log.Debug("Caching current continue code")
-				cacheContinueCode(clientset, job.Teamname, *currentContinueCode)
-			} else {
-				log.Debug("Continue codes are identical. Sleeping")
+		log.Debug("Checking Difference between ContinueCode")
+
+		currentSolvedChallenges, _ := ParseContinueCode(currentContinueCode)
+		lastSolvedChallenges, _ := ParseContinueCode(lastContinueCode)
+
+		switch CompareChallengeStates(currentSolvedChallenges, lastSolvedChallenges) {
+		case ApplyCode:
+			log.Debugf("ContinueCodes differ (current vs last): (%s vs %s)", currentContinueCode, lastContinueCode)
+			log.Debug("Applying cached ContinueCode")
+			log.Infof("Last ContinueCode for team '%s' contains unsolved challenges", job.Teamname)
+			applyContinueCode(job.Teamname, lastContinueCode)
+
+			log.Debug("ReFetching current ContinueCode")
+			currentContinueCode, err = getCurrentContinueCode(job.Teamname)
+
+			if err != nil {
+				log.Errorf("Failed to fetch ContinueCode from Juice Shop for team '%s' to reapply it", job.Teamname)
+				log.Error(err)
+				continue
 			}
+
+			log.Debug("Caching current ContinueCode")
+			cacheContinueCode(clientset, job.Teamname, currentContinueCode)
+		case UpdateCache:
+			cacheContinueCode(clientset, job.Teamname, currentContinueCode)
+		case NoOp:
+			log.Debug("No need to apply ContinueCode, Skipping")
 		}
 	}
 }
 
-func getCurrentContinueCode(teamname string) *string {
+func getCurrentContinueCode(teamname string) (string, error) {
 	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code", teamname)
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
 		log.Warning("Failed to create http request")
 		log.Warning(err)
-		return nil
+		panic("Failed to create http request")
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Warning("Failed to fetch continue code from juice shop.")
+		log.Warning("Failed to fetch ContinueCode from juice shop")
 		log.Warning(err)
-		return nil
+		return "", errors.New("Failed to fetch ContinueCode")
 	}
 	defer res.Body.Close()
 
@@ -158,8 +173,8 @@ func getCurrentContinueCode(teamname string) *string {
 		body, err := ioutil.ReadAll(res.Body)
 
 		if err != nil {
-			log.Error("Failed to read response body stream.")
-			return nil
+			log.Error("Failed to read response body stream")
+			return "", errors.New("Failed to response body stream from Juice Shop")
 		}
 
 		continueCodePayload := ContinueCodePayload{}
@@ -167,17 +182,16 @@ func getCurrentContinueCode(teamname string) *string {
 		err = json.Unmarshal(body, &continueCodePayload)
 
 		if err != nil {
-			log.Error("Failed to parse json of a challenge status.")
+			log.Error("Failed to parse json of a challenge status")
 			log.Error(err)
-			return nil
+			return "", errors.New("Failed to parse JSON from Juice Shop ContinueCode response")
 		}
 
-		log.Debugf("Got current continue code: '%s'", continueCodePayload.ContinueCode)
+		log.Debugf("Got current ContinueCode: '%s'", continueCodePayload.ContinueCode)
 
-		return &continueCodePayload.ContinueCode
+		return continueCodePayload.ContinueCode, nil
 	default:
-		log.Warningf("Unexpected response status code '%d'", res.StatusCode)
-		return nil
+		return "", fmt.Errorf("Unexpected response status code '%d' from Juice Shop", res.StatusCode)
 	}
 }
 
@@ -186,12 +200,12 @@ func applyContinueCode(teamname, continueCode string) {
 
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		log.Warning("Failed to create http request to set the current continue code")
+		log.Warning("Failed to create http request to set the current ContinueCode")
 		log.Warning(err)
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Warning("Failed to set the current continue code to juice shop.")
+		log.Warning("Failed to set the current ContinueCode to juice shop")
 		log.Warning(err)
 	}
 	defer res.Body.Close()
@@ -214,9 +228,9 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 }
 
 func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continueCode string) {
-	log.Debugf("Updating continue-code of team '%s' to '%s'", teamname, continueCode)
+	log.Infof("Updating saved ContinueCode of team '%s'", teamname)
 
-	challengeCount, err := ParseContinueCode(continueCode)
+	solvedChallenges, err := ParseContinueCode(continueCode)
 	if err != nil {
 		log.Warningf("Could not decode continueCode '%s'", continueCode)
 	}
@@ -225,26 +239,65 @@ func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continu
 		Metadata: UpdateProgressDeploymentMetadata{
 			Annotations: UpdateProgressDeploymentDiffAnnotations{
 				ContinueCode:     continueCode,
-				ChallengesSolved: fmt.Sprintf("%d", challengeCount),
+				ChallengesSolved: fmt.Sprintf("%d", len(solvedChallenges)),
 			},
 		},
 	}
 
 	jsonBytes, err := json.Marshal(diff)
 	if err != nil {
-		panic("Could not encode json, to update continueCode and challengeSolved count on deployment")
+		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
 	}
 
 	namespace := os.Getenv("NAMESPACE")
 	_, err = clientset.AppsV1().Deployments(namespace).Patch(fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes)
 	if err != nil {
-		log.Errorf("Failed to path new continue code into deployment for team %s", teamname)
+		log.Errorf("Failed to patch new ContinueCode into deployment for team %s", teamname)
 		log.Error(err)
 	}
 }
 
-// ParseContinueCode returns the number of challenges solved by this continue code
-func ParseContinueCode(continueCode string) (int, error) {
+func contains(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+// UpdateState defines how two challenge state differ from each other, and indicates which action should be taken
+type UpdateState string
+
+const (
+	// UpdateCache The cache aka the continue code annotation on the deployment should be updated
+	UpdateCache UpdateState = "UpdateCache"
+	// ApplyCode The last continue code should be applied to recover lost challenges
+	ApplyCode UpdateState = "ApplyCode"
+	// NoOp Challenge state is identical, nothing to do 🤷
+	NoOp UpdateState = "NoOp"
+)
+
+// CompareChallengeStates Compares to current vs last challenge state and decides what should happen next
+func CompareChallengeStates(currentSolvedChallenges, lastSolvedChallenges []int) UpdateState {
+	for _, challengeSolvedInLastContinueCode := range lastSolvedChallenges {
+		contained := contains(currentSolvedChallenges, challengeSolvedInLastContinueCode)
+
+		if contained == false {
+			return ApplyCode
+		}
+	}
+
+	sort.Ints(currentSolvedChallenges)
+	sort.Ints(lastSolvedChallenges)
+	if reflect.DeepEqual(currentSolvedChallenges, lastSolvedChallenges) {
+		return NoOp
+	}
+	return UpdateCache
+}
+
+// ParseContinueCode returns the number of challenges solved by this ContinueCode
+func ParseContinueCode(continueCode string) ([]int, error) {
 	hd := hashids.NewData()
 	hd.Salt = "this is my salt"
 	hd.MinLength = 60
@@ -254,8 +307,8 @@ func ParseContinueCode(continueCode string) (int, error) {
 	decoded, err := hashIDClient.DecodeWithError(continueCode)
 
 	if err != nil {
-		return -1, err
+		return make([]int, 0), err
 	}
 
-	return len(decoded), nil
+	return decoded, nil
 }
