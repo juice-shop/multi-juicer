@@ -75,7 +75,8 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 			LabelSelector: "app=juice-shop",
 		}
 
-		juiceShops, err := clientset.AppsV1().Deployments("default").List(opts)
+		namespace := os.Getenv("NAMESPACE")
+		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(opts)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -234,7 +235,8 @@ func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continu
 		panic("Could not encode json, to update continueCode and challengeSolved count on deployment")
 	}
 
-	_, err = clientset.AppsV1().Deployments("default").Patch(fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes)
+	namespace := os.Getenv("NAMESPACE")
+	_, err = clientset.AppsV1().Deployments(namespace).Patch(fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes)
 	if err != nil {
 		log.Errorf("Failed to path new continue code into deployment for team %s", teamname)
 		log.Error(err)
