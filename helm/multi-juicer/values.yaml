@@ -11,6 +11,12 @@ balancer:
   repository: iteratec/juice-balancer
   tag: latest
   replicas: 1
+  ingress:
+    enabled: false
+    host: multijuicer.local.svc
+    secretName: multijuicer-tls
+    annotations:
+      kubernetes.io/ingress.class: nginx
   service:
     # Kubernetes service type
     type: ClusterIP
