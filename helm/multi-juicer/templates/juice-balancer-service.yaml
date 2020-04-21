@@ -1,11 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: juice-balancer
+  name: {{ include "multi-juicer.fullname" . }}
   labels:
-    app.kubernetes.io/name: 'juice-balancer'
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.balancer.service.type }}
 {{- if (or (eq .Values.balancer.service.type "ClusterIP") (empty .Values.balancer.service.type)) }}
@@ -30,8 +28,7 @@ spec:
 {{ toYaml .Values.balancer.service.externalIPs | indent 4 }}
 {{- end }}
   selector:
-    app.kubernetes.io/name: juice-balancer
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "multi-juicer.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.service.port }}
       name: web
