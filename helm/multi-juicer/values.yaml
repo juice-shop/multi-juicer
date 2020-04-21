@@ -1,5 +1,22 @@
+# Default values for foobar.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
 imagePullPolicy: Always
 nodeSelector: {}
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: multi-juicer.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 balancer:
   cookie:
@@ -11,12 +28,6 @@ balancer:
   repository: iteratec/juice-balancer
   tag: latest
   replicas: 1
-  ingress:
-    enabled: false
-    host: multijuicer.local.svc
-    secretName: multijuicer-tls
-    annotations:
-      kubernetes.io/ingress.class: nginx
   service:
     # Kubernetes service type
     type: ClusterIP
