@@ -31,6 +31,26 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Common labels
+*/}}
+{{- define "multi-juicer.labels" -}}
+helm.sh/chart: {{ include "multi-juicer.chart" . }}
+{{ include "multi-juicer.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Selector labels
+*/}}
+{{- define "multi-juicer.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "multi-juicer.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
 {{- define "multi-juicer.cookieName" -}}
 {{- if .Values.balancer.cookie.secure -}}
 {{- printf "__Secure-%s" .Values.balancer.cookie.name -}}
