@@ -18,6 +18,10 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+service:
+  type: ClusterIP
+  port: 3000
+
 balancer:
   cookie:
     # SET THIS TO TRUE IF IN PRODUCTION

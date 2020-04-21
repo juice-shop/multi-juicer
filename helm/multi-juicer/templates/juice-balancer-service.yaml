@@ -33,5 +33,5 @@ spec:
     app.kubernetes.io/name: juice-balancer
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
-    - port: 3000
+    - port: {{ .Values.service.port }}
       name: web
