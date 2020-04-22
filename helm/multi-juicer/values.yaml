@@ -12,7 +12,8 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: multi-juicer.local
-      paths: []
+      paths:
+        - "/"
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
