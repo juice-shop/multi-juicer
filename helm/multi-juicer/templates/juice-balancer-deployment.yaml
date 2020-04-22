@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "multi-juicer.fullname" . }}
+  name: juice-balancer
   labels:
     {{- include "multi-juicer.labels" . | nindent 4 }}
 spec:

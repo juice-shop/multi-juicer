@@ -34,7 +34,7 @@ spec:
         {{- range .paths }}
           - path: {{ . }}
             backend:
-              serviceName: {{ $fullName }}
+              serviceName: juice-balancer
               servicePort: {{ $svcPort }}
         {{- end }}
   {{- end }}
