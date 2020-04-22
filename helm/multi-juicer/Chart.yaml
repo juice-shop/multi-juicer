@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 name: multi-juicer
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Juice Shop
 
