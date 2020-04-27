@@ -112,7 +112,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / max(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -1830,5 +1830,5 @@
   "timezone": "",
   "title": "MultiJuicer - Instance Dashboard",
   "uid": "Sj-cIdwZk",
-  "version": 17
+  "version": 18
 }
