@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 26,
-  "iteration": 1582921341599,
+  "iteration": 1588020408328,
   "links": [],
   "panels": [
     {
@@ -79,7 +79,6 @@
       "maxPerRow": 6,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.5.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -120,7 +119,7 @@
       "thresholds": "20,60",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Solved $difficulties Stars Challenges",
+      "title": "Solved $difficulties Star Challenges",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -160,7 +159,7 @@
         "x": 4,
         "y": 1
       },
-      "id": 72,
+      "id": 79,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -178,7 +177,6 @@
       "maxPerRow": 6,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.5.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -193,7 +191,7 @@
       ],
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1582921341599,
+      "repeatIteration": 1588020408328,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -213,7 +211,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / max(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -221,7 +219,7 @@
       "thresholds": "20,60",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Solved $difficulties Stars Challenges",
+      "title": "Solved $difficulties Star Challenges",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -261,7 +259,7 @@
         "x": 8,
         "y": 1
       },
-      "id": 73,
+      "id": 80,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -279,7 +277,6 @@
       "maxPerRow": 6,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.5.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -294,7 +291,7 @@
       ],
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1582921341599,
+      "repeatIteration": 1588020408328,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -314,7 +311,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / max(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -322,7 +319,7 @@
       "thresholds": "20,60",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Solved $difficulties Stars Challenges",
+      "title": "Solved $difficulties Star Challenges",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -362,7 +359,7 @@
         "x": 12,
         "y": 1
       },
-      "id": 74,
+      "id": 81,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -380,7 +377,6 @@
       "maxPerRow": 6,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.5.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -395,7 +391,7 @@
       ],
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1582921341599,
+      "repeatIteration": 1588020408328,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -415,7 +411,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / max(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -423,7 +419,7 @@
       "thresholds": "20,60",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Solved $difficulties Stars Challenges",
+      "title": "Solved $difficulties Star Challenges",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -463,7 +459,7 @@
         "x": 16,
         "y": 1
       },
-      "id": 75,
+      "id": 82,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -481,7 +477,6 @@
       "maxPerRow": 6,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.5.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -496,7 +491,7 @@
       ],
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1582921341599,
+      "repeatIteration": 1588020408328,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -516,7 +511,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / max(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -524,7 +519,7 @@
       "thresholds": "20,60",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Solved $difficulties Stars Challenges",
+      "title": "Solved $difficulties Star Challenges",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -564,7 +559,7 @@
         "x": 20,
         "y": 1
       },
-      "id": 76,
+      "id": 83,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -582,7 +577,6 @@
       "maxPerRow": 6,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "pluginVersion": "6.5.2",
       "postfix": "",
       "postfixFontSize": "50%",
@@ -597,7 +591,7 @@
       ],
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1582921341599,
+      "repeatIteration": 1588020408328,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -617,7 +611,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / max(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -625,7 +619,7 @@
       "thresholds": "20,60",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Solved $difficulties Stars Challenges",
+      "title": "Solved $difficulties Star Challenges",
       "type": "singlestat",
       "valueFontSize": "120%",
       "valueMaps": [
@@ -638,13 +632,71 @@
       "valueName": "current"
     },
     {
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 78,
+      "maxPerRow": 4,
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "max"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 100,
+            "min": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "vertical"
+      },
+      "pluginVersion": "6.7.1",
+      "repeat": null,
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "expr": "sum by (category)(juiceshop_challenges_solved{team=\"$team\"}) / sum by (category)(juiceshop_challenges_total{team=\"$team\"}) * 100 != 0",
+          "interval": "",
+          "legendFormat": "{{category}} ",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Solved Challenges by Category",
+      "type": "stat"
+    },
+    {
       "collapsed": true,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 13
       },
       "id": 32,
       "panels": [
@@ -660,7 +712,7 @@
             "h": 5,
             "w": 24,
             "x": 0,
-            "y": 6
+            "y": 10
           },
           "hiddenSeries": false,
           "id": 11,
@@ -749,7 +801,7 @@
             "h": 6,
             "w": 16,
             "x": 0,
-            "y": 11
+            "y": 15
           },
           "hiddenSeries": false,
           "id": 64,
@@ -848,7 +900,7 @@
             "h": 3,
             "w": 8,
             "x": 16,
-            "y": 11
+            "y": 15
           },
           "id": 13,
           "interval": null,
@@ -867,7 +919,6 @@
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "options": {},
           "pluginVersion": "6.5.2",
           "postfix": " Standard Users",
           "postfixFontSize": "50%",
@@ -933,7 +984,7 @@
             "h": 3,
             "w": 8,
             "x": 16,
-            "y": 14
+            "y": 18
           },
           "id": 14,
           "interval": null,
@@ -952,7 +1003,6 @@
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "options": {},
           "pluginVersion": "6.5.2",
           "postfix": " Deluxe Users",
           "postfixFontSize": "50%",
@@ -1006,7 +1056,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 14
       },
       "id": 39,
       "panels": [],
@@ -1025,7 +1075,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 15
       },
       "hiddenSeries": false,
       "id": 71,
@@ -1130,7 +1180,7 @@
         "h": 7,
         "w": 10,
         "x": 0,
-        "y": 13
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 46,
@@ -1229,7 +1279,7 @@
         "h": 7,
         "w": 9,
         "x": 10,
-        "y": 13
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 48,
@@ -1331,7 +1381,7 @@
         "h": 4,
         "w": 5,
         "x": 19,
-        "y": 13
+        "y": 21
       },
       "id": 52,
       "interval": null,
@@ -1350,7 +1400,6 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1415,7 +1464,7 @@
         "h": 3,
         "w": 5,
         "x": 19,
-        "y": 17
+        "y": 25
       },
       "id": 50,
       "interval": "",
@@ -1434,7 +1483,6 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1491,7 +1539,7 @@
         "h": 7,
         "w": 16,
         "x": 0,
-        "y": 20
+        "y": 28
       },
       "hiddenSeries": false,
       "id": 54,
@@ -1605,7 +1653,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 20
+        "y": 28
       },
       "hiddenSeries": false,
       "id": 56,
@@ -1698,12 +1746,14 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 35
       },
       "id": 23,
       "options": {
+        "showLabels": false,
         "showTime": true,
-        "sortOrder": "Ascending"
+        "sortOrder": "Ascending",
+        "wrapLogMessage": true
       },
       "targets": [
         {
@@ -1718,7 +1768,7 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 21,
+  "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1785,13 +1835,14 @@
       {
         "allValue": null,
         "current": {
-          "text": "jannik",
-          "value": "jannik"
+          "text": "team42",
+          "value": "team42"
         },
         "datasource": "Prometheus",
         "definition": "label_values(juiceshop_challenges_total, team)",
         "hide": 0,
         "includeAll": false,
+        "index": -1,
         "label": "Team",
         "multi": false,
         "name": "team",
@@ -1810,7 +1861,7 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {
@@ -1830,5 +1881,8 @@
   "timezone": "",
   "title": "MultiJuicer - Instance Dashboard",
   "uid": "Sj-cIdwZk",
-  "version": 18
+  "variables": {
+    "list": []
+  },
+  "version": 2
 }
