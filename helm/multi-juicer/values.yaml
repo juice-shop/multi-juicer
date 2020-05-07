@@ -53,6 +53,9 @@ balancer:
       cpu: 400m
   affinity: {}
   tolerations: []
+  # If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services
+  # This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
+  skipOwnerReference: false
   metrics:
     # enables prometheus metrics for the balancer
     # if set to true you should change the prometheus-scraper password

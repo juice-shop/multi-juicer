@@ -3,6 +3,7 @@
   "namespace": "default",
   "deploymentContext": "multi-juicer",
   "maxJuiceShopInstances": 10,
+  "skipOwnerReference": false,
   "admin": {
     "username": "admin",
     "password": "12345678"

@@ -11,6 +11,7 @@ data:
       "namespace": {{ .Release.Namespace | quote }},
       "deploymentContext": {{ .Release.Name | quote }},
       "maxJuiceShopInstances": {{ .Values.juiceShop.maxInstances}},
+      "skipOwnerReference": {{ .Values.balancer.skipOwnerReference }},
       "cookieParser": {
         "cookieName": {{ include "multi-juicer.cookieName" . | quote }},
         "secure": {{ .Values.balancer.cookie.secure }}

@@ -33,16 +33,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'multi-juicer.iteratec.dev/challengesSolved': '0',
         'multi-juicer.iteratec.dev/continueCode': '',
       },
-      ownerReferences: [
-        {
-          apiVersion: 'apps/v1',
-          blockOwnerDeletion: true,
-          controller: true,
-          kind: 'Deployment',
-          name: 'juice-balancer',
-          uid: await getJuiceBalancerDeploymentUid(),
-        },
-      ],
+      ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -139,16 +130,7 @@ const createServiceForTeam = async teamname =>
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        ownerReferences: [
-          {
-            apiVersion: 'apps/v1',
-            blockOwnerDeletion: true,
-            controller: true,
-            kind: 'Deployment',
-            name: 'juice-balancer',
-            uid: await getJuiceBalancerDeploymentUid(),
-          },
-        ],
+        ...(await getOwnerReference()),
       },
       spec: {
         selector: {
@@ -167,6 +149,24 @@ const createServiceForTeam = async teamname =>
       throw new Error(error.response.body.message);
     });
 module.exports.createServiceForTeam = createServiceForTeam;
+
+async function getOwnerReference() {
+  if (get('skipOwnerReference') === true) {
+    return {};
+  }
+  return {
+    ownerReferences: [
+      {
+        apiVersion: 'apps/v1',
+        blockOwnerDeletion: true,
+        controller: true,
+        kind: 'Deployment',
+        name: 'juice-balancer',
+        uid: await getJuiceBalancerDeploymentUid(),
+      },
+    ],
+  };
+}
 
 const getJuiceShopInstances = () =>
   k8sAppsApi
