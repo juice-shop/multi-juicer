@@ -1,6 +1,20 @@
 apiVersion: v2
 name: multi-juicer
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Juice Shop
+icon: https://raw.githubusercontent.com/iteratec/multi-juicer/master/logo.png
+
+home: https://github.com/iteratec/multi-juicer
+sources:
+  - https://github.com/iteratec/multi-juicer
+
+keywords:
+  - security
+  - juice-shop
+  - owasp
+  - capture-the-flag
+  - ctf-platform
+  - hacking
+  - kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
 #
