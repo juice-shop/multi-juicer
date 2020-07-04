@@ -14,7 +14,7 @@ spec:
   type: LoadBalancer
   selector:
     app.kubernetes.io/instance: multi-juicer
-    app.kubernetes.io/name: juice-balancer
+    app.kubernetes.io/name: multi-juicer
   ports:
     - name: http
       protocol: TCP
