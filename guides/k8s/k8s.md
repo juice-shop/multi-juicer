@@ -63,7 +63,6 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 kubectl get pods
 
 # We got a example loadbalancer yaml for this example in the repository
-# Edit the cert id in do-lb.yaml to the cert id of your domain
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/k8s/k8s-juice-service.yaml
 
 # Create the loadbalancer
