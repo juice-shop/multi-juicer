@@ -30,13 +30,14 @@ helm install multi-juicer/multi-juicer --name multi-juicer
 helm install multi-juicer multi-juicer/multi-juicer
 ```
 
-### Installation Guides for specific Cloud Providers
+### Installation Guides for specific Cloud Providers / Environments
 
 Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with MultiJuicer installed for some specific Cloud providers.
 
 - [Digital Ocean](./guides/digital-ocean/digital-ocean.md)
-- [OpenShift](./guides/openshift/openshift.md)
 - [AWS](./guides/aws/aws.md)
+- [OpenShift](./guides/openshift/openshift.md)
+- [Plain Kubernetes](./guides/k8s/k8s.md)
 - [\[WIP\]Azure](./guides/azure/azure.md)
 
 ### Customizing the Setup
