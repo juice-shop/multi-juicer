@@ -15,6 +15,7 @@ This example expects you to have the following cli tools setup.
 # First we'll need to confirm things are running
 # This should be instant, and return something along the lines of "Kubernetes master is running at https://localhost:6443"
 kubectl cluster-info
+```
 
 ## Step 2. Installing MultiJuicer via helm
 
