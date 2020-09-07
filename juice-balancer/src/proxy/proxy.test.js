@@ -23,6 +23,7 @@ beforeEach(() => {
 test('/balancer/ should return the balancer ui', async () => {
   await request(app)
     .get('/balancer/')
+    // if this returns a 302 locally this is likely caused by not having the frontend compiled. run `npm run build` in `juice-balancer/ui`
     .expect(200)
     .expect('Content-Type', /text\/html/);
 });
