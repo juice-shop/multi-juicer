@@ -3,18 +3,18 @@
   "version": "0.1.0",
   "license": "Apache-2.0",
   "dependencies": {
-    "axios": "^0.19.0",
-    "promise-retry": "^1.1.1",
-    "react": "^16.8.6",
-    "react-data-table-component": "^3.0.1",
-    "react-dom": "^16.8.6",
+    "axios": "^0.20.0",
+    "promise-retry": "^2.0.1",
+    "react": "^16.13.1",
+    "react-data-table-component": "^3.10.3",
+    "react-dom": "^16.13.1",
     "react-intl": "^2.9.0",
-    "react-router-dom": "^5.0.1",
-    "reactjs-popup": "^1.4.2",
-    "styled-components": "^4.3.1"
+    "react-router-dom": "^5.2.0",
+    "reactjs-popup": "^2.0.3",
+    "styled-components": "^5.2.0"
   },
   "devDependencies": {
-    "react-scripts": "^3.3.1",
+    "react-scripts": "^3.4.3",
     "source-map-explorer": "^2.0.1"
   },
   "scripts": {
