@@ -98,7 +98,7 @@ async function main() {
 }
 
 main()
-  .then(counts => {
+  .then((counts) => {
     console.log('Finished Juice Shop Instance Cleanup');
     console.log('');
     console.log('Successful deletions:');
@@ -108,7 +108,7 @@ main()
     console.log(`  Deployments: ${counts.failed.deployments}`);
     console.log(`  Services: ${counts.failed.services}`);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('Failed deletion tasks');
     console.error(err);
   });

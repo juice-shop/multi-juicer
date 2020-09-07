@@ -37,7 +37,7 @@ async function listInstances(req, res) {
   } = await getJuiceShopInstances();
 
   return res.json({
-    instances: instances.map(instance => {
+    instances: instances.map((instance) => {
       const team = instance.metadata.labels.team;
       return {
         team,

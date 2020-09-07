@@ -12,7 +12,7 @@ const {
 } = require('../kubernetes');
 
 afterAll(async () => {
-  await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
+  await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error
 });
 
 beforeEach(() => {
@@ -65,9 +65,7 @@ test('returns a 500 error code when kubernetes returns a unexpected error code w
     throw new Error(`kubernetes cluster is on burning. Evacuate immediately!`);
   });
 
-  await request(app)
-    .post('/balancer/teams/team42/join', {})
-    .expect(500);
+  await request(app).post('/balancer/teams/team42/join', {}).expect(500);
 });
 
 test('requires authentication response when the deployment exists but no passcode was provided', async () => {
@@ -78,9 +76,7 @@ test('requires authentication response when the deployment exists but no passcod
     };
   });
 
-  await request(app)
-    .post('/balancer/teams/team42/join', {})
-    .expect(401);
+  await request(app).post('/balancer/teams/team42/join', {}).expect(401);
 });
 
 test('requires authentication when the passcode is incorrect', async () => {
@@ -91,10 +87,7 @@ test('requires authentication when the passcode is incorrect', async () => {
     };
   });
 
-  await request(app)
-    .post('/balancer/teams/team42/join')
-    .send({ passcode: '01234567' })
-    .expect(401);
+  await request(app).post('/balancer/teams/team42/join').send({ passcode: '01234567' }).expect(401);
 });
 
 test('joins team when the passcode is correct and the instance exists', async () => {

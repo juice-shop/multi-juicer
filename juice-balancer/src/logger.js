@@ -4,7 +4,7 @@ const myFormat = winston.format.printf(({ level, message, timestamp }) => {
   return `time="${timestamp}" level="${level}" msg="${`${message}`.replace('"', '\\"')}"`;
 });
 
-const getLogLevelForEnvironment = env => {
+const getLogLevelForEnvironment = (env) => {
   switch (env) {
     case 'development':
       return 'debug';

@@ -115,7 +115,7 @@ function proxyTrafficToJuiceShop(req, res) {
       target: `http://${teamname}-juiceshop.${get('namespace')}.svc:3000`,
       ws: true,
     },
-    error => {
+    (error) => {
       logger.warn(`Proxy fail "${error.code}" for: ${req.method.toLocaleUpperCase()} ${req.path}`);
 
       if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {

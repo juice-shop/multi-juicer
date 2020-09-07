@@ -11,7 +11,7 @@ const {
 } = require('../kubernetes');
 
 afterAll(async () => {
-  await new Promise(resolve => setTimeout(() => resolve(), 500)); // avoid jest open handle error
+  await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error
 });
 
 beforeEach(() => {
@@ -41,7 +41,7 @@ test("should redirect to /balancer/ when requests don't have a team cookie", asy
     .get('/rest/admin/application-version')
     .send()
     .expect(302)
-    .then(res => {
+    .then((res) => {
       expect(res.header.location).toBe('/balancer/');
     });
 });
@@ -103,7 +103,7 @@ test('should redirect to /balancer/ when the instance is currently restarting', 
     .set('Cookie', ['balancer=t-restarting-instance'])
     .send()
     .expect(302)
-    .then(res => {
+    .then((res) => {
       expect(res.header.location).toBe(
         '/balancer/?msg=instance-restarting&teamname=restarting-instance'
       );
@@ -120,7 +120,7 @@ test('should redirect to /balancer/ when the instance is not existing', async ()
     .set('Cookie', ['balancer=t-missing-instance'])
     .send()
     .expect(302)
-    .then(res => {
+    .then((res) => {
       expect(res.header.location).toBe(
         '/balancer/?msg=instance-not-found&teamname=missing-instance'
       );

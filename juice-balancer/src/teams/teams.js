@@ -33,7 +33,7 @@ const { get } = require('../config');
 
 const BCRYPT_ROUNDS = process.env['NODE_ENV'] === 'production' ? 12 : 2;
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const cookieSettings = {
   signed: true,
@@ -239,10 +239,7 @@ const paramsSchema = Joi.object({
     .regex(/^[a-z0-9]([-a-z0-9])+[a-z0-9]$/),
 });
 const bodySchema = Joi.object({
-  passcode: Joi.string()
-    .alphanum()
-    .uppercase()
-    .length(8),
+  passcode: Joi.string().alphanum().uppercase().length(8),
 });
 
 router.post('/logout', logout);
