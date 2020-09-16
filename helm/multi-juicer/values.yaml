@@ -117,6 +117,7 @@ progressWatchdog:
     limits:
       memory: 48Mi
       cpu: 20m
+  securityContext: {}
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 juiceShopCleanup:

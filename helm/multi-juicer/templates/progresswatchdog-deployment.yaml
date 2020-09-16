@@ -17,6 +17,10 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       serviceAccountName: progress-watchdog
+      {{- with .Values.progressWatchdog.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: progress-watchdog
           image: '{{ .Values.progressWatchdog.repository }}:{{ .Values.progressWatchdog.tag }}'
