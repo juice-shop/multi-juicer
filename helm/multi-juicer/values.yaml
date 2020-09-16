@@ -90,6 +90,7 @@ juiceShop:
     limits:
       memory: 200Mi
       cpu: 200m
+  securityContext: {}
   # Specify a custom Juice Shop config.yaml
   # juiceShop.config -- See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
   # @default -- See values.yaml for full details
