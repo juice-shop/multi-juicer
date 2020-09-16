@@ -53,6 +53,7 @@ balancer:
     limits:
       memory: 256Mi
       cpu: 400m
+  securityContext: {}
   affinity: {}
   tolerations: []
   # If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services

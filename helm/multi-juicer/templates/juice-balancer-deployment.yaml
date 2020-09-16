@@ -17,6 +17,10 @@ spec:
         {{- include "multi-juicer.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: juice-balancer
+      {{- with .Values.balancer.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag }}'
