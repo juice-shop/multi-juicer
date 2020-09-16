@@ -134,5 +134,6 @@ juiceShopCleanup:
       memory: 256Mi
     limits:
       memory: 256Mi
+  securityContext: {}
   affinity: {}
   tolerations: []
