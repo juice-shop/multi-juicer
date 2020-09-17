@@ -34,6 +34,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | balancer.resources.limits.memory | string | `"256Mi"` |  |
 | balancer.resources.requests.cpu | string | `"400m"` |  |
 | balancer.resources.requests.memory | string | `"256Mi"` |  |
+| balancer.securityContext | object | `{}` |  |
 | balancer.service.clusterIP | string | `nil` |  |
 | balancer.service.externalIPs | string | `nil` |  |
 | balancer.service.loadBalancerIP | string | `nil` |  |
@@ -57,7 +58,8 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | juiceShop.resources.limits.memory | string | `"200Mi"` |  |
 | juiceShop.resources.requests.cpu | string | `"200m"` |  |
 | juiceShop.resources.requests.memory | string | `"200Mi"` |  |
-| juiceShop.tag | string | `"v10.3.1"` |  |
+| juiceShop.securityContext | object | `{}` |  |
+| juiceShop.tag | string | `"v12.0.2"` |  |
 | juiceShopCleanup.affinity | object | `{}` |  |
 | juiceShopCleanup.cron | string | `"0 * * * *"` | Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour |
 | juiceShopCleanup.enabled | bool | `true` |  |
@@ -66,6 +68,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | juiceShopCleanup.repository | string | `"iteratec/juice-cleaner"` |  |
 | juiceShopCleanup.resources.limits.memory | string | `"256Mi"` |  |
 | juiceShopCleanup.resources.requests.memory | string | `"256Mi"` |  |
+| juiceShopCleanup.securityContext | object | `{}` |  |
 | juiceShopCleanup.successfulJobsHistoryLimit | int | `1` |  |
 | juiceShopCleanup.tag | string | `"latest"` |  |
 | juiceShopCleanup.tolerations | list | `[]` |  |
@@ -75,6 +78,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | progressWatchdog.resources.limits.memory | string | `"48Mi"` |  |
 | progressWatchdog.resources.requests.cpu | string | `"20m"` |  |
 | progressWatchdog.resources.requests.memory | string | `"48Mi"` |  |
+| progressWatchdog.securityContext | object | `{}` |  |
 | progressWatchdog.tag | string | `"latest"` |  |
 | service.port | int | `3000` |  |
 | service.type | string | `"ClusterIP"` |  |
