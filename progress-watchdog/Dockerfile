@@ -11,7 +11,7 @@ RUN go build
 RUN chmod +x progress-watchdog
 
 FROM alpine
-RUN addgroup -S app && adduser app -S -G app
+RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
 COPY --from=builder --chown=app:app /src/progress-watchdog /home/app/progress-watchdog
-USER app
+USER 1001
 CMD /home/app/progress-watchdog

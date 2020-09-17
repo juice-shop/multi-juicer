@@ -5,9 +5,9 @@ COPY package.json package-lock.json ./
 RUN npm ci --production
 
 FROM node:12-alpine
-RUN addgroup -S app && adduser app -S -G app
+RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
 WORKDIR /home/app/
 COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
 COPY --chown=app:app ./src src/
-USER app
+USER 1001
 CMD ["node", "/home/app/src/main.js"]

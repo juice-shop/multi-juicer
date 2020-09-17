@@ -14,13 +14,13 @@ RUN npm run build
 
 FROM node:12-alpine
 ARG NODE_ENV
-RUN addgroup -S app && adduser app -S -G app
+RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
 WORKDIR /home/app/
 COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
 COPY --chown=app:app ./config config/
 COPY --from=ui --chown=app:app /home/app/build/ ./public/
 COPY --chown=app:app ./src src/
-USER app
+USER 1001
 EXPOSE 8080
 ENV NODE_ENV ${NODE_ENV:-production}
 CMD ["node", "/home/app/src/index.js"]
