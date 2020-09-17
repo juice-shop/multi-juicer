@@ -30,6 +30,7 @@ data:
         "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
         "ctfKey": {{ .Values.juiceShop.ctfKey | quote }},
         "nodeEnv": {{ .Values.juiceShop.nodeEnv | quote }},
-        "resources": {{ .Values.juiceShop.resources | toJson }}
+        "resources": {{ .Values.juiceShop.resources | toJson }},
+        "securityContext": {{ .Values.juiceShop.securityContext | toJson }}
       }
     }

@@ -53,6 +53,7 @@ balancer:
     limits:
       memory: 256Mi
       cpu: 400m
+  securityContext: {}
   affinity: {}
   tolerations: []
   # If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services
@@ -89,6 +90,7 @@ juiceShop:
     limits:
       memory: 200Mi
       cpu: 200m
+  securityContext: {}
   # Specify a custom Juice Shop config.yaml
   # juiceShop.config -- See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
   # @default -- See values.yaml for full details
@@ -116,6 +118,7 @@ progressWatchdog:
     limits:
       memory: 48Mi
       cpu: 20m
+  securityContext: {}
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 juiceShopCleanup:
@@ -133,5 +136,6 @@ juiceShopCleanup:
       memory: 256Mi
     limits:
       memory: 256Mi
+  securityContext: {}
   affinity: {}
   tolerations: []

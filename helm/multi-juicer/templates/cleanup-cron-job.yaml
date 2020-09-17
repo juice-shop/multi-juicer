@@ -16,6 +16,10 @@ spec:
             helm.sh/chart: {{ include "multi-juicer.chart" . }}
         spec:
           serviceAccountName: 'juice-cleaner'
+          {{- with .Values.juiceShopCleanup.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           containers:
             - image: '{{ .Values.juiceShopCleanup.repository }}:{{ .Values.juiceShopCleanup.tag }}'
               imagePullPolicy: {{ .Values.imagePullPolicy | quote }}

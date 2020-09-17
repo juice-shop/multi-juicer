@@ -53,6 +53,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           automountServiceAccountToken: false,
+          securityContext: get('juiceShop.securityContext'),
           containers: [
             {
               name: 'juice-shop',
