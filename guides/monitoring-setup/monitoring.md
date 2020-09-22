@@ -2,30 +2,27 @@
 
 This is a short and temporary guide on how to install MultiJuicer together with Prometheus, Grafana & Grafana Loki to get nice monitoring setup for your MultiJuicer installation.
 
-This Guide is considered temporary as it is intended to be replaced by fully featured Terraform Modules which will install everything for you 🚀
-
-The default admin password for the Grafana Setup is: `prom-operator`. You can overwrite this by adding `set="grafana.adminPassword=yourPasswordHere"` to the helm install command for the prometheus-operator.
+After you have everything installed you can locally port forward the grafana port by running: `kubectl -n monitoring port-forward service/monitoring-grafana 8080:80` and access Grafana in your browser on [http://localhost:8080](http://localhost:8080). The default admin password for the Grafana Setup is: `prom-operator`. You can overwrite this by adding `set="grafana.adminPassword=yourPasswordHere"` to the helm install command for the prometheus-operator.
 
 ```sh
 # Install Prometheus, Grafana & Grafana Loki
 
 helm repo add loki https://grafana.github.io/loki/charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
 kubectl create namespace monitoring
 
 echo "Installing prometheus-operator"
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/monitoring-setup/prometheus-operator-config.yaml
 
-# If you do not already have the stable helm repo installed you will have to add it:
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
-
-helm --namespace monitoring upgrade --install prometheus stable/prometheus-operator --version 8.14.0 --values ./prometheus-operator-config.yaml
+echo "Installing Prometheus Operator & Grafana"
+helm --namespace monitoring upgrade --install monitoring prometheus-community/kube-prometheus-stack --version 9.4.4 --values prometheus-operator-config.yaml
 
 echo "Installing loki"
-helm --namespace monitoring upgrade --install loki loki/loki --version 0.29.0 --set="serviceMonitor.enabled=true"
+helm --namespace monitoring upgrade --install loki loki/loki --version 0.31.1 --set="serviceMonitor.enabled=true"
 
 echo "Installing loki/promtail"
-helm --namespace monitoring upgrade --install promtail loki/promtail --version 0.23.1 --set "loki.serviceName=loki" --set="serviceMonitor.enabled=true"
+helm --namespace monitoring upgrade --install promtail loki/promtail --version 0.24.0 --set "loki.serviceName=loki" --set="serviceMonitor.enabled=true"
 
 echo "Installing MultiJuicer"
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
