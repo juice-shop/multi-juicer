@@ -13,7 +13,7 @@
   "proxy": "https://multi-juicer.cloudapps.iterashift.com/",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
-    "@kubernetes/client-node": "^0.11.2",
+    "@kubernetes/client-node": "^0.12.2",
     "basic-auth-connect": "^1.0.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.4.1",
