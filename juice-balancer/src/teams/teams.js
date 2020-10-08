@@ -153,6 +153,12 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
   }
 }
 
+function generatePasscode() {
+  const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
+  const hash = bcrypt.hashSync(passcode, BCRYPT_ROUNDS);
+  return { passcode, hash };
+}
+
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
@@ -160,8 +166,7 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
 async function createTeam(req, res) {
   const { team } = req.params;
   try {
-    const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
-    const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
+    const { passcode, hash } = generatePasscode();
 
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
@@ -203,8 +208,7 @@ async function resetPasscode(req, res) {
 
   logger.info(`Resetting passcode for team ${team}`);
 
-  const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
-  // const hash = bcrypt.hashSync(passcode, BCRYPT_ROUNDS);
+  const { passcode } = generatePasscode();
 
   try {
     // TODO: change passcode hash in deployment
