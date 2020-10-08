@@ -203,7 +203,9 @@ async function resetPasscode(req, res) {
     return res.status(401).send({ message: 'A cookie needs to be set to reset the passcode' });
   }
 
-  // TODO: Check admin requests
+  if (req.cleanedTeamname === get('admin.username')) {
+    return res.status(403).send({ message: 'The admin is not allowed to reset the passcode' });
+  }
 
   const team = req.cleanedTeamname;
 

@@ -4,6 +4,7 @@ jest.mock('http-proxy');
 const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const app = require('../app');
+const { get } = require('../config');
 const {
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
@@ -146,6 +147,14 @@ test('reset passcode needs authentication if no cookie is sent', async () => {
   await request(app).post('/balancer/teams/reset-passcode').send().expect(401);
 });
 
+test('reset passcode is forbidden for admin', async () => {
+  await request(app)
+    .post('/balancer/teams/reset-passcode')
+    .set('Cookie', [`${get('cookieParser.cookieName')}=t-${get('admin.username')}`])
+    .send()
+    .expect(403);
+});
+
 test('reset passcode fails with not found if team does not exist', async () => {
   const team = 't-test-team';
 
@@ -155,7 +164,7 @@ test('reset passcode fails with not found if team does not exist', async () => {
 
   await request(app)
     .post(`/balancer/teams/reset-passcode`)
-    .set('Cookie', [`balancer=${team}`])
+    .set('Cookie', [`${get('cookieParser.cookieName')}=${team}`])
     .send()
     .expect(404);
 });
@@ -167,7 +176,7 @@ test('reset passcode resets passcode to new value if team exists', async () => {
 
   await request(app)
     .post(`/balancer/teams/reset-passcode`)
-    .set('Cookie', [`balancer=${team}`])
+    .set('Cookie', [`${get('cookieParser.cookieName')}=${team}`])
     .send()
     .expect(200)
     .then(({ body }) => {
