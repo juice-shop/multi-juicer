@@ -192,6 +192,42 @@ async function createTeam(req, res) {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
+async function resetPasscode(req, res) {
+  if (!req.cleanedTeamname) {
+    return res.status(401).send({ message: 'A cookie needs to be set to reset the passcode' });
+  }
+
+  // TODO: Check admin requests
+
+  const team = req.cleanedTeamname;
+
+  logger.info(`Resetting passcode for team ${team}`);
+
+  const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
+  // const hash = bcrypt.hashSync(passcode, BCRYPT_ROUNDS);
+
+  try {
+    // TODO: change passcode hash in deployment
+
+    return res.status(200).json({
+      message: 'Reset Passcode',
+      passcode,
+    });
+  } catch (error) {
+    if (error.message === `deployments.apps "t-${team}-juiceshop" not found`) {
+      logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
+      return res.status(404).send({ message: 'No instance to reset the passcode for.' });
+    }
+    logger.error('Encountered unknown error while resetting passcode hash for deployment');
+    logger.error(error.message);
+    return res.status(500).send({ message: 'Unknown error while resetting passcode.' });
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 async function awaitReadiness(req, res) {
   const { team } = req.params;
 
@@ -253,6 +289,8 @@ router.post(
   checkIfMaxJuiceShopInstancesIsReached,
   createTeam
 );
+
+router.post('/reset-passcode', resetPasscode);
 
 router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadiness);
 
