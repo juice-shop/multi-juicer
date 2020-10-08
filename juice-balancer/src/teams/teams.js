@@ -75,7 +75,7 @@ async function interceptAdminLogin(req, res, next) {
  * @param {import("express").Response} res
  * @param {import("express").NextFunction} next
  */
-async function checkIfTeamAlreadyExists(req, res, next) {
+async function joinIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
@@ -249,7 +249,7 @@ router.post(
   validator.params(paramsSchema),
   validator.body(bodySchema),
   interceptAdminLogin,
-  checkIfTeamAlreadyExists,
+  joinIfTeamAlreadyExists,
   checkIfMaxJuiceShopInstancesIsReached,
   createTeam
 );
