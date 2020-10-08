@@ -145,3 +145,31 @@ test('create team creates a instance for team via k8s service', async () => {
   expect(bcrypt.compareSync(passcode, createDeploymentForTeamCallArgs.passcodeHash)).toBe(true);
   expect(createServiceForTeam).toBeCalledWith('team42');
 });
+
+test('reset passcode needs authentication if no cookie is sent', async () => {
+  await request(app).post('/balancer/teams/reset-passcode').send().expect(401);
+});
+
+test('reset passcode fails with not found if team does not exist', async () => {
+  const team = 't-test-team';
+
+  await request(app)
+    .post(`/balancer/teams/reset-passcode`)
+    .set('Cookie', [`balancer=${team}`])
+    .send()
+    .expect(404);
+});
+
+test('reset passcode resets passcode to new value if team exists', async () => {
+  const team = 't-test-team';
+
+  await request(app)
+    .post(`/balancer/teams/reset-passcode`)
+    .set('Cookie', [`balancer=${team}`])
+    .send()
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.message).toBe('Reset Passcode');
+      expect(body.passcode).toMatch(/[a-zA-Z0-9]{7}/);
+    });
+});
