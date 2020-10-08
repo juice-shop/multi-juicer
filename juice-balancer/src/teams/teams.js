@@ -15,6 +15,7 @@ const {
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
+  changePasscodeHashForTeam,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -208,10 +209,10 @@ async function resetPasscode(req, res) {
 
   logger.info(`Resetting passcode for team ${team}`);
 
-  const { passcode } = generatePasscode();
+  const { passcode, hash } = generatePasscode();
 
   try {
-    // TODO: change passcode hash in deployment
+    await changePasscodeHashForTeam(req.teamname, hash);
 
     return res.status(200).json({
       message: 'Reset Passcode',

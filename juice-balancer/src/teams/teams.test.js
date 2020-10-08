@@ -9,11 +9,13 @@ const {
   getJuiceShopInstances,
   createDeploymentForTeam,
   createServiceForTeam,
+  changePasscodeHashForTeam,
 } = require('../kubernetes');
 
 afterEach(() => {
   getJuiceShopInstanceForTeamname.mockReset();
   getJuiceShopInstances.mockReset();
+  changePasscodeHashForTeam.mockReset();
 });
 
 describe('teamname validation', () => {
@@ -147,6 +149,10 @@ test('reset passcode needs authentication if no cookie is sent', async () => {
 test('reset passcode fails with not found if team does not exist', async () => {
   const team = 't-test-team';
 
+  changePasscodeHashForTeam.mockImplementation(() => {
+    throw new Error(`deployments.apps "${team}-juiceshop" not found`);
+  });
+
   await request(app)
     .post(`/balancer/teams/reset-passcode`)
     .set('Cookie', [`balancer=${team}`])
@@ -157,6 +163,8 @@ test('reset passcode fails with not found if team does not exist', async () => {
 test('reset passcode resets passcode to new value if team exists', async () => {
   const team = 't-test-team';
 
+  let newPasscode = null;
+
   await request(app)
     .post(`/balancer/teams/reset-passcode`)
     .set('Cookie', [`balancer=${team}`])
@@ -165,5 +173,12 @@ test('reset passcode resets passcode to new value if team exists', async () => {
     .then(({ body }) => {
       expect(body.message).toBe('Reset Passcode');
       expect(body.passcode).toMatch(/[a-zA-Z0-9]{7}/);
+      newPasscode = body.passcode;
     });
+
+  expect(changePasscodeHashForTeam).toHaveBeenCalled();
+
+  const callArgs = changePasscodeHashForTeam.mock.calls[0];
+  expect(callArgs[0]).toBe(team);
+  expect(bcrypt.compareSync(newPasscode, callArgs[1])).toBe(true);
 });
