@@ -47,6 +47,21 @@ const LogoutButton = withRouter(({ history }) => {
   );
 });
 
+const PasscodeResetButton = withRouter(({ history, teamname }) => {
+  async function resetPasscode() {
+    await axios.post('/balancer/teams/reset-passcode')
+      .then(({ data }) => {
+          history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode, reset: true })
+      });
+  }
+
+  return (
+    <SecondaryButton onClick={resetPasscode}>
+      <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
+    </SecondaryButton>
+  );
+});
+
 export const TeamDisplayCard = ({ teamname }) => {
   return (
     <TeamDisplayCardWrapper>
@@ -58,6 +73,7 @@ export const TeamDisplayCard = ({ teamname }) => {
         <H3>{teamname}</H3>
       </TeamDisplayTextWrapper>
       <LogoutButton />
+      <PasscodeResetButton teamname={teamname} />
     </TeamDisplayCardWrapper>
   );
 };

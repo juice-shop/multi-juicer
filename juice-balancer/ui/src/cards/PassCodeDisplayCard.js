@@ -10,7 +10,7 @@ const CharDisplay = styled.span`
   background-color: #d8d8d8;
   border-radius: 4px;
   margin-right: 8px;
-  margin-left: ${props => (props.addOffset ? '8px' : '0')};
+  margin-left: ${(props) => (props.addOffset ? '8px' : '0')};
   display: inline-block;
 `;
 
@@ -35,12 +35,18 @@ const CenteredContent = styled.div`
   margin-top: 16px;
 `;
 
-export const PasscodeDisplayCard = ({ passcode = '' }) => {
+const PasscodeTitle = ({ reset }) => {
+  if (reset) {
+    return <H2><FormattedMessage id="passcode_reset" defaultMessage="Passcode Reset" /></H2>;
+  } else {
+    return <H2><FormattedMessage id="team_created" defaultMessage="Team Created" /></H2>;
+  }
+}
+
+export const PasscodeDisplayCard = ({ passcode = '', reset = false }) => {
   return (
     <BodyCard>
-      <H2>
-        <FormattedMessage id="team_created" defaultMessage="Team Created" />
-      </H2>
+      <PasscodeTitle reset={reset}/>
       <p>
         <FormattedMessage
           id="passcode_explanation"

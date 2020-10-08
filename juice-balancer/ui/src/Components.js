@@ -58,7 +58,7 @@ export const Button = styled.button`
 `;
 
 export const SecondaryButton = styled(Button)`
-  margin: 0;
+  margin: 0 0 0 5px;
   width: auto;
   background-color: #d8d8d8;
   color: #232323;
