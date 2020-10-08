@@ -11,15 +11,9 @@ const {
   createServiceForTeam,
 } = require('../kubernetes');
 
-afterAll(async () => {
-  await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error
-});
-
-beforeEach(() => {
-  getJuiceShopInstanceForTeamname.mockClear();
-  getJuiceShopInstances.mockImplementation(async () => {
-    return { body: { items: [] } };
-  });
+afterEach(() => {
+  getJuiceShopInstanceForTeamname.mockReset();
+  getJuiceShopInstances.mockReset();
 });
 
 describe('teamname validation', () => {
