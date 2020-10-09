@@ -154,9 +154,9 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
   }
 }
 
-function generatePasscode() {
+async function generatePasscode() {
   const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
-  const hash = bcrypt.hashSync(passcode, BCRYPT_ROUNDS);
+  const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
   return { passcode, hash };
 }
 
@@ -167,7 +167,7 @@ function generatePasscode() {
 async function createTeam(req, res) {
   const { team } = req.params;
   try {
-    const { passcode, hash } = generatePasscode();
+    const { passcode, hash } = await generatePasscode();
 
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
@@ -211,7 +211,7 @@ async function resetPasscode(req, res) {
 
   logger.info(`Resetting passcode for team ${team}`);
 
-  const { passcode, hash } = generatePasscode();
+  const { passcode, hash } = await generatePasscode();
 
   try {
     await changePasscodeHashForTeam(req.teamname, hash);
