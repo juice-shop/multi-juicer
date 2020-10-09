@@ -4,22 +4,19 @@ jest.mock('http-proxy');
 const request = require('supertest');
 const bcrypt = require('bcryptjs');
 const app = require('../app');
+const { get } = require('../config');
 const {
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
   createDeploymentForTeam,
   createServiceForTeam,
+  changePasscodeHashForTeam,
 } = require('../kubernetes');
 
-afterAll(async () => {
-  await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error
-});
-
-beforeEach(() => {
-  getJuiceShopInstanceForTeamname.mockClear();
-  getJuiceShopInstances.mockImplementation(async () => {
-    return { body: { items: [] } };
-  });
+afterEach(() => {
+  getJuiceShopInstanceForTeamname.mockReset();
+  getJuiceShopInstances.mockReset();
+  changePasscodeHashForTeam.mockReset();
 });
 
 describe('teamname validation', () => {
@@ -144,4 +141,53 @@ test('create team creates a instance for team via k8s service', async () => {
   expect(createDeploymentForTeamCallArgs.team).toBe('team42');
   expect(bcrypt.compareSync(passcode, createDeploymentForTeamCallArgs.passcodeHash)).toBe(true);
   expect(createServiceForTeam).toBeCalledWith('team42');
+});
+
+test('reset passcode needs authentication if no cookie is sent', async () => {
+  await request(app).post('/balancer/teams/reset-passcode').send().expect(401);
+});
+
+test('reset passcode is forbidden for admin', async () => {
+  await request(app)
+    .post('/balancer/teams/reset-passcode')
+    .set('Cookie', [`${get('cookieParser.cookieName')}=t-${get('admin.username')}`])
+    .send()
+    .expect(403);
+});
+
+test('reset passcode fails with not found if team does not exist', async () => {
+  const team = 't-test-team';
+
+  changePasscodeHashForTeam.mockImplementation(() => {
+    throw new Error(`deployments.apps "${team}-juiceshop" not found`);
+  });
+
+  await request(app)
+    .post(`/balancer/teams/reset-passcode`)
+    .set('Cookie', [`${get('cookieParser.cookieName')}=${team}`])
+    .send()
+    .expect(404);
+});
+
+test('reset passcode resets passcode to new value if team exists', async () => {
+  const team = 't-test-team';
+
+  let newPasscode = null;
+
+  await request(app)
+    .post(`/balancer/teams/reset-passcode`)
+    .set('Cookie', [`${get('cookieParser.cookieName')}=${team}`])
+    .send()
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.message).toBe('Reset Passcode');
+      expect(body.passcode).toMatch(/[a-zA-Z0-9]{7}/);
+      newPasscode = body.passcode;
+    });
+
+  expect(changePasscodeHashForTeam).toHaveBeenCalled();
+
+  const callArgs = changePasscodeHashForTeam.mock.calls[0];
+  expect(callArgs[0]).toBe(team);
+  expect(bcrypt.compareSync(newPasscode, callArgs[1])).toBe(true);
 });

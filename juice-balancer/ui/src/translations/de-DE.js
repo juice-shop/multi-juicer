@@ -15,7 +15,9 @@ export default {
   join_team: 'Team Beitreten',
   logged_in_as: 'Eingelogged als',
   log_out: 'Ausloggen',
+  reset_passcode: 'Passwort Zurücksetzen',
   team_created: 'Team Erstellt',
+  passcode_reset: 'Passwort Zurückgesetzt',
   passcode_explanation:
     'Um sicherzustellen das nicht jeder einfach deinem Team beitreten kann, haben wir ein Passwort erstellt das du mit deinem Teammitgliedern teilen kannst. Deine Teammitglieder brauchen das gleiche Passwort um dem Team beizutreten. Du kannst das Passwort von unten kopieren.',
   passcode: 'Passwort',

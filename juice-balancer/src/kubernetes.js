@@ -262,3 +262,26 @@ const updateLastRequestTimestampForTeam = (teamname) => {
   );
 };
 module.exports.updateLastRequestTimestampForTeam = updateLastRequestTimestampForTeam;
+
+const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
+  const headers = { 'content-type': 'application/strategic-merge-patch+json' };
+  const deploymentPatch = {
+    metadata: {
+      annotations: {
+        'multi-juicer.iteratec.dev/passcode': passcodeHash,
+      },
+    },
+  };
+
+  await k8sAppsApi.patchNamespacedDeployment(
+    `${teamname}-juiceshop`,
+    get('namespace'),
+    deploymentPatch,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    { headers }
+  );
+};
+module.exports.changePasscodeHashForTeam = changePasscodeHashForTeam;

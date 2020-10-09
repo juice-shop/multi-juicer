@@ -15,6 +15,7 @@ const {
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
+  changePasscodeHashForTeam,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -75,7 +76,7 @@ async function interceptAdminLogin(req, res, next) {
  * @param {import("express").Response} res
  * @param {import("express").NextFunction} next
  */
-async function checkIfTeamAlreadyExists(req, res, next) {
+async function joinIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
@@ -153,6 +154,12 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
   }
 }
 
+async function generatePasscode() {
+  const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
+  const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
+  return { passcode, hash };
+}
+
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
@@ -160,8 +167,7 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
 async function createTeam(req, res) {
   const { team } = req.params;
   try {
-    const passcode = cryptoRandomString({ length: 8 }).toUpperCase();
-    const hash = await bcrypt.hash(passcode, BCRYPT_ROUNDS);
+    const { passcode, hash } = await generatePasscode();
 
     logger.info(`Creating JuiceShop Deployment for team "${team}"`);
 
@@ -185,6 +191,43 @@ async function createTeam(req, res) {
     logger.error(`Error while creating deployment or service for team ${team}`);
     logger.error(error.message);
     res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+async function resetPasscode(req, res) {
+  if (!req.cleanedTeamname) {
+    return res.status(401).send({ message: 'A cookie needs to be set to reset the passcode' });
+  }
+
+  if (req.cleanedTeamname === get('admin.username')) {
+    return res.status(403).send({ message: 'The admin is not allowed to reset the passcode' });
+  }
+
+  const team = req.cleanedTeamname;
+
+  logger.info(`Resetting passcode for team ${team}`);
+
+  const { passcode, hash } = await generatePasscode();
+
+  try {
+    await changePasscodeHashForTeam(req.teamname, hash);
+
+    return res.status(200).json({
+      message: 'Reset Passcode',
+      passcode,
+    });
+  } catch (error) {
+    if (error.message === `deployments.apps "t-${team}-juiceshop" not found`) {
+      logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
+      return res.status(404).send({ message: 'No instance to reset the passcode for.' });
+    }
+    logger.error('Encountered unknown error while resetting passcode hash for deployment');
+    logger.error(error.message);
+    return res.status(500).send({ message: 'Unknown error while resetting passcode.' });
   }
 }
 
@@ -249,10 +292,12 @@ router.post(
   validator.params(paramsSchema),
   validator.body(bodySchema),
   interceptAdminLogin,
-  checkIfTeamAlreadyExists,
+  joinIfTeamAlreadyExists,
   checkIfMaxJuiceShopInstancesIsReached,
   createTeam
 );
+
+router.post('/reset-passcode', resetPasscode);
 
 router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadiness);
 
