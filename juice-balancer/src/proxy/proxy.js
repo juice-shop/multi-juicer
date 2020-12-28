@@ -77,7 +77,7 @@ async function checkIfInstanceIsUp(req, res, next) {
  */
 async function updateLastConnectTimestamp(req, res, next) {
   const currentTime = new Date().getTime();
-  const teamname = req.teamname;
+  const teamname = req.cleanedTeamname;
 
   try {
     if (connectionCache.has(teamname)) {
@@ -88,7 +88,6 @@ async function updateLastConnectTimestamp(req, res, next) {
       }
     } else {
       await updateLastRequestTimestampForTeam(teamname);
-
       connectionCache.set(teamname, currentTime);
     }
   } catch (error) {
