@@ -244,7 +244,7 @@ module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname
 const updateLastRequestTimestampForTeam = (teamname) => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };
   return k8sAppsApi.patchNamespacedDeployment(
-    `${teamname}-juiceshop`,
+    `t-${teamname}-juiceshop`,
     get('namespace'),
     {
       metadata: {
