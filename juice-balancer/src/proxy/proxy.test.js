@@ -57,7 +57,7 @@ test('should set the last-connect timestamp when a new team gets proxied the fir
     .expect(200)
     .expect('proxied');
 
-  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('t-team-last-connect-test');
+  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('team-last-connect-test');
 });
 
 test('should update the last-connect timestamp on requests at most every 10sec', async () => {
@@ -70,7 +70,7 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('t-team-update-last-connect-test');
+  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('team-update-last-connect-test');
 
   updateLastRequestTimestampForTeam.mockClear();
 
@@ -82,7 +82,7 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect('proxied');
 
   expect(updateLastRequestTimestampForTeam).not.toHaveBeenCalled();
-
+ 
   // Wait for >10s
   advanceBy(10 * 1000 + 1);
 
@@ -93,7 +93,42 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('t-team-update-last-connect-test');
+  expect(updateLastRequestTimestampForTeam).toHaveBeenCalledWith('team-update-last-connect-test');
+});
+
+test('should only call getJuiceShopInstanceForTeamname on requests at most every 10sec', async () => {
+  advanceTo(new Date(1000000000000));
+
+  await request(app)
+    .get('/rest/admin/application-version')
+    .set('Cookie', ['balancer=t-team-get-instance-test'])
+    .send()
+    .expect(200)
+   
+    expect(getJuiceShopInstanceForTeamname).toHaveBeenCalled();
+
+    getJuiceShopInstanceForTeamname.mockClear();
+
+    await request(app)
+      .get('/rest/admin/application-version')
+      .set('Cookie', ['balancer=t-team-get-instance-test'])
+      .send()
+      .expect(200)
+      .expect('proxied');
+  
+    expect(getJuiceShopInstanceForTeamname).not.toHaveBeenCalled();
+   
+    // Wait for >10s
+    advanceBy(10 * 1000 + 1);
+  
+    await request(app)
+      .get('/rest/admin/application-version')
+      .set('Cookie', ['balancer=t-team-get-instance-test'])
+      .send()
+      .expect(200)
+      .expect('proxied');
+  
+    expect(getJuiceShopInstanceForTeamname).toHaveBeenCalled();
 });
 
 test('should redirect to /balancer/ when the instance is currently restarting', async () => {
