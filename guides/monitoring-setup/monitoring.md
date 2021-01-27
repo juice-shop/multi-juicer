@@ -7,7 +7,7 @@ After you have everything installed you can locally port forward the grafana por
 ```sh
 # Install Prometheus, Grafana & Grafana Loki
 
-helm repo add loki https://grafana.github.io/loki/charts
+helm repo add grafana https://grafana.github.io/helm-charts
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
 kubectl create namespace monitoring
@@ -16,13 +16,13 @@ echo "Installing prometheus-operator"
 wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/monitoring-setup/prometheus-operator-config.yaml
 
 echo "Installing Prometheus Operator & Grafana"
-helm --namespace monitoring upgrade --install monitoring prometheus-community/kube-prometheus-stack --version 9.4.4 --values prometheus-operator-config.yaml
+helm --namespace monitoring upgrade --install monitoring prometheus-community/kube-prometheus-stack --version 13.3.0 --values prometheus-operator-config.yaml
 
 echo "Installing loki"
-helm --namespace monitoring upgrade --install loki loki/loki --version 0.31.1 --set="serviceMonitor.enabled=true"
+helm --namespace monitoring upgrade --install loki grafana/loki --version 2.3.0 --set="serviceMonitor.enabled=true"
 
 echo "Installing loki/promtail"
-helm --namespace monitoring upgrade --install promtail loki/promtail --version 0.24.0 --set "loki.serviceName=loki" --set="serviceMonitor.enabled=true"
+helm --namespace monitoring upgrade --install promtail grafana/promtail --version 3.0.4 --set "config.lokiAddress=http://loki:3100/loki/api/v1/push" --set="serviceMonitor.enabled=true"
 
 echo "Installing MultiJuicer"
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
