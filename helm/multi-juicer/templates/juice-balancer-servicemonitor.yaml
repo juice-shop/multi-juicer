@@ -6,8 +6,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: 'juice-balancer'
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "multi-juicer.labels" . | nindent 6 }}
   endpoints:
     - port: web
       path: '/balancer/metrics'
