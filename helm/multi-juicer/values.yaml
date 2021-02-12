@@ -110,7 +110,7 @@ juiceShop:
   #    cpu: 100m
   #    memory: 200Mi
   # juiceShop.securityContext -- Optional securityContext definitions to set for each JuiceShop instance
-  securityContext: []
+  securityContext: {}
   # juiceShop.env -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env: []
   # env:
