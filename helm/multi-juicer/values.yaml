@@ -83,8 +83,6 @@ juiceShop:
   tag: v12.3.0
   # juiceShop.ctfKey -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
-  resources: {}
-  securityContext: {}
   # Specify a custom Juice Shop config.yaml
   # juiceShop.config -- See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
   # @default -- See values.yaml for full details
@@ -102,6 +100,42 @@ juiceShop:
       showFlagsInNotifications: false
   # juiceShop.nodeEnv -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
   nodeEnv: "multi-juicer"
+  # juiceShop.resources -- Optional resources definitions to set for each JuiceShop instance
+  resources: []
+  #resources: 
+  #  limits:
+  #    cpu: 100m
+  #    memory: 200Mi
+  #  requests:
+  #    cpu: 100m
+  #    memory: 200Mi
+  # juiceShop.securityContext -- Optional securityContext definitions to set for each JuiceShop instance
+  securityContext: {}
+  # juiceShop.env -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
+  env: []
+  # env:
+  #   - name: FOO
+  #     valueFrom:
+  #       secretKeyRef:
+  #         key: FOO
+  #         name: secret-resource
+  # juiceShop.envFrom -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+  envFrom: []
+  # juiceShop.volumes -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+  # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
+  # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
+  # volumes: 
+  # - name: logo
+  #   configMap:
+  #     name: custom-logo
+  # juiceShop.volumeMounts -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumeMounts: []
+  # volumeMounts:
+  # - name: logo
+  #   mountPath: /juice-shop/frontend/dist/frontend/assets/public/images/custom.png
+  #   subPath: custom.png
+  #   readOnly: true
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 progressWatchdog:

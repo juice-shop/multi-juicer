@@ -69,7 +69,9 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'CTF_KEY',
                   value: get('juiceShop.ctfKey'),
                 },
+                ...get('juiceShop.env', []),
               ],
+              envFrom: get('juiceShop.envFrom'),
               ports: [
                 {
                   containerPort: 3000,
@@ -98,6 +100,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   mountPath: '/juice-shop/config/multi-juicer.yaml',
                   subPath: 'multi-juicer.yaml',
                 },
+                ...get('juiceShop.volumeMounts', []),
               ],
             },
           ],
@@ -108,6 +111,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 name: 'juice-shop-config',
               },
             },
+            ...get('juiceShop.volumes', []),
           ],
         },
       },
