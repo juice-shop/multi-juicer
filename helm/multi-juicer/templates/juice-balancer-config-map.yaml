@@ -32,5 +32,9 @@ data:
         "nodeEnv": {{ .Values.juiceShop.nodeEnv | quote }},
         "resources": {{ .Values.juiceShop.resources | toJson }},
         "securityContext": {{ .Values.juiceShop.securityContext | toJson }}
+        "env": {{ .Values.juiceShop.env | toJson }},
+        "envFrom": {{ .Values.juiceShop.envFrom | toJson }}
+        "volumes": {{ .Values.juiceShop.volumes | toJson }}
+        "volumeMounts": {{ .Values.juiceShop.volumeMounts | toJson }}
       }
     }
