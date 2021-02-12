@@ -123,14 +123,19 @@ juiceShop:
   envFrom: []
   # juiceShop.volumes -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
-  #volumes: 
-  #  - name: my-extra-volume
-  #   mountPath: /var/lib/juice-shop
+  # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
+  # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
+  # volumes: 
+  # - name: logo
+  #   configMap:
+  #     name: custom-logo
   # juiceShop.volumeMounts -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
-  #volumeMounts:
-  #  - name: my-extra-volume
-  #    emptyDir: {}
+  # volumeMounts:
+  # - name: logo
+  #   mountPath: /juice-shop/frontend/dist/frontend/assets/public/images/custom.png
+  #   subPath: custom.png
+  #   readOnly: true
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 progressWatchdog:
