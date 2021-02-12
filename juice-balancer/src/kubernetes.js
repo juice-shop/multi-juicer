@@ -9,7 +9,6 @@ const { get } = require('./config');
 
 const lodashGet = require('lodash/get');
 const once = require('lodash/once');
-const _ = require('lodash');
 
 // Gets the Deployment uid for the JuiceBalancer
 // This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
@@ -70,7 +69,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'CTF_KEY',
                   value: get('juiceShop.ctfKey'),
                 },
-                ...(!_.isEmpty(get('juiceShop.env')) && get('juiceShop.env')),
+                ...get('juiceShop.env', []),
               ],
               envFrom: get('juiceShop.envFrom'),
               ports: [
@@ -101,7 +100,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   mountPath: '/juice-shop/config/multi-juicer.yaml',
                   subPath: 'multi-juicer.yaml',
                 },
-                ...(!_.isEmpty(get('juiceShop.volumeMounts')) && get('juiceShop.volumeMounts')),
+                ...get('juiceShop.volumeMounts', []),
               ],
             },
           ],
@@ -112,7 +111,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 name: 'juice-shop-config',
               },
             },
-            ...(!_.isEmpty(get('juiceShop.volumes')) && get('juiceShop.volumes')),
+            ...get('juiceShop.volumes', []),
           ],
         },
       },
