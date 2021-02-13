@@ -101,12 +101,11 @@ juiceShop:
   # juiceShop.nodeEnv -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
   nodeEnv: "multi-juicer"
   # juiceShop.resources -- Optional resources definitions to set for each JuiceShop instance
-  resources: []
-  #resources: 
+  resources:
+    requests:
+      cpu: 150m
+      memory: 200Mi
   #  limits:
-  #    cpu: 100m
-  #    memory: 200Mi
-  #  requests:
   #    cpu: 100m
   #    memory: 200Mi
   # juiceShop.securityContext -- Optional securityContext definitions to set for each JuiceShop instance
