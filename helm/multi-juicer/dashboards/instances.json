@@ -15,8 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 26,
-  "iteration": 1588020408328,
+  "iteration": 1613221395031,
   "links": [],
   "panels": [
     {
@@ -47,6 +46,12 @@
       "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "percent",
       "gauge": {
         "maxValue": 100,
@@ -145,6 +150,12 @@
       "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "percent",
       "gauge": {
         "maxValue": 100,
@@ -159,7 +170,7 @@
         "x": 4,
         "y": 1
       },
-      "id": 79,
+      "id": 86,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -189,9 +200,8 @@
           "to": "null"
         }
       ],
-      "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1588020408328,
+      "repeatIteration": 1613221395031,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -245,6 +255,12 @@
       "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "percent",
       "gauge": {
         "maxValue": 100,
@@ -259,7 +275,7 @@
         "x": 8,
         "y": 1
       },
-      "id": 80,
+      "id": 87,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -289,9 +305,8 @@
           "to": "null"
         }
       ],
-      "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1588020408328,
+      "repeatIteration": 1613221395031,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -345,6 +360,12 @@
       "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "percent",
       "gauge": {
         "maxValue": 100,
@@ -359,7 +380,7 @@
         "x": 12,
         "y": 1
       },
-      "id": 81,
+      "id": 88,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -389,9 +410,8 @@
           "to": "null"
         }
       ],
-      "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1588020408328,
+      "repeatIteration": 1613221395031,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -445,6 +465,12 @@
       "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "percent",
       "gauge": {
         "maxValue": 100,
@@ -459,7 +485,7 @@
         "x": 16,
         "y": 1
       },
-      "id": 82,
+      "id": 89,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -489,9 +515,8 @@
           "to": "null"
         }
       ],
-      "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1588020408328,
+      "repeatIteration": 1613221395031,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -545,6 +570,12 @@
       "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "percent",
       "gauge": {
         "maxValue": 100,
@@ -559,7 +590,7 @@
         "x": 20,
         "y": 1
       },
-      "id": 83,
+      "id": 90,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -589,9 +620,8 @@
           "to": "null"
         }
       ],
-      "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1588020408328,
+      "repeatIteration": 1613221395031,
       "repeatPanelId": 2,
       "scopedVars": {
         "difficulties": {
@@ -633,47 +663,52 @@
     },
     {
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "max": 100,
+          "min": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 4,
-        "w": 24,
+        "w": 19,
         "x": 0,
-        "y": 9
+        "y": 5
       },
       "id": 78,
       "maxPerRow": 4,
       "options": {
         "colorMode": "value",
-        "fieldOptions": {
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
           "calcs": [
             "max"
           ],
-          "defaults": {
-            "mappings": [],
-            "max": 100,
-            "min": 1,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "unit": "percent"
-          },
-          "overrides": [],
+          "fields": "",
           "values": false
         },
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "vertical"
+        "textMode": "auto"
       },
-      "pluginVersion": "6.7.1",
+      "pluginVersion": "7.3.5",
       "repeat": null,
       "repeatDirection": "h",
       "targets": [
@@ -690,13 +725,84 @@
       "type": "stat"
     },
     {
+      "datasource": null,
+      "description": "The cheat score show a estimate of how likely it is that a team is cheating. This estimate is based on the time taken between challenges solved. Take this only as a approximation and never as direct prove that a team is in fact cheating.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 0,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "super-light-yellow",
+                "value": 0.5
+              },
+              {
+                "color": "semi-dark-orange",
+                "value": 0.65
+              },
+              {
+                "color": "dark-red",
+                "value": 0.8
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 5,
+        "x": 19,
+        "y": 5
+      },
+      "id": 85,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.5",
+      "targets": [
+        {
+          "expr": "juiceshop_cheat_score{team=\"$team\"}",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Cheat Score",
+      "type": "stat"
+    },
+    {
       "collapsed": true,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 9
       },
       "id": 32,
       "panels": [
@@ -1056,7 +1162,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 10
       },
       "id": 39,
       "panels": [],
@@ -1069,13 +1175,20 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 11
       },
       "hiddenSeries": false,
       "id": 71,
@@ -1092,9 +1205,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "7.3.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1174,13 +1288,20 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 10,
         "x": 0,
-        "y": 21
+        "y": 17
       },
       "hiddenSeries": false,
       "id": 46,
@@ -1199,10 +1320,11 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "paceLength": 10,
       "percentage": false,
+      "pluginVersion": "7.3.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1273,13 +1395,20 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 9,
         "x": 10,
-        "y": 21
+        "y": 17
       },
       "hiddenSeries": false,
       "id": 48,
@@ -1298,10 +1427,11 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "paceLength": 10,
       "percentage": false,
+      "pluginVersion": "7.3.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1369,6 +1499,12 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -1381,7 +1517,7 @@
         "h": 4,
         "w": 5,
         "x": 19,
-        "y": 21
+        "y": 17
       },
       "id": 52,
       "interval": null,
@@ -1452,6 +1588,12 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -1464,7 +1606,7 @@
         "h": 3,
         "w": 5,
         "x": 19,
-        "y": 25
+        "y": 21
       },
       "id": 50,
       "interval": "",
@@ -1533,13 +1675,20 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 16,
         "x": 0,
-        "y": 28
+        "y": 24
       },
       "hiddenSeries": false,
       "id": 54,
@@ -1559,10 +1708,11 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "paceLength": 10,
       "percentage": false,
+      "pluginVersion": "7.3.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1647,13 +1797,20 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": []
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 28
+        "y": 24
       },
       "hiddenSeries": false,
       "id": 56,
@@ -1672,10 +1829,11 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "paceLength": 10,
       "percentage": false,
+      "pluginVersion": "7.3.5",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1742,11 +1900,17 @@
     },
     {
       "datasource": "Loki",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 31
       },
       "id": 23,
       "options": {
@@ -1768,7 +1932,7 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 22,
+  "schemaVersion": 26,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1786,6 +1950,7 @@
             "6"
           ]
         },
+        "error": null,
         "hide": 2,
         "includeAll": true,
         "label": "Difficulty Levels supported by JuiceShop",
@@ -1835,14 +2000,15 @@
       {
         "allValue": null,
         "current": {
-          "text": "team42",
-          "value": "team42"
+          "selected": false,
+          "text": "team44",
+          "value": "team44"
         },
         "datasource": "Prometheus",
         "definition": "label_values(juiceshop_challenges_total, team)",
+        "error": null,
         "hide": 0,
         "includeAll": false,
-        "index": -1,
         "label": "Team",
         "multi": false,
         "name": "team",
@@ -1881,8 +2047,5 @@
   "timezone": "",
   "title": "MultiJuicer - Instance Dashboard",
   "uid": "Sj-cIdwZk",
-  "variables": {
-    "list": []
-  },
-  "version": 2
+  "version": 3
 }
