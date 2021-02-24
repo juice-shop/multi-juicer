@@ -1,6 +1,4 @@
-# [WIP] Example Setup with Microsoft Azure
-
-**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/multi-juicer/issues/16
+# Example Setup with Microsoft Azure
 
 **WARNING:** The resources created in this guid will cost about \$??/month.
 Make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
@@ -65,4 +63,97 @@ kubectl port-forward service/juice-balancer 3000:3000
 kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
-Hoping for https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard to come soon. I don't want to explain how to configure k8s ingress.
+
+
+## Step 4. Allow for ingress traffic 
+
+This step allows for external traffic to talk to your app
+
+First, we'll install nginx-ingress
+
+
+```bash
+# Create a namespace for your ingress resources
+kubectl create namespace ingress-basic
+
+# Add the ingress-nginx repository
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+# Use Helm to deploy an NGINX ingress controller
+# Note, if you used a different namespace above, change it to match below
+
+helm install nginx-ingress ingress-nginx/ingress-nginx \
+    --namespace default \
+    --set controller.replicaCount=2 \
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+```
+Using the CLI, touch this file as `ingress.yml`
+
+```yml
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: hello-world-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: juice-balancer
+          servicePort: 3000
+        path: /(.*)
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: hello-world-ingress-static
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /static/$2
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: juice-balancer
+          servicePort: 3000
+        path: /static(/|$)(.*)s
+```
+
+Finally, apply this config to configure nginx-ingress to handle your traffic appropriately.
+
+```bash
+kubectl apply -f hello-world-ingress.yaml
+```
+
+If all has worked well, you should see
+
+```bash
+ingress.extensions/hello-world-ingress created
+ingress.extensions/hello-world-ingress-static created
+```
+
+For testing
+
+```bash
+kubectl --namespace ingress-basic get services -o wide -w nginx-ingress-ingress-nginx-controller
+```
+
+Run this to see the public IP for your ingress controller, visit it to check if your app is running correctly.
+
+Remember, by default the allowed traffic source is 'ANY' meaning it is open to the world, if you want to restrict this, change the inbound security rules in the NSG for your K8S cluster.
+
+Check here for further information on ingress routing in Azure https://docs.microsoft.com/en-us/azure/aks/ingress-basic
+
