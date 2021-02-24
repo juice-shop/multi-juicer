@@ -148,7 +148,7 @@ ingress.extensions/hello-world-ingress-static created
 For testing
 
 ```bash
-kubectl --namespace ingress-basic get services -o wide -w nginx-ingress-ingress-nginx-controller
+kubectl --namespace default get services -o wide -w nginx-ingress-ingress-nginx-controller
 ```
 
 Run this to see the public IP for your ingress controller, visit it to check if your app is running correctly.
