@@ -23,7 +23,7 @@ jobs:
       matrix:
         component:
           - progress-watchdog
-          # - cleaner
+          - cleaner
           # - juice-balancer
     steps:
       - name: Checkout
