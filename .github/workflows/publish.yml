@@ -17,11 +17,11 @@ jobs:
           charts-folder: helm
           deploy-branch: gh-pages
   dockerBuilds:
-    name: "Build"
+    name: "Container Image Build"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        components:
+        component:
           - progress-watchdog
           - cleaner
           - juice-balancer
@@ -33,7 +33,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: iteratec/${{ matrix.components }}
+          images: iteratec/${{ matrix.component }}
           tag-sha: true
           tag-semver: |
             {{ version }}
