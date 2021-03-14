@@ -1,10 +1,10 @@
-FROM node:14-alpine as build
+FROM node:14 as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
 RUN npm ci --production
 
-FROM node:14-alpine as ui
+FROM node:14 as ui
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
