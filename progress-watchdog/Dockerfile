@@ -11,4 +11,4 @@ RUN chmod +x progress-watchdog
 
 FROM gcr.io/distroless/static:nonroot
 COPY --from=builder --chown=app:app /src/progress-watchdog /home/app/progress-watchdog
-CMD /home/app/progress-watchdog
+CMD ["/home/app/progress-watchdog"]
