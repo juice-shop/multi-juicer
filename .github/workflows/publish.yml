@@ -24,7 +24,7 @@ jobs:
         component:
           - progress-watchdog
           - cleaner
-          # - juice-balancer
+          - juice-balancer
     steps:
       - name: Checkout
         uses: actions/checkout@v2
