@@ -34,7 +34,6 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: iteratec/${{ matrix.component }}
-          tag-sha: true
           tag-semver: |
             {{ version }}
 
