@@ -1,13 +1,10 @@
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - 'build-rework'
-name: 'Publish Docker Images'
+name: "Publish Docker Images"
 jobs:
   helmRelease:
-    name: 'Package Helm Chart'
+    name: "Package Helm Chart"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
