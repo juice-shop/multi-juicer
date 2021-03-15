@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:14-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
