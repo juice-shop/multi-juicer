@@ -124,7 +124,7 @@ juiceShop:
   volumes: []
   # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
   # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
-  # volumes: 
+  # volumes:
   # - name: logo
   #   configMap:
   #     name: custom-logo
@@ -138,7 +138,7 @@ juiceShop:
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 progressWatchdog:
-  repository: iteratec/juice-progress-watchdog
+  repository: iteratec/progress-watchdog
   tag: latest
   resources:
     requests:
@@ -151,7 +151,7 @@ progressWatchdog:
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 juiceShopCleanup:
-  repository: iteratec/juice-cleaner
+  repository: iteratec/cleaner
   tag: latest
   enabled: true
   # juiceShopCleanup.gracePeriod -- Specifies when Juice Shop instances will be deleted when unused for that period.

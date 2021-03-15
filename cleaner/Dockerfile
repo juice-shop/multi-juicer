@@ -1,10 +1,13 @@
-FROM node:12-alpine as build
+FROM node:14-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
+RUN which npm
+RUN ls
+RUN npm help
 RUN npm ci --production
 
-FROM node:12-alpine
+FROM node:14-alpine
 RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
 WORKDIR /home/app/
 COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
