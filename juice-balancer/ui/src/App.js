@@ -6,6 +6,7 @@ import { IntlProvider } from 'react-intl';
 import { JoinPage } from './pages/JoinPage';
 import { JoiningPage } from './pages/JoiningPage';
 import { JoinedPage } from './pages/JoinedPage';
+import { ScoreBoard } from './pages/ScoreBoard';
 
 import { Layout } from './Layout';
 import { Spinner } from './Spinner';
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/teams/:team/joining/" element={<JoiningPage />} />
                 <Route path="/teams/:team/joined/" element={<JoinedPage />} />
+                <Route path="/score-board/" element={<ScoreBoard />} />
               </Routes>
             </Suspense>
           </Layout>

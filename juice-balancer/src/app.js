@@ -47,6 +47,7 @@ if (get('metrics.enabled')) {
 const teamRoutes = require('./teams/teams');
 const adminRoutes = require('./admin/admin');
 const proxyRoutes = require('./proxy/proxy');
+const scoreBoard = require('./score-board/score-board');
 
 app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());
@@ -75,6 +76,10 @@ app.get('/balancer/', (req, res, next) => {
 });
 
 app.use('/balancer', express.static(process.env['NODE_ENV'] === 'test' ? 'ui/build/' : 'public'));
+app.use(
+  '/balancer/score-board/',
+  express.static(process.env['NODE_ENV'] === 'test' ? 'ui/build/' : 'public')
+);
 
 app.use('/balancer/teams', teamRoutes);
 app.get('/balancer/admin', (req, res) => {
@@ -85,6 +90,7 @@ app.get('/balancer/admin', (req, res) => {
   res.sendFile(indexFile);
 });
 app.use('/balancer/admin', adminRoutes);
+app.use('/balancer/score-board', scoreBoard);
 
 app.use(proxyRoutes);
 
