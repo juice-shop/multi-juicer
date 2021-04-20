@@ -1,4 +1,4 @@
-export default [
+const availableLanguages = [
   {
     flag: '🇬🇧',
     name: 'English',
@@ -19,3 +19,4 @@ export default [
   },
 ];
 
+export default availableLanguages;
