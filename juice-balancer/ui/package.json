@@ -6,7 +6,7 @@
     "axios": "^0.21.1",
     "promise-retry": "^2.0.1",
     "react": "^16.13.1",
-    "react-data-table-component": "^3.10.3",
+    "react-data-table-component": "^6.11.7",
     "react-dom": "^16.13.1",
     "react-intl": "^2.9.0",
     "react-router-dom": "^5.2.0",
@@ -28,7 +28,6 @@
     "extends": "react-app"
   },
   "homepage": "/balancer/",
-  "proxy": "https://multi-juicer.cloudapps.iterashift.com",
   "browserslist": {
     "production": [
       ">0.2%",

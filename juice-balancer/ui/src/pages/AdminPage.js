@@ -1,18 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import DataTable from 'react-data-table-component';
+import DataTable, { createTheme } from 'react-data-table-component';
 import { FormattedRelative, defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 
 import { BodyCard, SecondaryButton } from '../Components';
 
+createTheme('multijuicer', {
+  text: {
+    primary: 'var(--font-color)',
+    secondary: 'var(--font-color-highlight)',
+  },
+  sortFocus: {
+    default: 'var(--font-color-highlight)',
+  },
+  highlightOnHover: {
+    default: 'var(--font-color-highlight)',
+    text: 'var(--font-color-highlight)',
+  },
+  background: {
+    default: 'var(--background-color)',
+  },
+  context: {
+    background: '#cb4b16',
+    text: '#FFFFFF',
+  },
+  divider: {
+    default: '#073642',
+  },
+  action: {
+    button: 'rgba(0,0,0,.54)',
+    hover: 'rgba(0,0,0,.08)',
+    disabled: 'rgba(0,0,0,.12)',
+  },
+});
+
 const SmallSecondary = styled(SecondaryButton)`
   padding: 8px;
+  min-width: 70px;
 `;
 
 const BigBodyCard = styled(BodyCard)`
   width: 60vw;
   max-width: 850px;
+`;
+
+const Text = styled.span`
+  color: var(--font-color);
 `;
 
 const messages = defineMessages({
@@ -49,7 +83,7 @@ const messages = defineMessages({
 function RestartInstanceButton({ team }) {
   const [restarting, setRestarting] = useState(false);
 
-  const restart = event => {
+  const restart = (event) => {
     event.preventDefault();
     setRestarting(true);
     axios.post(`/balancer/admin/teams/${team}/restart`).finally(() => setRestarting(false));
@@ -68,7 +102,7 @@ function RestartInstanceButton({ team }) {
 function DeleteInstanceButton({ team }) {
   const [deleting, setDeleting] = useState(false);
 
-  const remove = event => {
+  const remove = (event) => {
     event.preventDefault();
     setDeleting(true);
     axios.delete(`/balancer/admin/teams/${team}/delete`).finally(() => setDeleting(false));
@@ -90,9 +124,14 @@ export default injectIntl(({ intl }) => {
   const { formatMessage, formatDate } = intl;
 
   function updateAdminData() {
-    return axios.get(`/balancer/admin/all`).then(({ data }) => {
-      setTeams(data.instances);
-    });
+    return axios
+      .get(`/balancer/admin/all`)
+      .then(({ data }) => {
+        setTeams(data.instances);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch current teams!', err);
+      });
   }
 
   useEffect(() => {
@@ -116,6 +155,8 @@ export default injectIntl(({ intl }) => {
       selector: 'ready',
       sortable: true,
       right: true,
+      // ready is just a emoji, so the colum can shrink
+      grow: 0,
       format: ({ ready }) => (ready ? '✅' : '❌'),
     },
     {
@@ -124,9 +165,9 @@ export default injectIntl(({ intl }) => {
       sortable: true,
       format: ({ createdAt }) => {
         return (
-          <span title={createdAt}>
+          <Text title={createdAt}>
             <FormattedRelative value={createdAt} />
-          </span>
+          </Text>
         );
       },
     },
@@ -136,17 +177,22 @@ export default injectIntl(({ intl }) => {
       sortable: true,
       format: ({ lastConnect }) => {
         return (
-          <span title={formatDate(lastConnect)}>
+          <Text title={formatDate(lastConnect)}>
             <FormattedRelative value={lastConnect} />
-          </span>
+          </Text>
         );
       },
     },
     {
       name: formatMessage(messages.actions),
       selector: 'actions',
+      right: true,
       cell: ({ team }) => {
-        return [<DeleteInstanceButton team={team} />, <RestartInstanceButton team={team} />];
+        return (
+          <>
+            <DeleteInstanceButton team={team} /> <RestartInstanceButton team={team} />
+          </>
+        );
       },
       ignoreRowClick: true,
       button: true,
@@ -156,6 +202,7 @@ export default injectIntl(({ intl }) => {
   return (
     <BigBodyCard>
       <DataTable
+        theme="multijuicer"
         title={formatMessage(messages.tableHeader)}
         noDataComponent={formatMessage(messages.noContent)}
         defaultSortField="lastConnect"
