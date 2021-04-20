@@ -32,7 +32,7 @@ const TeamDisplayTextWrapper = styled.div`
 
 const Subtitle = styled.span`
   font-size: 14px;
-  color: #232323;
+  color: var(--font-color-highlight);
   font-weight: 300;
 `;
 
@@ -49,10 +49,9 @@ const LogoutButton = withRouter(({ history }) => {
 
 const PasscodeResetButton = withRouter(({ history, teamname }) => {
   async function resetPasscode() {
-    await axios.post('/balancer/teams/reset-passcode')
-      .then(({ data }) => {
-          history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode, reset: true })
-      });
+    await axios.post('/balancer/teams/reset-passcode').then(({ data }) => {
+      history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode, reset: true });
+    });
   }
 
   return (

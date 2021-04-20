@@ -5,8 +5,6 @@ Instructing everybody how to start Juice Shop on their own machine works ok, but
 
 MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
 
-> **Note:** This project was called JuicyCTF until recently. This was changed to avoid confusions with the [juice-shop-ctf](https://github.com/bkimminich/juice-shop-ctf) project.
-
 **What it does:**
 
 - dynamically create new Juice Shop instances when needed
@@ -23,10 +21,6 @@ MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh
 ```sh
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
-# for helm <= 2
-helm install multi-juicer/multi-juicer --name multi-juicer
-
-# for helm >= 3
 helm install multi-juicer multi-juicer/multi-juicer
 ```
 

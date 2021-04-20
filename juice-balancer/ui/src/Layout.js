@@ -2,48 +2,66 @@ import React from 'react';
 
 import styled, { createGlobalStyle } from 'styled-components';
 
-import logo from './logo.svg';
+import multiJuicerLogo from './multi-juicer.svg';
 import { Card, H1 } from './Components';
 
 const Header = styled.div`
-  background-color: #cf3a23;
   min-height: 128px;
   display: flex;
   justify-content: center;
-  position: relative;
-  margin-bottom: 64px;
+  margin: 64px;
 
   @media (max-width: 1280px) {
-    min-height: 64px;
+    min-height: 96px;
   }
 `;
 
 const Logo = styled.img`
-  width: 64px;
-  height: 64px;
-  margin-right: 16px;
+  height: 72px;
 `;
 Logo.defaultProps = {
-  src: logo,
+  src: multiJuicerLogo,
 };
 
 const HeaderCard = styled(Card)`
-  padding: 36px 0;
-  height: 96px;
   width: 50vw;
-  position: absolute;
-  bottom: -48px;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-width: 360px;
 
+  // #2D3848
+
+  @media (prefers-color-scheme: dark) {
+    // background-color: #3a4556;
+    // background-color: #2d3848;
+    background-color: #2d3848;
+  }
+
+  @media (max-width: 720px) {
+    width: 70vw;
+  }
   @media (max-width: 640px) {
-    min-width: 80vw;
-    min-width: 344px;
+    width: 80vw;
   }
 `;
 
 const GlobalStyles = createGlobalStyle`
+  :root {
+    --background: #f9fbfc;
+    --background-highlight: #fff;
+    --font-color: #000;
+    --font-color-highlight: #000;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #1a202c;
+      --background-highlight: #2d3848;
+      --font-color: #fefefe;
+      --font-color-highlight: #CBD5DF;
+    }
+  }
+
   html {
     box-sizing: border-box;
   }
@@ -53,7 +71,8 @@ const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    background-color: #f9fbfc;
+    background-color: var(--background);
+    color: var(--font-color);
   }
 `;
 
@@ -92,7 +111,6 @@ export function Layout({ children, footer }) {
         <Header>
           <HeaderCard>
             <Logo alt="CTF Logo" />
-            <H1>MultiJuicer</H1>
           </HeaderCard>
         </Header>
         <Body>

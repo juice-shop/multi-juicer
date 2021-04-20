@@ -7,7 +7,10 @@ import { BodyCard, H2, Label } from '../Components';
 const CharDisplay = styled.span`
   font-family: monospace;
   padding: 12px 8px;
-  background-color: #d8d8d8;
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--background);
+  }
+
   border-radius: 4px;
   margin-right: 8px;
   margin-left: ${(props) => (props.addOffset ? '8px' : '0')};
@@ -37,16 +40,24 @@ const CenteredContent = styled.div`
 
 const PasscodeTitle = ({ reset }) => {
   if (reset) {
-    return <H2><FormattedMessage id="passcode_reset" defaultMessage="Passcode Reset" /></H2>;
+    return (
+      <H2>
+        <FormattedMessage id="passcode_reset" defaultMessage="Passcode Reset" />
+      </H2>
+    );
   } else {
-    return <H2><FormattedMessage id="team_created" defaultMessage="Team Created" /></H2>;
+    return (
+      <H2>
+        <FormattedMessage id="team_created" defaultMessage="Team Created" />
+      </H2>
+    );
   }
-}
+};
 
 export const PasscodeDisplayCard = ({ passcode = '', reset = false }) => {
   return (
     <BodyCard>
-      <PasscodeTitle reset={reset}/>
+      <PasscodeTitle reset={reset} />
       <p>
         <FormattedMessage
           id="passcode_explanation"

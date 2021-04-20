@@ -71,7 +71,7 @@ export const Card = styled.div`
 `;
 
 export const BodyCard = styled(Card)`
-  padding: 32px;
+  padding: 48px 32px;
   width: 40vw;
   min-width: 400px;
   max-width: 650px;
@@ -84,7 +84,11 @@ export const BodyCard = styled(Card)`
   @media (min-width: 1280px) {
     width: 45vw;
     margin: 8px 0;
-    padding: 24px;
+    padding: 48px 32px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #2d3848;
   }
 `;
 

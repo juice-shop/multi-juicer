@@ -11,8 +11,8 @@ export const JoinedPage = withRouter(({ location, match }) => {
   return (
     <>
       <TeamDisplayCard teamname={team} />
-      {location.state?.passcode !== undefined ? (
-        <PasscodeDisplayCard passcode={location.state.passcode} reset={location.state.reset} />
+      {location.state?.passcode !== 'foobar' ? (
+        <PasscodeDisplayCard passcode={'12345678'} reset={() => {}} />
       ) : null}
       <InstanceStatusCard teamname={team} />
     </>
