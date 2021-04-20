@@ -3,7 +3,7 @@ import React from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 
 import multiJuicerLogo from './multi-juicer.svg';
-import { Card, H1 } from './Components';
+import { Card } from './Components';
 
 const Header = styled.div`
   min-height: 128px;
