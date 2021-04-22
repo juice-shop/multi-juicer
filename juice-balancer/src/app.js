@@ -31,9 +31,14 @@ if (get('metrics.enabled')) {
   app.get(
     '/balancer/metrics',
     basicAuth(get('metrics.basicAuth.username'), get('metrics.basicAuth.password')),
-    (req, res) => {
-      res.set('Content-Type', promClient.register.contentType);
-      res.end(promClient.register.metrics());
+    async (req, res) => {
+      try {
+        res.set('Content-Type', promClient.register.contentType);
+        res.end(await promClient.register.metrics());
+      } catch (err) {
+        console.error('Failed to write metrics', err);
+        res.status(500).end();
+      }
     }
   );
 }
