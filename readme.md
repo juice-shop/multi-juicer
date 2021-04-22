@@ -24,6 +24,8 @@ helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 helm install multi-juicer multi-juicer/multi-juicer
 ```
 
+See [production notes](./guides/production-notes/productions-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
+
 ### Installation Guides for specific Cloud Providers / Environments
 
 Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with MultiJuicer installed for some specific Cloud providers.

@@ -28,23 +28,26 @@ balancer:
   cookie:
     # SET THIS TO TRUE IF IN PRODUCTION
     # Sets secure Flag in cookie
-    # balancer.cookie.secure -- Sets the secure attribute on cookie so that it only be send over https
+    # -- Sets the secure attribute on cookie so that it only be send over https
     secure: false
-    # balancer.cookie.name -- Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true`
+    # -- Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true`
     name: balancer
+    # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
+    cookieParserSecret: null
   repository: iteratec/juice-balancer
+  # -- Number of replicas of the juice-balancer deployment
   tag: latest
   replicas: 1
   service:
-    # Kubernetes service type
+    # -- Kubernetes service type
     type: ClusterIP
-    # internal cluster service IP
+    # -- internal cluster service IP
     clusterIP: null
-    # IP address to assign to load balancer (if supported)
+    # -- IP address to assign to load balancer (if supported)
     loadBalancerIP: null
-    # list of IP CIDRs allowed access to lb (if supported)
+    # -- list of IP CIDRs allowed access to lb (if supported)
     loadBalancerSourceRanges: null
-    # IP address to assign to load balancer (if supported)
+    # -- IP address to assign to load balancer (if supported)
     externalIPs: null
   resources:
     requests:
@@ -56,35 +59,31 @@ balancer:
   securityContext: {}
   affinity: {}
   tolerations: []
-  # If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services
-  # This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
+  # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
   skipOwnerReference: false
   metrics:
-    # enables prometheus metrics for the balancer
-    # if set to true you should change the prometheus-scraper password
-    enabled: false
+    # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
+    enabled: true
     dashboards:
-      # if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true)
-      # These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/master/stable/grafana#sidecar-for-dashboards
+      # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/master/stable/grafana#sidecar-for-dashboards
       enabled: false
     serviceMonitor:
-      # if true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true)
-      # this will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
+      # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
       enabled: false
     basicAuth:
       username: prometheus-scraper
+      # -- Should be changed when metrics are enabled.
       password: ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy
 
 juiceShop:
-  # juiceShop.maxInstances -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
+  # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
-  # Juice Shop Image to use
+  # -- Juice Shop Image to use
   image: bkimminich/juice-shop
   tag: v12.7.1
-  # juiceShop.ctfKey -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey
+  # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
-  # Specify a custom Juice Shop config.yaml
-  # juiceShop.config -- See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
+  # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
   # @default -- See values.yaml for full details
   config: |
     application:
@@ -98,9 +97,9 @@ juiceShop:
       isEnabled: true
     ctf:
       showFlagsInNotifications: false
-  # juiceShop.nodeEnv -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
+  # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
   nodeEnv: "multi-juicer"
-  # juiceShop.resources -- Optional resources definitions to set for each JuiceShop instance
+  # -- Optional resources definitions to set for each JuiceShop instance
   resources:
     requests:
       cpu: 150m
@@ -108,9 +107,9 @@ juiceShop:
   #  limits:
   #    cpu: 100m
   #    memory: 200Mi
-  # juiceShop.securityContext -- Optional securityContext definitions to set for each JuiceShop instance
+  # -- Optional securityContext definitions to set for each JuiceShop instance
   securityContext: {}
-  # juiceShop.env -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
+  # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env: []
   # env:
   #   - name: FOO
@@ -118,9 +117,9 @@ juiceShop:
   #       secretKeyRef:
   #         key: FOO
   #         name: secret-resource
-  # juiceShop.envFrom -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+  # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
   envFrom: []
-  # juiceShop.volumes -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
+  # -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
   # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
   # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
@@ -128,7 +127,7 @@ juiceShop:
   # - name: logo
   #   configMap:
   #     name: custom-logo
-  # juiceShop.volumeMounts -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
+  # -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
   # volumeMounts:
   # - name: logo
@@ -154,9 +153,9 @@ juiceShopCleanup:
   repository: iteratec/cleaner
   tag: latest
   enabled: true
-  # juiceShopCleanup.gracePeriod -- Specifies when Juice Shop instances will be deleted when unused for that period.
+  # -- Specifies when Juice Shop instances will be deleted when unused for that period.
   gracePeriod: 1d
-  # juiceShopCleanup.cron -- Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour
+  # -- Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour
   cron: "0 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
