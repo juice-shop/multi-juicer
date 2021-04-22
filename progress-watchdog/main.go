@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -43,7 +44,7 @@ func main() {
 
 	logFormatter := logging.NewBackendFormatter(logBackend, format)
 	logBackendLeveled := logging.AddModuleLevel(logBackend)
-	logBackendLeveled.SetLevel(logging.DEBUG, "")
+	logBackendLeveled.SetLevel(logging.INFO, "")
 
 	log.SetBackend(logBackendLeveled)
 	logging.SetBackend(logBackendLeveled, logFormatter)
@@ -82,7 +83,8 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 		}
 
 		namespace := os.Getenv("NAMESPACE")
-		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(opts)
+		ctx := context.Background()
+		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(ctx, opts)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -250,7 +252,8 @@ func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continu
 	}
 
 	namespace := os.Getenv("NAMESPACE")
-	_, err = clientset.AppsV1().Deployments(namespace).Patch(fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes)
+	ctx := context.Background()
+	_, err = clientset.AppsV1().Deployments(namespace).Patch(ctx, fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes, metav1.PatchOptions{})
 	if err != nil {
 		log.Errorf("Failed to patch new ContinueCode into deployment for team %s", teamname)
 		log.Error(err)
