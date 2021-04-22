@@ -1,8 +1,7 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import { IntlProvider, addLocaleData } from 'react-intl';
-import translations from './translations';
+import { IntlProvider } from 'react-intl';
 
 import { JoinPage } from './pages/JoinPage';
 import { JoiningPage } from './pages/JoiningPage';
@@ -13,16 +12,6 @@ import { Spinner } from './Spinner';
 import { Footer } from './Footer';
 
 const AdminPage = lazy(() => import('./pages/AdminPage'));
-
-for (const translation of translations) {
-  if (translation.key === 'en') {
-    continue;
-  }
-  addLocaleData({
-    locale: translation.key,
-    parentLocale: 'en',
-  });
-}
 
 const LoadingPage = () => <Spinner />;
 

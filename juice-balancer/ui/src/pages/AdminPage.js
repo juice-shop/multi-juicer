@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import DataTable, { createTheme } from 'react-data-table-component';
-import { FormattedRelative, defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { FormattedRelativeTime, defineMessages, useIntl, FormattedMessage } from 'react-intl';
+import { selectUnit } from '@formatjs/intl-utils';
 
 import { BodyCard, SecondaryButton } from '../Components';
 
+// create react-data-table theme
 createTheme('multijuicer', {
   text: {
     primary: 'var(--font-color)',
@@ -118,10 +120,9 @@ function DeleteInstanceButton({ team }) {
   );
 }
 
-export default injectIntl(({ intl }) => {
+export default function AdminPage() {
   const [teams, setTeams] = useState([]);
-
-  const { formatMessage, formatDate } = intl;
+  const { formatMessage, formatDate } = useIntl();
 
   function updateAdminData() {
     return axios
@@ -164,9 +165,10 @@ export default injectIntl(({ intl }) => {
       selector: 'createdAt',
       sortable: true,
       format: ({ createdAt }) => {
+        const { value, unit } = selectUnit(createdAt);
         return (
           <Text title={createdAt}>
-            <FormattedRelative value={createdAt} />
+            <FormattedRelativeTime value={value} unit={unit} />
           </Text>
         );
       },
@@ -176,9 +178,10 @@ export default injectIntl(({ intl }) => {
       selector: 'lastConnect',
       sortable: true,
       format: ({ lastConnect }) => {
+        const { value, unit } = selectUnit(lastConnect);
         return (
           <Text title={formatDate(lastConnect)}>
-            <FormattedRelative value={lastConnect} />
+            <FormattedRelativeTime value={value} unit={unit} />
           </Text>
         );
       },
@@ -212,4 +215,4 @@ export default injectIntl(({ intl }) => {
       />
     </BigBodyCard>
   );
-});
+}
