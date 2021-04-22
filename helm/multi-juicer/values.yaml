@@ -35,8 +35,8 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: iteratec/juice-balancer
+  tag: null
   # -- Number of replicas of the juice-balancer deployment
-  tag: latest
   replicas: 1
   service:
     # -- Kubernetes service type
@@ -138,7 +138,7 @@ juiceShop:
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 progressWatchdog:
   repository: iteratec/progress-watchdog
-  tag: latest
+  tag: null
   resources:
     requests:
       memory: 48Mi
@@ -151,7 +151,7 @@ progressWatchdog:
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 juiceShopCleanup:
   repository: iteratec/cleaner
-  tag: latest
+  tag: null
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
   gracePeriod: 1d

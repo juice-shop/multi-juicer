@@ -23,7 +23,7 @@ spec:
       {{- end }}
       containers:
         - name: progress-watchdog
-          image: '{{ .Values.progressWatchdog.repository }}:{{ .Values.progressWatchdog.tag }}'
+          image: '{{ .Values.progressWatchdog.repository }}:{{ .Values.progressWatchdog.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           env:
             - name: NAMESPACE

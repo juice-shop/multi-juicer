@@ -24,7 +24,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag }}'
+          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           ports:
             - name: http
