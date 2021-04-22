@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "multi-juicer.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.balancer.replicas }}
   selector:
     matchLabels:
       {{- include "multi-juicer.selectorLabels" . | nindent 6 }}
