@@ -60,7 +60,7 @@ async function listInstances(req, res) {
 async function restartInstance(req, res) {
   try {
     const teamname = req.params.team;
-    logger.info(`Deleting deployment for team: "${teamname}"`);
+    logger.info(`Restarting deployment for team: '${teamname}'`);
 
     await deletePodForTeam(teamname);
 
@@ -78,7 +78,7 @@ async function restartInstance(req, res) {
 async function deleteInstance(req, res) {
   try {
     const teamname = req.params.team;
-    logger.info(`Deleting deployment for team: "${teamname}"`);
+    logger.info(`Deleting deployment for team: '${teamname}'`);
 
     await deleteDeploymentForTeam(teamname);
     await deleteServiceForTeam(teamname);

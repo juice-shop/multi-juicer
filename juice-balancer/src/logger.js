@@ -1,7 +1,7 @@
 const winston = require('winston');
 
 const myFormat = winston.format.printf(({ level, message, timestamp }) => {
-  return `time="${timestamp}" level="${level}" msg="${`${message}`.replace('"', '\\"')}"`;
+  return `time="${timestamp}" level="${level}" msg="${message}"`;
 });
 
 const getLogLevelForEnvironment = (env) => {

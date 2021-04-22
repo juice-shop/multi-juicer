@@ -129,7 +129,7 @@ async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
 
   // If max instances is set to negative numbers it's not capped
   if (maxInstances < 0) {
-    logger.debug(`Skipping max instance check, max instances is set to "${maxInstances}"`);
+    logger.debug(`Skipping max instance check, max instances is set to '${maxInstances}'`);
     return next();
   }
 
@@ -169,12 +169,12 @@ async function createTeam(req, res) {
   try {
     const { passcode, hash } = await generatePasscode();
 
-    logger.info(`Creating JuiceShop Deployment for team "${team}"`);
+    logger.info(`Creating JuiceShop Deployment for team '${team}'`);
 
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 
-    logger.info(`Created JuiceShop Deployment for team "${team}"`);
+    logger.info(`Created JuiceShop Deployment for team '${team}'`);
 
     loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
@@ -238,14 +238,14 @@ async function resetPasscode(req, res) {
 async function awaitReadiness(req, res) {
   const { team } = req.params;
 
-  logger.info(`Awaiting readiness of JuiceShop Deployment for team "${team}"`);
+  logger.info(`Awaiting readiness of JuiceShop Deployment for team '${team}'`);
 
   try {
     for (let i = 0; i < 180; i++) {
       const { readyReplicas } = await getJuiceShopInstanceForTeamname(team);
 
       if (readyReplicas === 1) {
-        logger.info(`JuiceShop Deployment for team "${team}" ready`);
+        logger.info(`JuiceShop Deployment for team '${team}' ready`);
 
         return res.status(200).send();
       }
@@ -253,10 +253,10 @@ async function awaitReadiness(req, res) {
       await sleep(1000);
     }
 
-    logger.error(`Waiting for deployment of team "${team}" timed out`);
+    logger.error(`Waiting for deployment of team '${team}' timed out`);
     res.status(500).send({ message: 'Waiting for Deployment Readiness Timed Out' });
   } catch (error) {
-    logger.error(`Failed to wait for teams "${team}" deployment to get ready`);
+    logger.error(`Failed to wait for teams '${team}' deployment to get ready`);
     logger.error(error);
     res.status(500).send({ message: 'Failed to Wait For Deployment Readiness' });
   }

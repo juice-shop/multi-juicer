@@ -91,7 +91,7 @@ async function updateLastConnectTimestamp(req, res, next) {
       connectionCache.set(teamname, currentTime);
     }
   } catch (error) {
-    logger.warn(`Failed to update lastRequest timestamp for team "${teamname}"`);
+    logger.warn(`Failed to update lastRequest timestamp for team '${teamname}'"`);
     logger.warn(error.message);
     logger.warn(JSON.stringify(error));
   }
@@ -115,7 +115,7 @@ function proxyTrafficToJuiceShop(req, res) {
       ws: true,
     },
     (error) => {
-      logger.warn(`Proxy fail "${error.code}" for: ${req.method.toLocaleUpperCase()} ${req.path}`);
+      logger.warn(`Proxy fail '${error.code}' for: ${req.method.toLocaleUpperCase()} ${req.path}`);
 
       if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
         logger.error(error.message);

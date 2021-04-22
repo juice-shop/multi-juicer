@@ -56,7 +56,7 @@ async function main() {
       10
     );
 
-    console.log(`Checking instance: "${instanceName}".`);
+    console.log(`Checking instance: '${instanceName}'.`);
 
     const currentTime = new Date().getTime();
 
@@ -64,7 +64,7 @@ async function main() {
 
     if (timeDifference > MaxInactiveDurationInMs) {
       console.log(
-        `Deleting Instance: "${instanceName}". Instance hasn't been used in ${msToHumanReadable(
+        `Deleting Instance: '${instanceName}'. Instance hasn't been used in ${msToHumanReadable(
           timeDifference
         )}.`
       );
@@ -74,7 +74,7 @@ async function main() {
       } catch (error) {
         counts.failed.deployments++;
         console.error(
-          `Failed to delete deployment: "${instanceName}" from namespace "${Namespace}"`
+          `Failed to delete deployment: '${instanceName}' from namespace '${Namespace}'`
         );
         console.error(error);
       }
@@ -83,11 +83,11 @@ async function main() {
         counts.successful.services++;
       } catch (error) {
         counts.failed.services++;
-        console.error(`Failed to delete service: "${instanceName}" from namespace "${Namespace}"`);
+        console.error(`Failed to delete service: '${instanceName}' from namespace '${Namespace}'`);
       }
     } else {
       console.log(
-        `Not deleting Instance: "${instanceName}". Been last active ${msToHumanReadable(
+        `Not deleting Instance: '${instanceName}'. Been last active ${msToHumanReadable(
           timeDifference
         )} ago.`
       );
