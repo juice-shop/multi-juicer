@@ -24,7 +24,7 @@ helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 helm install multi-juicer multi-juicer/multi-juicer
 ```
 
-See [production notes](./guides/production-notes/productions-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
+See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
 
 ### Installation Guides for specific Cloud Providers / Environments
 
