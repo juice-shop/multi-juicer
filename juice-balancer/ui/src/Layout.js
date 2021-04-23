@@ -10,6 +10,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   margin: 64px;
+  margin-bottom: 0;
 
   @media (max-width: 1280px) {
     min-height: 96px;
@@ -29,14 +30,7 @@ const HeaderCard = styled(Card)`
   justify-content: center;
   align-items: center;
   min-width: 360px;
-
-  // #2D3848
-
-  @media (prefers-color-scheme: dark) {
-    // background-color: #3a4556;
-    // background-color: #2d3848;
-    background-color: #2d3848;
-  }
+  background-color: var(--background-highlight);
 
   @media (max-width: 720px) {
     width: 70vw;
