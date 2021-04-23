@@ -27,10 +27,6 @@ oc new-project multi-juicer
 # You'll need to add the multi-juicer helm repo to your helm repos
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
-# for helm <= 2
-helm install multi-juicer/multi-juicer --name multi-juicer ./multi-juicer/helm/multi-juicer/
-
-# for helm >= 3
 helm install multi-juicer multi-juicer/multi-juicer ./multi-juicer/helm/multi-juicer/
 ```
 

@@ -35,10 +35,6 @@ kubectl config current-context
 # You'll need to add the multi-juicer helm repo to your helm repos
 helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
 
-# for helm <= 2
-helm install multi-juicer/multi-juicer --name multi-juicer
-
-# for helm >= 3
 helm install multi-juicer multi-juicer/multi-juicer
 
 # kubernetes will now spin up the pods
@@ -110,6 +106,7 @@ kubectl apply -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/
 ```
 
 You can get the LoadBalancer's DNS record either from the AWS console, or by running:
+
 ```sh
 kubectl get ingress
 # Should print something like:
@@ -118,6 +115,7 @@ kubectl get ingress
 ```
 
 Use `kubectl get pods`to see the pods you have successfully running, which should be similar to
+
 ```sh
 kubectl get pods
 # NAME                                 READY   STATUS      RESTARTS   AGE
@@ -149,6 +147,7 @@ kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingr
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer
 ```
+
 ## Errors you might see
 
 ```
@@ -157,6 +156,6 @@ AWS::IAM::Role/Role1: CREATE_FAILED – "1 validation error detected: Value '' a
 
 This error may occur when you don't update `cluster-iam.yaml` with your Region and Policy ARN.
 
-  - Update `cluster-iam.yaml`
-  - Run `eksctl delete iamserviceaccount --cluster=multi-juicer --name=alb-ingress-controller --namespace=kube-system` to delete the old account if it exists
-  - Run `eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts`
+- Update `cluster-iam.yaml`
+- Run `eksctl delete iamserviceaccount --cluster=multi-juicer --name=alb-ingress-controller --namespace=kube-system` to delete the old account if it exists
+- Run `eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts`
