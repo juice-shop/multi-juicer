@@ -113,6 +113,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             },
             ...get('juiceShop.volumes', []),
           ],
+          tolerations: get('juiceShop.tolerations'),
+          affinity: get('juiceShop.affinity'),
         },
       },
     },

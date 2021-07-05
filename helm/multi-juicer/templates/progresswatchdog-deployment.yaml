@@ -36,11 +36,11 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.balancer.affinity }}
+      {{- with .Values.progressWatchdog.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.balancer.tolerations }}
+      {{- with .Values.progressWatchdog.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
