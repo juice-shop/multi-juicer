@@ -9,10 +9,10 @@
     "react": "^17.0.2",
     "react-data-table-component": "^6.11.7",
     "react-dom": "^17.0.2",
-    "react-intl": "^5.16.0",
+    "react-intl": "^5.20.4",
     "react-router-dom": "^5.2.0",
-    "reactjs-popup": "^2.0.4",
-    "styled-components": "^5.2.3"
+    "reactjs-popup": "^2.0.5",
+    "styled-components": "^5.3.0"
   },
   "devDependencies": {
     "react-scripts": "^4.0.3",
