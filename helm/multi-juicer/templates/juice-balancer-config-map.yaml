@@ -35,8 +35,8 @@ data:
         "env": {{ .Values.juiceShop.env | toJson }},
         "envFrom": {{ .Values.juiceShop.envFrom | toJson }},
         "volumes": {{ .Values.juiceShop.volumes | toJson }},
-        "volumeMounts": {{ .Values.juiceShop.volumeMounts | toJson }}
-        "affinity": {{ .Values.juiceShop.affinity | toJson }}
+        "volumeMounts": {{ .Values.juiceShop.volumeMounts | toJson }},
+        "affinity": {{ .Values.juiceShop.affinity | toJson }},
         "tolerations": {{ .Values.juiceShop.tolerations | toJson }}
       }
     }
