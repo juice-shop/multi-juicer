@@ -115,6 +115,9 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
           ],
           tolerations: get('juiceShop.tolerations'),
           affinity: get('juiceShop.affinity'),
+          runtimeClassName: get('juiceShop.runtimeClassName')
+            ? get('juiceShop.runtimeClassName')
+            : undefined,
         },
       },
     },

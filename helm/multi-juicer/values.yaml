@@ -1,4 +1,4 @@
-# Default values for foobar.
+# Default values for MultiJuicer.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -141,6 +141,9 @@ juiceShop:
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
+
+  # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
+  runtimeClassName: null
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 progressWatchdog:
