@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 const promClient = require('prom-client');
 const basicAuth = require('basic-auth-connect');
@@ -76,6 +77,13 @@ app.get('/balancer/', (req, res, next) => {
 app.use('/balancer', express.static(process.env['NODE_ENV'] === 'test' ? 'ui/build/' : 'public'));
 
 app.use('/balancer/teams', teamRoutes);
+app.get('/balancer/admin', (req, res) => {
+  const indexFile = path.join(
+    __dirname,
+    process.env['NODE_ENV'] === 'test' ? '../ui/build/index.html' : '../public/index.html'
+  );
+  res.sendFile(indexFile);
+});
 app.use('/balancer/admin', adminRoutes);
 
 app.use(proxyRoutes);
