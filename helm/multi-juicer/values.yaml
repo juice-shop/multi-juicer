@@ -89,7 +89,7 @@ juiceShop:
   # @default -- See values.yaml for full details
   config: |
     application:
-      logo: JuiceShopCTF_Logo.png
+      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/master/images/multijuicer-icon-only.png
       favicon: favicon_ctf.ico
       showVersionNumber: false
       showGitHubLinks: false
