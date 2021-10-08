@@ -16,7 +16,7 @@ This example expects you to have the following cli tools setup.
 # This will take a couple of minutes
 eksctl create cluster \
 --name multi-juicer \
---version 1.14 \
+--version 1.21 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
 --nodes 2 \
