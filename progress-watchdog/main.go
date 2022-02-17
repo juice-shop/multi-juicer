@@ -1,31 +1,20 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
-	"reflect"
 	"sort"
-	"time"
 
+	"github.com/iteratec/multi-juicer/progress-watchdog/internal"
 	"github.com/op/go-logging"
-	"github.com/speps/go-hashids"
 
+	"github.com/gin-gonic/gin"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-)
-
-var log = logging.MustGetLogger("ProgressWatchdog")
-
-var format = logging.MustStringFormatter(
-	`%{time:15:04:05.000} %{shortfunc}: %{level:.4s} %{message}`,
 )
 
 // ContinueCodePayload json format of the get ContinueCode response
@@ -39,15 +28,40 @@ type ProgressUpdateJobs struct {
 	LastContinueCode string
 }
 
+type JuiceShopWebhookSolution struct {
+	Challenge string  `json:"challenge"`
+	Evidence  *string `json:"evidence"`
+	IssuedOn  string  `json:"issuedOn"`
+}
+
+type JuiceShopWebhookIssuer struct {
+	HostName string `json:"hostName"`
+	Os       string `json:"os"`
+	AppName  string `json:"appName"`
+	Config   string `json:"config"`
+	Version  string `json:"version"`
+}
+type JuiceShopWebhook struct {
+	Solution JuiceShopWebhookSolution `json:"solution"`
+	CtfFlag  string                   `json:"ctfFlag"`
+	Issuer   JuiceShopWebhookIssuer   `json:"issuer"`
+}
+
+var log = logging.MustGetLogger("ProgressWatchdog")
+var format = logging.MustStringFormatter(
+	`%{time:2006/01/02 15:04:05} %{message}`,
+)
+
 func main() {
-	logBackend := logging.NewLogBackend(os.Stdout, "", 0)
+	backend := logging.NewLogBackend(os.Stdout, "", 0)
 
-	logFormatter := logging.NewBackendFormatter(logBackend, format)
-	logBackendLeveled := logging.AddModuleLevel(logBackend)
-	logBackendLeveled.SetLevel(logging.INFO, "")
+	backendLeveled := logging.AddModuleLevel(backend)
+	backendLeveled.SetLevel(logging.INFO, "")
 
-	log.SetBackend(logBackendLeveled)
-	logging.SetBackend(logBackendLeveled, logFormatter)
+	logging.SetFormatter(format)
+	logging.SetBackend(backendLeveled)
+
+	log.Info("Starting ProgressWatchdog")
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -60,258 +74,46 @@ func main() {
 		panic(err.Error())
 	}
 
-	progressUpdateJobs := make(chan ProgressUpdateJobs)
+	const numberWorkers = 10
+	internal.StartBackgroundSync(clientset, numberWorkers)
 
-	workerCount := 10
-	log.Infof("Starting ProgressWatchdog with %d worker go routines", workerCount)
-
-	// Start 10 workers which fetch and update ContinueCodes based on the `progressUpdateJobs` queue / channel
-	for i := 0; i < workerCount; i++ {
-		go workOnProgressUpdates(progressUpdateJobs, clientset)
-	}
-
-	createProgressUpdateJobs(progressUpdateJobs, clientset)
-}
-
-// Constantly lists all JuiceShops in managed by MultiJuicer and queues progressUpdatesJobs for them
-func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clientset *kubernetes.Clientset) {
-	for {
-		// Get Instances
-		log.Debug("Looking for Instances")
-		opts := metav1.ListOptions{
-			LabelSelector: "app=juice-shop",
+	log.Info("Starting WebServer listening for Solution Webhooks")
+	router := gin.New()
+	router.POST("/team/:team/webhook", func(c *gin.Context) {
+		team := c.Param("team")
+		var webhook JuiceShopWebhook
+		if err := c.ShouldBindJSON(&webhook); err != nil {
+			c.String(http.StatusBadRequest, "not ok")
+			return
 		}
 
 		namespace := os.Getenv("NAMESPACE")
-		ctx := context.Background()
-		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(ctx, opts)
+		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.Background(), fmt.Sprintf("t-%s-juiceshop", team), metav1.GetOptions{})
 		if err != nil {
-			panic(err.Error())
-		}
-
-		log.Debugf("Found %d JuiceShop running", len(juiceShops.Items))
-
-		for _, instance := range juiceShops.Items {
-			teamname := instance.Labels["team"]
-
-			if instance.Status.ReadyReplicas != 1 {
-				continue
-			}
-
-			log.Debugf("Found instance for team %s", teamname)
-
-			progressUpdateJobs <- ProgressUpdateJobs{
-				Teamname:         instance.Labels["team"],
-				LastContinueCode: instance.Annotations["multi-juicer.iteratec.dev/continueCode"],
-			}
-		}
-		time.Sleep(5 * time.Second)
-	}
-}
-
-func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clientset *kubernetes.Clientset) {
-	for job := range progressUpdateJobs {
-		log.Debugf("Running ProgressUpdateJob for team '%s'", job.Teamname)
-		lastContinueCode := job.LastContinueCode
-		log.Debug("Fetching current ContinueCode")
-		currentContinueCode, err := getCurrentContinueCode(job.Teamname)
-
-		if err != nil {
-			log.Warningf("Failed to fetch ContinueCode for team '%s' from Juice Shop", job.Teamname)
-			log.Warning(err)
-			continue
-		}
-
-		log.Debug("Checking Difference between ContinueCode")
-
-		currentSolvedChallenges, _ := ParseContinueCode(currentContinueCode)
-		lastSolvedChallenges, _ := ParseContinueCode(lastContinueCode)
-
-		switch CompareChallengeStates(currentSolvedChallenges, lastSolvedChallenges) {
-		case ApplyCode:
-			log.Debugf("ContinueCodes differ (current vs last): (%s vs %s)", currentContinueCode, lastContinueCode)
-			log.Debug("Applying cached ContinueCode")
-			log.Infof("Last ContinueCode for team '%s' contains unsolved challenges", job.Teamname)
-			applyContinueCode(job.Teamname, lastContinueCode)
-
-			log.Debug("ReFetching current ContinueCode")
-			currentContinueCode, err = getCurrentContinueCode(job.Teamname)
-
-			if err != nil {
-				log.Errorf("Failed to fetch ContinueCode from Juice Shop for team '%s' to reapply it", job.Teamname)
-				log.Error(err)
-				continue
-			}
-
-			log.Debug("Caching current ContinueCode")
-			cacheContinueCode(clientset, job.Teamname, currentContinueCode)
-		case UpdateCache:
-			cacheContinueCode(clientset, job.Teamname, currentContinueCode)
-		case NoOp:
-			log.Debug("No need to apply ContinueCode, Skipping")
-		}
-	}
-}
-
-func getCurrentContinueCode(teamname string) (string, error) {
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code", teamname)
-
-	req, err := http.NewRequest("GET", url, bytes.NewBuffer([]byte{}))
-	if err != nil {
-		log.Warning("Failed to create http request")
-		log.Warning(err)
-		panic("Failed to create http request")
-	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Warning("Failed to fetch ContinueCode from juice shop")
-		log.Warning(err)
-		return "", errors.New("Failed to fetch ContinueCode")
-	}
-	defer res.Body.Close()
-
-	switch res.StatusCode {
-	case 200:
-		body, err := ioutil.ReadAll(res.Body)
-
-		if err != nil {
-			log.Error("Failed to read response body stream")
-			return "", errors.New("Failed to response body stream from Juice Shop")
-		}
-
-		continueCodePayload := ContinueCodePayload{}
-
-		err = json.Unmarshal(body, &continueCodePayload)
-
-		if err != nil {
-			log.Error("Failed to parse json of a challenge status")
+			log.Errorf("Failed to get deployment for teamname: '%s' received via in webhook", team)
 			log.Error(err)
-			return "", errors.New("Failed to parse JSON from Juice Shop ContinueCode response")
 		}
 
-		log.Debugf("Got current ContinueCode: '%s'", continueCodePayload.ContinueCode)
-
-		return continueCodePayload.ContinueCode, nil
-	default:
-		return "", fmt.Errorf("Unexpected response status code '%d' from Juice Shop", res.StatusCode)
-	}
-}
-
-func applyContinueCode(teamname, continueCode string) {
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code/apply/%s", teamname, continueCode)
-
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
-	if err != nil {
-		log.Warning("Failed to create http request to set the current ContinueCode")
-		log.Warning(err)
-	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Warning("Failed to set the current ContinueCode to juice shop")
-		log.Warning(err)
-	}
-	defer res.Body.Close()
-}
-
-// UpdateProgressDeploymentDiff contains only the parts of the deployment we are interessted in updating
-type UpdateProgressDeploymentDiff struct {
-	Metadata UpdateProgressDeploymentMetadata `json:"metadata"`
-}
-
-// UpdateProgressDeploymentMetadata a shim of the k8s metadata object containing only annotations
-type UpdateProgressDeploymentMetadata struct {
-	Annotations UpdateProgressDeploymentDiffAnnotations `json:"annotations"`
-}
-
-// UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
-type UpdateProgressDeploymentDiffAnnotations struct {
-	ContinueCode     string `json:"multi-juicer.iteratec.dev/continueCode"`
-	ChallengesSolved string `json:"multi-juicer.iteratec.dev/challengesSolved"`
-}
-
-func cacheContinueCode(clientset *kubernetes.Clientset, teamname string, continueCode string) {
-	log.Infof("Updating saved ContinueCode of team '%s'", teamname)
-
-	solvedChallenges, err := ParseContinueCode(continueCode)
-	if err != nil {
-		log.Warningf("Could not decode continueCode '%s'", continueCode)
-	}
-
-	diff := UpdateProgressDeploymentDiff{
-		Metadata: UpdateProgressDeploymentMetadata{
-			Annotations: UpdateProgressDeploymentDiffAnnotations{
-				ContinueCode:     continueCode,
-				ChallengesSolved: fmt.Sprintf("%d", len(solvedChallenges)),
-			},
-		},
-	}
-
-	jsonBytes, err := json.Marshal(diff)
-	if err != nil {
-		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
-	}
-
-	namespace := os.Getenv("NAMESPACE")
-	ctx := context.Background()
-	_, err = clientset.AppsV1().Deployments(namespace).Patch(ctx, fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes, metav1.PatchOptions{})
-	if err != nil {
-		log.Errorf("Failed to patch new ContinueCode into deployment for team %s", teamname)
-		log.Error(err)
-	}
-}
-
-func contains(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
+		challengeStatusJson := "[]"
+		if json, ok := deployment.Annotations["multi-juicer.iteratec.dev/challenges"]; ok {
+			challengeStatusJson = json
 		}
-	}
-	return false
-}
 
-// UpdateState defines how two challenge state differ from each other, and indicates which action should be taken
-type UpdateState string
-
-const (
-	// UpdateCache The cache aka the continue code annotation on the deployment should be updated
-	UpdateCache UpdateState = "UpdateCache"
-	// ApplyCode The last continue code should be applied to recover lost challenges
-	ApplyCode UpdateState = "ApplyCode"
-	// NoOp Challenge state is identical, nothing to do 🤷
-	NoOp UpdateState = "NoOp"
-)
-
-// CompareChallengeStates Compares to current vs last challenge state and decides what should happen next
-func CompareChallengeStates(currentSolvedChallenges, lastSolvedChallenges []int) UpdateState {
-	for _, challengeSolvedInLastContinueCode := range lastSolvedChallenges {
-		contained := contains(currentSolvedChallenges, challengeSolvedInLastContinueCode)
-
-		if contained == false {
-			return ApplyCode
+		challengeStatus := make(internal.ChallengeStatuses, 0)
+		err = json.Unmarshal([]byte(challengeStatusJson), &challengeStatus)
+		if err != nil {
+			log.Error("Failed to decode json from juice shop deployment annotation")
+			log.Error(err)
 		}
-	}
 
-	sort.Ints(currentSolvedChallenges)
-	sort.Ints(lastSolvedChallenges)
-	if reflect.DeepEqual(currentSolvedChallenges, lastSolvedChallenges) {
-		return NoOp
-	}
-	return UpdateCache
-}
+		challengeStatus = append(challengeStatus, internal.ChallengeStatus{Key: webhook.Solution.Challenge, SolvedAt: webhook.Solution.IssuedOn})
+		sort.Stable(challengeStatus)
 
-// ParseContinueCode returns the number of challenges solved by this ContinueCode
-func ParseContinueCode(continueCode string) ([]int, error) {
-	hd := hashids.NewData()
-	hd.Salt = "this is my salt"
-	hd.MinLength = 60
-	hd.Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+		internal.PersistProgress(clientset, team, challengeStatus)
 
-	hashIDClient, _ := hashids.NewWithData(hd)
-	decoded, err := hashIDClient.DecodeWithError(continueCode)
+		log.Infof("Received Webhook for Team '%s' for Challenge '%s'", team, webhook.Solution.Challenge)
 
-	if err != nil {
-		return make([]int, 0), err
-	}
-
-	return decoded, nil
+		c.String(http.StatusOK, "ok")
+	})
+	router.Run()
 }

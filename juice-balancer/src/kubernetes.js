@@ -31,7 +31,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
         'multi-juicer.iteratec.dev/passcode': passcodeHash,
         'multi-juicer.iteratec.dev/challengesSolved': '0',
-        'multi-juicer.iteratec.dev/continueCode': '',
+        'multi-juicer.iteratec.dev/challenges': '[]',
       },
       ...(await getOwnerReference()),
     },
@@ -68,6 +68,10 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   name: 'CTF_KEY',
                   value: get('juiceShop.ctfKey'),
+                },
+                {
+                  name: 'SOLUTIONS_WEBHOOK',
+                  value: `http://progress-watchdog.${get('namespace')}.svc/team/${team}/webhook`,
                 },
                 ...get('juiceShop.env', []),
               ],
