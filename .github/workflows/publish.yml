@@ -18,7 +18,7 @@ jobs:
           # Remove leading 'v' from git tag to create valid semver
           RELEASE_VERSION="${RELEASE_VERSION//v}"
           # patch the version & appVersion in the Chart.yaml to the release version
-          yq eval -i '.version = "$RELEASE_VERSION", .appVersion = "RELEASE_VERSION"' Chart.yaml
+          yq eval -i ".version = \"$RELEASE_VERSION\", .appVersion = \"$RELEASE_VERSION\"" Chart.yaml
       - uses: J12934/helm-gh-pages-action@v2.0.0
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
