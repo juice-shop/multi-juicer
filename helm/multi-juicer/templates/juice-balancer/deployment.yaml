@@ -12,8 +12,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/juice-balancer-config-map.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/juice-balancer-secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/juice-balancer/config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/juice-balancer/secret.yaml") . | sha256sum }}
       labels:
         {{- include "multi-juicer.selectorLabels" . | nindent 8 }}
     spec:
