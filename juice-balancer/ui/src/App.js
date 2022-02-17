@@ -36,17 +36,64 @@ function App() {
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
       <>
         <BrowserRouter basename="/balancer">
-          <Layout footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}>
-            <Suspense fallback={<LoadingPage />}>
-              <Routes>
-                <Route path="/" exact element={<JoinPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/teams/:team/joining/" element={<JoiningPage />} />
-                <Route path="/teams/:team/joined/" element={<JoinedPage />} />
-                <Route path="/score-board/" element={<ScoreBoard />} />
-              </Routes>
-            </Suspense>
-          </Layout>
+          <Suspense fallback={<LoadingPage />}>
+            <Routes>
+              <Route
+                path="/"
+                exact
+                element={
+                  <Layout
+                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                  >
+                    <JoinPage />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <Layout
+                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                    siteHeader="Admin"
+                    wide={true}
+                  >
+                    <AdminPage />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/teams/:team/joining/"
+                element={
+                  <Layout
+                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                  >
+                    <JoiningPage />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/teams/:team/joined/"
+                element={
+                  <Layout
+                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                  >
+                    <JoinedPage />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/score-board/"
+                element={
+                  <Layout
+                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                    siteHeader="ScoreBoard"
+                  >
+                    <ScoreBoard />
+                  </Layout>
+                }
+              />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </>
     </IntlProvider>

@@ -42,9 +42,16 @@ const SmallSecondary = styled(SecondaryButton)`
   min-width: 70px;
 `;
 
+const WarnSmallSecondary = styled(SmallSecondary)`
+  padding: 8px;
+  min-width: 70px;
+  background-color: #ef4444;
+  color: var(--font-color);
+`;
+
 const BigBodyCard = styled(BodyCard)`
-  width: 60vw;
-  max-width: 850px;
+  width: 70vw;
+  max-width: initial;
 `;
 
 const Text = styled.span`
@@ -101,22 +108,27 @@ function RestartInstanceButton({ team }) {
   );
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 function DeleteInstanceButton({ team }) {
   const [deleting, setDeleting] = useState(false);
 
   const remove = (event) => {
     event.preventDefault();
     setDeleting(true);
-    axios.delete(`/balancer/admin/teams/${team}/delete`).finally(() => setDeleting(false));
+
+    Promise.all([sleep(3000), axios.delete(`/balancer/admin/teams/${team}/delete`)]).finally(() =>
+      setDeleting(false)
+    );
   };
   return (
-    <SmallSecondary onClick={remove}>
+    <WarnSmallSecondary onClick={remove}>
       {deleting ? (
         <FormattedMessage id="admin_table.deleting" defaultMessage="Deleting..." />
       ) : (
         <FormattedMessage id="admin_table.delete" defaultMessage="Delete" />
       )}
-    </SmallSecondary>
+    </WarnSmallSecondary>
   );
 }
 
@@ -193,12 +205,14 @@ export default function AdminPage() {
       cell: ({ team }) => {
         return (
           <>
-            <DeleteInstanceButton team={team} /> <RestartInstanceButton team={team} />
+            <DeleteInstanceButton team={team} />
+            <RestartInstanceButton team={team} />
           </>
         );
       },
       ignoreRowClick: true,
       button: true,
+      minWidth: '200px',
     },
   ];
 
@@ -212,6 +226,7 @@ export default function AdminPage() {
         defaultSortAsc={false}
         columns={columns}
         data={teams}
+        keyField="team"
       />
     </BigBodyCard>
   );

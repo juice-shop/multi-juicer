@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { withRouter } from 'react-router-dom';
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 
@@ -197,11 +195,6 @@ export const ScoreBoard = injectIntl(() => {
 
   return (
     <>
-      <BodyCard>
-        <H1>
-          <FormattedMessage id="score_board" defaultMessage="Score Board" />
-        </H1>
-      </BodyCard>
       <NoPaddingBodyCard>
         <Table>
           <Thead>

@@ -25,18 +25,23 @@ Logo.defaultProps = {
 };
 
 const HeaderCard = styled(Card)`
-  width: 50vw;
+  width: ${props => props.wide ? "70vw" : "50vw"};
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   min-width: 360px;
   background-color: var(--background-highlight);
 
   @media (max-width: 720px) {
-    width: 70vw;
+    flex-wrap: wrap;
+    padding: 20px;
+  }
+
+  @media (max-width: 1024px) {
+    width: 65vw;
   }
   @media (max-width: 640px) {
-    width: 80vw;
+    width: 75vw;
   }
 `;
 
@@ -97,14 +102,30 @@ const Footer = styled.div`
   flex-grow: 1;
 `;
 
-export function Layout({ children, footer }) {
+const SiteHeader = styled.h1`
+  margin-top: 38px;
+  font-size: 40px;
+  font-weight: normal;
+  
+  @media (max-width: 720px) {
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+`
+
+export function Layout({ children, footer, siteHeader = null, wide = false }) {
   return (
     <>
       <GlobalStyles />
       <Wrapper>
         <Header>
-          <HeaderCard>
-            <Logo alt="CTF Logo" />
+          <HeaderCard wide={wide}>
+            <Logo alt="MultiJuicer Logo" />
+            {siteHeader ? (
+              <SiteHeader>
+                {siteHeader}
+              </SiteHeader>
+            ) : null}
           </HeaderCard>
         </Header>
         <Body>
