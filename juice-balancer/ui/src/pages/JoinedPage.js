@@ -1,12 +1,13 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { TeamDisplayCard } from '../cards/TeamDisplayCard';
 import { InstanceStatusCard } from '../cards/InstanceStatusCard';
 import { PasscodeDisplayCard } from '../cards/PassCodeDisplayCard';
 
-export const JoinedPage = withRouter(({ location, match }) => {
-  const { team } = match.params;
+export const JoinedPage = () => {
+  const location = useLocation()
+  const { team } = useParams()
 
   return (
     <>
@@ -17,4 +18,4 @@ export const JoinedPage = withRouter(({ location, match }) => {
       <InstanceStatusCard teamname={team} />
     </>
   );
-});
+};

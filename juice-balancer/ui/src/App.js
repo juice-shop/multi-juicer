@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { IntlProvider } from 'react-intl';
 
@@ -34,18 +34,18 @@ function App() {
   return (
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
       <>
-        <Router basename="/balancer">
+        <BrowserRouter basename="/balancer">
           <Layout footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}>
             <Suspense fallback={<LoadingPage />}>
-              <Switch>
-                <Route path="/" exact component={JoinPage} />
-                <Route path="/admin" component={AdminPage} />
-                <Route path="/teams/:team/joining/" component={JoiningPage} />
-                <Route path="/teams/:team/joined/" component={JoinedPage} />
-              </Switch>
+              <Routes>
+                <Route path="/" exact element={<JoinPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/teams/:team/joining/" element={<JoiningPage />} />
+                <Route path="/teams/:team/joined/" element={<JoinedPage />} />
+              </Routes>
             </Suspense>
           </Layout>
-        </Router>
+        </BrowserRouter>
       </>
     </IntlProvider>
   );

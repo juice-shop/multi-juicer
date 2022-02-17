@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { FormattedMessage } from 'react-intl';
-import { withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { BodyCard, SecondaryButton, H3 } from '../Components';
 import astronaut from './astronaut.svg';
@@ -36,22 +36,25 @@ const Subtitle = styled.span`
   font-weight: 300;
 `;
 
-const LogoutButton = withRouter(({ history }) => {
+const LogoutButton = () => {
+  const navigate = useNavigate();
+
   function logout() {
-    axios.post('/balancer/teams/logout').then(() => history.push('/'));
+    axios.post('/balancer/teams/logout').then(() => navigate('/'));
   }
   return (
     <SecondaryButton onClick={logout}>
       <FormattedMessage id="log_out" defaultMessage="Log Out" />
     </SecondaryButton>
   );
-});
+};
 
-const PasscodeResetButton = withRouter(({ history, teamname }) => {
+const PasscodeResetButton = ({ teamname }) => {
+  const navigate = useNavigate();
+
   async function resetPasscode() {
-    await axios.post('/balancer/teams/reset-passcode').then(({ data }) => {
-      history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode, reset: true });
-    });
+    const { data } = await axios.post('/balancer/teams/reset-passcode');
+    navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode, reset: true }});
   }
 
   return (
@@ -59,7 +62,7 @@ const PasscodeResetButton = withRouter(({ history, teamname }) => {
       <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
     </SecondaryButton>
   );
-});
+};
 
 export const TeamDisplayCard = ({ teamname }) => {
   return (

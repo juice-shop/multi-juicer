@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
@@ -15,109 +15,107 @@ const messages = defineMessages({
   },
 });
 
-export const JoinPage = injectIntl(
-  withRouter(({ history, intl, location }) => {
-    const [teamname, setTeamname] = useState('');
-    const [failed, setFailed] = useState(false);
-    const queryParams = new URLSearchParams(location.search);
+export const JoinPage = injectIntl(({ intl }) => {
+  const [teamname, setTeamname] = useState('');
+  const [failed, setFailed] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const queryMessage = queryParams.get('msg');
-    const queryTeamname = queryParams.get('teamname');
-    useEffect(() => {
-      if (queryMessage === 'instance-not-found') {
-        setTeamname(queryTeamname);
-      }
-    }, [queryMessage, queryTeamname]);
+  const queryParams = new URLSearchParams(location.search);
 
-    const passcode = undefined;
+  const queryMessage = queryParams.get('msg');
+  const queryTeamname = queryParams.get('teamname');
+  useEffect(() => {
+    if (queryMessage === 'instance-not-found') {
+      setTeamname(queryTeamname);
+    }
+  }, [queryMessage, queryTeamname]);
 
-    const { formatMessage } = intl;
+  const passcode = undefined;
 
-    async function sendJoinRequest() {
-      try {
-        const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
-          passcode,
-        });
+  const { formatMessage } = intl;
 
-        history.push(`/teams/${teamname}/joined/`, { passcode: data.passcode });
-      } catch (error) {
-        if (
-          error.response.status === 401 &&
-          error.response.data.message === 'Team requires authentication to join'
-        ) {
-          history.push(`/teams/${teamname}/joining/`);
-        } else {
-          setFailed(true);
-        }
+  async function sendJoinRequest() {
+    try {
+      const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
+        passcode,
+      });
+
+      navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode }});
+    } catch (error) {
+      if (
+        error.response.status === 401 &&
+        error.response.data.message === 'Team requires authentication to join'
+      ) {
+        navigate(`/teams/${teamname}/joining/`);
+      } else {
+        setFailed(true);
       }
     }
+  }
 
-    function onSubmit(event) {
-      event.preventDefault();
-      sendJoinRequest({ teamname });
-    }
+  function onSubmit(event) {
+    event.preventDefault();
+    sendJoinRequest({ teamname });
+  }
 
-    return (
-      <>
-        {queryMessage === 'instance-restarting' ? (
-          <InstanceRestartingCard teamname={queryTeamname} />
-        ) : null}
-        {queryMessage === 'instance-not-found' ? <InstanceNotFoundCard /> : null}
-        {queryMessage === 'logged-in' && queryTeamname ? (
-          <TeamDisplayCard teamname={queryTeamname} />
-        ) : null}
+  return (
+    <>
+      {queryMessage === 'instance-restarting' ? (
+        <InstanceRestartingCard teamname={queryTeamname} />
+      ) : null}
+      {queryMessage === 'instance-not-found' ? <InstanceNotFoundCard /> : null}
+      {queryMessage === 'logged-in' && queryTeamname ? (
+        <TeamDisplayCard teamname={queryTeamname} />
+      ) : null}
 
-        <BodyCard>
-          <H2>
-            <FormattedMessage id="getting_started" defaultMessage="Getting Started" />
-          </H2>
+      <BodyCard>
+        <H2>
+          <FormattedMessage id="getting_started" defaultMessage="Getting Started" />
+        </H2>
 
-          <FormattedMessage
-            id="getting_started_text"
-            defaultMessage={`
+        <FormattedMessage
+          id="getting_started_text"
+          defaultMessage={`
               Choose a teamname so that we will be able to recognize you back.
               If you want to team up with other people you can join up under the same teamname.
             `}
-            values={{
-              strong: msg => <strong>{msg}</strong>,
-            }}
-          />
+          values={{
+            strong: (msg) => <strong>{msg}</strong>,
+          }}
+        />
 
-          {failed ? (
-            <p>
-              <strong>
-                <FormattedMessage
-                  id="join_failed_text"
-                  defaultMessage="Failed to create / join the team"
-                />
-              </strong>
-            </p>
-          ) : null}
-
-          <Form onSubmit={onSubmit}>
-            <Label htmlFor="teamname">
-              <FormattedMessage id="teamname" defaultMessage="Teamname" />
-            </Label>
-            <Input
-              type="text"
-              id="teamname"
-              data-test-id="teamname-input"
-              name="teamname"
-              value={teamname}
-              title={formatMessage(messages.teamnameValidationConstraints)}
-              pattern="^[a-z0-9]([-a-z0-9])+[a-z0-9]$"
-              maxLength="16"
-              onChange={({ target }) => setTeamname(target.value)}
-            />
-            <Button data-test-id="create-join-team-button" type="submit">
+        {failed ? (
+          <p>
+            <strong>
               <FormattedMessage
-                id="create_or_join_team_label"
-                defaultMessage="Create / Join Team"
+                id="join_failed_text"
+                defaultMessage="Failed to create / join the team"
               />
-            </Button>
-          </Form>
-        </BodyCard>
-      </>
-    );
-  })
-);
+            </strong>
+          </p>
+        ) : null}
+
+        <Form onSubmit={onSubmit}>
+          <Label htmlFor="teamname">
+            <FormattedMessage id="teamname" defaultMessage="Teamname" />
+          </Label>
+          <Input
+            type="text"
+            id="teamname"
+            data-test-id="teamname-input"
+            name="teamname"
+            value={teamname}
+            title={formatMessage(messages.teamnameValidationConstraints)}
+            pattern="^[a-z0-9]([-a-z0-9])+[a-z0-9]$"
+            maxLength="16"
+            onChange={({ target }) => setTeamname(target.value)}
+          />
+          <Button data-test-id="create-join-team-button" type="submit">
+            <FormattedMessage id="create_or_join_team_label" defaultMessage="Create / Join Team" />
+          </Button>
+        </Form>
+      </BodyCard>
+    </>
+  );
+});

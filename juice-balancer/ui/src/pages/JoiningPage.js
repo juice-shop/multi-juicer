@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { withRouter } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 
-export const JoiningPage = withRouter(({ history, match }) => {
+export const JoiningPage = () => {
   const [passcode, setPasscode] = useState('');
   const [failed, setFailed] = useState(false);
-  const { team } = match.params;
+  const navigate = useNavigate()
+  const { team } = useParams()
+
 
   async function sendJoinRequest() {
     try {
@@ -17,10 +19,10 @@ export const JoiningPage = withRouter(({ history, match }) => {
       });
 
       if (res.data.message === 'Signed in as admin') {
-        history.push(`/admin`);
+        navigate(`/admin`);
         return;
       }
-      history.push(`/teams/${team}/joined/`);
+      navigate(`/teams/${team}/joined/`);
     } catch (error) {
       console.error('Unknown error while trying to join a team!');
       console.error(error);
@@ -74,4 +76,4 @@ export const JoiningPage = withRouter(({ history, match }) => {
       </Form>
     </BodyCard>
   );
-});
+};
