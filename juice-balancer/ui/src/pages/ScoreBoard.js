@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 
-import { BodyCard, H1 } from '../Components';
+import { BodyCard } from '../Components';
 
 const Table = styled.table`
   width: 100%;
