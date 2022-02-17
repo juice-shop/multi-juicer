@@ -3,7 +3,7 @@ entries:
   juicy-ctf:
   - apiVersion: v1
     appVersion: 1.3.1
-    created: "2022-02-17T20:18:21.696832786Z"
+    created: "2022-02-17T20:32:25.638405048Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 507ae43be801d9c84a8b9965222d3a4c639bf0abd346a60bab126bbe5d47005c
@@ -13,7 +13,7 @@ entries:
     version: 1.3.1
   - apiVersion: v1
     appVersion: 1.3.0
-    created: "2022-02-17T20:18:21.694397951Z"
+    created: "2022-02-17T20:32:25.63607397Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 23df6540e03975e122ebd288c625cd92b9539c197102b0f93186b2d858698e0b
@@ -23,7 +23,7 @@ entries:
     version: 1.3.0
   - apiVersion: v1
     appVersion: 1.2.1
-    created: "2022-02-17T20:18:21.693839143Z"
+    created: "2022-02-17T20:32:25.635494326Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: f0210a86153ddbd5ecc4b66191681e58301cab1810acc664ca811d792af0f0db
@@ -33,7 +33,7 @@ entries:
     version: 1.2.1
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2022-02-17T20:18:21.693196234Z"
+    created: "2022-02-17T20:32:25.634806874Z"
     dependencies:
     - name: redis
       repository: https://kubernetes-charts.storage.googleapis.com/
@@ -48,7 +48,7 @@ entries:
     version: 1.2.0
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2022-02-17T20:18:21.68800916Z"
+    created: "2022-02-17T20:32:25.630470243Z"
     dependencies:
     - name: redis
       repository: https://kubernetes-charts.storage.googleapis.com/
@@ -63,7 +63,7 @@ entries:
     version: 1.1.1
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2022-02-17T20:18:21.685599726Z"
+    created: "2022-02-17T20:32:25.62781224Z"
     dependencies:
     - name: redis
       repository: https://kubernetes-charts.storage.googleapis.com/
@@ -78,7 +78,7 @@ entries:
     version: 1.1.0
   - apiVersion: v1
     appVersion: 1.0.0
-    created: "2022-02-17T20:18:21.683146391Z"
+    created: "2022-02-17T20:32:25.625245745Z"
     dependencies:
     - name: redis
       repository: https://kubernetes-charts.storage.googleapis.com/
@@ -93,8 +93,31 @@ entries:
     version: 1.0.0
   multi-juicer:
   - apiVersion: v2
+    appVersion: 5.0.0-beta.3
+    created: "2022-02-17T20:32:25.691914128Z"
+    description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
+      Juice Shop
+    digest: 954b95839251a739da22ca87c6e5b4e9d70c9e952d04c7bec914f4af69e38298
+    home: https://github.com/iteratec/multi-juicer
+    icon: https://raw.githubusercontent.com/iteratec/multi-juicer/master/images/multijuicer-icon-only.png
+    keywords:
+    - security
+    - juice-shop
+    - owasp
+    - capture-the-flag
+    - ctf-platform
+    - hacking
+    - kubernetes
+    name: multi-juicer
+    sources:
+    - https://github.com/iteratec/multi-juicer
+    type: application
+    urls:
+    - multi-juicer-5.0.0-beta.3.tgz
+    version: 5.0.0-beta.3
+  - apiVersion: v2
     appVersion: 5.0.0-beta.2
-    created: "2022-02-17T20:18:21.738209974Z"
+    created: "2022-02-17T20:32:25.690678434Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: b8533928b38002803a8426394b2addf0cd0b082bb7b6b1620967d6bdb73878b0
@@ -117,7 +140,7 @@ entries:
     version: 5.0.0-beta.2
   - apiVersion: v2
     appVersion: 4.4.2
-    created: "2022-02-17T20:18:21.737134559Z"
+    created: "2022-02-17T20:32:25.689467342Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: f320cc6d79606c032207e805ba6a8afa51dfc65104ee41f59a74a0a7800aa0f6
@@ -140,7 +163,7 @@ entries:
     version: 4.4.2
   - apiVersion: v2
     appVersion: 4.3.2
-    created: "2022-02-17T20:18:21.736097544Z"
+    created: "2022-02-17T20:32:25.688163342Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 4440c2d40014ecbf2f05b6522de9f544473685f02869198aad0c677506ca5821
@@ -163,7 +186,7 @@ entries:
     version: 4.3.2
   - apiVersion: v2
     appVersion: 4.3.1
-    created: "2022-02-17T20:18:21.734988229Z"
+    created: "2022-02-17T20:32:25.686886845Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 023780a59e4557aff6cbab328a95846ec28a9cfee902bb5c3ce9d3e10e17f1d6
@@ -186,7 +209,7 @@ entries:
     version: 4.3.1
   - apiVersion: v2
     appVersion: 4.3.0
-    created: "2022-02-17T20:18:21.733941414Z"
+    created: "2022-02-17T20:32:25.685712555Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: e2dce26edaba6ad8dbf7a2499feca3af00056e6212652f78909b3e039ae8fad4
@@ -209,7 +232,7 @@ entries:
     version: 4.3.0
   - apiVersion: v2
     appVersion: 4.2.0
-    created: "2022-02-17T20:18:21.732859598Z"
+    created: "2022-02-17T20:32:25.684138035Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 32d39520a48da5fc6830cebb4c88437531617a5bc7235eb7b436cff4da285442
@@ -232,7 +255,7 @@ entries:
     version: 4.2.0
   - apiVersion: v2
     appVersion: 4.1.0
-    created: "2022-02-17T20:18:21.731381277Z"
+    created: "2022-02-17T20:32:25.682469008Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 3aa3f80f7f39192aec5f972cbeac8cb1f3c346360865994af6f683941efa5d12
@@ -255,7 +278,7 @@ entries:
     version: 4.1.0
   - apiVersion: v2
     appVersion: 4.0.0
-    created: "2022-02-17T20:18:21.729716754Z"
+    created: "2022-02-17T20:32:25.680686572Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: a5f287444aecd29ab28b548e045a70055def0498f088d41d2d655cdf2b2869a6
@@ -278,7 +301,7 @@ entries:
     version: 4.0.0
   - apiVersion: v2
     appVersion: 3.11.0
-    created: "2022-02-17T20:18:21.718317591Z"
+    created: "2022-02-17T20:32:25.663936395Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 68de66ad7ffd5981d633f99e4526d26ab0176416542f6bbe602348913ef30ace
@@ -301,7 +324,7 @@ entries:
     version: 3.11.0
   - apiVersion: v2
     appVersion: 3.10.0
-    created: "2022-02-17T20:18:21.717332477Z"
+    created: "2022-02-17T20:32:25.662722202Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 3c5c8fb67bc7f4b0fe8db842be6f2d08d7be71fbd173b8b6e0d5643f4846c0e2
@@ -324,7 +347,7 @@ entries:
     version: 3.10.0
   - apiVersion: v2
     appVersion: 3.9.0
-    created: "2022-02-17T20:18:21.728708539Z"
+    created: "2022-02-17T20:32:25.677789351Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: c25336a431ce4ce03d9be6d58382d94a1aff193b7b98e4796f9110cc4aee5a3e
@@ -347,7 +370,7 @@ entries:
     version: 3.9.0
   - apiVersion: v2
     appVersion: 3.8.0
-    created: "2022-02-17T20:18:21.727695825Z"
+    created: "2022-02-17T20:32:25.676513354Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 8fe82ff94142d60c8f88e7efc3293287144c57c8024c1f3e7a8c07959d18ad9f
@@ -370,7 +393,7 @@ entries:
     version: 3.8.0
   - apiVersion: v2
     appVersion: 3.7.0
-    created: "2022-02-17T20:18:21.726700911Z"
+    created: "2022-02-17T20:32:25.674188277Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: e21dd04c54146917ea10f21a0c69c49410523b956744537b1a93f0b4d68d3d71
@@ -393,7 +416,7 @@ entries:
     version: 3.7.0
   - apiVersion: v2
     appVersion: 3.6.1
-    created: "2022-02-17T20:18:21.725744397Z"
+    created: "2022-02-17T20:32:25.672992285Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 88bf6f9dd086a56197ff202464d97efdde6636afb553b929b4116ee4a6c5c494
@@ -416,7 +439,7 @@ entries:
     version: 3.6.1
   - apiVersion: v2
     appVersion: 3.6.0
-    created: "2022-02-17T20:18:21.724809084Z"
+    created: "2022-02-17T20:32:25.671729089Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 0f4d0557734149e9963e834b795b953ac2c5663bd58badddb17115f9024616f8
@@ -439,7 +462,7 @@ entries:
     version: 3.6.0
   - apiVersion: v2
     appVersion: 3.5.0
-    created: "2022-02-17T20:18:21.72382927Z"
+    created: "2022-02-17T20:32:25.670619304Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 44d3ef3c07dca57188fb49937314e5f12a302d624f181dce0217efaf2e3c045d
@@ -462,7 +485,7 @@ entries:
     version: 3.5.0
   - apiVersion: v2
     appVersion: 3.4.1
-    created: "2022-02-17T20:18:21.72240935Z"
+    created: "2022-02-17T20:32:25.669415813Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 2df1c575d368ba2560cf384a32b8b0540789f6b0e2dea3325330b793b2dfa134
@@ -485,7 +508,7 @@ entries:
     version: 3.4.1
   - apiVersion: v2
     appVersion: 3.4.0
-    created: "2022-02-17T20:18:21.720829427Z"
+    created: "2022-02-17T20:32:25.667765287Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 52ff9b0cd1a1174f02761d67aa0bff7dca4e34270bda56625ff82f8da4c5846f
@@ -496,7 +519,7 @@ entries:
     version: 3.4.0
   - apiVersion: v2
     appVersion: 3.3.0
-    created: "2022-02-17T20:18:21.719994015Z"
+    created: "2022-02-17T20:32:25.666043656Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 1f52604c0b9a943fbccc442ef3fddff71b32f8c48f3c78ee0b1d61713ff22193
@@ -507,7 +530,7 @@ entries:
     version: 3.3.0
   - apiVersion: v2
     appVersion: 3.2.0
-    created: "2022-02-17T20:18:21.719130503Z"
+    created: "2022-02-17T20:32:25.664983875Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: d97bc7375127144294241592222c4e59da5d4e8d57a93f63521d974c8482eeee
@@ -518,7 +541,7 @@ entries:
     version: 3.2.0
   - apiVersion: v1
     appVersion: 3.1.1
-    created: "2022-02-17T20:18:21.716338663Z"
+    created: "2022-02-17T20:32:25.661484108Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 8c0f53196b896b9da3caef124c08afe16061c5b2ba70485fedc8237b1a6e2f1d
@@ -529,7 +552,7 @@ entries:
     version: 3.1.1
   - apiVersion: v1
     appVersion: 3.1.0
-    created: "2022-02-17T20:18:21.715549252Z"
+    created: "2022-02-17T20:32:25.660527035Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: aa715a60eba988a538dab412263fb2325166981d56a65eabbe6af1f642f841a2
@@ -540,7 +563,7 @@ entries:
     version: 3.1.0
   - apiVersion: v1
     appVersion: 3.0.0
-    created: "2022-02-17T20:18:21.714776041Z"
+    created: "2022-02-17T20:32:25.659464154Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: b671ccb000dea6c51acbd12ff6ba27a0d85d2e0f50edeaef2e865be70827aa3c
@@ -550,7 +573,7 @@ entries:
     version: 3.0.0
   - apiVersion: v1
     appVersion: 2.1.3
-    created: "2022-02-17T20:18:21.713969429Z"
+    created: "2022-02-17T20:32:25.65849578Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 149db7a4e63cae7bbf68fbb1aad3b787738f88177cd3a58fb38b9f488ed94f09
@@ -560,7 +583,7 @@ entries:
     version: 2.1.3
   - apiVersion: v1
     appVersion: 2.1.2
-    created: "2022-02-17T20:18:21.710811184Z"
+    created: "2022-02-17T20:32:25.654447971Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 8521007b72f1a0944ddd82b5fc7160ddf68e05165b90a15e26a8aa091e46d9ac
@@ -570,7 +593,7 @@ entries:
     version: 2.1.2
   - apiVersion: v1
     appVersion: 2.1.1
-    created: "2022-02-17T20:18:21.707884143Z"
+    created: "2022-02-17T20:32:25.650480969Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: e60d9c7cae770d03e0152299c17031dff7fcedcb8aca0046d86bd2807fc62d9d
@@ -580,7 +603,7 @@ entries:
     version: 2.1.1
   - apiVersion: v1
     appVersion: 2.1.0
-    created: "2022-02-17T20:18:21.705493709Z"
+    created: "2022-02-17T20:32:25.647968277Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 2e77508286c24581354dff41fcec44d47765aca3211cb1e6fc47b99f4c6f3b62
@@ -590,7 +613,7 @@ entries:
     version: 2.1.0
   - apiVersion: v1
     appVersion: 2.0.1
-    created: "2022-02-17T20:18:21.703047374Z"
+    created: "2022-02-17T20:32:25.645476187Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: 15e7f3fd5bd42d1751dea88880a5fc5fc2b8bfae18b59b16188a25825f97b519
@@ -600,7 +623,7 @@ entries:
     version: 2.0.1
   - apiVersion: v1
     appVersion: 2.0.0
-    created: "2022-02-17T20:18:21.699298421Z"
+    created: "2022-02-17T20:32:25.641329671Z"
     description: Run Multi User "Capture the Flags" or Security Trainings with OWASP
       Juice Shop
     digest: f4b3b46cb54bc177b4171b1d80ac4965cec5f29649dde6fc35045f185681331c
@@ -608,4 +631,4 @@ entries:
     urls:
     - multi-juicer-2.0.0.tgz
     version: 2.0.0
-generated: "2022-02-17T20:18:21.678109019Z"
+generated: "2022-02-17T20:32:25.62032787Z"
