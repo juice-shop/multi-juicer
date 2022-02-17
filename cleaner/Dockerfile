@@ -2,9 +2,6 @@ FROM node:16-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
-RUN which npm
-RUN ls
-RUN npm help
 RUN npm ci --production
 
 FROM node:16-alpine
