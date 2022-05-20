@@ -69,49 +69,21 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 
 ## Step 4. Add Ingress to expose the app to the world
 
-First, we need to create an iam policy which gives permissions to create the load balancer.
+Create a loadbalancer which is exposed is achieved by running the following command:
 
 ```sh
-#Take note of the ARN of the Policy
-aws iam create-policy \
---policy-name ALBIngressControllerIAMPolicy \
---policy-document https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/iam-policy.json
-```
-
-Next, we will integrate Kubernetes with AWS, allowing the Kubernetes to provision an Application load balancer on our behalf.
-
-**IMPORTANT!** Note the second step requires modifying `cluster-iam.yaml`
-
-```sh
-#Associate IAM OIDC Provider
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/cluster-iam.yaml
-#Edit line 15 - Place the ARN of the policy you created in the attachPolicyARNs field and update your aws region in the metadata section.
-eksctl utils associate-iam-oidc-provider --config-file=cluster-iam.yaml --approve
-
-#Create Kubernetes Service Account and bind it to Ingress Controller
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
-
-#Create IAM Role to attach to Service Account
-eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts
-
-#Create Ingress Controller
-kubectl apply -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/alb-ingress-controller.yaml
-```
-
-After you have set that up we can now create a ingress config for our the MultiJuicer Stack.
-
-```sh
-# create the ingress for the JuiceBalancer service
-kubectl apply -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
+kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/loadbalancer.yaml
 ```
 
 You can get the LoadBalancer's DNS record either from the AWS console, or by running:
 
 ```sh
-kubectl get ingress
-# Should print something like:
-# NAME                     HOSTS   ADDRESS                                                                       PORTS   AGE
-# juice-balancer-ingress   *       YOUR_DNS_RECORD_WILL_BE_HERE.elb.amazonaws.com   80      2m3s
+kubectl get services
+
+# NAME                                TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+# juice-balancer                      ClusterIP      10.100.29.23     <none>                                                                    3000/TCP       3m14s
+# kubernetes                          ClusterIP      10.100.0.1       <none>                                                                    443/TCP        11h
+# multi-juicer-service-loadbalancer   LoadBalancer   10.100.134.210   YOUR_DNS_RECORD_WILL_BE_HERE.eu-north-1.elb.amazonaws.com                 80:32111/TCP   3m13s
 ```
 
 Use `kubectl get pods`to see the pods you have successfully running, which should be similar to
@@ -140,22 +112,9 @@ kubectl get pods -n kube-system
 ```sh
 helm delete multi-juicer
 
-# Delete the ingress setup
-kubectl delete -f https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/aws-ingress.yaml
-kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
+# Delete the loadbalancer setup
+kubectl delete -f kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/loadbalancer.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer
 ```
-
-## Errors you might see
-
-```
-AWS::IAM::Role/Role1: CREATE_FAILED – "1 validation error detected: Value '' at 'policyArn' failed to satisfy constraint: Member must have length greater than or equal to 20 (Service: AmazonIdentityManagement; Status Code: 400; Error Code: ValidationError; Request ID: X)"
-```
-
-This error may occur when you don't update `cluster-iam.yaml` with your Region and Policy ARN.
-
-- Update `cluster-iam.yaml`
-- Run `eksctl delete iamserviceaccount --cluster=multi-juicer --name=alb-ingress-controller --namespace=kube-system` to delete the old account if it exists
-- Run `eksctl create iamserviceaccount --config-file=cluster-iam.yaml --approve --override-existing-serviceaccounts`
