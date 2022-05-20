@@ -13,7 +13,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 kubectl create namespace monitoring
 
 echo "Installing prometheus-operator"
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/monitoring-setup/prometheus-operator-config.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/monitoring-setup/prometheus-operator-config.yaml
 
 echo "Installing Prometheus Operator & Grafana"
 helm --namespace monitoring upgrade --install monitoring prometheus-community/kube-prometheus-stack --version 13.3.0 --values prometheus-operator-config.yaml

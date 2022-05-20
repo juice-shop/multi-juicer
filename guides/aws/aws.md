@@ -72,7 +72,7 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 Create a loadbalancer which is exposed is achieved by running the following command:
 
 ```sh
-kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/loadbalancer.yaml
+kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
 ```
 
 You can get the LoadBalancer's DNS record either from the AWS console, or by running:
@@ -113,7 +113,7 @@ kubectl get pods -n kube-system
 helm delete multi-juicer
 
 # Delete the loadbalancer setup
-kubectl delete -f kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/aws/loadbalancer.yaml
+kubectl delete -f kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer

@@ -13,7 +13,7 @@ This example expects you to have the following cli tools setup.
 
 ```bash
 # First we'll need to confirm things are running
-# This should be instant, and return something along the lines of "Kubernetes master is running at https://localhost:6443"
+# This should be instant, and return something along the lines of "Kubernetes control-plane is running at https://localhost:6443"
 kubectl cluster-info
 ```
 
@@ -63,7 +63,7 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 kubectl get pods
 
 # We got a example loadbalancer yaml for this example in the repository
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/k8s/k8s-juice-service.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/k8s/k8s-juice-service.yaml
 
 # Create the loadbalancer
 # This might take a couple of minutes

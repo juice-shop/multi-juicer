@@ -67,7 +67,7 @@ balancer:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
     dashboards:
-      # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/master/stable/grafana#sidecar-for-dashboards
+      # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards
       enabled: false
     serviceMonitor:
       # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
@@ -89,8 +89,8 @@ juiceShop:
   # @default -- See values.yaml for full details
   config: |
     application:
-      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/master/images/multijuicer-icon-only-padding.png
-      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/master/juice-balancer/ui/public/favicon.ico
+      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
+      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/juice-balancer/ui/public/favicon.ico
       showVersionNumber: false
       showGitHubLinks: false
     challenges:
@@ -136,7 +136,7 @@ juiceShop:
   #   mountPath: /juice-shop/frontend/dist/frontend/assets/public/images/custom.png
   #   subPath: custom.png
   #   readOnly: true
-  
+
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)

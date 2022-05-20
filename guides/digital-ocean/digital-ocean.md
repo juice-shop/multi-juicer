@@ -72,7 +72,7 @@ doctl compute certificate list
 
 # We got a example loadbalancer yaml for this example in the repository
 # Edit the cert id in do-lb.yaml to the cert id of your domain
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/master/guides/digital-ocean/do-lb.yaml
+wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/digital-ocean/do-lb.yaml
 vim do-lb.yaml
 
 # Create the loadbalancer
