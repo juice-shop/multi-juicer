@@ -60,5 +60,24 @@ kubectl port-forward service/juice-balancer 3000:3000
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
 kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
+## Step 4. External Connectivity
 
-Hoping for https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard to come soon. I don't want to explain how to configure k8s ingress.
+Create a yaml file with the following contents:
+```bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: juice-loadbalancer
+spec:
+  selector:
+    app.kubernetes.io/name: multi-juicer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer
+  ```
+  Then, create the new Service with the following using the kubectl command. The Azure Cloud Shell (https://shell.azure.com) can be used for this.
+  ```bash
+  kubectl create -f loadbalancer.yaml
+  ```
