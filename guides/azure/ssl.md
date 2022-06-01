@@ -1,8 +1,8 @@
 
 # Setup SSL for multi-juicer with Microsoft Azure
 
-Following this guide, you should be able to setup a https ingress with certificates from letsencrypt. https://docs.microsoft.com/en-us/azure/aks/ingress-tls?tabs=azure-cli
-You might want to use the default namespace instead of creating a new namespace called ingress-basic as outlined in the guide. You won't need the loadbalancer service as outlined in the [multi-juicer azure setup guide](azure.md) if you set up your own ingress. 
+Following this guide, you should be able to setup a https ingress with certificates from letsencrypt. https://docs.microsoft.com/en-us/azure/aks/ingress-tls?tabs=azure-cli .
+This guide is based on the official microsoft guide and tested on azure. 
 
 ## 1. Create the Container registry 
 
