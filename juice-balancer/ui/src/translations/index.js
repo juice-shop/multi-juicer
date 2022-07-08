@@ -17,6 +17,12 @@ const availableLanguages = [
     key: 'nl-NL',
     messageLoader: () => import('./nl-NL'),
   },
+  {
+    flag: '🇷🇺',
+    name: 'Русский',
+    key: 'ru-RU',
+    messageLoader: () => import('./ru-RU'),
+  },
 ];
 
 export default availableLanguages;
