@@ -81,3 +81,8 @@ spec:
   ```bash
   kubectl create -f loadbalancer.yaml
   ```
+
+## Step 5. SSL
+
+To expose multi-juicer over https you should use a propper ingress controller instead of just a loadbalancer. This will give you far better control. Remove the loadbalancer from step 4 once you have setup the https connection. To continue follow [the multi-juicer azure ssl guide](ssl.md)
+
