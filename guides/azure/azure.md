@@ -1,4 +1,4 @@
-# [WIP] Example Setup with Microsoft Azure
+# Example Setup with Microsoft Azure
 
 **NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/multi-juicer/issues/16
 
@@ -60,9 +60,11 @@ kubectl port-forward service/juice-balancer 3000:3000
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
 kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
+
 ## Step 4. External Connectivity
 
 Create a yaml file with the following contents:
+
 ```bash
 apiVersion: v1
 kind: Service
@@ -76,13 +78,14 @@ spec:
     port: 80
     targetPort: 3000
   type: LoadBalancer
-  ```
-  Then, create the new Service with the following using the kubectl command. The Azure Cloud Shell (https://shell.azure.com) can be used for this.
-  ```bash
-  kubectl create -f loadbalancer.yaml
-  ```
+```
+
+Then, create the new Service with the following using the kubectl command. The Azure Cloud Shell (https://shell.azure.com) can be used for this.
+
+```bash
+kubectl create -f loadbalancer.yaml
+```
 
 ## Step 5. SSL
 
 To expose multi-juicer over https you should use a propper ingress controller instead of just a loadbalancer. This will give you far better control. Remove the loadbalancer from step 4 once you have setup the https connection. To continue follow [the multi-juicer azure ssl guide](ssl.md)
-
