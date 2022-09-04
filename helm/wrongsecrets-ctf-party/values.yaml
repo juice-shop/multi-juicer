@@ -12,7 +12,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: multi-juicer.local
+    - host: wrongsecrets-ctf-party.local
       paths:
         - "/"
   tls: []
@@ -34,7 +34,7 @@ balancer:
     name: balancer
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
-  repository: iteratec/juice-balancer
+  repository: commjoen/wrongsecrets-ctf-party
   tag: null
   # -- Number of replicas of the juice-balancer deployment
   replicas: 1
@@ -81,8 +81,8 @@ juiceShop:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
   # -- Juice Shop Image to use
-  image: bkimminich/juice-shop
-  tag: v14.1.1
+  image: jeroenwillemsens/wrongsecrets-ctf
+  tag: 1.5.3RC1-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
@@ -99,8 +99,8 @@ juiceShop:
       isEnabled: true
     ctf:
       showFlagsInNotifications: false
-  # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
-  nodeEnv: "multi-juicer"
+  # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'wrongsecrets-ctf-party' it's not possible to set a custom config via `juiceShop.config`.
+  nodeEnv: "wrongsecrets-ctf-party"
   # -- Optional resources definitions to set for each JuiceShop instance
   resources:
     requests:

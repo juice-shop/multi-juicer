@@ -1,3 +1,15 @@
+# WrongSecrets CTF Party
+_Powered by MultiJuicer_
+
+This is a fork of MultiJuicer, which is now being rebuilt in order to server WrongSecret in creating CTFs. The tracking isssue of the first endavour can be found at https://github.com/commjoen/wrongsecrets/issues/403 .
+
+
+**This is by no means ready for anything, and work in progress.**
+
+Original readme:
+
+
+
 ![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
 
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
@@ -19,9 +31,9 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh).
 
 ```sh
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 ```
 
 See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
@@ -39,18 +51,18 @@ Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it
 ### Customizing the Setup
 
 You got some options on how to setup the stack, with some option to customize the JuiceShop instances to your own liking.
-You can find the default config values under: [helm/multi-juicer/values.yaml](./helm/multi-juicer/values.yaml)
+You can find the default config values under: [helm/multi-juicer/values.yaml](helm/wrongsecrets-ctf-party/values.yaml)
 
 Download & Save the file and tell helm to use your config file over the default by running:
 
 ```sh
-helm install -f values.yaml multi-juicer ./multi-juicer/helm/multi-juicer/
+helm install -f values.yaml wrongsecrets-ctf-party ./wrongsecrets-ctf-party/helm/wrongsecrets-ctf-party/
 ```
 
 ### Deinstallation
 
 ```sh
-helm delete multi-juicer
+helm delete wrongsecrets-ctf-party
 ```
 
 ## FAQ

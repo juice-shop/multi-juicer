@@ -25,8 +25,8 @@ echo "Installing loki/promtail"
 helm --namespace monitoring upgrade --install promtail grafana/promtail --version 3.0.4 --set "config.lokiAddress=http://loki:3100/loki/api/v1/push" --set="serviceMonitor.enabled=true"
 
 echo "Installing MultiJuicer"
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
 # for helm >= 3
-helm install multi-juicer multi-juicer/multi-juicer --set="balancer.metrics.enabled=true" --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party --set="balancer.metrics.enabled=true" --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
 ```

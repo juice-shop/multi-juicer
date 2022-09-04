@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/op/go-logging"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
@@ -37,8 +36,8 @@ type UpdateProgressDeploymentMetadata struct {
 
 // UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
 type UpdateProgressDeploymentDiffAnnotations struct {
-	Challenges       string `json:"multi-juicer.iteratec.dev/challenges"`
-	ChallengesSolved string `json:"multi-juicer.iteratec.dev/challengesSolved"`
+	Challenges       string `json:"wrongsecrets-ctf-party.iteratec.dev/challenges"`
+	ChallengesSolved string `json:"wrongsecrets-ctf-party.iteratec.dev/challengesSolved"`
 }
 
 func PersistProgress(clientset *kubernetes.Clientset, teamname string, solvedChallenges []ChallengeStatus) {

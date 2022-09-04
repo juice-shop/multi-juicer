@@ -9,14 +9,14 @@ Make sure to delete the resources as described in Step 5 Deinstallation when you
 
 ```sh
 # Before we can do anything we need a resource group
-az group create --location westeurope --name multi-juicer
+az group create --location westeurope --name wrongsecrets-ctf-party
 
 # let's create the cluster now
 # I decreased the node count to 2, to dodge the default core limit
-az aks create --resource-group multi-juicer --name juicy-k8s --node-count 2
+az aks create --resource-group wrongsecrets-ctf-party --name juicy-k8s --node-count 2
 
 # now to authenticate fetch the credentials for the new cluster
-az aks get-credentials --resource-group multi-juicer --name juicy-k8s
+az aks get-credentials --resource-group wrongsecrets-ctf-party --name juicy-k8s
 
 # verify by running
 # should print "juicy-k8s"
@@ -26,10 +26,10 @@ kubectl config current-context
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -72,7 +72,7 @@ metadata:
   name: juice-loadbalancer
 spec:
   selector:
-    app.kubernetes.io/name: multi-juicer
+    app.kubernetes.io/name: wrongsecrets-ctf-party
   ports:
   - protocol: TCP
     port: 80

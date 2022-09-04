@@ -20,10 +20,10 @@ kubectl cluster-info
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -70,13 +70,13 @@ wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/k8s/k8s
 kubectl apply -f k8s-juice-service.yaml
 
 # If it takes longer than a few minutes take a detailed look at the loadbalancer
-kubectl describe svc multi-juicer-loadbalancer
+kubectl describe svc wrongsecrets-ctf-party-loadbalancer
 ```
 
 ## Step 5. Deinstallation
 
 ```bash
-helm uninstall multi-juicer
+helm uninstall wrongsecrets-ctf-party
 
 # Delete the loadbalancer
 kubectl delete -f k8s-juice-service.yaml

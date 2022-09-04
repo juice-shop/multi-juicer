@@ -101,8 +101,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               volumeMounts: [
                 {
                   name: 'juice-shop-config',
-                  mountPath: '/juice-shop/config/multi-juicer.yaml',
-                  subPath: 'multi-juicer.yaml',
+                  mountPath: '/juice-shop/config/wrongsecrets-ctf-party.yaml',
+                  subPath: 'wrongsecrets-ctf-party.yaml',
                 },
                 ...get('juiceShop.volumeMounts', []),
               ],

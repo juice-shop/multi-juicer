@@ -17,17 +17,17 @@ This example expects you to have the following prerequisites.
 # You can copy the login command including your token from the web ui
 oc login https://console.openshift.example.com --token=****
 
-# Create a new project to hold the multi-juicer resources
-oc new-project multi-juicer
+# Create a new project to hold the wrongsecrets-ctf-party resources
+oc new-project wrongsecrets-ctf-party
 ```
 
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer ./multi-juicer/helm/multi-juicer/
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party ./wrongsecrets-ctf-party/helm/wrongsecrets-ctf-party/
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -61,13 +61,13 @@ OpenShift lets you create routes to expose your app to the internet.
 # Create the route.
 # Make sure to adjust the hostname to match the one of your org.
 # You can also perform this step easily via the OpenShift web ui.
-oc create route edge juice-balancer --service juice-balancer --hostname multi-juicer.cloudapps.example.com
+oc create route edge juice-balancer --service juice-balancer --hostname wrongsecrets-ctf-party.cloudapps.example.com
 ```
 
 ## Step 4. Deinstallation
 
 ```bash
-helm delete multi-juicer
+helm delete wrongsecrets-ctf-party
 
 # Delete the route
 oc delete route edge juice-balancer

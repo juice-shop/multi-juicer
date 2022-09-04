@@ -15,7 +15,7 @@ This example expects you to have the following cli tools setup.
 # First we'll need a cluster, you can create one using the eksctl cli.
 # This will take a couple of minutes
 eksctl create cluster \
---name multi-juicer \
+--name wrongsecrets-ctf-party \
 --version 1.21 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
@@ -25,17 +25,17 @@ eksctl create cluster \
 --node-ami auto
 
 # After completion verify that your kubectl context has been updated:
-# Should print something like: Administrator@multi-juicer.eu-central-1.eksctl.io
+# Should print something like: Administrator@wrongsecrets-ctf-party.eu-central-1.eksctl.io
 kubectl config current-context
 ```
 
 ## Step 2. Installing MultiJuicer via helm
 
 ```sh
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
@@ -83,7 +83,7 @@ kubectl get services
 # NAME                                TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
 # juice-balancer                      ClusterIP      10.100.29.23     <none>                                                                    3000/TCP       3m14s
 # kubernetes                          ClusterIP      10.100.0.1       <none>                                                                    443/TCP        11h
-# multi-juicer-service-loadbalancer   LoadBalancer   10.100.134.210   YOUR_DNS_RECORD_WILL_BE_HERE.eu-north-1.elb.amazonaws.com                 80:32111/TCP   3m13s
+# wrongsecrets-ctf-party-service-loadbalancer   LoadBalancer   10.100.134.210   YOUR_DNS_RECORD_WILL_BE_HERE.eu-north-1.elb.amazonaws.com                 80:32111/TCP   3m13s
 ```
 
 Use `kubectl get pods`to see the pods you have successfully running, which should be similar to
@@ -110,11 +110,11 @@ kubectl get pods -n kube-system
 ## Step 5. Deinstallation
 
 ```sh
-helm delete multi-juicer
+helm delete wrongsecrets-ctf-party
 
 # Delete the loadbalancer setup
 kubectl delete -f kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
 
 # Delete the kubernetes cluster
-eksctl delete cluster multi-juicer
+eksctl delete cluster wrongsecrets-ctf-party
 ```
