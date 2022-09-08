@@ -10,9 +10,9 @@ version="$(uuidgen)"
 
 docker build -t local/wrongsecrets-balancer:$version ./wrongsecrets-balancer &
 docker build -t local/cleaner:$version ./cleaner &
-#docker build -t local/progress-watchdog:$version ./progress-watchdog &
+#docker build -t local/unusued-progress-watchdog:$version ./unusued-progress-watchdog &
 
 wait
 
-#helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Never" --set="balancer.repository=local/wrongsecrets-balancer" --set="balancer.tag=$version" --set="progressWatchdog.repository=local/progress-watchdog" --set="progressWatchdog.tag=$version" --set="wrongsecretsCleanup.repository=local/cleaner" --set="wrongsecretsCleanup.tag=$version"
+#helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Never" --set="balancer.repository=local/wrongsecrets-balancer" --set="balancer.tag=$version" --set="progressWatchdog.repository=local/unusued-progress-watchdog" --set="progressWatchdog.tag=$version" --set="wrongsecretsCleanup.repository=local/cleaner" --set="wrongsecretsCleanup.tag=$version"
 helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Never" --set="balancer.repository=local/wrongsecrets-balancer" --set="balancer.tag=$version" --set="wrongsecretsCleanup.repository=local/cleaner" --set="wrongsecretsCleanup.tag=$version"

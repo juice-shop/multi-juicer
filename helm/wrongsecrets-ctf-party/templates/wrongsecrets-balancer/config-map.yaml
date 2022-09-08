@@ -10,10 +10,10 @@ data:
       "port": 3000,
       "namespace": {{ .Release.Namespace | quote }},
       "deploymentContext": {{ .Release.Name | quote }},
-      "maxJuiceShopInstances": {{ .Values.juiceShop.maxInstances}},
+      "maxJuiceShopInstances": {{ .Values.wrongsecrets.maxInstances}},
       "skipOwnerReference": {{ .Values.balancer.skipOwnerReference }},
       "cookieParser": {
-        "cookieName": {{ include "multi-juicer.cookieName" . | quote }},
+        "cookieName": {{ include "wrongsecrets-ctf-party.cookieName" . | quote }},
         "secure": {{ .Values.balancer.cookie.secure }}
       },
       "admin": {

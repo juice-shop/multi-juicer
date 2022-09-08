@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         component:
-          - progress-watchdog
+          - unusued-progress-watchdog
           - cleaner
           - wrongsecrets-balancer
     steps:

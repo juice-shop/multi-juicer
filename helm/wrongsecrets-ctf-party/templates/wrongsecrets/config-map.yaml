@@ -5,5 +5,5 @@ metadata:
   labels:
     helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 data:
-  multi-juicer.yaml: |-
+  wrongsecrets-ctf-party.yaml: |-
 {{ .Values.wrongsecrets.config | indent 4 }}

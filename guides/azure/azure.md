@@ -34,7 +34,7 @@ helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-part
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you two pods a wrongsecrets-balancer pod and a progress-watchdog pod
+# This should show you two pods a wrongsecrets-balancer pod and a unusued-progress-watchdog pod
 # Wait until both pods are ready
 ```
 

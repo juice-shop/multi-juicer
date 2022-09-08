@@ -153,7 +153,7 @@ wrongsecrets:
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 #progressWatchdog:
-#  repository: iteratec/progress-watchdog
+#  repository: iteratec/unusued-progress-watchdog
 #  tag: null
 #  resources:
 #    requests:

@@ -8,7 +8,7 @@ COPY main.go main.go
 COPY internal/ internal/
 ENV CGO_ENABLED 0
 RUN go build
-RUN chmod +x progress-watchdog
+RUN chmod +x unusued-progress-watchdog
 
 FROM gcr.io/distroless/static:nonroot
 COPY --from=builder --chown=nonroot:nonroot /src/progress-watchdog /progress-watchdog

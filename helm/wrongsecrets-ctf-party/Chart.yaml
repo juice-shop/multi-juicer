@@ -1,5 +1,5 @@
 apiVersion: v2
-name: multi-juicer
+name: wrongsecrets-ctf-party
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Juice Shop
 icon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only.png
 

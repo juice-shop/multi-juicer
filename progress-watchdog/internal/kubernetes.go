@@ -34,7 +34,7 @@ type UpdateProgressDeploymentMetadata struct {
 	Annotations UpdateProgressDeploymentDiffAnnotations `json:"annotations"`
 }
 
-// UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
+// UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `unusued-progress-watchdog`
 type UpdateProgressDeploymentDiffAnnotations struct {
 	Challenges       string `json:"wrongsecrets-ctf-party.iteratec.dev/challenges"`
 	ChallengesSolved string `json:"wrongsecrets-ctf-party.iteratec.dev/challengesSolved"`
