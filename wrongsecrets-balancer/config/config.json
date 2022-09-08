@@ -1,8 +1,8 @@
 {
   "port": 3000,
   "namespace": "default",
-  "deploymentContext": "multi-juicer",
-  "maxJuiceShopInstances": 10,
+  "deploymentContext": "wrongsecrets-ctf-party",
+  "maxJuiceShopInstances": 100,
   "skipOwnerReference": false,
   "admin": {
     "username": "admin",
@@ -20,12 +20,12 @@
       "password": "ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"
     }
   },
-  "juiceShop": {
+  "wrongsecrets": {
     "image": "jeroenwillemsen/wrongsecrets",
     "tag": "latest-no-vault",
     "imagePullPolicy": "IfNotPresent",
     "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
-    "nodeEnv": "multi-juicer",
+    "nodeEnv": "wrongsecrets-ctf-party",
     "resources:": {
       "requests": {
         "memory": "256Mi",

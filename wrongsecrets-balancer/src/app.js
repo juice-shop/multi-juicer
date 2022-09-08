@@ -13,7 +13,7 @@ const app = express();
 if (get('metrics.enabled')) {
   promClient.collectDefaultMetrics();
 
-  promClient.register.setDefaultLabels({ app: 'multijuicer' });
+  promClient.register.setDefaultLabels({ app: 'wrongsecrets-ctf-party' });
 
   const httpRequestsMetric = new promClient.Counter({
     name: 'http_requests_count',

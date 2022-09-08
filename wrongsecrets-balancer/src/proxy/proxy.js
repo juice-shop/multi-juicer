@@ -111,7 +111,7 @@ function proxyTrafficToJuiceShop(req, res) {
     req,
     res,
     {
-      target: `http://${teamname}-juiceshop.${get('namespace')}.svc:3000`,
+      target: `http://${teamname}-wrongsecrets.${get('namespace')}.svc:8080`,
       ws: true,
     },
     (error) => {

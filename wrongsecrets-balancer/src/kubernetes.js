@@ -27,10 +27,10 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'deployment-context': get('deploymentContext'),
       },
       annotations: {
-        'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
-        'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
-        'multi-juicer.iteratec.dev/passcode': passcodeHash,
-        'multi-juicer.iteratec.dev/challengesSolved': '0',
+        'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
+        'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
+        'wrongsecrets-ctf-party/passcode': passcodeHash,
+        'wrongsecrets-ctf-party/challengesSolved': '0',
         'multi-juicer.iteratec.dev/challenges': '[]',
       },
       ...(await getOwnerReference()),
@@ -53,11 +53,12 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           automountServiceAccountToken: false,
-          securityContext: get('juiceShop.securityContext'),
+          securityContext: get('wrongsecrets.securityContext'),
           containers: [
             {
               name: 'wrongsecrets',
-              image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
+              //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
+              image: 'jeroenwillemsen/wrongsecrets:latest-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               resources: get('wrongsecrets.resources'),
               env: [
@@ -67,24 +68,24 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 {
                   name: 'CTF_KEY',
-                  value: get('juiceShop.ctfKey'),
+                  value: get('wrongsecrets.ctfKey'),
                 },
                 {
                   name: 'SOLUTIONS_WEBHOOK',
                   value: `http://progress-watchdog.${get('namespace')}.svc/team/${team}/webhook`,
                 },
-                ...get('juiceShop.env', []),
+                ...get('wrongsecrets.env', []),
               ],
-              envFrom: get('juiceShop.envFrom'),
+              envFrom: get('wrongsecrets.envFrom'),
               ports: [
                 {
-                  containerPort: 3000,
+                  containerPort: 8080,
                 },
               ],
               readinessProbe: {
                 httpGet: {
-                  path: '/rest/admin/application-version',
-                  port: 3000,
+                  path: '/',
+                  port: 8080,
                 },
                 initialDelaySeconds: 5,
                 periodSeconds: 2,
@@ -92,8 +93,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
               livenessProbe: {
                 httpGet: {
-                  path: '/rest/admin/application-version',
-                  port: 3000,
+                  path: '/',
+                  port: 8080,
                 },
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
@@ -104,7 +105,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
                   subPath: 'wrongsecrets-ctf-party.yaml',
                 },
-                ...get('juiceShop.volumeMounts', []),
+                ...get('wrongsecrets.volumeMounts', []),
               ],
             },
           ],
@@ -115,12 +116,12 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 name: 'wrongsecrets-config',
               },
             },
-            ...get('juiceShop.volumes', []),
+            ...get('wrongsecrets.volumes', []),
           ],
-          tolerations: get('juiceShop.tolerations'),
-          affinity: get('juiceShop.affinity'),
-          runtimeClassName: get('juiceShop.runtimeClassName')
-            ? get('juiceShop.runtimeClassName')
+          tolerations: get('wrongsecrets.tolerations'),
+          affinity: get('wrongsecrets.affinity'),
+          runtimeClassName: get('wrongsecrets.runtimeClassName')
+            ? get('wrongsecrets.runtimeClassName')
             : undefined,
         },
       },
@@ -156,7 +157,7 @@ const createServiceForTeam = async (teamname) =>
         },
         ports: [
           {
-            port: 3000,
+            port: 8080,
           },
         ],
       },
@@ -192,7 +193,7 @@ const getJuiceShopInstances = () =>
       undefined,
       undefined,
       undefined,
-      `app=juice-shop,deployment-context=${get('deploymentContext')}`
+      `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
     )
     .catch((error) => {
       throw new Error(error.response.body.message);
@@ -246,7 +247,7 @@ const getJuiceShopInstanceForTeamname = (teamname) =>
       return {
         readyReplicas: res.body.status.readyReplicas,
         availableReplicas: res.body.status.availableReplicas,
-        passcodeHash: res.body.metadata.annotations['multi-juicer.iteratec.dev/passcode'],
+        passcodeHash: res.body.metadata.annotations['wrongsecrets-ctf-party/passcode'],
       };
     })
     .catch((error) => {
@@ -262,8 +263,8 @@ const updateLastRequestTimestampForTeam = (teamname) => {
     {
       metadata: {
         annotations: {
-          'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
-          'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
+          'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
+          'mwrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
         },
       },
     },
@@ -281,7 +282,7 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
   const deploymentPatch = {
     metadata: {
       annotations: {
-        'multi-juicer.iteratec.dev/passcode': passcodeHash,
+        'wrongsecrets-ctf-party/passcode': passcodeHash,
       },
     },
   };

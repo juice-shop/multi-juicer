@@ -105,7 +105,7 @@ test('joins team when the passcode is correct and the instance exists', async ()
 
 test('create team fails when max instances is reached', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
-    throw new Error(`deployments.apps "t-team42-juiceshop" not found`);
+    throw new Error(`deployments.apps "t-team42-wrongsecrets" not found`);
   });
   getJuiceShopInstances.mockImplementation(async () => {
     return { body: { items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } };
@@ -121,7 +121,7 @@ test('create team fails when max instances is reached', async () => {
 
 test('create team creates a instance for team via k8s service', async () => {
   getJuiceShopInstanceForTeamname.mockImplementation(async () => {
-    throw new Error(`deployments.apps "t-team42-juiceshop" not found`);
+    throw new Error(`deployments.apps "t-team42-wrongsecrets" not found`);
   });
 
   let passcode = null;
@@ -159,7 +159,7 @@ test('reset passcode fails with not found if team does not exist', async () => {
   const team = 't-test-team';
 
   changePasscodeHashForTeam.mockImplementation(() => {
-    throw new Error(`deployments.apps "${team}-juiceshop" not found`);
+    throw new Error(`deployments.apps "${team}-wrongsecrets" not found`);
   });
 
   await request(app)
