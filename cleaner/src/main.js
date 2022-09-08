@@ -36,7 +36,7 @@ async function main() {
   };
 
   console.log(
-    `Looking for Juice Shop Instances which have been inactive for more than ${MaxInactiveDuration}.`
+    `Looking for WrongSecerets Instances which have been inactive for more than ${MaxInactiveDuration}.`
   );
   const instances = await k8sAppsApi.listNamespacedDeployment(
     Namespace,

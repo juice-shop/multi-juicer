@@ -116,7 +116,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(wrongsecrets_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(wrongsecrets_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -221,7 +221,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(wrongsecrets_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(wrongsecrets_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -326,7 +326,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(wrongsecrets_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(wrongsecrets_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -431,7 +431,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(wrongsecrets_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(wrongsecrets_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -536,7 +536,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(wrongsecrets_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(wrongsecrets_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -641,7 +641,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+          "expr": "sum without (category)(wrongsecrets_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(wrongsecrets_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
           "legendFormat": "",
           "refId": "A"
         }
@@ -713,7 +713,7 @@
       "repeatDirection": "h",
       "targets": [
         {
-          "expr": "sum by (category)(juiceshop_challenges_solved{team=\"$team\"}) / sum by (category)(juiceshop_challenges_total{team=\"$team\"}) * 100 != 0",
+          "expr": "sum by (category)(wrongsecrets_challenges_solved{team=\"$team\"}) / sum by (category)(wrongsecrets_challenges_total{team=\"$team\"}) * 100 != 0",
           "interval": "",
           "legendFormat": "{{category}} ",
           "refId": "A"
@@ -784,7 +784,7 @@
       "pluginVersion": "7.3.5",
       "targets": [
         {
-          "expr": "juiceshop_cheat_score{team=\"$team\"}",
+          "expr": "wrongsecrets_cheat_score{team=\"$team\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -847,7 +847,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "juiceshop_user_social_interactions{team=\"$team\"}",
+              "expr": "wrongsecrets_user_social_interactions{team=\"$team\"}",
               "interval": "1m",
               "legendFormat": "{{type}}",
               "refId": "A"
@@ -936,7 +936,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "increase(juiceshop_users_registered{team=\"$team\"}[1m])",
+              "expr": "increase(wrongsecrets_users_registered{team=\"$team\"}[1m])",
               "legendFormat": "{{type}}",
               "refId": "A"
             }
@@ -1048,7 +1048,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "juiceshop_users_registered{type=\"standard\", team=\"$team\"}",
+              "expr": "wrongsecrets_users_registered{type=\"standard\", team=\"$team\"}",
               "refId": "A"
             }
           ],
@@ -1132,7 +1132,7 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "juiceshop_users_registered{type=\"deluxe\", team=\"$team\"}",
+              "expr": "wrongsecrets_users_registered{type=\"deluxe\", team=\"$team\"}",
               "refId": "A"
             }
           ],
@@ -1235,7 +1235,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "increase(http_requests_count{app=\"juiceshop\", team=\"$team\"}[1m])",
+          "expr": "increase(http_requests_count{app=\"wrongsecrets\", team=\"$team\"}[1m])",
           "interval": "1m",
           "legendFormat": "{{status_code}}",
           "refId": "A"
@@ -1921,7 +1921,7 @@
       },
       "targets": [
         {
-          "expr": "{app=\"juice-shop\", team=\"$team\"}",
+          "expr": "{app=\"wrongsecrets\", team=\"$team\"}",
           "refId": "A"
         }
       ],
@@ -1953,7 +1953,7 @@
         "error": null,
         "hide": 2,
         "includeAll": true,
-        "label": "Difficulty Levels supported by JuiceShop",
+        "label": "Difficulty Levels supported by wrongsecrets",
         "multi": true,
         "name": "difficulties",
         "options": [
@@ -2005,7 +2005,7 @@
           "value": "team44"
         },
         "datasource": "Prometheus",
-        "definition": "label_values(juiceshop_challenges_total, team)",
+        "definition": "label_values(wrongsecrets_challenges_total, team)",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -2013,7 +2013,7 @@
         "multi": false,
         "name": "team",
         "options": [],
-        "query": "label_values(juiceshop_challenges_total, team)",
+        "query": "label_values(wrongsecrets_challenges_total, team)",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -2045,7 +2045,7 @@
     ]
   },
   "timezone": "",
-  "title": "MultiJuicer - Instance Dashboard",
+  "title": "WrongSecrets - Instance Dashboard",
   "uid": "Sj-cIdwZk",
   "version": 3
 }

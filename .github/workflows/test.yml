@@ -25,20 +25,20 @@ jobs:
       - uses: actions/checkout@master
       - name: "Install & Build BalancerUI"
         run: |
-          cd juice-balancer/ui
+          cd wrongsecrets-balancer/ui
           npm ci
           npm run build
       - name: Install Balancer
         run: |
-          cd juice-balancer
+          cd wrongsecrets-balancer
           npm ci
       - name: Run Linter
         run: |
-          cd juice-balancer
+          cd wrongsecrets-balancer
           npm run lint
       - name: Test Balancer
         run: |
-          cd juice-balancer
+          cd wrongsecrets-balancer
           npm test -- --ci --color --verbose
   progressWatchdog:
     name: ProgressWatchdog

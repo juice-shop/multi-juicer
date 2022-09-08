@@ -32,7 +32,7 @@ jobs:
         component:
           - progress-watchdog
           - cleaner
-          - juice-balancer
+          - wrongsecrets-balancer
     steps:
       - name: Checkout
         uses: actions/checkout@v2

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wrongsecrets-balancer-config
+  labels:
+    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
+data:
+  config.json: |
+    {
+      "port": 3000,
+      "namespace": {{ .Release.Namespace | quote }},
+      "deploymentContext": {{ .Release.Name | quote }},
+      "maxJuiceShopInstances": {{ .Values.juiceShop.maxInstances}},
+      "skipOwnerReference": {{ .Values.balancer.skipOwnerReference }},
+      "cookieParser": {
+        "cookieName": {{ include "multi-juicer.cookieName" . | quote }},
+        "secure": {{ .Values.balancer.cookie.secure }}
+      },
+      "admin": {
+        "username": "admin"
+      },
+  {{- if .Values.balancer.metrics.enabled }}
+      "metrics": {
+        "enabled": true
+      },
+  {{- end }}
+      "juiceShop": {
+        "image": {{ .Values.juiceShop.image | quote }},
+        "tag": {{ .Values.juiceShop.tag | quote }},
+        "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
+        "ctfKey": {{ .Values.juiceShop.ctfKey | quote }},
+        "nodeEnv": {{ .Values.juiceShop.nodeEnv | quote }},
+        "resources": {{ .Values.juiceShop.resources | toJson }},
+        "securityContext": {{ .Values.juiceShop.securityContext | toJson }},
+        "env": {{ .Values.juiceShop.env | toJson }},
+        "envFrom": {{ .Values.juiceShop.envFrom | toJson }},
+        "volumes": {{ .Values.juiceShop.volumes | toJson }},
+        "volumeMounts": {{ .Values.juiceShop.volumeMounts | toJson }},
+        "affinity": {{ .Values.juiceShop.affinity | toJson }},
+        "tolerations": {{ .Values.juiceShop.tolerations | toJson }},
+        "runtimeClassName": {{ .Values.juiceShop.runtimeClassName | toJson }}
+      }
+    }

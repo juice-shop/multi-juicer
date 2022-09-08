@@ -106,7 +106,7 @@ You can list all JuiceShops with relevant information using the custom-columns f
 You'll need to down load the juiceShop.txt from the repository first:
 
 ```bash
-kubectl get -l app=juice-shop -o custom-columns-file=juiceShop.txt deployments
+kubectl get -l app=wrongsecrets -o custom-columns-file=juiceShop.txt deployments
 ```
 
 ### Did somebody actually ask any of these questions?

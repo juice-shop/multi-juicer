@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wrongsecrets-balancer
+  labels:
+    {{- include "multi-juicer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.balancer.replicas }}
+  selector:
+    matchLabels:
+      {{- include "multi-juicer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/wrongsecrets-balancer/config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/wrongsecrets-balancer/secret.yaml") . | sha256sum }}
+      labels:
+        {{- include "multi-juicer.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: wrongsecrets-balancer
+      {{- with .Values.balancer.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
+          imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+          ports:
+            - name: http
+              containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /balancer/
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /balancer/
+              port: http
+          env:
+            - name: COOKIEPARSER_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: wrongsecrets-balancer-secret
+                  key: cookieParserSecret
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wrongsecrets-balancer-secret
+                  key: adminPassword
+            {{- if .Values.balancer.metrics.enabled }}
+            - name: METRICS_BASICAUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: wrongsecrets-balancer-secret
+                  key: metricsBasicAuthUsername
+            - name: METRICS_BASICAUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wrongsecrets-balancer-secret
+                  key: metricsBasicAuthPassword
+            {{- end }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /home/app/config/
+          resources:
+            {{- toYaml .Values.balancer.resources | nindent 12 }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: wrongsecrets-balancer-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

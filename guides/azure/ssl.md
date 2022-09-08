@@ -190,7 +190,7 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: juice-balancer
+            name: wrongsecrets-balancer
             port:
               number: 3000
 ```

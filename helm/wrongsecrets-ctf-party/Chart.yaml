@@ -3,13 +3,13 @@ name: multi-juicer
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Juice Shop
 icon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only.png
 
-home: https://github.com/iteratec/multi-juicer
+home: https://github.com/
 sources:
-  - https://github.com/iteratec/multi-juicer
+  - https://github.com/commjoen/wrongsecrets-ctf-party
 
 keywords:
   - security
-  - juice-shop
+  - wrongsecrets
   - owasp
   - capture-the-flag
   - ctf-platform

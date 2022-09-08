@@ -4,7 +4,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   name: progress-watchdog
   labels:
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']

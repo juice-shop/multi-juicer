@@ -157,7 +157,7 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 		// Get Instances
 		log.Info("Looking for Instances")
 		opts := metav1.ListOptions{
-			LabelSelector: "app=juice-shop",
+			LabelSelector: "app=wrongsecrets",
 		}
 
 		namespace := os.Getenv("NAMESPACE")

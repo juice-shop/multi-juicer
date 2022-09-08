@@ -36,7 +36,7 @@ balancer:
     cookieParserSecret: null
   repository: commjoen/wrongsecrets-ctf-party
   tag: null
-  # -- Number of replicas of the juice-balancer deployment
+  # -- Number of replicas of the wrongsecrets-balancer deployment
   replicas: 1
   service:
     # -- Kubernetes service type
@@ -77,20 +77,25 @@ balancer:
       # -- Should be changed when metrics are enabled.
       password: ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy
 
-juiceShop:
+##TODO:
+#1. UPDATE WRONGSECRETS TO DEFINITION WHERE K8S IS USED FOR AWS!
+#2. UPDATE VIRTUALDESKTOP TO DEFINITION WHERE IT CN BE USED
+#3. ADD VAULT INSTANCE PER TEAM!
+
+wrongsecrets:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
-  maxInstances: 10
+  maxInstances: 100
   # -- Juice Shop Image to use
   image: jeroenwillemsens/wrongsecrets-ctf
-  tag: 1.5.3RC1-no-vault
-  # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey
+  tag: 1.5.3-no-vault
+  # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/commjoen/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
   # @default -- See values.yaml for full details
   config: |
     application:
       logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
-      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
       showVersionNumber: false
       showGitHubLinks: false
     challenges:
@@ -124,7 +129,7 @@ juiceShop:
   # -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
   # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
-  # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
+  # then switch out the logo parameter in the wrongsecrets config section above to the mounted filename.
   # volumes:
   # - name: logo
   #   configMap:
@@ -133,7 +138,7 @@ juiceShop:
   volumeMounts: []
   # volumeMounts:
   # - name: logo
-  #   mountPath: /juice-shop/frontend/dist/frontend/assets/public/images/custom.png
+  #   mountPath: /wrongsecrets/frontend/dist/frontend/assets/public/images/custom.png
   #   subPath: custom.png
   #   readOnly: true
 
@@ -146,24 +151,39 @@ juiceShop:
   runtimeClassName: null
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
-progressWatchdog:
-  repository: iteratec/progress-watchdog
+#progressWatchdog:
+#  repository: iteratec/progress-watchdog
+#  tag: null
+#  resources:
+#    requests:
+#      memory: 48Mi
+#      cpu: 20m
+#    limits:
+#      memory: 48Mi
+#      cpu: 20m
+#  securityContext: {}
+#  # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+#  affinity: {}
+#  # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+#  tolerations: []
+
+#the virtual desktop for the deploymebt
+virtualDesktop:
+  repository : commjoenie/wrongSecrets
   tag: null
   resources:
-    requests:
-      memory: 48Mi
-      cpu: 20m
+    request:
+      memory: 1GB
+      cpu: 50m
     limits:
-      memory: 48Mi
-      cpu: 20m
+      memory: 2GB
+      cpu: 50m
   securityContext: {}
-  # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
-  # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
-juiceShopCleanup:
+wrongsecretsCleanup:
   repository: iteratec/cleaner
   tag: null
   enabled: true
@@ -179,7 +199,7 @@ juiceShopCleanup:
     limits:
       memory: 256Mi
   securityContext: {}
-  # -- Optional Configure kubernetes scheduling affinity for the JuiceShopCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # -- Optional Configure kubernetes scheduling affinity for the wrongsecretsCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
-  # -- Optional Configure kubernetes toleration for the JuiceShopCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # -- Optional Configure kubernetes toleration for the wrongsecretsCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []

@@ -4,7 +4,7 @@ metadata:
   name: 'progress-watchdog'
   labels:
     app: 'progress-watchdog'
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
 spec:
   selector:
     matchLabels:

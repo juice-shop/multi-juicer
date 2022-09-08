@@ -1,4 +1,4 @@
-{{- if .Values.juiceShopCleanup.enabled -}}
+{{- if .Values.wrongsecretsCleanup.enabled -}}
 {{- if semverCompare ">=1.21-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: batch/v1
 {{- else -}}
@@ -8,41 +8,41 @@ kind: CronJob
 metadata:
   name: 'cleanup-job'
 spec:
-  schedule: {{ .Values.juiceShopCleanup.cron }}
-  successfulJobsHistoryLimit: {{ .Values.juiceShopCleanup.successfulJobsHistoryLimit }}
-  failedJobsHistoryLimit: {{ .Values.juiceShopCleanup.failedJobsHistoryLimit }}
+  schedule: {{ .Values.wrongsecretsCleanup.cron }}
+  successfulJobsHistoryLimit: {{ .Values.wrongsecretsCleanup.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.wrongsecretsCleanup.failedJobsHistoryLimit }}
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
             name: 'cleanup-job'
-            helm.sh/chart: {{ include "multi-juicer.chart" . }}
+            helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
         spec:
-          serviceAccountName: 'juice-cleaner'
-          {{- with .Values.juiceShopCleanup.securityContext }}
+          serviceAccountName: 'wrongsecrets-cleaner'
+          {{- with .Values.wrongsecretsCleanup.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
-            - image: '{{ .Values.juiceShopCleanup.repository }}:{{ .Values.juiceShopCleanup.tag | default (printf "v%s" .Chart.Version) }}'
+            - image: '{{ .Values.wrongsecretsCleanup.repository }}:{{ .Values.wrongsecretsCleanup.tag | default (printf "v%s" .Chart.Version) }}'
               imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
               name: 'cleanup-job'
               env:
                 - name: NAMESPACE
                   value: {{ .Release.Namespace | quote }}
                 - name: MAX_INACTIVE_DURATION
-                  value: {{ .Values.juiceShopCleanup.gracePeriod }}
+                  value: {{ .Values.wrongsecretsCleanup.gracePeriod }}
           restartPolicy: Never
           {{- with .Values.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.juiceShopCleanup.affinity }}
+          {{- with .Values.wrongsecretsCleanup.affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.juiceShopCleanup.tolerations }}
+          {{- with .Values.wrongsecretsCleanup.tolerations }}
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: multijuicer-instance
+  name: wrongsecrets-ctf-party-instance
   labels:
      grafana_dashboard: "1"
 data:

@@ -29,7 +29,7 @@ helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-part
 # to verify every thing is starting up, run:
 kubectl get pods
 
-# This should show you two pods a juice-balancer pod and a progress-watchdog pod
+# This should show you two pods a wrongsecrets-balancer pod and a progress-watchdog pod
 # Wait until both pods are ready
 ```
 
@@ -40,7 +40,7 @@ This step is optional, but helpful to catch errors quicker.
 ```bash
 # lets test out if the app is working correctly before proceeding
 # for that we can port forward the JuiceBalancer service to your local machine
-kubectl port-forward service/juice-balancer 3000:3000
+kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 # Open up your browser for localhost:3000
 # You should be able to see the MultiJuicer Balancer UI
@@ -53,7 +53,7 @@ kubectl port-forward service/juice-balancer 3000:3000
 # Go back to localhost:3000/balancer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. Make a service to expose multi-juicer outside of the cluster
