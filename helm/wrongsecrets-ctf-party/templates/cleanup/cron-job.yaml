@@ -17,7 +17,7 @@ spec:
         metadata:
           labels:
             name: 'cleanup-job'
-            helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
+            helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
         spec:
           serviceAccountName: 'wrongsecrets-cleaner'
           {{- with .Values.wrongsecretsCleanup.securityContext }}

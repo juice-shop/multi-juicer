@@ -4,7 +4,7 @@ metadata:
   name: progress-watchdog
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 subjects:
   - kind: ServiceAccount
     name: progress-watchdog # Name is case sensitive

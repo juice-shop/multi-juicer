@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: wrongsecrets-balancer-config
   labels:
-    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 data:
   config.json: |
     {
@@ -25,19 +25,19 @@ data:
       },
   {{- end }}
       "juiceShop": {
-        "image": {{ .Values.juiceShop.image | quote }},
-        "tag": {{ .Values.juiceShop.tag | quote }},
+        "image": {{ .Values.wrongsecrets.image | quote }},
+        "tag": {{ .Values.wrongsecrets.tag | quote }},
         "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
-        "ctfKey": {{ .Values.juiceShop.ctfKey | quote }},
-        "nodeEnv": {{ .Values.juiceShop.nodeEnv | quote }},
-        "resources": {{ .Values.juiceShop.resources | toJson }},
-        "securityContext": {{ .Values.juiceShop.securityContext | toJson }},
-        "env": {{ .Values.juiceShop.env | toJson }},
-        "envFrom": {{ .Values.juiceShop.envFrom | toJson }},
-        "volumes": {{ .Values.juiceShop.volumes | toJson }},
-        "volumeMounts": {{ .Values.juiceShop.volumeMounts | toJson }},
-        "affinity": {{ .Values.juiceShop.affinity | toJson }},
-        "tolerations": {{ .Values.juiceShop.tolerations | toJson }},
-        "runtimeClassName": {{ .Values.juiceShop.runtimeClassName | toJson }}
+        "ctfKey": {{ .Values.wrongsecrets.ctfKey | quote }},
+        "nodeEnv": {{ .Values.wrongsecrets.nodeEnv | quote }},
+        "resources": {{ .Values.wrongsecrets.resources | toJson }},
+        "securityContext": {{ .Values.wrongsecrets.securityContext | toJson }},
+        "env": {{ .Values.wrongsecrets.env | toJson }},
+        "envFrom": {{ .Values.wrongsecrets.envFrom | toJson }},
+        "volumes": {{ .Values.wrongsecrets.volumes | toJson }},
+        "volumeMounts": {{ .Values.wrongsecrets.volumeMounts | toJson }},
+        "affinity": {{ .Values.wrongsecrets.affinity | toJson }},
+        "tolerations": {{ .Values.wrongsecrets.tolerations | toJson }},
+        "runtimeClassName": {{ .Values.wrongsecrets.runtimeClassName | toJson }}
       }
     }

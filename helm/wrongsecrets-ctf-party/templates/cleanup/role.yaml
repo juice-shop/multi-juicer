@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   name: wrongsecrets-cleaner
   labels:
-    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']

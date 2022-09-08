@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "multi-juicer.labels" . | nindent 6 }}
+      {{- include "wrongsecrets-ctf-party.labels" . | nindent 6 }}
   endpoints:
     - port: web
       path: '/balancer/metrics'

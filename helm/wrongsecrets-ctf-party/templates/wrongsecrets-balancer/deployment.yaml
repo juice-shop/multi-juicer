@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: wrongsecrets-balancer
   labels:
-    {{- include "multi-juicer.labels" . | nindent 4 }}
+    {{- include "wrongsecrets-ctf-party.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.balancer.replicas }}
   selector:
     matchLabels:
-      {{- include "multi-juicer.selectorLabels" . | nindent 6 }}
+      {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/wrongsecrets-balancer/config-map.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/wrongsecrets-balancer/secret.yaml") . | sha256sum }}
       labels:
-        {{- include "multi-juicer.selectorLabels" . | nindent 8 }}
+        {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: wrongsecrets-balancer
       {{- with .Values.balancer.securityContext }}

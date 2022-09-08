@@ -86,31 +86,32 @@ wrongsecrets:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 100
   # -- Juice Shop Image to use
-  image: jeroenwillemsens/wrongsecrets-ctf
+  image: jeroenwillemsens/wrongsecrets
   tag: 1.5.3-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/commjoen/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
   # @default -- See values.yaml for full details
   config: |
-    application:
-      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
-      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
-      showVersionNumber: false
-      showGitHubLinks: false
-    challenges:
-      showHints: true
-    hackingInstructor:
-      isEnabled: true
-    ctf:
-      showFlagsInNotifications: false
+    K8S_ENV: aws
+#    application:
+#      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
+#      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
+#      showVersionNumber: false
+#      showGitHubLinks: false
+#    challenges:
+#      showHints: true
+#    hackingInstructor:
+#      isEnabled: true
+#    ctf:
+#      showFlagsInNotifications: false
   # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'wrongsecrets-ctf-party' it's not possible to set a custom config via `juiceShop.config`.
   nodeEnv: "wrongsecrets-ctf-party"
   # -- Optional resources definitions to set for each JuiceShop instance
   resources:
     requests:
-      cpu: 150m
-      memory: 200Mi
+      cpu: 256Mi
+      memory: 300Mi
   #  limits:
   #    cpu: 100m
   #    memory: 200Mi
@@ -168,7 +169,12 @@ wrongsecrets:
 #  tolerations: []
 
 #the virtual desktop for the deploymebt
-virtualDesktop:
+virtualdesktop:
+  # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
+  maxInstances: 100
+  # -- Juice Shop Image to use
+  image: jeroenwillemsen/wrongsecrets-desktop
+  tag: latest
   repository : commjoenie/wrongSecrets
   tag: null
   resources:

@@ -4,7 +4,7 @@ metadata:
   name: wrongsecrets-balancer
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    helm.sh/chart: {{ include "wrongsecrets-ctf.chart" . }}
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 subjects:
   - kind: ServiceAccount
     name: wrongsecrets-balancer # Name is case sensitive
