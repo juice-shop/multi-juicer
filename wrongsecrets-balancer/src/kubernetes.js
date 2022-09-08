@@ -13,12 +13,15 @@ const once = require('lodash/once');
 // Gets the Deployment uid for the JuiceBalancer
 // This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
 const getJuiceBalancerDeploymentUid = once(async () => {
-  const deployment = await k8sAppsApi.readNamespacedDeployment('wrongsecrets-balancer', get('namespace'));
+  const deployment = await k8sAppsApi.readNamespacedDeployment(
+    'wrongsecrets-balancer',
+    get('namespace')
+  );
   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
 });
 
 const createDeploymentForTeam = async ({ team, passcodeHash }) => {
-  const deploymentConfig = {
+  const deploymentWrongSecretsConfig = {
     metadata: {
       name: `t-${team}-wrongsecrets`,
       labels: {
@@ -129,13 +132,103 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   };
 
   return k8sAppsApi
-    .createNamespacedDeployment(get('namespace'), deploymentConfig)
+    .createNamespacedDeployment(get('namespace'), deploymentWrongSecretsConfig)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
 };
 
 module.exports.createDeploymentForTeam = createDeploymentForTeam;
+
+const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
+  const deploymentWrongSecretsDesktopConfig = {
+    metadata: {
+      name: `t-${team}-virtualdesktop`,
+      labels: {
+        app: 'virtualdesktop',
+        team,
+        'deployment-context': get('deploymentContext'),
+      },
+      annotations: {
+        'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
+        'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
+        'wrongsecrets-ctf-party/passcode': passcodeHash,
+        'wrongsecrets-ctf-party/challengesSolved': '0',
+      },
+      ...(await getOwnerReference()),
+    },
+    spec: {
+      selector: {
+        matchLabels: {
+          app: 'virtualdesktop',
+          team,
+          'deployment-context': get('deploymentContext'),
+        },
+      },
+      template: {
+        metadata: {
+          labels: {
+            app: 'virtualdesktop',
+            team,
+            'deployment-context': get('deploymentContext'),
+          },
+        },
+        spec: {
+          automountServiceAccountToken: false,
+          securityContext: get('virtualdesktop.securityContext'),
+          containers: [
+            {
+              name: 'virtualdesktop',
+              //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
+              image: 'jeroenwillemsen/wrongsecrets-desktop:latest',
+              imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
+              resources: get('virtualdesktop.resources'),
+              env: [...get('virtualdesktop.env', [])],
+              envFrom: get('virtualdesktop.envFrom'),
+              ports: [
+                {
+                  containerPort: 3000,
+                },
+              ],
+              readinessProbe: {
+                httpGet: {
+                  path: '/',
+                  port: 3000,
+                },
+                initialDelaySeconds: 5,
+                periodSeconds: 2,
+                failureThreshold: 10,
+              },
+              livenessProbe: {
+                httpGet: {
+                  path: '/',
+                  port: 3000,
+                },
+                initialDelaySeconds: 30,
+                periodSeconds: 15,
+              },
+              volumeMounts: [],
+            },
+          ],
+          volumes: [],
+          tolerations: get('virtualdesktop.tolerations'),
+          affinity: get('virtualdesktop.affinity'),
+          runtimeClassName: get('virtualdesktop.runtimeClassName')
+            ? get('virtualdesktop.runtimeClassName')
+            : undefined,
+        },
+      },
+    },
+  };
+
+  return k8sAppsApi
+    .createNamespacedDeployment(get('namespace'), deploymentWrongSecretsDesktopConfig)
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+};
+
+module.exports.createDesktopDeploymentForTeam = createDesktopDeploymentForTeam;
 
 const createServiceForTeam = async (teamname) =>
   k8sCoreApi
@@ -166,6 +259,37 @@ const createServiceForTeam = async (teamname) =>
       throw new Error(error.response.body.message);
     });
 module.exports.createServiceForTeam = createServiceForTeam;
+
+const createDesktopServiceForTeam = async (teamname) =>
+  k8sCoreApi
+    .createNamespacedService(get('namespace'), {
+      metadata: {
+        name: `t-${teamname}-virtualdesktop`,
+        labels: {
+          app: 'virtualdesktop',
+          team: teamname,
+          'deployment-context': get('deploymentContext'),
+        },
+        ...(await getOwnerReference()),
+      },
+      spec: {
+        selector: {
+          app: 'virtualdesktop',
+          team: teamname,
+          'deployment-context': get('deploymentContext'),
+        },
+        ports: [
+          {
+            port: 3001,
+            targetPort: 3000,
+          },
+        ],
+      },
+    })
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+module.exports.createDesktopServiceForTeam = createDesktopServiceForTeam;
 
 async function getOwnerReference() {
   if (get('skipOwnerReference') === true) {
@@ -206,12 +330,22 @@ const deleteDeploymentForTeam = async (team) => {
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
+  await k8sAppsApi
+    .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, get('namespace'))
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
 };
 module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
 
 const deleteServiceForTeam = async (team) => {
   await k8sCoreApi
     .deleteNamespacedService(`t-${team}-wrongsecrets`, get('namespace'))
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+  await k8sCoreApi
+    .deleteNamespacedService(`t-${team}-virtualdesktop`, get('namespace'))
     .catch((error) => {
       throw new Error(error.response.body.message);
     });

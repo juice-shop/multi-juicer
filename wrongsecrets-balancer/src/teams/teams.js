@@ -15,7 +15,7 @@ const {
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
-  changePasscodeHashForTeam,
+  changePasscodeHashForTeam, createDesktopDeploymentForTeam, createDesktopServiceForTeam,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -80,12 +80,12 @@ async function joinIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
-  logger.debug(`Checking if team ${team} already has a JuiceShop Deployment`);
+  logger.debug(`Checking if team ${team} already has a WrongSecrets Deployment`);
 
   try {
     const { passcodeHash } = await getJuiceShopInstanceForTeamname(team);
 
-    logger.debug(`Team ${team} already has a JuiceShop deployment`);
+    logger.debug(`Team ${team} already has a WrongSecrets deployment`);
 
     if (passcode !== undefined && (await bcrypt.compare(passcode, passcodeHash))) {
       // Set cookie, (join team)
@@ -107,10 +107,10 @@ async function joinIfTeamAlreadyExists(req, res, next) {
     });
   } catch (error) {
     if (error.message === `deployments.apps "t-${team}-wrongsecrets" not found`) {
-      logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
+      logger.info(`Team ${team} doesn't have a WrongSecrets deployment yet`);
       return next();
     } else {
-      logger.error('Encountered unknown error while checking for existing JuiceShop deployment');
+      logger.error('Encountered unknown error while checking for existing WrongSecrets deployment');
       logger.error(error.message);
       return res
         .status(500)
@@ -169,12 +169,16 @@ async function createTeam(req, res) {
   try {
     const { passcode, hash } = await generatePasscode();
 
-    logger.info(`Creating JuiceShop Deployment for team '${team}'`);
+    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
 
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 
-    logger.info(`Created JuiceShop Deployment for team '${team}'`);
+    logger.info(`Created Wrongsecrets Deployment for team '${team}'`);
+    await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
+    await createDesktopServiceForTeam(team);
+
+    logger.info(`Created virtualdektop Desktop Deployment for team '${team}'`);
 
     loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
@@ -221,8 +225,8 @@ async function resetPasscode(req, res) {
       passcode,
     });
   } catch (error) {
-    if (error.message === `deployments.apps "t-${team}-juiceshop" not found`) {
-      logger.info(`Team ${team} doesn't have a JuiceShop deployment yet`);
+    if (error.message === `deployments.apps "t-${team}-wrongsecrets" not found`) {
+      logger.info(`Team ${team} doesn't have a wrongsecrets deployment yet`);
       return res.status(404).send({ message: 'No instance to reset the passcode for.' });
     }
     logger.error('Encountered unknown error while resetting passcode hash for deployment');
@@ -238,14 +242,14 @@ async function resetPasscode(req, res) {
 async function awaitReadiness(req, res) {
   const { team } = req.params;
 
-  logger.info(`Awaiting readiness of JuiceShop Deployment for team '${team}'`);
+  logger.info(`Awaiting readiness of wrongsecrets Deployment for team '${team}'`);
 
   try {
     for (let i = 0; i < 180; i++) {
       const { readyReplicas } = await getJuiceShopInstanceForTeamname(team);
 
       if (readyReplicas === 1) {
-        logger.info(`JuiceShop Deployment for team '${team}' ready`);
+        logger.info(`wrongsecrets Deployment for team '${team}' ready`);
 
         return res.status(200).send();
       }

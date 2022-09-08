@@ -176,7 +176,6 @@ virtualdesktop:
   image: jeroenwillemsen/wrongsecrets-desktop
   tag: latest
   repository : commjoenie/wrongSecrets
-  tag: null
   resources:
     request:
       memory: 1GB
@@ -185,7 +184,10 @@ virtualdesktop:
       memory: 2GB
       cpu: 50m
   securityContext: {}
+  runtimeClassName: {}
   affinity: {}
+  # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+  envFrom: [ ]
   tolerations: []
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity

@@ -106,24 +106,29 @@ async function updateLastConnectTimestamp(req, res, next) {
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
   logger.debug(`Proxing request ${req.method.toLocaleUpperCase()} ${req.path}`);
-
-  proxy.web(
-    req,
-    res,
-    {
+  let target;
+  if (req.path.includes('desktop')) {
+    logger.info('we have a desktop entry for team ' + teamname);
+    target = {
+      target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:3001`,
+      ws: true,
+    };
+  } else {
+    target = {
       target: `http://${teamname}-wrongsecrets.${get('namespace')}.svc:8080`,
       ws: true,
-    },
-    (error) => {
-      logger.warn(`Proxy fail '${error.code}' for: ${req.method.toLocaleUpperCase()} ${req.path}`);
+    };
+  }
+  logger.info(target.target);
+  proxy.web(req, res, target, (error) => {
+    logger.warn(`Proxy fail '${error.code}' for: ${req.method.toLocaleUpperCase()} ${req.path}`);
 
-      if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
-        logger.error(error.message);
-      } else {
-        logger.debug(error.message);
-      }
+    if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
+      logger.error(error.message);
+    } else {
+      logger.debug(error.message);
     }
-  );
+  });
 }
 
 router.use(
