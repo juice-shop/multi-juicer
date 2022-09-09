@@ -10,7 +10,6 @@ const {
 } = require('../kubernetes');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// let server = require('http').createServer(require('../app'));
 //
 // server.on('upgrade', function (req, socket, head) {
 //   logger.info('proxying upgrade request for: ' + req.url);
@@ -122,11 +121,8 @@ async function updateLastConnectTimestamp(req, res, next) {
  */
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
-  logger.debug(`Proxying request ${req.method.toLocaleUpperCase()} ${req.path}`);
   const currentReferrerForDesktop = 'http://' + req.host + ':' + 3000 + '/?desktop';
-  logger.info(req.path);
-  logger.info(JSON.stringify(req.headers));
-  logger.info(currentReferrerForDesktop);
+  logger.debug(`Proxying request ${req.method.toLocaleUpperCase()} ${req.path} with matcher for referer: ${currentReferrerForDesktop}`);
   let target;
   if (
     (req.query != null && req.query.desktop != null) ||
@@ -138,7 +134,8 @@ function proxyTrafficToJuiceShop(req, res) {
     req.path === '/css/filebrowser.css' ||
     req.path === '/files/socket.io/socket.io.js' ||
     req.path === '/js/vendor/jquery.min.js' ||
-    req.path === '/files/socket.io/'
+    req.path === '/files/socket.io/' ||
+    req.path === '/files/socket.io/socket.io.js.map'
   ) {
     // req.path === '/css/keyboard.svg' ||
     //   req.path === '/css/vdi.css' ||
@@ -169,18 +166,19 @@ function proxyTrafficToJuiceShop(req, res) {
   logger.info(target.target);
 
   if (req.path === '/guaclite') {
+    server = res.connection.server;
     logger.info('putting ws through for /quaclite');
     server.on('upgrade', function (req, socket, head) {
       logger.info('proxying upgrade request for: ' + req.url);
       proxy.ws(req, socket, head, {
-        target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+        target: `ws://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
         ws: true,
       });
     });
     server.on('connect', function (req, socket, head) {
       logger.info('proxying connect request for: ' + req.url);
       proxy.ws(req, socket, head, {
-        target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+        target: `ws://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
         ws: true,
       });
     });
@@ -214,7 +212,8 @@ const magic = createProxyMiddleware({
       req.path === '/css/filebrowser.css' ||
       req.path === '/files/socket.io/socket.io.js' ||
       req.path === '/js/vendor/jquery.min.js' ||
-      req.path === '/files/socket.io/'
+      req.path === '/files/socket.io/' ||
+      req.path === '/files/socket.io/socket.io.js.map'
     ) {
       return `http://${teamname}-virtualdesktop.default.svc:8080`;
     }
@@ -228,7 +227,7 @@ router.use(
   redirectAdminTrafficToBalancerPage,
   checkIfInstanceIsUp,
   updateLastConnectTimestamp,
-  magic
+  proxyTrafficToJuiceShop
 );
 
 module.exports = router;
