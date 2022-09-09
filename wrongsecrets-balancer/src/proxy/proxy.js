@@ -1,6 +1,5 @@
 const express = require('express');
 const httpProxy = require('http-proxy');
-
 const proxy = httpProxy.createProxyServer();
 
 const { get } = require('../config');
@@ -9,7 +8,23 @@ const {
   getJuiceShopInstanceForTeamname,
   updateLastRequestTimestampForTeam,
 } = require('../kubernetes');
-const app = require("../app");
+
+// let server = require('http').createServer(require('../app'));
+//
+// server.on('upgrade', function (req, socket, head) {
+//   logger.info('proxying upgrade request for: ' + req.url);
+//   proxy.ws(req, socket, head, {
+//     target: `http://${req.teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+//     ws: true,
+//   });
+// });
+// server.on('connect', function (req, socket, head) {
+//   logger.info('proxying connect request for: ' + req.url);
+//   proxy.ws(req, socket, head, {
+//     target: `http://${req.teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+//     ws: true,
+//   });
+// });
 
 const router = express.Router();
 
@@ -106,26 +121,39 @@ async function updateLastConnectTimestamp(req, res, next) {
  */
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
-  logger.debug(`Proxing request ${req.method.toLocaleUpperCase()} ${req.path}`);
+  logger.debug(`Proxying request ${req.method.toLocaleUpperCase()} ${req.path}`);
+  const currentReferrerForDesktop = 'http://' + req.host + ':' + 3000 + '/?desktop';
+  logger.info(req.path);
+  logger.info(JSON.stringify(req.headers));
+  logger.info(currentReferrerForDesktop);
   let target;
   if (
     (req.query != null && req.query.desktop != null) ||
-    req.path === '/css/keyboard.svg' ||
-      req.path === '/css/vdi.css' ||
-      req.path === '/css/fit.svg' ||
-      req.path === '/css/fullscreen.svg' ||
-      // req.path === '/favicon.ico' ||
-      req.path === '/css/files.svg' ||
-      req.path === '/js/vendor/guac.min.js' ||
-      req.path === '/js/rdp.js' ||
-      req.path === '/files' ||
+    (req.headers['referer'] !== undefined &&
+      req.headers['referer'] === currentReferrerForDesktop) ||
+    (req.headers['Referer'] !== undefined &&
+      req.headers['Referer'] === currentReferrerForDesktop) ||
       req.path === '/js/filebrowser.js' ||
       req.path === '/css/filebrowser.css' ||
       req.path === '/files/socket.io/socket.io.js' ||
-      req.path === '/files/socket.io/' ||
-      req.path === '/files/socket.io/socket.io.js.map' ||
-      req.path === '/js/vendor/jquery.min.js'
+      req.path === '/js/vendor/jquery.min.js' ||
+      req.path === '/files/socket.io/'
   ) {
+    // req.path === '/css/keyboard.svg' ||
+    //   req.path === '/css/vdi.css' ||
+    //   req.path === '/css/fit.svg' ||
+    //   req.path === '/css/fullscreen.svg' ||
+    //   // req.path === '/favicon.ico' ||
+    //   req.path === '/css/files.svg' ||
+    //   req.path === '/js/vendor/guac.min.js' ||
+    //   req.path === '/js/rdp.js' ||
+    //   req.path === '/files' ||
+    //   req.path === '/js/filebrowser.js' ||
+    //   req.path === '/css/filebrowser.css' ||
+    //   req.path === '/files/socket.io/socket.io.js' ||
+    //   req.path === '/files/socket.io/' ||
+    //   req.path === '/files/socket.io/socket.io.js.map' ||
+    //
     logger.info('we have a desktop entry for team ' + teamname);
     target = {
       target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
@@ -138,12 +166,18 @@ function proxyTrafficToJuiceShop(req, res) {
     };
   }
   logger.info(target.target);
-  logger.info(req.path);
 
   if (req.path === '/guaclite') {
     logger.info('putting ws through for /quaclite');
-    app.server.on('upgrade', function (req, socket, head) {
+    server.on('upgrade', function (req, socket, head) {
       logger.info('proxying upgrade request for: ' + req.url);
+      proxy.ws(req, socket, head, {
+        target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+        ws: true,
+      });
+    });
+    server.on('connect', function (req, socket, head) {
+      logger.info('proxying connect request for: ' + req.url);
       proxy.ws(req, socket, head, {
         target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
         ws: true,

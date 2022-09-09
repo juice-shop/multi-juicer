@@ -3,19 +3,19 @@
 # Declare variables to be passed into your templates.
 
 imagePullPolicy: Always
-nodeSelector: {}
+nodeSelector: { }
 
 ingress:
   enabled: false
   annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+    { }
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: wrongsecrets-ctf-party.local
       paths:
         - "/"
-  tls: []
+  tls: [ ]
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -56,11 +56,11 @@ balancer:
     limits:
       memory: 256Mi
       cpu: 400m
-  securityContext: {}
+  securityContext: { }
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
+  affinity: { }
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
+  tolerations: [ ]
   # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
   skipOwnerReference: false
   metrics:
@@ -94,17 +94,17 @@ wrongsecrets:
   # @default -- See values.yaml for full details
   config: |
     K8S_ENV: aws
-#    application:
-#      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
-#      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
-#      showVersionNumber: false
-#      showGitHubLinks: false
-#    challenges:
-#      showHints: true
-#    hackingInstructor:
-#      isEnabled: true
-#    ctf:
-#      showFlagsInNotifications: false
+  #    application:
+  #      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
+  #      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
+  #      showVersionNumber: false
+  #      showGitHubLinks: false
+  #    challenges:
+  #      showHints: true
+  #    hackingInstructor:
+  #      isEnabled: true
+  #    ctf:
+  #      showFlagsInNotifications: false
   # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'wrongsecrets-ctf-party' it's not possible to set a custom config via `juiceShop.config`.
   nodeEnv: "wrongsecrets-ctf-party"
   # -- Optional resources definitions to set for each JuiceShop instance
@@ -116,9 +116,21 @@ wrongsecrets:
   #    cpu: 100m
   #    memory: 200Mi
   # -- Optional securityContext definitions to set for each JuiceShop instance
-  securityContext: {}
+  securityContext: { }
   # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
-  env: []
+  env:
+    - name: K8S_ENV
+      value: k8s
+    - name: SPECIAL_K8S_SECRET
+      valueFrom:
+        configMapKeyRef:
+          name: secrets-file
+          key: funny.entry
+    - name: SPECIAL_SPECIAL_K8S_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: funnystuff
+          key: funnier
   # env:
   #   - name: FOO
   #     valueFrom:
@@ -126,9 +138,9 @@ wrongsecrets:
   #         key: FOO
   #         name: secret-resource
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
-  envFrom: []
+  envFrom: [ ]
   # -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumes: []
+  volumes: [ ]
   # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
   # then switch out the logo parameter in the wrongsecrets config section above to the mounted filename.
   # volumes:
@@ -136,7 +148,7 @@ wrongsecrets:
   #   configMap:
   #     name: custom-logo
   # -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumeMounts: []
+  volumeMounts: [ ]
   # volumeMounts:
   # - name: logo
   #   mountPath: /wrongsecrets/frontend/dist/frontend/assets/public/images/custom.png
@@ -144,9 +156,9 @@ wrongsecrets:
   #   readOnly: true
 
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
+  affinity: { }
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
+  tolerations: [ ]
 
   # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
   runtimeClassName: null
@@ -175,7 +187,7 @@ virtualdesktop:
   # -- Juice Shop Image to use
   image: jeroenwillemsen/wrongsecrets-desktop
   tag: latest
-  repository : commjoenie/wrongSecrets
+  repository: commjoenie/wrongSecrets
   resources:
     request:
       memory: 1GB
@@ -183,12 +195,12 @@ virtualdesktop:
     limits:
       memory: 2GB
       cpu: 50m
-  securityContext: {}
-  runtimeClassName: {}
-  affinity: {}
+  securityContext: { }
+  runtimeClassName: { }
+  affinity: { }
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
   envFrom: [ ]
-  tolerations: []
+  tolerations: [ ]
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 wrongsecretsCleanup:
@@ -206,8 +218,8 @@ wrongsecretsCleanup:
       memory: 256Mi
     limits:
       memory: 256Mi
-  securityContext: {}
+  securityContext: { }
   # -- Optional Configure kubernetes scheduling affinity for the wrongsecretsCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
+  affinity: { }
   # -- Optional Configure kubernetes toleration for the wrongsecretsCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
+  tolerations: [ ]
