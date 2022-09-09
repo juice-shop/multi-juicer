@@ -21,6 +21,7 @@
     "express": "^4.17.3",
     "express-joi-validation": "^5.0.1",
     "http-proxy": "^1.18.1",
+    "http-proxy-middleware": "^2.0.6",
     "lodash": "^4.17.21",
     "on-finished": "^2.3.0",
     "prom-client": "^14.0.1",
