@@ -280,7 +280,7 @@ const createDesktopServiceForTeam = async (teamname) =>
         },
         ports: [
           {
-            port: 3001,
+            port: 8080,
             targetPort: 3000,
           },
         ],

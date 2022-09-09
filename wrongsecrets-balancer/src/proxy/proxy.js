@@ -9,6 +9,7 @@ const {
   getJuiceShopInstanceForTeamname,
   updateLastRequestTimestampForTeam,
 } = require('../kubernetes');
+const app = require("../app");
 
 const router = express.Router();
 
@@ -107,10 +108,27 @@ function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
   logger.debug(`Proxing request ${req.method.toLocaleUpperCase()} ${req.path}`);
   let target;
-  if (req.path.includes('desktop')) {
+  if (
+    (req.query != null && req.query.desktop != null) ||
+    req.path === '/css/keyboard.svg' ||
+      req.path === '/css/vdi.css' ||
+      req.path === '/css/fit.svg' ||
+      req.path === '/css/fullscreen.svg' ||
+      // req.path === '/favicon.ico' ||
+      req.path === '/css/files.svg' ||
+      req.path === '/js/vendor/guac.min.js' ||
+      req.path === '/js/rdp.js' ||
+      req.path === '/files' ||
+      req.path === '/js/filebrowser.js' ||
+      req.path === '/css/filebrowser.css' ||
+      req.path === '/files/socket.io/socket.io.js' ||
+      req.path === '/files/socket.io/' ||
+      req.path === '/files/socket.io/socket.io.js.map' ||
+      req.path === '/js/vendor/jquery.min.js'
+  ) {
     logger.info('we have a desktop entry for team ' + teamname);
     target = {
-      target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:3001`,
+      target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
       ws: true,
     };
   } else {
@@ -120,17 +138,29 @@ function proxyTrafficToJuiceShop(req, res) {
     };
   }
   logger.info(target.target);
-  proxy.web(req, res, target, (error) => {
-    logger.warn(`Proxy fail '${error.code}' for: ${req.method.toLocaleUpperCase()} ${req.path}`);
+  logger.info(req.path);
 
-    if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
-      logger.error(error.message);
-    } else {
-      logger.debug(error.message);
-    }
-  });
+  if (req.path === '/guaclite') {
+    logger.info('putting ws through for /quaclite');
+    app.server.on('upgrade', function (req, socket, head) {
+      logger.info('proxying upgrade request for: ' + req.url);
+      proxy.ws(req, socket, head, {
+        target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+        ws: true,
+      });
+    });
+  } else {
+    proxy.web(req, res, target, (error) => {
+      logger.warn(`Proxy fail '${error.code}' for: ${req.method.toLocaleUpperCase()} ${req.path}`);
+
+      if (error.code !== 'ENOTFOUND' && error.code !== 'EHOSTUNREACH') {
+        logger.error(error.message);
+      } else {
+        logger.debug(error.message);
+      }
+    });
+  }
 }
-
 router.use(
   redirectJuiceShopTrafficWithoutBalancerCookies,
   redirectAdminTrafficToBalancerPage,

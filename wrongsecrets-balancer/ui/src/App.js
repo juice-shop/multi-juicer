@@ -19,12 +19,10 @@ const LoadingPage = () => <Spinner />;
 function App() {
   const [locale, setLocale] = useState('en');
   const [messages, setMessages] = useState({});
-
   const navigatorLocale = navigator.language;
   useEffect(() => {
     setLocale(navigatorLocale);
   }, [navigatorLocale]);
-
   const switchLanguage = async ({ key, messageLoader }) => {
     const messages = (await messageLoader).default;
 
