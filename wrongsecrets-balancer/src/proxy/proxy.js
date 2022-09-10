@@ -8,23 +8,6 @@ const {
   getJuiceShopInstanceForTeamname,
   updateLastRequestTimestampForTeam,
 } = require('../kubernetes');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-
-//
-// server.on('upgrade', function (req, socket, head) {
-//   logger.info('proxying upgrade request for: ' + req.url);
-//   proxy.ws(req, socket, head, {
-//     target: `http://${req.teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
-//     ws: true,
-//   });
-// });
-// server.on('connect', function (req, socket, head) {
-//   logger.info('proxying connect request for: ' + req.url);
-//   proxy.ws(req, socket, head, {
-//     target: `http://${req.teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
-//     ws: true,
-//   });
-// });
 
 const router = express.Router();
 
@@ -137,21 +120,6 @@ function proxyTrafficToJuiceShop(req, res) {
     req.path === '/files/socket.io/' ||
     req.path === '/files/socket.io/socket.io.js.map'
   ) {
-    // req.path === '/css/keyboard.svg' ||
-    //   req.path === '/css/vdi.css' ||
-    //   req.path === '/css/fit.svg' ||
-    //   req.path === '/css/fullscreen.svg' ||
-    //   // req.path === '/favicon.ico' ||
-    //   req.path === '/css/files.svg' ||
-    //   req.path === '/js/vendor/guac.min.js' ||
-    //   req.path === '/js/rdp.js' ||
-    //   req.path === '/files' ||
-    //   req.path === '/js/filebrowser.js' ||
-    //   req.path === '/css/filebrowser.css' ||
-    //   req.path === '/files/socket.io/socket.io.js' ||
-    //   req.path === '/files/socket.io/' ||
-    //   req.path === '/files/socket.io/socket.io.js.map' ||
-    //
     logger.info('we have a desktop entry for team ' + teamname);
     target = {
       target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
@@ -194,33 +162,6 @@ function proxyTrafficToJuiceShop(req, res) {
     });
   }
 }
-
-// const magic = createProxyMiddleware({
-//   router: function (req) {
-//     logger.info('Entering router for req' + req.path);
-//     const teamname = req.teamname;
-//     const currentReferrerForDesktop = 'http://' + req.hostname + ':' + 3000 + '/?desktop';
-//     if (req.path === '/guaclite') {
-//       return `ws://${teamname}-virtualdesktop.default.svc:8080`;
-//     } else if (
-//       (req.query != null && req.query.desktop != null) ||
-//       (req.headers['referer'] !== undefined &&
-//         req.headers['referer'] === currentReferrerForDesktop) ||
-//       (req.headers['Referer'] !== undefined &&
-//         req.headers['Referer'] === currentReferrerForDesktop) ||
-//       req.path === '/js/filebrowser.js' ||
-//       req.path === '/css/filebrowser.css' ||
-//       req.path === '/files/socket.io/socket.io.js' ||
-//       req.path === '/js/vendor/jquery.min.js' ||
-//       req.path === '/files/socket.io/' ||
-//       req.path === '/files/socket.io/socket.io.js.map'
-//     ) {
-//       return `http://${teamname}-virtualdesktop.default.svc:8080`;
-//     }
-
-//     return `http://${teamname}-wrongsecrets.default.svc:8080`;
-//   },
-// });
 
 router.use(
   redirectJuiceShopTrafficWithoutBalancerCookies,

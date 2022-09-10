@@ -108,7 +108,7 @@ test('create team fails when max instances is reached', async () => {
     throw new Error(`deployments.apps "t-team42-wrongsecrets" not found`);
   });
   getJuiceShopInstances.mockImplementation(async () => {
-    return { body: { items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } };
+    return { body: { items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } };
   });
 
   await request(app)
