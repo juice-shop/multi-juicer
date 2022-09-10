@@ -38,6 +38,8 @@ spec:
               path: /balancer/
               port: http
           env:
+            - name: REACT_APP_MOVING_GIF_LOGO
+              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME!
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:

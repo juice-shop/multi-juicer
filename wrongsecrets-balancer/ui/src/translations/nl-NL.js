@@ -17,9 +17,10 @@ const dutchTranslations = {
   passcode_explanation:
     'Om zeker te weten dat niet iedereen je team kan joinen hebben we een passcode gemaakt voor je team. Als je teamgenoten zich bij het team willen voegen dienen ze deze passcode in te voeren. Je kan de passcode uit onderstaand veld kopieren.',
   passcode: 'Passcode',
-  instance_status_ready: 'Juice Shop is beschikbaar',
+  instance_status_ready: 'Wrongsecrets is beschikbaar',
   instance_status_start_hacking: 'Start Hacking',
-  instance_status_starting: 'Juice Shop bezig met starten',
+  instance_status_start_vm: 'Start je webtop',
+  instance_status_starting: 'Wrongecrets bezig met starten',
   'admin_table.table_header': 'Active Teams',
   'admin_table.teamname': 'Teamnaam',
   'admin_table.ready': 'Klaar',

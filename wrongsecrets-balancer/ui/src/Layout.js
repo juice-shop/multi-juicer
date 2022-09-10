@@ -3,6 +3,7 @@ import React from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 
 import multiJuicerLogo from './multi-juicer.svg';
+import wrongsecretsLogo from './ws-icon.png';
 import { Card } from './Components';
 
 const Header = styled.div`
@@ -17,12 +18,20 @@ const Header = styled.div`
   }
 `;
 
-const Logo = styled.img`
-  height: 72px;
+const MJLogo = styled.img`
+  height: 32px;
 `;
-Logo.defaultProps = {
+MJLogo.defaultProps = {
   src: multiJuicerLogo,
 };
+
+const WSLogo = styled.img`
+  height: 64px;
+`;
+
+WSLogo.defaultProps = {
+  src: wrongsecretsLogo,
+}
 
 const HeaderCard = styled(Card)`
   width: ${props => props.wide ? "70vw" : "50vw"};
@@ -120,10 +129,11 @@ export function Layout({ children, footer, siteHeader = null, wide = false }) {
       <Wrapper>
         <Header>
           <HeaderCard wide={wide}>
-            <Logo alt="MultiJuicer Logo" />
+          <WSLogo alt="WrongSecretsLogo"/> WrongSecrets CTF, powered by
+            <MJLogo alt="MultiJuicer Logo" />
             {siteHeader ? (
               <SiteHeader>
-                {siteHeader}
+                WrongSecrets CTF, powered by{siteHeader}
               </SiteHeader>
             ) : null}
           </HeaderCard>

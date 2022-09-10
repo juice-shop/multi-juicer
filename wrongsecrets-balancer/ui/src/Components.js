@@ -74,7 +74,7 @@ export const BodyCard = styled(Card)`
   padding: 48px 32px;
   width: 40vw;
   min-width: 400px;
-  max-width: 650px;
+  max-width: 900px;
   margin-bottom: 32px;
 
   @media (max-width: 1280px) {
@@ -97,3 +97,4 @@ export const CenteredCard = styled(BodyCard)`
   justify-content: center;
   align-items: center;
 `;
+

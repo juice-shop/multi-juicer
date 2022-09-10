@@ -64,7 +64,7 @@ export const InstanceStatusCard = ({ teamname }) => {
           <span data-test-id="instance-status">
             <FormattedMessage
               id="instance_status_starting"
-              defaultMessage="Starting a new Juice Shop Instance"
+              defaultMessage="Starting a new WrongSecrets Instance"
             />
           </span>
         </CenteredCard>
@@ -79,12 +79,15 @@ export const InstanceStatusCard = ({ teamname }) => {
             <span data-test-id="instance-status">
               <FormattedMessage
                 id="instance_status_ready"
-                defaultMessage="Juice Shop Instance Ready"
+                defaultMessage="WrongSecrets Instance Ready"
               />
             </span>
           </CenteredText>
-          <LinkButton data-test-id="start-hacking-button" href="/">
+          <LinkButton data-test-id="start-hacking-button" href="/" target="_blank">
             <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
+          </LinkButton>
+          <LinkButton data-test-id="start-desktop-button" href="/?desktop" target="_blank">
+            <FormattedMessage id="instance_status_start_vm" defaultMessage="Start your Webtop, might require refresh"  />
           </LinkButton>
         </BodyCard>
       );

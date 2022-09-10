@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
 
+import styled, { createGlobalStyle } from 'styled-components';
+
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
 import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
@@ -59,6 +61,18 @@ export const JoinPage = injectIntl(({ intl }) => {
     sendJoinRequest({ teamname });
   }
 
+  const CenterLogo = styled.img`
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+`;
+
+CenterLogo.defaultProps = {
+  src: process.env.REACT_APP_MOVING_GIF_LOGO,
+}
+
+
   return (
     <>
       {queryMessage === 'instance-restarting' ? (
@@ -70,6 +84,29 @@ export const JoinPage = injectIntl(({ intl }) => {
       ) : null}
 
       <BodyCard>
+        <CenterLogo/>
+        <H2>
+          <FormattedMessage id="welcome_title" defaultMessage="Welcome!" />
+        </H2>
+        <FormattedMessage id="welcome_text" defaultMessage={`
+          Welcome to the WrongSecrets CTF Party! This CTF uses 3 domains:
+        `}
+        values={{
+          strong: (msg) => <strong>{msg}</strong>,
+        }}/>
+        <ul> 
+          <li>This domain: here is where you can do your exercises</li>
+          <li>The domain where you provide your responses in exchange for a CTF key: URLHERE1</li>
+          <li>The domain where you provide your CTF key: URLHERE2</li>
+          <li>Optionally: the storage bucket with Terraform state for the cloud challneges: URLHERE3</li>
+        </ul>
+        <FormattedMessage id="welcome_text_2" defaultMessage={`
+          We need multiple domains, as you will be able to steal the CTF key after a few challenges.
+        `}
+        values={{
+          strong: (msg) => <strong>{msg}</strong>,
+        }}/>
+
         <H2>
           <FormattedMessage id="getting_started" defaultMessage="Getting Started" />
         </H2>

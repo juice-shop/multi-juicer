@@ -39,7 +39,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
           <span data-test-id="instance-status">
             <FormattedMessage
               id="instance_status_restarted"
-              defaultMessage="Juice Shop Instance ready again"
+              defaultMessage="Wrongsecrets Instance ready again"
             />
           </span>
         </CenteredText>
@@ -58,7 +58,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
         <span data-test-id="instance-status">
           <FormattedMessage
             id="instance_status_restarting"
-            defaultMessage="Juice Shop Instance is currently restarting. It should be ready in a couple of seconds."
+            defaultMessage="Wrongssecrets Instance is currently restarting. It should be ready in a couple of seconds."
           />
         </span>
       </CenteredCard>
