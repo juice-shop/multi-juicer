@@ -15,7 +15,9 @@ const {
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
-  changePasscodeHashForTeam, createDesktopDeploymentForTeam, createDesktopServiceForTeam,
+  changePasscodeHashForTeam,
+  createDesktopDeploymentForTeam,
+  createDesktopServiceForTeam,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({

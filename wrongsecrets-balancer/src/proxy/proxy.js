@@ -134,7 +134,7 @@ function proxyTrafficToJuiceShop(req, res) {
   logger.info(target.target);
 
   if (req.path === '/guaclite') {
-    server = res.connection.server;
+    let server = res.connection.server;
     logger.info('putting ws through for /quaclite');
     server.on('upgrade', function (req, socket, head) {
       logger.info('proxying upgrade request for: ' + req.url);

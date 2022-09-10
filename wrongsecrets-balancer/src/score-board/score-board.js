@@ -30,7 +30,7 @@ const keyDifficultyMapping = Object.freeze({
   challenge21: 5,
   challenge22: 5,
   challenge23: 1,
-  challenge24: 2
+  challenge24: 2,
 });
 
 /**
