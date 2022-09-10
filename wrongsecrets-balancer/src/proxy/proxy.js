@@ -105,7 +105,11 @@ async function updateLastConnectTimestamp(req, res, next) {
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
   const currentReferrerForDesktop = 'http://' + req.host + ':' + 3000 + '/?desktop';
-  logger.debug(`Proxying request ${req.method.toLocaleUpperCase()} ${req.path} with matcher for referer: ${currentReferrerForDesktop}`);
+  logger.debug(
+    `Proxying request ${req.method.toLocaleUpperCase()} ${
+      req.path
+    } with matcher for referer: ${currentReferrerForDesktop}`
+  );
   let target;
   if (
     (req.query != null && req.query.desktop != null) ||
