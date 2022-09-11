@@ -108,6 +108,27 @@ function RestartInstanceButton({ team }) {
   );
 }
 
+
+function RestartDesktopInstanceButton({ team }) {
+  const [restarting, setRestarting] = useState(false);
+
+  const restart = (event) => {
+    event.preventDefault();
+    setRestarting(true);
+    axios.post(`/balancer/admin/teams/${team}/restartdesktop`).finally(() => setRestarting(false));
+  };
+  return (
+    <SmallSecondary onClick={restart}>
+      {restarting ? (
+        <FormattedMessage id="admin_table.restarting" defaultMessage="Restarting..." />
+      ) : (
+        <FormattedMessage id="admin_table.restart" defaultMessage="Restart" />
+      )}
+    </SmallSecondary>
+  );
+}
+
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function DeleteInstanceButton({ team }) {
@@ -207,6 +228,7 @@ export default function AdminPage() {
           <>
             <DeleteInstanceButton team={team} />
             <RestartInstanceButton team={team} />
+            <RestartDesktopInstanceButton team={team} />
           </>
         );
       },

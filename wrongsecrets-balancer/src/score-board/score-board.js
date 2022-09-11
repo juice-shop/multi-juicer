@@ -40,11 +40,11 @@ const keyDifficultyMapping = Object.freeze({
 async function getTopTeams(req, res) {
   const instances = await getJuiceShopInstances();
 
-  logger.debug(`Listing top teams`);
+  logger.debug(`Listing teams`);
 
   const teams = instances.body.items.map((team) => {
     const challengeProgress = JSON.parse(
-      team.metadata.annotations['multi-juicer.iteratec.dev/challenges'] ?? '[]'
+      team.metadata.annotations['wrongsecrets-ctf-party/challenges'] ?? '[]'
     ).map((progress) => {
       const difficulty = keyDifficultyMapping[progress.key];
 

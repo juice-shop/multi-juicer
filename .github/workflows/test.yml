@@ -40,13 +40,14 @@ jobs:
         run: |
           cd wrongsecrets-balancer
           npm test -- --ci --color --verbose
-  progressWatchdog:
-    name: ProgressWatchdog
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: "Test ProgressWatchdog"
-        run: |
-          cd progress-watchdog
-          go vet
-          go test -cover
+  #disabled as for now: we cannot use it yet
+  # progressWatchdog:
+  #   name: ProgressWatchdog
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - name: "Test ProgressWatchdog"
+  #       run: |
+  #         cd progress-watchdog
+  #         go vet
+  #         go test -cover

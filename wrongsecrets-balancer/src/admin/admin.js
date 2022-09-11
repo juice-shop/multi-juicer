@@ -7,6 +7,7 @@ const {
   deletePodForTeam,
   deleteDeploymentForTeam,
   deleteServiceForTeam,
+  deleteDesktopPodForTeam,
 } = require('../kubernetes');
 
 const { get } = require('../config');
@@ -45,7 +46,7 @@ async function listInstances(req, res) {
         ready: instance.status.availableReplicas === 1,
         createdAt: instance.metadata.creationTimestamp.getTime(),
         lastConnect: parseInt(
-          instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
+          instance.metadata.annotations['wrongsecrets-ctf-party/lastRequest'],
           10
         ),
       };
@@ -63,6 +64,20 @@ async function restartInstance(req, res) {
     logger.info(`Restarting deployment for team: '${teamname}'`);
 
     await deletePodForTeam(teamname);
+
+    res.send();
+  } catch (error) {
+    logger.error(error);
+    res.status(500).send();
+  }
+}
+
+async function restartDesktopInstance(req, res) {
+  try {
+    const teamname = req.params.team;
+    logger.info(`Restarting Dektopdeployment for team: '${teamname}'`);
+
+    await deleteDesktopPodForTeam(teamname);
 
     res.send();
   } catch (error) {
@@ -93,5 +108,6 @@ async function deleteInstance(req, res) {
 router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
 router.post('/teams/:team/restart', restartInstance);
+router.post('/teams/:team/restartdesktop', restartDesktopInstance);
 router.delete('/teams/:team/delete', deleteInstance);
 module.exports = router;

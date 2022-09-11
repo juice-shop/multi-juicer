@@ -3,6 +3,12 @@ _Powered by MultiJuicer_
 
 This is a fork of MultiJuicer, which is now being rebuilt in order to server WrongSecret in creating CTFs. The tracking isssue of the first endavour can be found at https://github.com/commjoen/wrongsecrets/issues/403 .
 
+Note that we:
+- have a Webtop integrated
+- have a WrongSecrets instance integrated
+- A working admin interface which can restart both or delete both
+- Do not support any progress watchdog as you will have access to it, we therefore disabled it.
+
 
 **This is by no means ready for anything, and work in progress.**
 

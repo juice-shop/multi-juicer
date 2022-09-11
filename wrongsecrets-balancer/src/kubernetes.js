@@ -34,7 +34,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
         'wrongsecrets-ctf-party/passcode': passcodeHash,
         'wrongsecrets-ctf-party/challengesSolved': '0',
-        'multi-juicer.iteratec.dev/challenges': '[]',
+        'wrongsecrets-ctf-party/challenges': '[]',
       },
       ...(await getOwnerReference()),
     },
@@ -324,6 +324,7 @@ const getJuiceShopInstances = () =>
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
+
 const deleteDeploymentForTeam = async (team) => {
   await k8sAppsApi
     .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, get('namespace'))
@@ -374,6 +375,28 @@ const deletePodForTeam = async (team) => {
 };
 module.exports.deletePodForTeam = deletePodForTeam;
 
+const deleteDesktopPodForTeam = async (team) => {
+  const res = await k8sCoreApi.listNamespacedPod(
+    get('namespace'),
+    true,
+    undefined,
+    undefined,
+    undefined,
+    `app=virtualdesktop,team=${team},deployment-context=${get('deploymentContext')}`
+  );
+
+  const pods = res.body.items;
+
+  if (pods.length !== 1) {
+    throw new Error(`Unexpected number of pods ${pods.length}`);
+  }
+
+  const podname = pods[0].metadata.name;
+
+  await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
+};
+module.exports.deleteDesktopPodForTeam = deleteDesktopPodForTeam;
+
 const getJuiceShopInstanceForTeamname = (teamname) =>
   k8sAppsApi
     .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, get('namespace'))
@@ -398,7 +421,7 @@ const updateLastRequestTimestampForTeam = (teamname) => {
       metadata: {
         annotations: {
           'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
-          'mwrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
+          'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
         },
       },
     },
