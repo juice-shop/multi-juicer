@@ -56,7 +56,11 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           automountServiceAccountToken: false,
-          securityContext: get('wrongsecrets.securityContext'),
+          securityContext: {
+            runAsUser: 2000,
+            runAsGroup: 2000,
+            fsGroup: 2000,
+          },
           containers: [
             {
               name: 'wrongsecrets',
@@ -64,6 +68,11 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               image: 'jeroenwillemsen/wrongsecrets:latest-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               resources: get('wrongsecrets.resources'),
+              securityContext: {
+                allowPrivilegeEscalation: false,
+                readOnlyRootFilesystem: true,
+                runAsNonRoot: true,
+              },
               env: [
                 {
                   name: 'NODE_ENV',
@@ -102,11 +111,16 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
+          
               volumeMounts: [
                 {
                   name: 'wrongsecrets-config',
                   mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
                   subPath: 'wrongsecrets-ctf-party.yaml',
+                },
+                {
+                  mountPath: "/tmp",
+                  name: "cache-volume",
                 },
                 ...get('wrongsecrets.volumeMounts', []),
               ],
@@ -118,6 +132,10 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               configMap: {
                 name: 'wrongsecrets-config',
               },
+            },
+            {
+              name: 'cache-volume',
+              emptyDir:{},
             },
             ...get('wrongsecrets.volumes', []),
           ],
@@ -175,7 +193,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           automountServiceAccountToken: false,
-          securityContext: get('virtualdesktop.securityContext'),
+          securityContext: {
+            runAsUser: 1000,
+            runAsGroup: 1000,
+            fsGroup: 1000,
+          },
           containers: [
             {
               name: 'virtualdesktop',
@@ -207,10 +229,21 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
-              volumeMounts: [],
+              volumeMounts: [
+                {mountPath: "/tmp",
+                name: "cache-volume",},
+              ],
             },
           ],
-          volumes: [],
+          volumes: [
+            {name: "cache-volume",
+            emptyDir:{},}
+          ],
+          securityContext: {
+            allowPrivilegeEscalation: false,
+            readOnlyRootFilesystem: true,
+            runAsNonRoot: true,
+          },
           tolerations: get('virtualdesktop.tolerations'),
           affinity: get('virtualdesktop.affinity'),
           runtimeClassName: get('virtualdesktop.runtimeClassName')
@@ -284,6 +317,11 @@ const createDesktopServiceForTeam = async (teamname) =>
             targetPort: 3000,
           },
         ],
+        securityContext: {
+          allowPrivilegeEscalation: false,
+          readOnlyRootFilesystem: true,
+          runAsNonRoot: true,
+        },
       },
     })
     .catch((error) => {

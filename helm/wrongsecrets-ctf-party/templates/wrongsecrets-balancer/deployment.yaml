@@ -17,6 +17,10 @@ spec:
       labels:
         {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
       serviceAccountName: wrongsecrets-balancer
       {{- with .Values.balancer.securityContext }}
       securityContext:
@@ -39,7 +43,7 @@ spec:
               port: http
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
-              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME!
+              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME AND DO SO IN CONTAINER DEF AS WELL!
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
@@ -62,6 +66,10 @@ spec:
                   name: wrongsecrets-balancer-secret
                   key: metricsBasicAuthPassword
             {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
           volumeMounts:
             - name: config-volume
               mountPath: /home/app/config/

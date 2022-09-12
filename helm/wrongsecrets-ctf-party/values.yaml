@@ -56,7 +56,6 @@ balancer:
     limits:
       memory: 256Mi
       cpu: 400m
-  securityContext: { }
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -116,7 +115,10 @@ wrongsecrets:
   #    cpu: 100m
   #    memory: 200Mi
   # -- Optional securityContext definitions to set for each JuiceShop instance
-  securityContext: { }
+  securityContext: 
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
   # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env:
     - name: K8S_ENV
@@ -195,7 +197,10 @@ virtualdesktop:
     limits:
       memory: 2GB
       cpu: 50m
-  securityContext: { }
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
   runtimeClassName: { }
   affinity: { }
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
