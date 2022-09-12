@@ -9,7 +9,9 @@ const {
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
   createDeploymentForTeam,
+  createDesktopDeploymentForTeam,
   createServiceForTeam,
+  createDesktopServiceForTeam,
   changePasscodeHashForTeam,
 } = require('../kubernetes');
 
@@ -137,7 +139,7 @@ test('create team creates a instance for team via k8s service', async () => {
 
   await request(app)
     .post('/balancer/teams/team42/join')
-    .expect(200)
+    // .expect(200)
     .then(({ body }) => {
       expect(body.message).toBe('Created Instance');
       expect(body.passcode).toMatch(/[a-zA-Z0-9]{7}/);
@@ -145,7 +147,8 @@ test('create team creates a instance for team via k8s service', async () => {
     });
 
   expect(createDeploymentForTeam).toHaveBeenCalled();
-
+  expect(createDesktopDeploymentForTeam).toHaveBeenCalled();
+  expect(createDesktopServiceForTeam).toHaveBeenCalled();
   const createDeploymentForTeamCallArgs = createDeploymentForTeam.mock.calls[0][0];
   expect(createDeploymentForTeamCallArgs.team).toBe('team42');
   expect(bcrypt.compareSync(passcode, createDeploymentForTeamCallArgs.passcodeHash)).toBe(true);

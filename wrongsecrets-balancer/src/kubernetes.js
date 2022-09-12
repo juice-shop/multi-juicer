@@ -324,7 +324,6 @@ const getJuiceShopInstances = () =>
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
-
 const deleteDeploymentForTeam = async (team) => {
   await k8sAppsApi
     .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, get('namespace'))

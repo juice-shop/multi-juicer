@@ -177,10 +177,11 @@ async function createTeam(req, res) {
     await createServiceForTeam(team);
 
     logger.info(`Created Wrongsecrets Deployment for team '${team}'`);
+
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
     await createDesktopServiceForTeam(team);
 
-    logger.info(`Created virtualdektop Desktop Deployment for team '${team}'`);
+    logger.info(`Created virtualdesktop Deployment for team '${team}'`);
 
     loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
@@ -196,7 +197,7 @@ async function createTeam(req, res) {
   } catch (error) {
     logger.error(`Error while creating deployment or service for team ${team}`);
     logger.error(error.message);
-    res.status(500).send({ message: 'Failed to Create Instance' });
+    res.status(500).send({ message: 'Failed to Create Instance: ' + error.message });
   }
 }
 
