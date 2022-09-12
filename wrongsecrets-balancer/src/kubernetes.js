@@ -193,11 +193,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           automountServiceAccountToken: false,
-          securityContext: {
-            runAsUser: 1000,
-            runAsGroup: 1000,
-            fsGroup: 1000,
-          },
+          // securityContext: {
+          //   runAsUser: 911,
+          //   runAsGroup: 911,
+          //   fsGroup: 911,
+          // },
           containers: [
             {
               name: 'virtualdesktop',
@@ -205,7 +205,13 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
               image: 'jeroenwillemsen/wrongsecrets-desktop:latest',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: get('virtualdesktop.resources'),
-              env: [...get('virtualdesktop.env', [])],
+              securityContext: {
+                // allowPrivilegeEscalation: false,
+                // readOnlyRootFilesystem: true,
+              },
+              env: [
+                ...get('virtualdesktop.env', []),
+              ],
               envFrom: get('virtualdesktop.envFrom'),
               ports: [
                 {
@@ -239,11 +245,6 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {name: "cache-volume",
             emptyDir:{},}
           ],
-          securityContext: {
-            allowPrivilegeEscalation: false,
-            readOnlyRootFilesystem: true,
-            runAsNonRoot: true,
-          },
           tolerations: get('virtualdesktop.tolerations'),
           affinity: get('virtualdesktop.affinity'),
           runtimeClassName: get('virtualdesktop.runtimeClassName')
@@ -317,11 +318,6 @@ const createDesktopServiceForTeam = async (teamname) =>
             targetPort: 3000,
           },
         ],
-        securityContext: {
-          allowPrivilegeEscalation: false,
-          readOnlyRootFilesystem: true,
-          runAsNonRoot: true,
-        },
       },
     })
     .catch((error) => {
