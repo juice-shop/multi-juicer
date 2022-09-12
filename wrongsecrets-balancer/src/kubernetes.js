@@ -111,7 +111,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
-          
+
               volumeMounts: [
                 {
                   name: 'wrongsecrets-config',
@@ -119,8 +119,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   subPath: 'wrongsecrets-ctf-party.yaml',
                 },
                 {
-                  mountPath: "/tmp",
-                  name: "cache-volume",
+                  mountPath: '/tmp',
+                  name: 'cache-volume',
                 },
                 ...get('wrongsecrets.volumeMounts', []),
               ],
@@ -135,7 +135,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             },
             {
               name: 'cache-volume',
-              emptyDir:{},
+              emptyDir: {},
             },
             ...get('wrongsecrets.volumes', []),
           ],
@@ -209,9 +209,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 // allowPrivilegeEscalation: false,
                 // readOnlyRootFilesystem: true,
               },
-              env: [
-                ...get('virtualdesktop.env', []),
-              ],
+              env: [...get('virtualdesktop.env', [])],
               envFrom: get('virtualdesktop.envFrom'),
               ports: [
                 {
@@ -235,16 +233,10 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
-              volumeMounts: [
-                {mountPath: "/tmp",
-                name: "cache-volume",},
-              ],
+              volumeMounts: [{ mountPath: '/tmp', name: 'cache-volume' }],
             },
           ],
-          volumes: [
-            {name: "cache-volume",
-            emptyDir:{},}
-          ],
+          volumes: [{ name: 'cache-volume', emptyDir: {} }],
           tolerations: get('virtualdesktop.tolerations'),
           affinity: get('virtualdesktop.affinity'),
           runtimeClassName: get('virtualdesktop.runtimeClassName')
