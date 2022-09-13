@@ -7,18 +7,20 @@ const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
 const { get } = require('./config');
 
-const lodashGet = require('lodash/get');
-const once = require('lodash/once');
+//used for owner ref, not used now:
+// const lodashGet = require('lodash/get');
+// const once = require('lodash/once');
 
+//used for owner ref, not used now:
 // Gets the Deployment uid for the JuiceBalancer
 // This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
-const getJuiceBalancerDeploymentUid = once(async () => {
-  const deployment = await k8sAppsApi.readNamespacedDeployment(
-    'wrongsecrets-balancer',
-    get('namespace')
-  );
-  return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
-});
+// const getJuiceBalancerDeploymentUid = once(async () => {
+//   const deployment = await k8sAppsApi.readNamespacedDeployment(
+//     'wrongsecrets-balancer',
+//     get('namespace')
+//   );
+//   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
+// });
 
 const createNameSpaceForTeam = async (team) => {
   const namedNameSpace = {
@@ -349,23 +351,24 @@ const createDesktopServiceForTeam = async (teamname) =>
     });
 module.exports.createDesktopServiceForTeam = createDesktopServiceForTeam;
 
-async function getOwnerReference() {
-  if (get('skipOwnerReference') === true) {
-    return {};
-  }
-  return {
-    ownerReferences: [
-      {
-        apiVersion: 'apps/v1',
-        blockOwnerDeletion: true,
-        controller: true,
-        kind: 'Deployment',
-        name: 'wrongsecrets-balancer',
-        uid: await getJuiceBalancerDeploymentUid(),
-      },
-    ],
-  };
-}
+//used for owner ref, not used now as we cannot do clusterwide owning of namespaced items:
+// async function getOwnerReference() {
+//   if (get('skipOwnerReference') === true) {
+//     return {};
+//   }
+//   return {
+//     ownerReferences: [
+//       {
+//         apiVersion: 'apps/v1',
+//         blockOwnerDeletion: true,
+//         controller: true,
+//         kind: 'Deployment',
+//         name: 'wrongsecrets-balancer',
+//         uid: await getJuiceBalancerDeploymentUid(),
+//       },
+//     ],
+//   };
+// }
 
 // TODO fix!
 const getJuiceShopInstances = () =>
@@ -378,16 +381,9 @@ const getJuiceShopInstances = () =>
     //   undefined, //labelSelector
     //   undefined, //limit
     //   `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
-    .listDeploymentForAllNamespaces(
-      true,
-      false,
-      undefined,
-      undefined,
-      undefined,
-      `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
-    )
+    .listDeploymentForAllNamespaces()
     .catch((error) => {
-      throw new Error(error.response.body.message);
+      throw new Error(error);
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 

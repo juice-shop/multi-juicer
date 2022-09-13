@@ -67,6 +67,10 @@ const messages = defineMessages({
     id: 'admin_table.teamname',
     defaultMessage: 'Teamname',
   },
+  name: {
+    id: 'admin_table.name',
+    defaultMessage: 'Name',
+  },
   ready: {
     id: 'admin_table.ready',
     defaultMessage: 'Ready',
@@ -102,7 +106,7 @@ function RestartInstanceButton({ team }) {
       {restarting ? (
         <FormattedMessage id="admin_table.restarting" defaultMessage="Restarting..." />
       ) : (
-        <FormattedMessage id="admin_table.restart" defaultMessage="Restart" />
+        <FormattedMessage id="admin_table.restart" defaultMessage="Restart-WS" />
       )}
     </SmallSecondary>
   );
@@ -122,7 +126,7 @@ function RestartDesktopInstanceButton({ team }) {
       {restarting ? (
         <FormattedMessage id="admin_table.restarting" defaultMessage="Restarting..." />
       ) : (
-        <FormattedMessage id="admin_table.restart" defaultMessage="Restart" />
+        <FormattedMessage id="admin_table.restart" defaultMessage="Restart-VD" />
       )}
     </SmallSecondary>
   );
@@ -185,6 +189,11 @@ export default function AdminPage() {
       sortable: true,
     },
     {
+      name: formatMessage(messages.name),
+      selector: 'name',
+      sortable: true,
+    },
+    {
       name: formatMessage(messages.ready),
       selector: 'ready',
       sortable: true,
@@ -226,8 +235,8 @@ export default function AdminPage() {
       cell: ({ team }) => {
         return (
           <>
-            <DeleteInstanceButton team={team} />
-            <RestartInstanceButton team={team} />
+            <DeleteInstanceButton team={team} /><br/>
+            <RestartInstanceButton team={team} /><br/>
             <RestartDesktopInstanceButton team={team} />
           </>
         );
