@@ -1,5 +1,6 @@
 module.exports = {
   createDeploymentForTeam: jest.fn(),
+  createNameSpaceForTeam: jest.fn(),
   createDesktopDeploymentForTeam: jest.fn(),
   createServiceForTeam: jest.fn(),
   createDesktopServiceForTeam: jest.fn(),

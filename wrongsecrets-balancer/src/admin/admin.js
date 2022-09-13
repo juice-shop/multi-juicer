@@ -39,7 +39,10 @@ async function listInstances(req, res) {
 
   return res.json({
     instances: instances.map((instance) => {
-      const team = instance.metadata.labels.team;
+      let team = instance.metadata.labels.team;
+      if (team === '') {
+        team = 'kubelet-ignore-this';
+      }
       return {
         team,
         name: instance.metadata.name,

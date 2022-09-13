@@ -7,22 +7,42 @@ const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
 const { get } = require('./config');
 
-const lodashGet = require('lodash/get');
-const once = require('lodash/once');
+//used for owner ref, not used now:
+// const lodashGet = require('lodash/get');
+// const once = require('lodash/once');
 
+//used for owner ref, not used now:
 // Gets the Deployment uid for the JuiceBalancer
 // This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
-const getJuiceBalancerDeploymentUid = once(async () => {
-  const deployment = await k8sAppsApi.readNamespacedDeployment(
-    'wrongsecrets-balancer',
-    get('namespace')
-  );
-  return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
-});
+// const getJuiceBalancerDeploymentUid = once(async () => {
+//   const deployment = await k8sAppsApi.readNamespacedDeployment(
+//     'wrongsecrets-balancer',
+//     get('namespace')
+//   );
+//   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
+// });
+
+const createNameSpaceForTeam = async (team) => {
+  const namedNameSpace = {
+    apiVersion: 'v1',
+    kind: 'Namespace',
+    metadata: {
+      name: `t-${team}`,
+    },
+    labels: {
+      name: `t-${team}`,
+    },
+  };
+  k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
+    throw new Error(error.response.body.message);
+  });
+};
+module.exports.createNameSpaceForTeam = createNameSpaceForTeam;
 
 const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
     metadata: {
+      namespace: `t-${team}`,
       name: `t-${team}-wrongsecrets`,
       labels: {
         app: 'wrongsecrets',
@@ -36,7 +56,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/challengesSolved': '0',
         'wrongsecrets-ctf-party/challenges': '[]',
       },
-      ...(await getOwnerReference()),
+      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -67,7 +87,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
               image: 'jeroenwillemsen/wrongsecrets:latest-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
-              resources: get('wrongsecrets.resources'),
+              // resources: get('wrongsecrets.resources'),
               securityContext: {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
@@ -84,7 +104,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 {
                   name: 'SOLUTIONS_WEBHOOK',
-                  value: `http://progress-watchdog.${get('namespace')}.svc/team/${team}/webhook`,
+                  value: `http://progress-watchdog.t-${team}.svc/team/${team}/webhook`,
                 },
                 ...get('wrongsecrets.env', []),
               ],
@@ -99,7 +119,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/',
                   port: 8080,
                 },
-                initialDelaySeconds: 5,
+                initialDelaySeconds: 20,
                 periodSeconds: 2,
                 failureThreshold: 10,
               },
@@ -111,33 +131,44 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
-
-              volumeMounts: [
-                {
-                  name: 'wrongsecrets-config',
-                  mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
-                  subPath: 'wrongsecrets-ctf-party.yaml',
+              resources: {
+                requests: {
+                  memory: '512Mi',
+                  cpu: '200m',
                 },
+                limits: {
+                  memory: '512Mi',
+                  cpu: '200m',
+                },
+              },
+
+              //#TODO: DELETE NAMESPACE WHEN DELETING BOTH PODS AND SERVICE!
+              volumeMounts: [
+                // {
+                //   name: 'wrongsecrets-config',
+                //   mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
+                //   subPath: 'wrongsecrets-ctf-party.yaml',
+                // },
                 {
                   mountPath: '/tmp',
                   name: 'cache-volume',
                 },
-                ...get('wrongsecrets.volumeMounts', []),
+                // ...get('wrongsecrets.volumeMounts', []),
               ],
             },
           ],
           volumes: [
-            {
-              name: 'wrongsecrets-config',
-              configMap: {
-                name: 'wrongsecrets-config',
-              },
-            },
+            // {
+            //   name: 'wrongsecrets-config',
+            //   configMap: {
+            //     name: 'wrongsecrets-config',
+            //   },
+            // },
             {
               name: 'cache-volume',
               emptyDir: {},
             },
-            ...get('wrongsecrets.volumes', []),
+            // ...get('wrongsecrets.volumes', []),
           ],
           tolerations: get('wrongsecrets.tolerations'),
           affinity: get('wrongsecrets.affinity'),
@@ -148,9 +179,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
       },
     },
   };
-
   return k8sAppsApi
-    .createNamespacedDeployment(get('namespace'), deploymentWrongSecretsConfig)
+    .createNamespacedDeployment('t-' + team, deploymentWrongSecretsConfig)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -162,6 +192,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsDesktopConfig = {
     metadata: {
       name: `t-${team}-virtualdesktop`,
+      namespace: `t-${team}`,
       labels: {
         app: 'virtualdesktop',
         team,
@@ -173,7 +204,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/passcode': passcodeHash,
         'wrongsecrets-ctf-party/challengesSolved': '0',
       },
-      ...(await getOwnerReference()),
+      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -189,6 +220,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             app: 'virtualdesktop',
             team,
             'deployment-context': get('deploymentContext'),
+            namespace: `t-${team}`,
           },
         },
         spec: {
@@ -221,7 +253,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/',
                   port: 3000,
                 },
-                initialDelaySeconds: 5,
+                initialDelaySeconds: 24,
                 periodSeconds: 2,
                 failureThreshold: 10,
               },
@@ -248,7 +280,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
   };
 
   return k8sAppsApi
-    .createNamespacedDeployment(get('namespace'), deploymentWrongSecretsDesktopConfig)
+    .createNamespacedDeployment('t-' + team, deploymentWrongSecretsDesktopConfig)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -258,15 +290,16 @@ module.exports.createDesktopDeploymentForTeam = createDesktopDeploymentForTeam;
 
 const createServiceForTeam = async (teamname) =>
   k8sCoreApi
-    .createNamespacedService(get('namespace'), {
+    .createNamespacedService('t-' + teamname, {
       metadata: {
+        namespace: `t-${teamname}`,
         name: `t-${teamname}-wrongsecrets`,
         labels: {
           app: 'wrongsecrets',
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        ...(await getOwnerReference()),
+        // ...(await getOwnerReference()),
       },
       spec: {
         selector: {
@@ -288,15 +321,16 @@ module.exports.createServiceForTeam = createServiceForTeam;
 
 const createDesktopServiceForTeam = async (teamname) =>
   k8sCoreApi
-    .createNamespacedService(get('namespace'), {
+    .createNamespacedService('t-' + teamname, {
       metadata: {
         name: `t-${teamname}-virtualdesktop`,
+        namespace: `t-${teamname}`,
         labels: {
           app: 'virtualdesktop',
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        ...(await getOwnerReference()),
+        // ...(await getOwnerReference()),
       },
       spec: {
         selector: {
@@ -317,47 +351,50 @@ const createDesktopServiceForTeam = async (teamname) =>
     });
 module.exports.createDesktopServiceForTeam = createDesktopServiceForTeam;
 
-async function getOwnerReference() {
-  if (get('skipOwnerReference') === true) {
-    return {};
-  }
-  return {
-    ownerReferences: [
-      {
-        apiVersion: 'apps/v1',
-        blockOwnerDeletion: true,
-        controller: true,
-        kind: 'Deployment',
-        name: 'wrongsecrets-balancer',
-        uid: await getJuiceBalancerDeploymentUid(),
-      },
-    ],
-  };
-}
+//used for owner ref, not used now as we cannot do clusterwide owning of namespaced items:
+// async function getOwnerReference() {
+//   if (get('skipOwnerReference') === true) {
+//     return {};
+//   }
+//   return {
+//     ownerReferences: [
+//       {
+//         apiVersion: 'apps/v1',
+//         blockOwnerDeletion: true,
+//         controller: true,
+//         kind: 'Deployment',
+//         name: 'wrongsecrets-balancer',
+//         uid: await getJuiceBalancerDeploymentUid(),
+//       },
+//     ],
+//   };
+// }
 
+// TODO fix!
 const getJuiceShopInstances = () =>
   k8sAppsApi
-    .listNamespacedDeployment(
-      get('namespace'),
-      true,
-      undefined,
-      undefined,
-      undefined,
-      `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
-    )
+    //namespace: string, pretty?: string, allowWatchBookmarks?: boolean, _continue?: string, fieldSelector?: string, labelSelector?: string, limit?: number, resourceVersion?: string, resourceVersionMatch?: string, timeoutSeconds?: number, watch?: boolean
+    // .listDeploymentForAllNamespaces(
+    //   get('namespace'), //namespace
+    //   true, //alowwatchbookmarks
+    //   undefined,//fieldselector
+    //   undefined, //labelSelector
+    //   undefined, //limit
+    //   `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
+    .listDeploymentForAllNamespaces()
     .catch((error) => {
-      throw new Error(error.response.body.message);
+      throw new Error(error);
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
 const deleteDeploymentForTeam = async (team) => {
   await k8sAppsApi
-    .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, get('namespace'))
+    .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
   await k8sAppsApi
-    .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, get('namespace'))
+    .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -365,13 +402,11 @@ const deleteDeploymentForTeam = async (team) => {
 module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
 
 const deleteServiceForTeam = async (team) => {
+  await k8sCoreApi.deleteNamespacedService(`t-${team}-wrongsecrets`, `t-${team}`).catch((error) => {
+    throw new Error(error.response.body.message);
+  });
   await k8sCoreApi
-    .deleteNamespacedService(`t-${team}-wrongsecrets`, get('namespace'))
-    .catch((error) => {
-      throw new Error(error.response.body.message);
-    });
-  await k8sCoreApi
-    .deleteNamespacedService(`t-${team}-virtualdesktop`, get('namespace'))
+    .deleteNamespacedService(`t-${team}-virtualdesktop`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -380,7 +415,7 @@ module.exports.deleteServiceForTeam = deleteServiceForTeam;
 
 const deletePodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
-    get('namespace'),
+    `t-${team}`,
     true,
     undefined,
     undefined,
@@ -396,13 +431,13 @@ const deletePodForTeam = async (team) => {
 
   const podname = pods[0].metadata.name;
 
-  await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
+  await k8sCoreApi.deleteNamespacedPod(podname, `t-${team}`);
 };
 module.exports.deletePodForTeam = deletePodForTeam;
 
 const deleteDesktopPodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
-    get('namespace'),
+    `t-${team}`,
     true,
     undefined,
     undefined,
@@ -418,13 +453,13 @@ const deleteDesktopPodForTeam = async (team) => {
 
   const podname = pods[0].metadata.name;
 
-  await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
+  await k8sCoreApi.deleteNamespacedPod(podname, `t-${team}`);
 };
 module.exports.deleteDesktopPodForTeam = deleteDesktopPodForTeam;
 
 const getJuiceShopInstanceForTeamname = (teamname) =>
   k8sAppsApi
-    .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, get('namespace'))
+    .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, `t-${teamname}`)
     .then((res) => {
       return {
         readyReplicas: res.body.status.readyReplicas,
@@ -441,7 +476,7 @@ const updateLastRequestTimestampForTeam = (teamname) => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };
   return k8sAppsApi.patchNamespacedDeployment(
     `t-${teamname}-wrongsecrets`,
-    get('namespace'),
+    `t-${teamname}`,
     {
       metadata: {
         annotations: {
@@ -471,7 +506,7 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
 
   await k8sAppsApi.patchNamespacedDeployment(
     `${teamname}-wrongsecrets`,
-    get('namespace'),
+    `t-${teamname}`,
     deploymentPatch,
     undefined,
     undefined,

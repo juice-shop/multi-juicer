@@ -11,6 +11,7 @@ const {
   createDeploymentForTeam,
   createDesktopDeploymentForTeam,
   createServiceForTeam,
+  createNameSpaceForTeam,
   createDesktopServiceForTeam,
   changePasscodeHashForTeam,
 } = require('../kubernetes');
@@ -146,6 +147,7 @@ test('create team creates a instance for team via k8s service', async () => {
       passcode = body.passcode;
     });
 
+  expect(createNameSpaceForTeam).toHaveBeenCalled();
   expect(createDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopServiceForTeam).toHaveBeenCalled();
