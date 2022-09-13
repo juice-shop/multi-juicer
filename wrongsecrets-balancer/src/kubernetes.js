@@ -127,11 +127,11 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
 
               volumeMounts: [
-                {
-                  name: 'wrongsecrets-config',
-                  mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
-                  subPath: 'wrongsecrets-ctf-party.yaml',
-                },
+                // {
+                //   name: 'wrongsecrets-config',
+                //   mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
+                //   subPath: 'wrongsecrets-ctf-party.yaml',
+                // },
                 {
                   mountPath: '/tmp',
                   name: 'cache-volume',
