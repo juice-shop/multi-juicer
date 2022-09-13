@@ -44,7 +44,7 @@ async function main() {
     undefined,
     'app in (wrongsecrets, virtualdesktop)',
     200
-  )
+  );
 
   console.log(`Found ${instances.body.items.length} instances. Checking their activity.`);
 
