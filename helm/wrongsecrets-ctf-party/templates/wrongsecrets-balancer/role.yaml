@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  namespace: {{ .Release.Namespace | quote }}
+  # namespace: {{ .Release.Namespace | quote }}
   name: wrongsecrets-balancer
   labels:
     helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
@@ -17,4 +17,4 @@ rules:
     verbs: ['get', 'list', 'delete']
   - apiGroups: ['']
     resources: ['namespaces']
-    verbs: ['get', 'create', 'list', 'delete', 'patch']
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

@@ -176,7 +176,7 @@ async function createTeam(req, res) {
 
     await createNameSpaceForTeam(team);
     logger.info(`Created Namespace for team '${team}'`);
-    
+
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 
