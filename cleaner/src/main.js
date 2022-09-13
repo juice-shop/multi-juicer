@@ -38,14 +38,13 @@ async function main() {
   console.log(
     `Looking for WrongSecerets Instances which have been inactive for more than ${MaxInactiveDuration}.`
   );
-  const instances = await k8sAppsApi.listNamespacedDeployment(
-    Namespace,
+  const instances = await k8sAppsApi.listDeploymentForAllNamespaces(
     true,
     undefined,
     undefined,
-    undefined,
-    'app=wrongsecrets'
-  );
+    'app in (wrongsecrets, virtualdesktop)',
+    200
+  )
 
   console.log(`Found ${instances.body.items.length} instances. Checking their activity.`);
 

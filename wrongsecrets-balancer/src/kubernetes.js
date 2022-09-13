@@ -381,8 +381,15 @@ const getJuiceShopInstances = () =>
     //   undefined, //labelSelector
     //   undefined, //limit
     //   `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
-    .listDeploymentForAllNamespaces()
+    .listDeploymentForAllNamespaces(
+      true,
+      undefined,
+      undefined,
+      'app in (wrongsecrets, virtualdesktop)',
+      200
+    )
     .catch((error) => {
+      console.log(error);
       throw new Error(error);
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;

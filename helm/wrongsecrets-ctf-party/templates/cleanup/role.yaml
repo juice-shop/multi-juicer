@@ -1,8 +1,8 @@
 {{- if .Values.wrongsecretsCleanup.enabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  namespace: {{ .Release.Namespace | quote }}
+  # namespace: {{ .Release.Namespace | quote }}
   name: wrongsecrets-cleaner
   labels:
     helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}

@@ -1,16 +1,17 @@
 {{- if .Values.wrongsecretsCleanup.enabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: wrongsecrets-cleaner
-  namespace: {{ .Release.Namespace | quote }}
+  # namespace: {{ .Release.Namespace | quote }}
   labels:
     helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 subjects:
   - kind: ServiceAccount
     name: wrongsecrets-cleaner # Name is case sensitive
+    namespace: {{ .Release.Namespace | quote }}
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: wrongsecrets-cleaner
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
