@@ -177,7 +177,6 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
       },
     },
   };
-  // console.log(deploymentWrongSecretsConfig);
   return k8sAppsApi
     .createNamespacedDeployment('t-' + team, deploymentWrongSecretsConfig)
     .catch((error) => {

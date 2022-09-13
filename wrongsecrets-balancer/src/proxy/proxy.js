@@ -126,12 +126,12 @@ function proxyTrafficToJuiceShop(req, res) {
   ) {
     logger.info('we have a desktop entry for team ' + teamname);
     target = {
-      target: `http://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+      target: `http://${teamname}-virtualdesktop.${teamname}.svc:8080`,
       ws: true,
     };
   } else {
     target = {
-      target: `http://${teamname}-wrongsecrets.${get('namespace')}.svc:8080`,
+      target: `http://${teamname}-wrongsecrets.${teamname}.svc:8080`,
       ws: true,
     };
   }
@@ -143,14 +143,14 @@ function proxyTrafficToJuiceShop(req, res) {
     server.on('upgrade', function (req, socket, head) {
       logger.info('proxying upgrade request for: ' + req.url);
       proxy.ws(req, socket, head, {
-        target: `ws://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+        target: `ws://${teamname}-virtualdesktop.${teamname}.svc:8080`,
         ws: true,
       });
     });
     server.on('connect', function (req, socket, head) {
       logger.info('proxying connect request for: ' + req.url);
       proxy.ws(req, socket, head, {
-        target: `ws://${teamname}-virtualdesktop.${get('namespace')}.svc:8080`,
+        target: `ws://${teamname}-virtualdesktop.${teamname}.svc:8080`,
         ws: true,
       });
     });
