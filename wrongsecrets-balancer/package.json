@@ -1,14 +1,14 @@
 {
   "name": "wrongsecrets-balancer",
   "version": "1.0.0",
-  "description": "Run Capture the Flags and Security Trainings with OWASP Juice Shop",
+  "description": "Run Capture the Flags and Security Trainings with OWASP Wrongsecrets (based on multijuicer from Iteratec)",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint --config .eslintrc src/**",
     "test": "NODE_ENV=test jest"
   },
   "keywords": [],
-  "author": "iteratec GmbH",
+  "author": "Project OWASP WrongSecrets",
   "license": "Apache-2.0",
   "dependencies": {
     "@hapi/joi": "^17.1.1",

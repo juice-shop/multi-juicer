@@ -209,7 +209,7 @@ virtualdesktop:
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 wrongsecretsCleanup:
-  repository: iteratec/cleaner
+  repository: jeroenwillemsen/wrongsecrets-ctf-cleaner
   tag: null
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
