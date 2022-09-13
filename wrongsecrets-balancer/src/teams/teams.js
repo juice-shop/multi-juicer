@@ -12,6 +12,7 @@ const router = express.Router();
 
 const {
   createDeploymentForTeam,
+  createNameSpaceForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
@@ -173,6 +174,9 @@ async function createTeam(req, res) {
 
     logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
 
+    await createNameSpaceForTeam(team);
+    logger.info(`Created Namespace for team '${team}'`);
+    
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 

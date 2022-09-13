@@ -20,6 +20,22 @@ const getJuiceBalancerDeploymentUid = once(async () => {
   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
 });
 
+const createNameSpaceForTeam = async (team)=>{
+  const namedNameSpace = {
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "name": "t-"+team
+    }
+  };
+  k8sCoreApi.createNamespace(namedNameSpace)
+  .catch((error) => {
+    throw new Error(error.response.body.message);
+  });
+
+};
+module.exports.createNameSpaceForTeam = createNameSpaceForTeam;
+
 const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
     metadata: {
@@ -150,7 +166,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   };
 
   return k8sAppsApi
-    .createNamespacedDeployment(get('namespace'), deploymentWrongSecretsConfig)
+    .createNamespacedDeployment('t-'+team, deploymentWrongSecretsConfig)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -248,7 +264,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
   };
 
   return k8sAppsApi
-    .createNamespacedDeployment(get('namespace'), deploymentWrongSecretsDesktopConfig)
+    .createNamespacedDeployment('t-'+team, deploymentWrongSecretsDesktopConfig)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -258,7 +274,7 @@ module.exports.createDesktopDeploymentForTeam = createDesktopDeploymentForTeam;
 
 const createServiceForTeam = async (teamname) =>
   k8sCoreApi
-    .createNamespacedService(get('namespace'), {
+    .createNamespacedService('t-'+teamname, {
       metadata: {
         name: `t-${teamname}-wrongsecrets`,
         labels: {
@@ -288,7 +304,7 @@ module.exports.createServiceForTeam = createServiceForTeam;
 
 const createDesktopServiceForTeam = async (teamname) =>
   k8sCoreApi
-    .createNamespacedService(get('namespace'), {
+    .createNamespacedService('t-'+teamname, {
       metadata: {
         name: `t-${teamname}-virtualdesktop`,
         labels: {
@@ -335,6 +351,7 @@ async function getOwnerReference() {
   };
 }
 
+// TODO fix!
 const getJuiceShopInstances = () =>
   k8sAppsApi
     .listNamespacedDeployment(
@@ -352,12 +369,12 @@ module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
 const deleteDeploymentForTeam = async (team) => {
   await k8sAppsApi
-    .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, get('namespace'))
+    .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
   await k8sAppsApi
-    .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, get('namespace'))
+    .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -366,12 +383,12 @@ module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
 
 const deleteServiceForTeam = async (team) => {
   await k8sCoreApi
-    .deleteNamespacedService(`t-${team}-wrongsecrets`, get('namespace'))
+    .deleteNamespacedService(`t-${team}-wrongsecrets`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
   await k8sCoreApi
-    .deleteNamespacedService(`t-${team}-virtualdesktop`, get('namespace'))
+    .deleteNamespacedService(`t-${team}-virtualdesktop`, `t-${team}`)
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
@@ -380,7 +397,7 @@ module.exports.deleteServiceForTeam = deleteServiceForTeam;
 
 const deletePodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
-    get('namespace'),
+    `t-${team}`,
     true,
     undefined,
     undefined,
@@ -396,13 +413,13 @@ const deletePodForTeam = async (team) => {
 
   const podname = pods[0].metadata.name;
 
-  await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
+  await k8sCoreApi.deleteNamespacedPod(podname, `t-${team}`);
 };
 module.exports.deletePodForTeam = deletePodForTeam;
 
 const deleteDesktopPodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
-    get('namespace'),
+    `t-${team}`,
     true,
     undefined,
     undefined,
@@ -418,13 +435,13 @@ const deleteDesktopPodForTeam = async (team) => {
 
   const podname = pods[0].metadata.name;
 
-  await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
+  await k8sCoreApi.deleteNamespacedPod(podname, `t-${team}`);
 };
 module.exports.deleteDesktopPodForTeam = deleteDesktopPodForTeam;
 
 const getJuiceShopInstanceForTeamname = (teamname) =>
   k8sAppsApi
-    .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, get('namespace'))
+    .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, `t-${teamname}`)
     .then((res) => {
       return {
         readyReplicas: res.body.status.readyReplicas,
@@ -441,7 +458,7 @@ const updateLastRequestTimestampForTeam = (teamname) => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };
   return k8sAppsApi.patchNamespacedDeployment(
     `t-${teamname}-wrongsecrets`,
-    get('namespace'),
+    `t-${teamname}`,
     {
       metadata: {
         annotations: {
@@ -471,7 +488,7 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
 
   await k8sAppsApi.patchNamespacedDeployment(
     `${teamname}-wrongsecrets`,
-    get('namespace'),
+    `t-${teamname}`,
     deploymentPatch,
     undefined,
     undefined,

@@ -15,3 +15,6 @@ rules:
   - apiGroups: [''] # "" indicates the core API group
     resources: ['pods']
     verbs: ['get', 'list', 'delete']
+  - apiGroups: ['']
+    resources: ['namespaces']
+    verbs: ['get', 'create', 'list', 'delete', 'patch']
