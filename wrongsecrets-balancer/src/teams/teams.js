@@ -113,8 +113,9 @@ async function joinIfTeamAlreadyExists(req, res, next) {
       logger.info(`Team ${team} doesn't have a WrongSecrets deployment yet`);
       return next();
     } else {
-      logger.error('Encountered unknown error while checking for existing WrongSecrets deployment');
-      logger.error(error.message);
+      logger.error(
+        `Encountered unknown error while checking for existing WrongSecrets deployment: ${error.message}`
+      );
       return res
         .status(500)
         .send({ message: `Unknown error while looking for an existing instance."` });
@@ -199,9 +200,8 @@ async function createTeam(req, res) {
         passcode,
       });
   } catch (error) {
-    logger.error(`Error while creating deployment or service for team ${team}`);
-    logger.error(error.message);
-    res.status(500).send({ message: 'Failed to Create Instance: ' + error.message });
+    logger.error(`Error while creating deployment or service for team ${team}: ${error.message}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
   }
 }
 
@@ -236,8 +236,10 @@ async function resetPasscode(req, res) {
       logger.info(`Team ${team} doesn't have a wrongsecrets deployment yet`);
       return res.status(404).send({ message: 'No instance to reset the passcode for.' });
     }
-    logger.error('Encountered unknown error while resetting passcode hash for deployment');
-    logger.error(error.message);
+    logger.error(
+      `Encountered unknown error while resetting passcode hash for deployment: ${error.message}`
+    );
+    // logger.error(error.message);
     return res.status(500).send({ message: 'Unknown error while resetting passcode.' });
   }
 }
@@ -267,7 +269,7 @@ async function awaitReadiness(req, res) {
     logger.error(`Waiting for deployment of team '${team}' timed out`);
     res.status(500).send({ message: 'Waiting for Deployment Readiness Timed Out' });
   } catch (error) {
-    logger.error(`Failed to wait for teams '${team}' deployment to get ready`);
+    logger.error(`Failed to wait for teams '${team}' deployment to get ready: ${error}`);
     logger.error(error);
     res.status(500).send({ message: 'Failed to Wait For Deployment Readiness' });
   }

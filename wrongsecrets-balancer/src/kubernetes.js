@@ -25,7 +25,10 @@ const createNameSpaceForTeam = async (team) => {
     apiVersion: 'v1',
     kind: 'Namespace',
     metadata: {
-      name: 't-' + team,
+      name: `t-${team}`,
+    },
+    labels: {
+      name: `t-${team}`,
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
@@ -38,10 +41,12 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
     metadata: {
       name: `t-${team}-wrongsecrets`,
+      namespace: `t-${team}`,
       labels: {
         app: 'wrongsecrets',
         team,
         'deployment-context': get('deploymentContext'),
+        namespace: `t-${team}`,
       },
       annotations: {
         'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
@@ -58,6 +63,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
           app: 'wrongsecrets',
           team,
           'deployment-context': get('deploymentContext'),
+          namespace: `t-${team}`,
         },
       },
       template: {
@@ -66,6 +72,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             app: 'wrongsecrets',
             team,
             'deployment-context': get('deploymentContext'),
+            namespace: `t-${team}`,
           },
         },
         spec: {
@@ -81,7 +88,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
               image: 'jeroenwillemsen/wrongsecrets:latest-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
-              resources: get('wrongsecrets.resources'),
+              // resources: get('wrongsecrets.resources'),
               securityContext: {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
@@ -98,7 +105,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 {
                   name: 'SOLUTIONS_WEBHOOK',
-                  value: `http://progress-watchdog.${get('namespace')}.svc/team/${team}/webhook`,
+                  value: `http://progress-watchdog.t-${team}.svc/team/${team}/webhook`,
                 },
                 ...get('wrongsecrets.env', []),
               ],
@@ -113,7 +120,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/',
                   port: 8080,
                 },
-                initialDelaySeconds: 5,
+                initialDelaySeconds: 20,
                 periodSeconds: 2,
                 failureThreshold: 10,
               },
@@ -125,7 +132,18 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
+              resources: {
+                requests: {
+                  memory: '512Mi',
+                  cpu: '200m',
+                },
+                limits: {
+                  memory: '512Mi',
+                  cpu: '200m',
+                },
+              },
 
+              //#TODO: DELETE NAMESPACE WHEN DELETING BOTH PODS AND SERVICE!
               volumeMounts: [
                 // {
                 //   name: 'wrongsecrets-config',
@@ -136,22 +154,22 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   mountPath: '/tmp',
                   name: 'cache-volume',
                 },
-                ...get('wrongsecrets.volumeMounts', []),
+                // ...get('wrongsecrets.volumeMounts', []),
               ],
             },
           ],
           volumes: [
-            {
-              name: 'wrongsecrets-config',
-              configMap: {
-                name: 'wrongsecrets-config',
-              },
-            },
+            // {
+            //   name: 'wrongsecrets-config',
+            //   configMap: {
+            //     name: 'wrongsecrets-config',
+            //   },
+            // },
             {
               name: 'cache-volume',
               emptyDir: {},
             },
-            ...get('wrongsecrets.volumes', []),
+            // ...get('wrongsecrets.volumes', []),
           ],
           tolerations: get('wrongsecrets.tolerations'),
           affinity: get('wrongsecrets.affinity'),
@@ -162,7 +180,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
       },
     },
   };
-
+  console.log(deploymentWrongSecretsConfig);
   return k8sAppsApi
     .createNamespacedDeployment('t-' + team, deploymentWrongSecretsConfig)
     .catch((error) => {
@@ -176,6 +194,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsDesktopConfig = {
     metadata: {
       name: `t-${team}-virtualdesktop`,
+      namespace: `t-${team}`,
       labels: {
         app: 'virtualdesktop',
         team,
@@ -203,6 +222,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             app: 'virtualdesktop',
             team,
             'deployment-context': get('deploymentContext'),
+            namespace: `t-${team}`,
           },
         },
         spec: {
@@ -235,7 +255,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/',
                   port: 3000,
                 },
-                initialDelaySeconds: 5,
+                initialDelaySeconds: 24,
                 periodSeconds: 2,
                 failureThreshold: 10,
               },
@@ -275,6 +295,7 @@ const createServiceForTeam = async (teamname) =>
     .createNamespacedService('t-' + teamname, {
       metadata: {
         name: `t-${teamname}-wrongsecrets`,
+        namespace: `t-${teamname}`,
         labels: {
           app: 'wrongsecrets',
           team: teamname,
@@ -305,6 +326,7 @@ const createDesktopServiceForTeam = async (teamname) =>
     .createNamespacedService('t-' + teamname, {
       metadata: {
         name: `t-${teamname}-virtualdesktop`,
+        namespace: `t-${teamname}`,
         labels: {
           app: 'virtualdesktop',
           team: teamname,
@@ -352,9 +374,17 @@ async function getOwnerReference() {
 // TODO fix!
 const getJuiceShopInstances = () =>
   k8sAppsApi
-    .listNamespacedDeployment(
-      get('namespace'),
+    //namespace: string, pretty?: string, allowWatchBookmarks?: boolean, _continue?: string, fieldSelector?: string, labelSelector?: string, limit?: number, resourceVersion?: string, resourceVersionMatch?: string, timeoutSeconds?: number, watch?: boolean
+    // .listDeploymentForAllNamespaces(
+    //   get('namespace'), //namespace
+    //   true, //alowwatchbookmarks
+    //   undefined,//fieldselector
+    //   undefined, //labelSelector
+    //   undefined, //limit
+    //   `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
+    .listDeploymentForAllNamespaces(
       true,
+      false,
       undefined,
       undefined,
       undefined,
