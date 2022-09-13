@@ -40,13 +40,12 @@ module.exports.createNameSpaceForTeam = createNameSpaceForTeam;
 const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
     metadata: {
-      name: `t-${team}-wrongsecrets`,
       namespace: `t-${team}`,
+      name: `t-${team}-wrongsecrets`,
       labels: {
         app: 'wrongsecrets',
         team,
         'deployment-context': get('deploymentContext'),
-        namespace: `t-${team}`,
       },
       annotations: {
         'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
@@ -55,7 +54,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/challengesSolved': '0',
         'wrongsecrets-ctf-party/challenges': '[]',
       },
-      ...(await getOwnerReference()),
+      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -63,7 +62,6 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
           app: 'wrongsecrets',
           team,
           'deployment-context': get('deploymentContext'),
-          namespace: `t-${team}`,
         },
       },
       template: {
@@ -72,7 +70,6 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             app: 'wrongsecrets',
             team,
             'deployment-context': get('deploymentContext'),
-            namespace: `t-${team}`,
           },
         },
         spec: {
@@ -180,7 +177,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
       },
     },
   };
-  console.log(deploymentWrongSecretsConfig);
+  // console.log(deploymentWrongSecretsConfig);
   return k8sAppsApi
     .createNamespacedDeployment('t-' + team, deploymentWrongSecretsConfig)
     .catch((error) => {
@@ -206,7 +203,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/passcode': passcodeHash,
         'wrongsecrets-ctf-party/challengesSolved': '0',
       },
-      ...(await getOwnerReference()),
+      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -294,14 +291,14 @@ const createServiceForTeam = async (teamname) =>
   k8sCoreApi
     .createNamespacedService('t-' + teamname, {
       metadata: {
-        name: `t-${teamname}-wrongsecrets`,
         namespace: `t-${teamname}`,
+        name: `t-${teamname}-wrongsecrets`,
         labels: {
           app: 'wrongsecrets',
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        ...(await getOwnerReference()),
+        // ...(await getOwnerReference()),
       },
       spec: {
         selector: {
@@ -332,7 +329,7 @@ const createDesktopServiceForTeam = async (teamname) =>
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        ...(await getOwnerReference()),
+        // ...(await getOwnerReference()),
       },
       spec: {
         selector: {
