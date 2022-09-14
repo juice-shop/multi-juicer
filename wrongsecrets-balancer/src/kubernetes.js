@@ -154,8 +154,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'SPECIAL_K8S_SECRET',
                   valueFrom: {
                     configMapKeyRef:{
-                      key: 'funny.entry',
                       name: 'secrets-file',
+                      key: 'funny.entry',
                     }
                   }
                 },
@@ -163,8 +163,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'SPECIAL_SPECIAL_K8S_SECRET',
                   valueFrom: {
                     secretKeyRef:{
-                      key: 'funnier',
                       name: 'funnystuff',
+                      key: 'funnier',
                     }
                   }
                 },
