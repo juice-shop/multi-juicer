@@ -149,6 +149,8 @@ test('create team creates a instance for team via k8s service', async () => {
       passcode = body.passcode;
     });
 
+  expect(createConfigmapForTeam).toHaveBeenCalled();
+  expect(createSecretsfileForTeam).toHaveBeenCalled();
   expect(createNameSpaceForTeam).toHaveBeenCalled();
   expect(createDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopDeploymentForTeam).toHaveBeenCalled();
