@@ -39,6 +39,44 @@ const createNameSpaceForTeam = async (team) => {
 };
 module.exports.createNameSpaceForTeam = createNameSpaceForTeam;
 
+const createConfigmapForTeam = async (team) => {
+  const configmap = {
+    apiVersion: 'v1',
+    data: {
+      'funny.entry': 'thisIsK8SConfigMap',
+    },
+    kind: 'ConfigMap',
+    metadata: {
+      annotations: {},
+      name: 'secrets-file',
+      namespace: `t-${team}`,
+    },
+  };
+  return k8sCoreApi.createNamespacedConfigMap('t-' + team, configmap).catch((error) => {
+    throw new Error(error.response.body.message);
+  });
+};
+module.exports.createConfigmapForTeam = createConfigmapForTeam;
+
+const createSecretsfileForTeam = async (team) => {
+  const secret = {
+    apiVersion: 'v1',
+    data: {
+      funnier: 'dGhpcyBpcyBhcGFzc3dvcmQ=',
+    },
+    kind: 'Secret',
+    type: 'Opaque',
+    metadata: {
+      name: 'funnystuff',
+      namespace: `t-${team}`,
+    },
+  };
+  return k8sCoreApi.createNamespacedSecret('t-' + team, secret).catch((error) => {
+    throw new Error(error.response.body.message);
+  });
+};
+module.exports.createSecretsfileForTeam = createSecretsfileForTeam;
+
 const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
     metadata: {
@@ -95,16 +133,38 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
               env: [
                 {
-                  name: 'NODE_ENV',
-                  value: get('wrongsecrets.nodeEnv'),
+                  name: 'hints_enabled',
+                  value: 'false',
                 },
                 {
-                  name: 'CTF_KEY',
-                  value: get('wrongsecrets.ctfKey'),
+                  name: 'ctf_enabled',
+                  value: 'true',
                 },
                 {
-                  name: 'SOLUTIONS_WEBHOOK',
-                  value: `http://progress-watchdog.t-${team}.svc/team/${team}/webhook`,
+                  name: 'ctf_key',
+                  value: 'notarealkeyyouknowbutyoumightgetflags',
+                },
+                {
+                  name: 'K8S_ENV',
+                  value: 'k8s',
+                },
+                {
+                  name: 'SPECIAL_K8S_SECRET',
+                  valueFrom: {
+                    configMapKeyRef: {
+                      name: 'secrets-file',
+                      key: 'funny.entry',
+                    },
+                  },
+                },
+                {
+                  name: 'SPECIAL_SPECIAL_K8S_SECRET',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'funnystuff',
+                      key: 'funnier',
+                    },
+                  },
                 },
                 ...get('wrongsecrets.env', []),
               ],
@@ -390,35 +450,38 @@ const getJuiceShopInstances = () =>
     )
     .catch((error) => {
       console.log(error);
-      throw new Error(error);
+      throw new Error(error.response.body.message);
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
-const deleteDeploymentForTeam = async (team) => {
-  await k8sAppsApi
-    .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, `t-${team}`)
-    .catch((error) => {
-      throw new Error(error.response.body.message);
-    });
-  await k8sAppsApi
-    .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, `t-${team}`)
-    .catch((error) => {
-      throw new Error(error.response.body.message);
-    });
-};
-module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
-
-const deleteServiceForTeam = async (team) => {
-  await k8sCoreApi.deleteNamespacedService(`t-${team}-wrongsecrets`, `t-${team}`).catch((error) => {
+const deleteNamespaceForTeam = async (team) => {
+  // await k8sAppsApi
+  //   .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, `t-${team}`)
+  //   .catch((error) => {
+  //     throw new Error(error.response.body.message);
+  //   });
+  // await k8sAppsApi
+  //   .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, `t-${team}`)
+  //   .catch((error) => {
+  //     throw new Error(error.response.body.message);
+  //   });
+  await k8sCoreApi.deleteNamespace(`t-${team}`).catch((error) => {
     throw new Error(error.response.body.message);
   });
-  await k8sCoreApi
-    .deleteNamespacedService(`t-${team}-virtualdesktop`, `t-${team}`)
-    .catch((error) => {
-      throw new Error(error.response.body.message);
-    });
 };
-module.exports.deleteServiceForTeam = deleteServiceForTeam;
+module.exports.deleteNamespaceForTeam = deleteNamespaceForTeam;
+
+// const deleteServiceForTeam = async (team) => {
+//   await k8sCoreApi.deleteNamespacedService(`t-${team}-wrongsecrets`, `t-${team}`).catch((error) => {
+//     throw new Error(error.response.body.message);
+//   });
+//   await k8sCoreApi
+//     .deleteNamespacedService(`t-${team}-virtualdesktop`, `t-${team}`)
+//     .catch((error) => {
+//       throw new Error(error.response.body.message);
+//     });
+// };
+// module.exports.deleteServiceForTeam = deleteServiceForTeam;
 
 const deletePodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
