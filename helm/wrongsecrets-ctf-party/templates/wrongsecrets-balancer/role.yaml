@@ -17,3 +17,9 @@ rules:
   - apiGroups: [''] # "" indicates the core API group
     resources: ['namespaces']
     verbs: ['get', 'create', 'list', 'delete', 'patch', 'watch', 'update']
+  - apiGroups: [''] # "" indicates the core API group
+    resources: ['configmaps']
+    verbs: ['create', 'get', 'list', 'delete']
+  - apiGroups: [''] # "" indicates the core API group
+    resources: ['secrets']
+    verbs: ['create', 'get', 'list', 'delete']

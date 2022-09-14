@@ -19,6 +19,8 @@ const {
   changePasscodeHashForTeam,
   createDesktopDeploymentForTeam,
   createDesktopServiceForTeam,
+  createConfigmapForTeam,
+  createSecretsfileForTeam,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -173,16 +175,28 @@ async function createTeam(req, res) {
   try {
     const { passcode, hash } = await generatePasscode();
 
-    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
-
+    logger.info(`Creating Namespace for team '${team}'`);    
     await createNameSpaceForTeam(team);
-    logger.info(`Created Namespace for team '${team}'`);
+  } catch (error) {
+    logger.error(`Error while creating namespace for ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try{
+    logger.info(`Creating Configmap for team '${team}'`);
+    await createConfigmapForTeam(team);
 
+    logger.info(`Creating Secretsfile for team '${team}'`)
+    await createSecretsfileForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating secretsfile or configmap for ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try{
+    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
 
-    logger.info(`Created Wrongsecrets Deployment for team '${team}'`);
-
+    logger.info(`Created virtualdesktop Deployment for team '${team}'`);
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
     await createDesktopServiceForTeam(team);
 
