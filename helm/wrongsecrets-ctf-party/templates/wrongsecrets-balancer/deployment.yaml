@@ -44,6 +44,12 @@ spec:
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
               value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME AND DO SO IN CONTAINER DEF AS WELL!
+            - name: REACT_APP_HEROKU_WRONGSECRETS_URL
+              value: "https://wrongsecrets.herokuapp.com/"
+            - name: REACT_APP_CTFD_URL
+              value: "https://ctfd.io"
+            - name: REACT_APP_S3_BUCKET_URL
+              value: "s3://funstuff"
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:

@@ -6,7 +6,6 @@ RUN npm ci --production
 
 FROM node:16-alpine as ui
 RUN mkdir -p /home/app
-ENV REACT_APP_MOVING_GIF_LOGO "https://i.gifer.com/9kGQ.gif"
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
 RUN npm ci
@@ -24,5 +23,4 @@ COPY --chown=app:app ./src src/
 USER 1001
 EXPOSE 8080
 ENV NODE_ENV ${NODE_ENV:-production}
-ENV REACT_APP_MOVING_GIF_LOGO "https://i.gifer.com/9kGQ.gif"
 CMD ["node", "/home/app/src/index.js"]

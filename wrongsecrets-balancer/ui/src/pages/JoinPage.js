@@ -17,6 +17,14 @@ const messages = defineMessages({
   },
 });
 
+const CenterLogo = styled.img`
+display: block;
+margin-left: auto;
+margin-right: auto;
+width: 50%;
+`;
+
+
 export const JoinPage = injectIntl(({ intl }) => {
   const [teamname, setTeamname] = useState('');
   const [failed, setFailed] = useState(false);
@@ -61,16 +69,27 @@ export const JoinPage = injectIntl(({ intl }) => {
     sendJoinRequest({ teamname });
   }
 
-  const CenterLogo = styled.img`
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-`;
+  const initialDynamics = {                   // type all the fields you need
+    react_gif_logo: 'https://i.gifer.com/9kGQ.gif',
+    heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
+    ctfd_url: process.env['REACT_APP_CTFD_URL'],
+    s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
+  };
 
-CenterLogo.defaultProps = {
-  src: process.env.REACT_APP_MOVING_GIF_LOGO,
-}
+  const [dynamics, setDynamics] = useState(initialDynamics);
+  useEffect(() => {
+    axios.get('/balancer/dynamics')
+    .then((response) => {
+      setDynamics(response.data)
+    })
+    .catch((err) => {
+      console.error(`Failed to wait parse values: ${err}`);
+    });
+  });
+
+ 
+
+
 
 
   return (
@@ -84,7 +103,7 @@ CenterLogo.defaultProps = {
       ) : null}
 
       <BodyCard>
-        <CenterLogo/>
+        <CenterLogo src={dynamics.react_gif_logo}/>
         <H2>
           <FormattedMessage id="welcome_title" defaultMessage="Welcome!" />
         </H2>
@@ -96,9 +115,9 @@ CenterLogo.defaultProps = {
         }}/>
         <ul> 
           <li>This domain: here is where you can do your exercises</li>
-          <li>The domain where you provide your responses in exchange for a CTF key: URLHERE1</li>
-          <li>The domain where you provide your CTF key: URLHERE2</li>
-          <li>Optionally: the storage bucket with Terraform state for the cloud challneges: URLHERE3</li>
+          <li>The domain where you provide your responses in exchange for a CTF key: <a href={dynamics.heroku_wrongsecret_ctf_url}>{dynamics.heroku_wrongsecret_ctf_url}</a></li>
+          <li>The domain where you provide your CTF key: <a href={dynamics.ctfd_url}>{dynamics.ctfd_url}</a></li>
+          <li>Optionally: the storage bucket with Terraform state for the cloud challneges: <a href={dynamics.s3_bucket_url}>{dynamics.s3_bucket_url}</a></li>
         </ul>
         <FormattedMessage id="welcome_text_2" defaultMessage={`
           We need multiple domains, as you will be able to steal the CTF key after a few challenges.

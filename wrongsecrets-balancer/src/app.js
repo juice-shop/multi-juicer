@@ -49,6 +49,15 @@ const adminRoutes = require('./admin/admin');
 const proxyRoutes = require('./proxy/proxy');
 const scoreBoard = require('./score-board/score-board');
 
+app.get('/balancer/dynamics', (req, res) =>
+  res.json({
+    react_gif_logo: process.env['REACT_APP_MOVING_GIF_LOGO'],
+    heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
+    ctfd_url: process.env['REACT_APP_CTFD_URL'],
+    s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
+  })
+);
+
 app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());
 app.use((req, res, next) => {

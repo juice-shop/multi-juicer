@@ -10,6 +10,9 @@ Note that we:
 - Do not support any progress watchdog as you will have access to it, we therefore disabled it.
 
 
+## Special thanks
+Special thanks to Madhu Akula, Ben de Haan, and Mike Woudenberg for making this port a reality!
+
 **This is by no means ready for anything, and work in progress.**
 
 Original readme:
