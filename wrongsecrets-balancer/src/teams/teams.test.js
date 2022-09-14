@@ -14,6 +14,8 @@ const {
   createNameSpaceForTeam,
   createDesktopServiceForTeam,
   changePasscodeHashForTeam,
+  createConfigmapForTeam,
+  createSecretsfileForTeam,
 } = require('../kubernetes');
 
 afterEach(() => {
