@@ -172,44 +172,47 @@ async function generatePasscode() {
  */
 async function createTeam(req, res) {
   const { team } = req.params;
+  const { passcode, hash } = await generatePasscode();
   try {
-    const { passcode, hash } = await generatePasscode();
-
-    logger.info(`Creating Namespace for team '${team}'`);    
+    logger.info(`Creating Namespace for team '${team}'`);
     await createNameSpaceForTeam(team);
   } catch (error) {
     logger.error(`Error while creating namespace for ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
-  try{
+  try {
     logger.info(`Creating Configmap for team '${team}'`);
     await createConfigmapForTeam(team);
 
-    logger.info(`Creating Secretsfile for team '${team}'`)
+    logger.info(`Creating Secretsfile for team '${team}'`);
     await createSecretsfileForTeam(team);
   } catch (error) {
     logger.error(`Error while creating secretsfile or configmap for ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
-  try{
+  try {
     logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
   } catch (error) {
-    logger.error(`Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`);
+    logger.error(
+      `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
+    );
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
-  try{
+  try {
     logger.info(`Created virtualdesktop Deployment for team '${team}'`);
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
     await createDesktopServiceForTeam(team);
 
     logger.info(`Created virtualdesktop Deployment for team '${team}'`);
   } catch (error) {
-    logger.error(`Error while creating Virtualdesktop deployment or service for team ${team}: ${error.message}`);
+    logger.error(
+      `Error while creating Virtualdesktop deployment or service for team ${team}: ${error.message}`
+    );
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
-  try{
+  try {
     loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
     res

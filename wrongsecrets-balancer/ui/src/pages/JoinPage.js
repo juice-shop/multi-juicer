@@ -85,7 +85,7 @@ export const JoinPage = injectIntl(({ intl }) => {
     .catch((err) => {
       console.error(`Failed to wait parse values: ${err}`);
     });
-  });
+  },[]);
 
  
 

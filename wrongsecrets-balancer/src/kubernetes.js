@@ -42,18 +42,17 @@ module.exports.createNameSpaceForTeam = createNameSpaceForTeam;
 const createConfigmapForTeam = async (team) => {
   const configmap = {
     apiVersion: 'v1',
-    data:{
+    data: {
       'funny.entry': 'thisIsK8SConfigMap',
     },
     kind: 'ConfigMap',
-    metadata:{
+    metadata: {
       annotations: {},
       name: 'secrets-file',
       namespace: `t-${team}`,
-    }
+    },
   };
-  return k8sCoreApi.createNamespacedConfigMap('t-' + team, configmap)
-  .catch((error) => {
+  return k8sCoreApi.createNamespacedConfigMap('t-' + team, configmap).catch((error) => {
     throw new Error(error.response.body.message);
   });
 };
@@ -62,18 +61,17 @@ module.exports.createConfigmapForTeam = createConfigmapForTeam;
 const createSecretsfileForTeam = async (team) => {
   const secret = {
     apiVersion: 'v1',
-    data:{
-      'funnier': 'dGhpcyBpcyBhcGFzc3dvcmQ='
+    data: {
+      funnier: 'dGhpcyBpcyBhcGFzc3dvcmQ=',
     },
     kind: 'Secret',
     type: 'Opaque',
-    metadata:{
+    metadata: {
       name: 'funnystuff',
       namespace: `t-${team}`,
-    }
+    },
   };
-  return k8sCoreApi.createNamespacedSecret('t-' + team, secret)
-  .catch((error) => {
+  return k8sCoreApi.createNamespacedSecret('t-' + team, secret).catch((error) => {
     throw new Error(error.response.body.message);
   });
 };
@@ -153,20 +151,20 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   name: 'SPECIAL_K8S_SECRET',
                   valueFrom: {
-                    configMapKeyRef:{
+                    configMapKeyRef: {
                       name: 'secrets-file',
                       key: 'funny.entry',
-                    }
-                  }
+                    },
+                  },
                 },
                 {
                   name: 'SPECIAL_SPECIAL_K8S_SECRET',
                   valueFrom: {
-                    secretKeyRef:{
+                    secretKeyRef: {
                       name: 'funnystuff',
                       key: 'funnier',
-                    }
-                  }
+                    },
+                  },
                 },
                 ...get('wrongsecrets.env', []),
               ],
@@ -467,12 +465,10 @@ const deleteNamespaceForTeam = async (team) => {
   //   .catch((error) => {
   //     throw new Error(error.response.body.message);
   //   });
-    await k8sCoreApi
-      .deleteNamespace(`t-${team}`)
-      .catch((error) => {
-        throw new Error(error.response.body.message);
-      });
-  };
+  await k8sCoreApi.deleteNamespace(`t-${team}`).catch((error) => {
+    throw new Error(error.response.body.message);
+  });
+};
 module.exports.deleteNamespaceForTeam = deleteNamespaceForTeam;
 
 // const deleteServiceForTeam = async (team) => {
@@ -486,8 +482,6 @@ module.exports.deleteNamespaceForTeam = deleteNamespaceForTeam;
 //     });
 // };
 // module.exports.deleteServiceForTeam = deleteServiceForTeam;
-
-
 
 const deletePodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
