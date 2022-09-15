@@ -123,7 +123,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'wrongsecrets',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:latest-no-vault',
+              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC1-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
@@ -176,7 +176,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               ],
               readinessProbe: {
                 httpGet: {
-                  path: '/',
+                  path: '/actuator/health/readiness',
                   port: 8080,
                 },
                 initialDelaySeconds: 20,
@@ -185,7 +185,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
               livenessProbe: {
                 httpGet: {
-                  path: '/',
+                  path: '/actuator/health/liveness',
                   port: 8080,
                 },
                 initialDelaySeconds: 30,
