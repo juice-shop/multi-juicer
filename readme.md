@@ -6,14 +6,42 @@ This is a fork of MultiJuicer, which is now being rebuilt in order to server Wro
 Note that we:
 - have a Webtop integrated
 - have a WrongSecrets instance integrated
-- A working admin interface which can restart both or delete both
+- A working admin interface which can restart both or delete both (by deleting the full namespace)
 - Do not support any progress watchdog as you will have access to it, we therefore disabled it.
 
 
 ## Special thanks
 Special thanks to Madhu Akula, Ben de Haan, and Mike Woudenberg for making this port a reality!
 
+## Status
+
 **This is by no means ready for anything, and work in progress.**
+
+Still want to play? Ok, here we go:
+
+We currently only support minikube and AWS EKS (_**But the latter needs you to understand what to do as the guides section is not updated yet**_).
+
+For minikube, run:
+
+```shell
+minikube start
+eval $(minikube docker-env)
+./build-an-deploy
+kubectl port-forward service/wrongsecrets-balancer 3000:3000
+```
+
+Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
+
+
+
+
+
+
+
+
+
+
+
 
 Original readme:
 
