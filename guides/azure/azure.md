@@ -9,14 +9,14 @@ Make sure to delete the resources as described in Step 5 Deinstallation when you
 
 ```sh
 # Before we can do anything we need a resource group
-az group create --location westeurope --name multi-juicer
+az group create --location westeurope --name wrongsecrets-ctf-party
 
 # let's create the cluster now
 # I decreased the node count to 2, to dodge the default core limit
-az aks create --resource-group multi-juicer --name juicy-k8s --node-count 2
+az aks create --resource-group wrongsecrets-ctf-party --name juicy-k8s --node-count 2
 
 # now to authenticate fetch the credentials for the new cluster
-az aks get-credentials --resource-group multi-juicer --name juicy-k8s
+az aks get-credentials --resource-group wrongsecrets-ctf-party --name juicy-k8s
 
 # verify by running
 # should print "juicy-k8s"
@@ -26,15 +26,15 @@ kubectl config current-context
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you two pods a juice-balancer pod and a progress-watchdog pod
+# This should show you two pods a wrongsecrets-balancer pod and a unusued-progress-watchdog pod
 # Wait until both pods are ready
 ```
 
@@ -45,7 +45,7 @@ This step is optional, but helpful to catch errors quicker.
 ```bash
 # lets test out if the app is working correctly before proceeding
 # for that we can port forward the JuiceBalancer service to your local machine
-kubectl port-forward service/juice-balancer 3000:3000
+kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 # Open up your browser for localhost:3000
 # You should be able to see the MultiJuicer Balancer UI
@@ -58,7 +58,7 @@ kubectl port-forward service/juice-balancer 3000:3000
 # Go back to localhost:3000/balancer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. External Connectivity
@@ -72,7 +72,7 @@ metadata:
   name: juice-loadbalancer
 spec:
   selector:
-    app.kubernetes.io/name: multi-juicer
+    app.kubernetes.io/name: wrongsecrets-ctf-party
   ports:
   - protocol: TCP
     port: 80

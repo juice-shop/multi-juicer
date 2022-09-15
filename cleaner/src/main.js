@@ -36,15 +36,14 @@ async function main() {
   };
 
   console.log(
-    `Looking for Juice Shop Instances which have been inactive for more than ${MaxInactiveDuration}.`
+    `Looking for WrongSecerets Instances which have been inactive for more than ${MaxInactiveDuration}.`
   );
-  const instances = await k8sAppsApi.listNamespacedDeployment(
-    Namespace,
+  const instances = await k8sAppsApi.listDeploymentForAllNamespaces(
     true,
     undefined,
     undefined,
-    undefined,
-    'app=juice-shop'
+    'app in (wrongsecrets, virtualdesktop)',
+    200
   );
 
   console.log(`Found ${instances.body.items.length} instances. Checking their activity.`);
@@ -52,7 +51,7 @@ async function main() {
   for (const instance of instances.body.items) {
     const instanceName = instance.metadata.name;
     const lastConnectTimestamps = parseInt(
-      instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
+      instance.metadata.annotations['wrongsecrets.owasp.dev/lastRequest'],
       10
     );
 
@@ -99,7 +98,7 @@ async function main() {
 
 main()
   .then((counts) => {
-    console.log('Finished Juice Shop Instance Cleanup');
+    console.log('Finished WrongSecrets Instance Cleanup');
     console.log('');
     console.log('Successful deletions:');
     console.log(`  Deployments: ${counts.successful.deployments}`);

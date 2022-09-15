@@ -1,0 +1,42 @@
+{
+  "port": 3000,
+  "namespace": "default",
+  "deploymentContext": "wrongsecrets-ctf-party",
+  "maxJuiceShopInstances": 100,
+  "skipOwnerReference": false,
+  "admin": {
+    "username": "admin",
+    "password": "12345678"
+  },
+  "cookieParser": {
+    "cookieName": "balancer",
+    "secret": "askdbakhdajhvdsjavjdsgv",
+    "secure": false
+  },
+  "metrics": {
+    "enabled": false,
+    "basicAuth": {
+      "username": "prometheus-scraper",
+      "password": "ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"
+    }
+  },
+  "wrongsecrets": {
+    "image": "jeroenwillemsen/wrongsecrets",
+    "tag": "latest-no-vault",
+    "imagePullPolicy": "IfNotPresent",
+    "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
+    "nodeEnv": "wrongsecrets-ctf-party",
+    "resources:": {
+      "requests": {
+        "memory": "256Mi",
+        "cpu": "200m"
+      },
+      "limits": {
+        "memory": "256Mi",
+        "cpu": "200m"
+      }
+    },
+    "tolerations": [],
+    "affinity": {}
+  }
+}

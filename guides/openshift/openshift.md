@@ -17,17 +17,17 @@ This example expects you to have the following prerequisites.
 # You can copy the login command including your token from the web ui
 oc login https://console.openshift.example.com --token=****
 
-# Create a new project to hold the multi-juicer resources
-oc new-project multi-juicer
+# Create a new project to hold the wrongsecrets-ctf-party resources
+oc new-project wrongsecrets-ctf-party
 ```
 
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer ./multi-juicer/helm/multi-juicer/
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party ./wrongsecrets-ctf-party/helm/wrongsecrets-ctf-party/
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -37,7 +37,7 @@ This step is optional, but helpful to catch errors quicker.
 ```bash
 # lets test out if the app is working correctly before proceeding
 # for that we can port forward the JuiceBalancer service to your local machine
-oc port-forward service/juice-balancer 3000:3000
+oc port-forward service/wrongsecrets-balancer 3000:3000
 
 # Open up your browser for localhost:3000
 # You should be able to see the MultiJuicer Balancer UI
@@ -50,7 +50,7 @@ oc port-forward service/juice-balancer 3000:3000
 # Go back to localhost:3000/balancer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-oc get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+oc get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. Add a route to expose the app to the world
@@ -61,14 +61,14 @@ OpenShift lets you create routes to expose your app to the internet.
 # Create the route.
 # Make sure to adjust the hostname to match the one of your org.
 # You can also perform this step easily via the OpenShift web ui.
-oc create route edge juice-balancer --service juice-balancer --hostname multi-juicer.cloudapps.example.com
+oc create route edge wrongsecrets-balancer --service wrongsecrets-balancer --hostname wrongsecrets-ctf-party.cloudapps.example.com
 ```
 
 ## Step 4. Deinstallation
 
 ```bash
-helm delete multi-juicer
+helm delete wrongsecrets-ctf-party
 
 # Delete the route
-oc delete route edge juice-balancer
+oc delete route edge wrongsecrets-balancer
 ```

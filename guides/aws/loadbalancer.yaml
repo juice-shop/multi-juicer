@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: multi-juicer-service-loadbalancer
+  name: wrongsecrets-balancer-public
 spec:
   type: LoadBalancer
   selector:
-    app.kubernetes.io/name: multi-juicer
-    app.kubernetes.io/instance: multi-juicer
+    app.kubernetes.io/name: wrongsecrets-ctf-party
+    app.kubernetes.io/instance: wrongsecrets-ctf-party
   ports:
     - protocol: TCP
       port: 80

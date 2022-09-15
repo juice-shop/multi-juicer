@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: wrongsecrets-balancer
+  labels:
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
+subjects:
+  - kind: ServiceAccount
+    name: wrongsecrets-balancer # Name is case sensitive
+    namespace: {{ .Release.Namespace | quote }}
+roleRef:
+  kind: ClusterRole
+  name: wrongsecrets-balancer
+  apiGroup: rbac.authorization.k8s.io

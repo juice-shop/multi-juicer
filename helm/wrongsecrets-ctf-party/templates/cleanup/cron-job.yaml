@@ -1,0 +1,49 @@
+{{- if .Values.wrongsecretsCleanup.enabled -}}
+{{- if semverCompare ">=1.21-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: batch/v1
+{{- else -}}
+apiVersion: batch/v1beta1
+{{- end }}
+kind: CronJob
+metadata:
+  name: 'cleanup-job'
+spec:
+  schedule: {{ .Values.wrongsecretsCleanup.cron }}
+  successfulJobsHistoryLimit: {{ .Values.wrongsecretsCleanup.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.wrongsecretsCleanup.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            name: 'cleanup-job'
+            helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
+        spec:
+          serviceAccountName: 'wrongsecrets-cleaner'
+          {{- with .Values.wrongsecretsCleanup.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - image: '{{ .Values.wrongsecretsCleanup.repository }}:{{ .Values.wrongsecretsCleanup.tag | default (printf "v%s" .Chart.Version) }}'
+              imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+              name: 'cleanup-job'
+              env:
+                - name: NAMESPACE
+                  value: {{ .Release.Namespace | quote }}
+                - name: MAX_INACTIVE_DURATION
+                  value: {{ .Values.wrongsecretsCleanup.gracePeriod }}
+          restartPolicy: Never
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.wrongsecretsCleanup.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.wrongsecretsCleanup.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

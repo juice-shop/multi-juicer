@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wrongsecrets-balancer-config
+  labels:
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
+data:
+  config.json: |
+    {
+      "port": 3000,
+      "namespace": {{ .Release.Namespace | quote }},
+      "deploymentContext": {{ .Release.Name | quote }},
+      "maxJuiceShopInstances": {{ .Values.wrongsecrets.maxInstances}},
+      "skipOwnerReference": {{ .Values.balancer.skipOwnerReference }},
+      "cookieParser": {
+        "cookieName": {{ include "wrongsecrets-ctf-party.cookieName" . | quote }},
+        "secure": {{ .Values.balancer.cookie.secure }}
+      },
+      "admin": {
+        "username": "admin"
+      },
+  {{- if .Values.balancer.metrics.enabled }}
+      "metrics": {
+        "enabled": true
+      },
+  {{- end }}
+      "juiceShop": {
+        "image": {{ .Values.wrongsecrets.image | quote }},
+        "tag": {{ .Values.wrongsecrets.tag | quote }},
+        "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
+        "ctfKey": {{ .Values.wrongsecrets.ctfKey | quote }},
+        "nodeEnv": {{ .Values.wrongsecrets.nodeEnv | quote }},
+        "resources": {{ .Values.wrongsecrets.resources | toJson }},
+        "securityContext": {{ .Values.wrongsecrets.securityContext | toJson }},
+        "env": {{ .Values.wrongsecrets.env | toJson }},
+        "envFrom": {{ .Values.wrongsecrets.envFrom | toJson }},
+        "volumes": {{ .Values.wrongsecrets.volumes | toJson }},
+        "volumeMounts": {{ .Values.wrongsecrets.volumeMounts | toJson }},
+        "affinity": {{ .Values.wrongsecrets.affinity | toJson }},
+        "tolerations": {{ .Values.wrongsecrets.tolerations | toJson }},
+        "runtimeClassName": {{ .Values.wrongsecrets.runtimeClassName | toJson }}
+      }
+    }

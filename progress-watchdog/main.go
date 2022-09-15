@@ -8,10 +8,8 @@ import (
 	"os"
 	"sort"
 
-	"github.com/iteratec/multi-juicer/progress-watchdog/internal"
-	"github.com/op/go-logging"
-
 	"github.com/gin-gonic/gin"
+	"github.com/iteratec/multi-juicer/progress-watchdog/internal"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -95,7 +93,7 @@ func main() {
 		}
 
 		challengeStatusJson := "[]"
-		if json, ok := deployment.Annotations["multi-juicer.iteratec.dev/challenges"]; ok {
+		if json, ok := deployment.Annotations["wrongsecrets-ctf-party.iteratec.dev/challenges"]; ok {
 			challengeStatusJson = json
 		}
 

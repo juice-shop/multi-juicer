@@ -20,16 +20,16 @@ kubectl cluster-info
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+# You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
+helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
 
-helm install multi-juicer multi-juicer/multi-juicer
+helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
 
-# This should show you two pods a juice-balancer pod and a progress-watchdog pod
+# This should show you two pods a wrongsecrets-balancer pod and a unusued-progress-watchdog pod
 # Wait until both pods are ready
 ```
 
@@ -40,7 +40,7 @@ This step is optional, but helpful to catch errors quicker.
 ```bash
 # lets test out if the app is working correctly before proceeding
 # for that we can port forward the JuiceBalancer service to your local machine
-kubectl port-forward service/juice-balancer 3000:3000
+kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 # Open up your browser for localhost:3000
 # You should be able to see the MultiJuicer Balancer UI
@@ -53,7 +53,7 @@ kubectl port-forward service/juice-balancer 3000:3000
 # Go back to localhost:3000/balancer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. Make a service to expose multi-juicer outside of the cluster
@@ -70,13 +70,13 @@ wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/k8s/k8s
 kubectl apply -f k8s-juice-service.yaml
 
 # If it takes longer than a few minutes take a detailed look at the loadbalancer
-kubectl describe svc multi-juicer-loadbalancer
+kubectl describe svc wrongsecrets-ctf-party-loadbalancer
 ```
 
 ## Step 5. Deinstallation
 
 ```bash
-helm uninstall multi-juicer
+helm uninstall wrongsecrets-ctf-party
 
 # Delete the loadbalancer
 kubectl delete -f k8s-juice-service.yaml

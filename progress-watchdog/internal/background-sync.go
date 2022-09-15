@@ -11,7 +11,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/speps/go-hashids"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -158,7 +157,7 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 		// Get Instances
 		log.Info("Looking for Instances")
 		opts := metav1.ListOptions{
-			LabelSelector: "app=juice-shop",
+			LabelSelector: "app=wrongsecrets",
 		}
 
 		namespace := os.Getenv("NAMESPACE")
@@ -179,7 +178,7 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 			log.Debugf("Found instance for team %s", teamname)
 
 			var lastChallengeProgress []ChallengeStatus
-			json.Unmarshal([]byte(instance.Annotations["multi-juicer.iteratec.dev/challenges"]), &lastChallengeProgress)
+			json.Unmarshal([]byte(instance.Annotations["wrongsecrets-ctf-party.iteratec.dev/challenges"]), &lastChallengeProgress)
 
 			progressUpdateJobs <- ProgressUpdateJobs{
 				Teamname:              instance.Labels["team"],

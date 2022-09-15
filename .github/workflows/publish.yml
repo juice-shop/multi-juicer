@@ -12,7 +12,7 @@ jobs:
         run: |
           sudo snap install yq
       - name: "Patch Chart.yaml to the current released version"
-        working-directory: helm/multi-juicer/
+        working-directory: helm/wrongsecrets-ctf-party/
         run: |
           RELEASE_VERSION="${GITHUB_REF#refs/*/}"
           # Remove leading 'v' from git tag to create valid semver
@@ -30,9 +30,9 @@ jobs:
     strategy:
       matrix:
         component:
-          - progress-watchdog
+          - unusued-progress-watchdog
           - cleaner
-          - juice-balancer
+          - wrongsecrets-balancer
     steps:
       - name: Checkout
         uses: actions/checkout@v2

@@ -1,0 +1,20 @@
+{{- if and .Values.balancer.metrics.enabled .Values.balancer.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: wrongsecrets-balancer
+spec:
+  selector:
+    matchLabels:
+      {{- include "wrongsecrets-ctf-party.labels" . | nindent 6 }}
+  endpoints:
+    - port: web
+      path: '/balancer/metrics'
+      basicAuth:
+        username:
+          name: wrongsecrets-balancer-secret
+          key: metricsBasicAuthUsername
+        password:
+          name: wrongsecrets-balancer-secret
+          key: metricsBasicAuthPassword
+{{- end }}

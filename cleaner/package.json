@@ -1,7 +1,7 @@
 {
   "name": "cleaner",
   "version": "1.0.0",
-  "description": "k8s ChronJob for cleaning up unused Juice Shop instances.",
+  "description": "k8s ChronJob for cleaning up unused WrongSecrets instances.",
   "main": "src/main.js",
   "scripts": {
     "test": "jest",

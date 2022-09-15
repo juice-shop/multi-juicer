@@ -13,14 +13,14 @@ First create a container registry where you will be storing the images for your 
 NB: Please note that you will need to pick a new name for the registry since the name needs to be globally unique.
 
 ```bash
-az acr create -n <acr-name> -g multi-juicer --sku basic
+az acr create -n <acr-name> -g wrongsecrets-ctf-party --sku basic
 
 ```
 
 Then connect the registry with your multi-juicer kubernetes cluster
 
 ```bash
-az aks update -n juicy-k8s -g multi-juicer --attach-acr <acr-name>
+az aks update -n juicy-k8s -g wrongsecrets-ctf-party --attach-acr <acr-name>
 ```
 
 Import the images for the cert-manager and nginx controller
@@ -173,24 +173,24 @@ Save the following content as `ingress.yaml`
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: my-multi-juicer
+  name: my-wrongsecrets-ctf-party
   annotations: 
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - my-multi-juicer.<availability zone>.cloudapp.azure.com
+    - my-wrongsecrets-ctf-party.<availability zone>.cloudapp.azure.com
     secretName: tls-secret
   rules:
-  - host: my-multi-juicer.<availability zone>.cloudapp.azure.com
+  - host: my-wrongsecrets-ctf-party.<availability zone>.cloudapp.azure.com
     http:
       paths:
       - path: /
         pathType: ImplementationSpecific
         backend:
           service:
-            name: juice-balancer
+            name: wrongsecrets-balancer
             port:
               number: 3000
 ```

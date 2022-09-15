@@ -1,0 +1,16 @@
+{{- if .Values.wrongsecretsCleanup.enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # namespace: {{ .Release.Namespace | quote }}
+  name: wrongsecrets-cleaner
+  labels:
+    helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
+rules:
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'delete', 'list']
+  - apiGroups: [''] # "" indicates the core API group
+    resources: ['services']
+    verbs: ['get', 'delete']
+{{- end }}
