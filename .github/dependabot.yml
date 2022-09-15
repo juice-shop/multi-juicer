@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/wrongsecrets-balancer/" # Location of package manifests
     schedule:
