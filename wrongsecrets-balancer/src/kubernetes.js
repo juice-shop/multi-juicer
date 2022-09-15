@@ -123,7 +123,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'wrongsecrets',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC3-no-vault',
+              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC4-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
@@ -147,6 +147,10 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   name: 'K8S_ENV',
                   value: 'k8s',
+                },
+                {
+                  name: 'challenge_acht_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostThankyouAlllGoodDoYouLikeRandomLogging?',
                 },
                 {
                   name: 'SPECIAL_K8S_SECRET',
