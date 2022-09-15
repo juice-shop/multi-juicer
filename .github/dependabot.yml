@@ -13,7 +13,7 @@ updates:
     directory: "/wrongsecrets-balancer/" # Location of package manifests
     schedule:
       interval: "monthly"
-   - package-ecosystem: "npm" # See documentation for possible values
+  - package-ecosystem: "npm" # See documentation for possible values
     directory: "/wrongsecrets-balancer/ui" # Location of package manifests
     schedule:
       interval: "monthly"
