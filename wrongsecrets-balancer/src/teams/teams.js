@@ -280,7 +280,7 @@ async function createAWSTeam(req, res) {
     logger.info(`Creating Secrets provider for team ${team}`);
     await createAWSSecretsProviderForTeam(team);
   } catch (error) {
-    logger.error(`Error while creating Secretsprovider for team ${team}: ${error.message}`);
+    logger.error(`Error while creating Secretsprovider for team ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {
