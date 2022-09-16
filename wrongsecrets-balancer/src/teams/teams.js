@@ -7,11 +7,12 @@ const expressJoiValidation = require('express-joi-validation');
 const promClient = require('prom-client');
 
 const validator = expressJoiValidation.createValidator();
+const k8sEnv = process.env.K8S_ENV || 'k8s';
 
 const router = express.Router();
 
 const {
-  createDeploymentForTeam,
+  createK8sDeploymentForTeam,
   createNameSpaceForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
@@ -21,6 +22,8 @@ const {
   createDesktopServiceForTeam,
   createConfigmapForTeam,
   createSecretsfileForTeam,
+  createAWSDeploymentForTeam,
+  createAWSSecretsProviderForTeam,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -171,6 +174,9 @@ async function generatePasscode() {
  * @param {import("express").Response} res
  */
 async function createTeam(req, res) {
+  if (k8sEnv === 'aws') {
+    return createAWSTeam(req, res);
+  }
   const { team } = req.params;
   const { passcode, hash } = await generatePasscode();
   try {
@@ -192,12 +198,84 @@ async function createTeam(req, res) {
   }
   try {
     logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
-    await createDeploymentForTeam({ team, passcodeHash: hash });
+    await createK8sDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
   } catch (error) {
     logger.error(
       `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
     );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    logger.info(`Created virtualdesktop Deployment for team '${team}'`);
+    await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
+    await createDesktopServiceForTeam(team);
+
+    logger.info(`Created virtualdesktop Deployment for team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating Virtualdesktop deployment or service for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
+
+    res
+      .cookie(get('cookieParser.cookieName'), `t-${team}`, {
+        ...cookieSettings,
+      })
+      .status(200)
+      .json({
+        message: 'Created Instance',
+        passcode,
+      });
+  } catch (error) {
+    logger.error(`Error while creating deployment or service for team ${team}: ${error.message}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+async function createAWSTeam(req, res) {
+  const { team } = req.params;
+  const { passcode, hash } = await generatePasscode();
+  try {
+    logger.info(`Creating Namespace for team '${team}'`);
+    await createNameSpaceForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating namespace for ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    logger.info(`Creating Configmap for team '${team}'`);
+    await createConfigmapForTeam(team);
+
+    logger.info(`Creating Secretsfile for team '${team}'`);
+    await createSecretsfileForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating secretsfile or configmap for ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
+    await createAWSSecretsProviderForTeam(team);
+    await createAWSDeploymentForTeam({ team, passcodeHash: hash });
+    await createServiceForTeam(team);
+  } catch (error) {
+    logger.error(
+      `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    logger.info(`Creating Secrets provider for team ${team}`);
+    await createAWSSecretsProviderForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating Secretsprovider for team ${team}: ${error.message}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {

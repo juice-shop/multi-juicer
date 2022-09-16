@@ -50,6 +50,8 @@ spec:
               value: "https://ctfd.io"
             - name: REACT_APP_S3_BUCKET_URL
               value: "s3://funstuff"
+            - name: K8S_ENV # PUT THIS TO K8S IF YOU WANT TO PLAY ALL THE NON-CLOUD CHALLENGES ON A K8S CLUSTER
+              value: "aws"
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:

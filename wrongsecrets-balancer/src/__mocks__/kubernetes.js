@@ -1,5 +1,6 @@
 module.exports = {
-  createDeploymentForTeam: jest.fn(),
+  createK8sDeploymentForTeam: jest.fn(),
+  createAWSDeploymentForTeam: jest.fn(),
   createNameSpaceForTeam: jest.fn(),
   createConfigmapForTeam: jest.fn(),
   createSecretsfileForTeam: jest.fn(),

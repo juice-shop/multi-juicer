@@ -23,3 +23,6 @@ rules:
   - apiGroups: [''] # "" indicates the core API group
     resources: ['secrets']
     verbs: ['create', 'get', 'list', 'delete']
+  - apiGroups: [''] 
+    resources: ['serviceaccounts']
+    verbs: ['create', 'get', 'list', 'delete']
