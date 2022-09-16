@@ -175,8 +175,14 @@ async function generatePasscode() {
  */
 async function createTeam(req, res) {
   if (k8sEnv === 'aws') {
+    logger.info(
+      'We will create an AWS deployment see the helm chart/deployment for setting this to k8s'
+    );
     return createAWSTeam(req, res);
   }
+  logger.info(
+    'We will create a K8s deployment see the helm chart/deployment for setting this to aws'
+  );
   const { team } = req.params;
   const { passcode, hash } = await generatePasscode();
   try {
@@ -262,7 +268,6 @@ async function createAWSTeam(req, res) {
   }
   try {
     logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
-    await createAWSSecretsProviderForTeam(team);
     await createAWSDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
   } catch (error) {
@@ -279,7 +284,7 @@ async function createAWSTeam(req, res) {
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {
-    logger.info(`Created virtualdesktop Deployment for team '${team}'`);
+    logger.info(`Creating virtualdesktop Deployment for team '${team}'`);
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
     await createDesktopServiceForTeam(team);
 

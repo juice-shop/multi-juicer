@@ -256,7 +256,7 @@ module.exports.createK8sDeploymentForTeam = createK8sDeploymentForTeam;
 
 //BEGIN AWS
 const createAWSSecretsProviderForTeam = async (team) => {
-  const secretproviderClass = {
+  const body = {
     apiVersion: 'secrets-store.csi.x-k8s.io/v1',
     kind: 'SecretProviderClass',
     metadata: {
@@ -279,13 +279,24 @@ const createAWSSecretsProviderForTeam = async (team) => {
       },
     },
   };
+  /**
+   * Creates a namespace scoped Custom object
+   * @param group The custom resource\&#39;s group name
+   * @param version The custom resource\&#39;s version
+   * @param namespace The custom resource\&#39;s namespace
+   * @param plural The custom resource\&#39;s plural name. For TPRs this would be lowercase plural kind.
+   * @param body The JSON schema of the Resource to create.
+   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
+   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
+   */
   return k8sCustomAPI
     .createNamespacedCustomObject(
       'secrets-store.csi.x-k8s.io',
       'v1',
       `t-${team}`,
       'secretproviderclasses',
-      secretproviderClass
+      body
     )
     .catch((error) => {
       throw new Error(error.respone.body.message);
