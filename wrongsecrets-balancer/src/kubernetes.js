@@ -358,7 +358,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'wrongsecrets',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC5-no-vault',
+              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC6-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
