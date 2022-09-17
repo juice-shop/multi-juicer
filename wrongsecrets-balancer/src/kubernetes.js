@@ -1,10 +1,17 @@
-const { KubeConfig, AppsV1Api, CoreV1Api, CustomObjectsApi } = require('@kubernetes/client-node');
+const {
+  KubeConfig,
+  AppsV1Api,
+  CoreV1Api,
+  CustomObjectsApi,
+  PatchUtils,
+} = require('@kubernetes/client-node');
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
+const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
 
 const { get } = require('./config');
 
@@ -124,7 +131,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'wrongsecrets',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC5-no-vault',
+              image: 'jeroenwillemsen/wrongsecrets:1.5.4RC6-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
@@ -266,20 +273,11 @@ const createAWSSecretsProviderForTeam = async (team) => {
     spec: {
       provider: 'aws',
       parameters: {
-        objects: [
-          {
-            objectName: 'wrongsecret',
-            objectType: 'secretsmanager',
-          },
-          {
-            objectName: 'wrongsecret-2',
-            objectType: 'secretsmanager',
-          },
-        ],
+        objects:
+          '- objectName: "wrongsecret"\n  objectType: "secretsmanager"\n- objectName: "wrongsecret-2"\n  objectType: "secretsmanager"\n',
       },
     },
   };
-//todo before aWS completed: fix below call and teams.js function calling this: createNamespacedCustomObject(group: string, version: string, namespace: string, plural: string, body: object, pretty?: string, dryRun?: string, fieldManager?: string, options?: {
   return k8sCustomAPI
     .createNamespacedCustomObject(
       'secrets-store.csi.x-k8s.io',
@@ -289,10 +287,49 @@ const createAWSSecretsProviderForTeam = async (team) => {
       secretProviderClass
     )
     .catch((error) => {
-      throw new Error(error);
+      throw new Error(JSON.stringify(error));
     });
 };
 module.exports.createAWSSecretsProviderForTeam = createAWSSecretsProviderForTeam;
+
+//kubectl patc sa wrongsecrets-balancer --type=json -p='[{"op": "add", "path": "/metadata/annotations/somethingk8snewkey", "value": "somethingk8snewvalue"}]'
+
+const patchServiceAccountForTeamForAWS = async (team) => {
+  const patch = {
+    op: 'add',
+    path: 'annotations/eks.amazonaws.com~1role-arn',
+    value: `${awsAccountEnv}`,
+  };
+
+  const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_PATCH } };
+  /**
+   * partially update the specified ServiceAccount
+   * @param name name of the ServiceAccount
+   * @param namespace object name and auth scope, such as for teams and projects
+   * @param body
+   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
+   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint. This field is required for apply requests (application/apply-patch) but optional for non-apply patch types (JsonPatch, MergePatch, StrategicMergePatch).
+   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
+   * @param force Force is going to \&quot;force\&quot; Apply requests. It means user will re-acquire conflicting fields owned by other people. Force flag must be unset for non-apply patch requests.
+   */
+  return k8sCoreApi
+    .patchNamespacedServiceAccount(
+      'default',
+      `t-${team}`,
+      patch,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      options
+    )
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+};
+module.exports.patchServiceAccountForTeamForAWS = patchServiceAccountForTeamForAWS;
 
 //todo before AWS completed; kubectl annotate --overwrite sa default -n t-workit1 eks.amazonaws.com/role-arn="$(terraform output -raw irsa_role)"
 

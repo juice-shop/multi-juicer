@@ -43,15 +43,17 @@ spec:
               port: http
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
-              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME AND DO SO IN CONTAINER DEF AS WELL!
-            - name: REACT_APP_HEROKU_WRONGSECRETS_URL
-              value: "https://wrongsecrets.herokuapp.com/"
+              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME
+            - name: REACT_APP_HEROKU_WRONGSECRETS_URL 
+              value: "https://wrongsecrets.herokuapp.com/" #REPLACE WITH THE ACTUAL LOCATION WHERE ANSWERS ARE PROVIDED
             - name: REACT_APP_CTFD_URL
-              value: "https://ctfd.io"
+              value: "https://ctfd.io" #REPLACE WITH THE ACTUAL CTFD SERVER
             - name: REACT_APP_S3_BUCKET_URL
-              value: "s3://funstuff"
-            - name: K8S_ENV # PUT THIS TO K8S IF YOU WANT TO PLAY ALL THE NON-CLOUD CHALLENGES ON A K8S CLUSTER
-              value: "aws"
+              value: "s3://funstuff" #REPLACE WITH THE ACTUAL S3 BUCKET IF IN AWS MODE
+            - name: K8S_ENV 
+              value: "aws" # PUT THIS TO K8S IF YOU WANT TO PLAY ALL THE NON-CLOUD CHALLENGES ON A K8S CLUSTER
+            - name: IRSA_ROLE
+              value: "arn:aws:iam::233483431651:role/wrongsecrets-secret-manager" #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:

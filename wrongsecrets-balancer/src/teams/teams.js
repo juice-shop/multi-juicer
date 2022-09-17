@@ -24,6 +24,7 @@ const {
   createSecretsfileForTeam,
   createAWSDeploymentForTeam,
   createAWSSecretsProviderForTeam,
+  patchServiceAccountForTeamForAWS,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -277,12 +278,23 @@ async function createAWSTeam(req, res) {
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {
-    logger.info(`Creating Secrets provider for team ${team}`);
+    logger.info(
+      `Creating Secrets provider for team ${team}, please make sure the csi driver helm is installed and running`
+    );
     await createAWSSecretsProviderForTeam(team);
   } catch (error) {
     logger.error(`Error while creating Secretsprovider for team ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
+
+  try {
+    logger.info(`Annotating the service account for ${team},`);
+    await patchServiceAccountForTeamForAWS(team);
+  } catch (error) {
+    logger.error(`Error while annotating the service account for  ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
   try {
     logger.info(`Creating virtualdesktop Deployment for team '${team}'`);
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
