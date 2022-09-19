@@ -12,7 +12,7 @@ rules:
     resources: ['services']
     verbs: ['get', 'create', 'delete']
   - apiGroups: [''] # "" indicates the core API group
-    resources: ['pod', 'pods', 'pod/log']
+    resources: ['pod', 'pods', 'pods/log']
     verbs: ['create', 'get', 'list', 'delete', 'watch']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['namespaces']
