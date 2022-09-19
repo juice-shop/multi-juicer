@@ -578,7 +578,7 @@ const createRoleForWebTop = async (team) => {
       },
       {
         apiGroups: [''],
-        resources: ['pod', 'pods', 'pod/log', 'pod/logs'],
+        resources: ['pod', 'pods', 'pods/log'],
         verbs: ['get', 'list', 'watch'],
       },
       {
@@ -682,7 +682,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'virtualdesktop',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets-desktop:1.5.4RC7',
+              image: 'jeroenwillemsen/wrongsecrets-desktop:1.5.4RC8',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: get('virtualdesktop.resources'),
               securityContext: {
