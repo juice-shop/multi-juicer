@@ -292,16 +292,28 @@ const createAWSSecretsProviderForTeam = async (team) => {
 };
 module.exports.createAWSSecretsProviderForTeam = createAWSSecretsProviderForTeam;
 
-//kubectl patc sa wrongsecrets-balancer --type=json -p='[{"op": "add", "path": "/metadata/annotations/somethingk8snewkey", "value": "somethingk8snewvalue"}]'
-
+// kubectl patch sa default -n t-team -v8 -p='{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"foo"}}}'
+//below does not
 const patchServiceAccountForTeamForAWS = async (team) => {
-  const patch = {
-    op: 'add',
-    path: 'annotations/eks.amazonaws.com~1role-arn',
-    value: `${awsAccountEnv}`,
-  };
+  // const patch = {
+  //   op: 'add',
+  //   path: 'Annotations/eks.amazonaws.com~1role-arn',
+  //   value: `${awsAccountEnv}`,
+  // };
 
-  const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_PATCH } };
+  // const patch = {
+  //   op: 'add',
+  //   path: 'Annotations',
+  //   value: {'eks.amazonaws.com~1role-arn': `${awsAccountEnv}`,},
+  // };
+  const patch = {
+      metadata:{
+        annotations: {
+        'eks.amazonaws.com/role-arn': `${awsAccountEnv}`,
+      },
+    }
+  };
+  const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
   /**
    * partially update the specified ServiceAccount
    * @param name name of the ServiceAccount
