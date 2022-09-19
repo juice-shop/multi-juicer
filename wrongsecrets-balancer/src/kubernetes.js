@@ -578,12 +578,12 @@ const createRoleForWebTop = async (team) => {
       },
       {
         apiGroups: [''],
-        resources: ['pod', 'pods/log'],
+        resources: ['pod', 'pods', 'pod/log'],
         verbs: ['get', 'list', 'watch'],
       },
       {
         apiGroups: ['apps'],
-        resources: ['deployment'],
+        resources: ['deployments', 'deployment'],
         verbs: ['get', 'list', 'watch'],
       },
     ],

@@ -6,13 +6,13 @@ metadata:
     helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
 rules:
   - apiGroups: ['apps']
-    resources: ['deployments']
+    resources: ['deployment', 'deployments']
     verbs: ['get', 'create', 'list', 'delete', 'patch', 'watch', 'update']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['services']
     verbs: ['get', 'create', 'delete']
   - apiGroups: [''] # "" indicates the core API group
-    resources: ['pods', 'pods/log']
+    resources: ['pod', 'pods', 'pod/log']
     verbs: ['create', 'get', 'list', 'delete', 'watch']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['namespaces']
@@ -34,7 +34,7 @@ rules:
     verbs: ['create', 'get', 'list', 'delete', 'patch', 'grant', 'bind', 'escalate']
   - apiGroups: ['rbac.authorization.k8s.io'] 
     resources: ['roleRef']
-    verbs: ['create', 'get', 'list', 'delete', 'patch', 'grant']
+    verbs: ['create', 'get', 'list', 'delete', 'patch', 'grant', 'escalate']
   - apiGroups: ['secrets-store.csi.x-k8s.io'] 
     resources: ['secretproviderclasses']
     verbs: ['create', 'get', 'list', 'delete']
