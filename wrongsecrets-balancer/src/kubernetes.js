@@ -5,6 +5,7 @@ const {
   CustomObjectsApi,
   PatchUtils,
   RbacAuthorizationV1Api,
+  NetworkingV1Api,
 } = require('@kubernetes/client-node');
 const kc = new KubeConfig();
 kc.loadFromCluster();
@@ -13,6 +14,7 @@ const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
 const k8sRBACAPI = kc.makeApiClient(RbacAuthorizationV1Api);
+const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
 
 const { get } = require('./config');
@@ -531,6 +533,62 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
 module.exports.createAWSDeploymentForTeam = createAWSDeploymentForTeam;
 
 //END AWS
+
+const createNSPsforTeam = async (team) => {
+  const nspDefaultDeny = {
+    apiVersion: 'networking.k8s.io/v1',
+    kind: 'NetworkPolicy',
+    metadata: {
+      name: 'default-deny-all',
+      namespace: 'wrongsecrets-test',
+    },
+    spec: {
+      podSelector: {},
+      policyTypes: [{ Ingresss }, { Egress }],
+    },
+  };
+  const nspDenyMetadataSP = {
+    apiVersion: 'networking.k8s.io/v1',
+    kind: 'NetworkPolicy',
+    metadata:{
+      name: 'block-metadata-service',
+      namespace: 'wrongsecrets-test',
+    },
+    spec: {
+      podSelector: {
+        matchLabels: {
+          app: 'wrongsecrets-no-vault',
+        },
+      },
+      policyTypes: [
+        {Egress},
+      ],
+      egress: {
+        action: 'deny',
+        [
+          {
+            to: 
+            [
+              {
+                ipBlock:{
+                  cidr: '169.254.169.254/32',
+                },
+              },
+            ],
+            ports: [
+              {
+                protocol: 'tcp',
+                port: '80',
+              },
+            ],
+          },
+        ],
+      },
+    },
+  }
+};
+
+module.exports.createNSPsforTeam = createNSPsforTeam;
 
 const createServiceAccountForWebTop = async (team) => {
   const webtopSA = {
