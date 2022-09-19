@@ -34,8 +34,8 @@ balancer:
     name: balancer
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
-  repository: commjoen/wrongsecrets-ctf-party
-  tag: null
+  repository: jeroenwillemsen/wrongsecrets-balancer
+  tag: 0.66aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
   replicas: 1
   service:
@@ -62,6 +62,12 @@ balancer:
   tolerations: [ ]
   # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
   skipOwnerReference: false
+  env:
+    REACT_APP_MOVING_GIF_LOGO : 'https://i.gifer.com/9kGQ.gif'
+    REACT_APP_HEROKU_WRONGSECRETS_URL : 'https://wrongsecrets-ctf.herokuapp.com'
+    REACT_APP_CTFD_URL : 'https://ctfd.io'
+    REACT_APP_S3_BUCKET_URL : 's3://funstuff'
+    K8S_ENV: 'k8s' #oraws
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
@@ -196,7 +202,7 @@ virtualdesktop:
       cpu: 50m
     limits:
       memory: 2GB
-      cpu: 50m
+      cpu: 500m
   securityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true

@@ -43,15 +43,15 @@ spec:
               port: http
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
-              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME
+              value: {{ .Values.balancer.env.REACT_APP_MOVING_GIF_LOGO }}
             - name: REACT_APP_HEROKU_WRONGSECRETS_URL 
-              value: "https://wrongsecrets.herokuapp.com/" #REPLACE WITH THE ACTUAL LOCATION WHERE ANSWERS ARE PROVIDED
+              value: {{ .Values.balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL }} 
             - name: REACT_APP_CTFD_URL
-              value: "https://ctfd.io" #REPLACE WITH THE ACTUAL CTFD SERVER
+              value: {{ .Values.balancer.env.REACT_APP_CTFD_URL }} 
             - name: REACT_APP_S3_BUCKET_URL
-              value: "s3://funstuff" #REPLACE WITH THE ACTUAL S3 BUCKET IF IN AWS MODE
+              value: {{ .Values.balancer.env.REACT_APP_S3_BUCKET_URL }} 
             - name: K8S_ENV 
-              value: "aws" # PUT THIS TO K8S IF YOU WANT TO PLAY ALL THE NON-CLOUD CHALLENGES ON A K8S CLUSTER
+              value: {{ .Values.balancer.env.K8S_ENV }} 
             - name: IRSA_ROLE
               value: "arn:aws:iam::233483431651:role/wrongsecrets-secret-manager" #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
             - name: COOKIEPARSER_SECRET
