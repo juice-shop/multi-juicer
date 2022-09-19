@@ -3,9 +3,9 @@
 # set -o pipefail
 # set -o nounset
 
-source ../scripts/check-available-commands.sh
-
-checkCommandsAvailable helm jq vault sed grep docker grep cat aws curl eksctl kubectl
+#TODO; PORT BELOW!
+# source ../scripts/check-available-commands.sh
+# checkCommandsAvailable helm jq vault sed grep docker grep cat aws curl eksctl kubectl
 
 if test -n "${AWS_REGION-}"; then
   echo "AWS_REGION is set to <$AWS_REGION>"
@@ -89,15 +89,22 @@ sleep 10
 
 EKS_CLUSTER_VERSION=$(aws eks describe-cluster --name $CLUSTERNAME --region $AWS_REGION --query cluster.version --output text)
 
-echo "apply -f k8s/secret-challenge-vault-service.yml in 10 s"
+# echo "apply -f k8s/secret-challenge-vault-service.yml in 10 s"
+# sleep 10
+# kubectl apply -f k8s/secret-challenge-vault-service.yml
+echo "apply -f k8s/wrongsecrets-balancer-service.yml in 10 s"
 sleep 10
-kubectl apply -f k8s/secret-challenge-vault-service.yml
-echo "apply -f k8s/secret-challenge-vault-ingress.yml in 1 s"
-sleep 1
-kubectl apply -f k8s/secret-challenge-vault-ingress.yml
+kubectl apply -f k8s/wrongsecrets-balancer-service.yml
+# echo "apply -f k8s/secret-challenge-vault-ingress.yml in 1 s"
+# sleep 1
+# kubectl apply -f k8s/secret-challenge-vault-ingress.yml
+echo "apply -f k8s/wrongsecrets-balancer-ingress.yml in 10 s"
+sleep 10
+kubectl apply -f k8s/wrongsecrets-balancer-ingress.yml
+
 
 echo "waiting 10 s for loadBalancer"
 sleep 10
-echo "http://$(kubectl get ingress wrongsecrets -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+echo "http://$(kubectl get ingress wrongsecrets-balancer -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 
 echo "Do not forget to cleanup afterwards! Run k8s-aws-alb-script-cleanup.sh"

@@ -25,8 +25,8 @@ ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' -r)
 echo "ACCOUNT_ID=${ACCOUNT_ID}"
 
 echo "cleanup k8s ingress and service. This may take a while"
-kubectl delete service secret-challenge
-kubectl delete ingress wrongsecrets
+kubectl delete service wrongsecrets-balancer
+kubectl delete ingress wrongsecrets-balancer
 
 echo "Cleanup helm chart"
 helm uninstall aws-load-balancer-controller \
