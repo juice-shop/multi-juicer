@@ -268,16 +268,6 @@ async function createAWSTeam(req, res) {
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {
-    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
-    await createAWSDeploymentForTeam({ team, passcodeHash: hash });
-    await createServiceForTeam(team);
-  } catch (error) {
-    logger.error(
-      `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
-    );
-    res.status(500).send({ message: 'Failed to Create Instance' });
-  }
-  try {
     logger.info(
       `Creating Secrets provider for team ${team}, please make sure the csi driver helm is installed and running`
     );
@@ -294,6 +284,17 @@ async function createAWSTeam(req, res) {
     logger.error(`Error while annotating the service account for  ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
+  try {
+    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
+    await createAWSDeploymentForTeam({ team, passcodeHash: hash });
+    await createServiceForTeam(team);
+  } catch (error) {
+    logger.error(
+      `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
 
   try {
     logger.info(`Creating virtualdesktop Deployment for team '${team}'`);
