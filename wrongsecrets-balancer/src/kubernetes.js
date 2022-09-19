@@ -4,6 +4,7 @@ const {
   CoreV1Api,
   CustomObjectsApi,
   PatchUtils,
+  RbacAuthorizationV1Api,
 } = require('@kubernetes/client-node');
 const kc = new KubeConfig();
 kc.loadFromCluster();
@@ -11,6 +12,7 @@ kc.loadFromCluster();
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
+const k8sRBACAPI = kc.makeApiClient(RbacAuthorizationV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
 
 const { get } = require('./config');
@@ -530,6 +532,114 @@ module.exports.createAWSDeploymentForTeam = createAWSDeploymentForTeam;
 
 //END AWS
 
+const createServiceAccountForWebTop = async (team) => {
+  const webtopSA = {
+    apiVersion: 'v1',
+    kind: 'ServiceAccount',
+    metadata: {
+      name: 'webtop-sa',
+      namespace: `t-${team}`,
+    },
+  };
+  /**
+   * create a ServiceAccount
+   * @param namespace object name and auth scope, such as for teams and projects
+   * @param body
+   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
+   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
+   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
+   */
+  return k8sCoreApi.createNamespacedServiceAccount(`t-${team}`, webtopSA).catch((error) => {
+    throw new Error(JSON.stringify(error));
+  });
+};
+
+module.exports.createServiceAccountForWebTop = createServiceAccountForWebTop;
+
+const createRoleForWebTop = async (team) => {
+  const roleDefinitionForWebtop = {
+    kind: 'Role',
+    apiVersion: 'rbac.authorization.k8s.io/v1',
+    metadata: {
+      namespace: `t-${team}`,
+      name: 'virtualdesktop-team-role',
+      rules: [
+        {
+          apiGroup: [''],
+          resources: ['secrets'],
+          verbs: ['get', 'list'],
+        },
+        {
+          apiGroup: [''],
+          resources: ['configmaps'],
+          verbs: ['get', 'list'],
+        },
+        {
+          apiGroup: [''],
+          resources: ['pod'],
+          verbs: ['get', 'list', 'watch'],
+        },
+        {
+          apiGroup: [''],
+          resources: ['pods/log'],
+          verbs: ['get', 'list'],
+        },
+        {
+          apiGroup: ['apps'],
+          resources: ['deployment'],
+          verbs: ['get', 'list', 'watch'],
+        },
+      ],
+    },
+  };
+  /**
+   * create a Role
+   * @param namespace object name and auth scope, such as for teams and projects
+   * @param body
+   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
+   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
+   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
+   */
+  return k8sRBACAPI.createNamespacedRole(`t-${team}`, roleDefinitionForWebtop).catch((error) => {
+    throw new Error(JSON.stringify(error));
+  });
+};
+
+module.exports.createRoleForWebTop = createRoleForWebTop;
+
+const createRoleBindingForWebtop = async (team) => {
+  const roleBindingforWebtop = {
+    kind: 'RoleBinding',
+    metadata: {
+      name: 'virtualdesktop-team-rolebinding',
+      namespace: `t-${team}`,
+    },
+    subjects: [{ kind: 'ServiceAccount', name: 'webtop-sa', namespace: `t-${team}` }],
+    roleRef: {
+      kind: 'Role',
+      name: 'virtualdesktop-team-role',
+      apiGroup: 'rbac.authorization.k8s.io',
+    },
+  };
+  /**
+   * create a RoleBinding
+   * @param namespace object name and auth scope, such as for teams and projects
+   * @param body
+   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
+   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
+   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
+   */
+  return k8sRBACAPI
+    .createNamespacedRoleBinding(`t-${team}`, roleBindingforWebtop)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+};
+module.exports.createRoleBindingForWebtop = createRoleBindingForWebtop;
+
 const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsDesktopConfig = {
     metadata: {
@@ -566,7 +676,8 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
           },
         },
         spec: {
-          automountServiceAccountToken: false,
+          serviceAccountName: 'webtop-sa',
+          //automountServiceAccountToken: false,
           // securityContext: {
           //   runAsUser: 911,
           //   runAsGroup: 911,
@@ -576,7 +687,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'virtualdesktop',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets-desktop:latest',
+              image: 'jeroenwillemsen/wrongsecrets-desktop:1.5.4RC7',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: get('virtualdesktop.resources'),
               securityContext: {

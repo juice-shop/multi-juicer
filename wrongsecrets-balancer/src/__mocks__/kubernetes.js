@@ -7,6 +7,9 @@ module.exports = {
   createDesktopDeploymentForTeam: jest.fn(),
   createServiceForTeam: jest.fn(),
   createDesktopServiceForTeam: jest.fn(),
+  createServiceAccountForWebTop: jest.fn(),
+  createRoleForWebTop: jest.fn(),
+  createRoleBindingForWebtop: jest.fn(),
   getJuiceShopInstanceForTeamname: jest.fn(() => ({
     readyReplicas: 1,
     availableReplicas: 1,

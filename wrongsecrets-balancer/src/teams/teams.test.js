@@ -16,6 +16,9 @@ const {
   changePasscodeHashForTeam,
   createConfigmapForTeam,
   createSecretsfileForTeam,
+  createServiceAccountForWebTop,
+  createRoleForWebTop,
+  createRoleBindingForWebtop,
 } = require('../kubernetes');
 
 afterEach(() => {

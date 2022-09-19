@@ -25,6 +25,9 @@ const {
   createAWSDeploymentForTeam,
   createAWSSecretsProviderForTeam,
   patchServiceAccountForTeamForAWS,
+  createServiceAccountForWebTop,
+  createRoleForWebTop,
+  createRoleBindingForWebtop,
 } = require('../kubernetes');
 
 const loginCounter = new promClient.Counter({
@@ -214,6 +217,38 @@ async function createTeam(req, res) {
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {
+    logger.info(`Creating service account for virtual desktop in K8s '${team}'`);
+    await createServiceAccountForWebTop(team);
+    logger.info(`Created service account for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating service account for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating role for virtual desktop in K8s '${team}'`);
+    await createRoleForWebTop(team);
+    logger.info(`Created role for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating role for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating roleBinding for virtual desktop in K8s '${team}'`);
+    await createRoleBindingForWebtop(team);
+    logger.info(`Created roleBinding for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating roleBinding for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
     logger.info(`Created virtualdesktop Deployment for team '${team}'`);
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
     await createDesktopServiceForTeam(team);
@@ -284,6 +319,7 @@ async function createAWSTeam(req, res) {
     logger.error(`Error while annotating the service account for  ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
+
   try {
     logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
     await createAWSDeploymentForTeam({ team, passcodeHash: hash });
@@ -291,6 +327,39 @@ async function createAWSTeam(req, res) {
   } catch (error) {
     logger.error(
       `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating service account for virtual desktop in AWS '${team}'`);
+    await createServiceAccountForWebTop(team);
+    logger.info(`Created service account for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating service account for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating role for virtual desktop in AWS '${team}'`);
+    await createRoleForWebTop(team);
+    logger.info(`Created role for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating role for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating roleBinding for virtual desktop in AWS '${team}'`);
+    await createRoleBindingForWebtop(team);
+    logger.info(`Created roleBinding for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating roleBinding for virtual desktop for team ${team}: ${error.message}`
     );
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
