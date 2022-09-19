@@ -104,7 +104,8 @@ async function updateLastConnectTimestamp(req, res, next) {
  */
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
-  const currentReferrerForDesktop = 'http://' + req.host + ':' + 3000 + '/?desktop';
+  //TODO: FIX THE PORT!
+  const currentReferrerForDesktop = '/?desktop';
   logger.debug(
     `Proxying request ${req.method.toLocaleUpperCase()} ${
       req.path
@@ -114,9 +115,9 @@ function proxyTrafficToJuiceShop(req, res) {
   if (
     (req.query != null && req.query.desktop != null) ||
     (req.headers['referer'] !== undefined &&
-      req.headers['referer'] === currentReferrerForDesktop) ||
+      req.headers['referer'].includes(currentReferrerForDesktop)) ||
     (req.headers['Referer'] !== undefined &&
-      req.headers['Referer'] === currentReferrerForDesktop) ||
+      req.headers['Referer'].includes(currentReferrerForDesktop)) ||
     req.path === '/js/filebrowser.js' ||
     req.path === '/css/filebrowser.css' ||
     req.path === '/files/socket.io/socket.io.js' ||

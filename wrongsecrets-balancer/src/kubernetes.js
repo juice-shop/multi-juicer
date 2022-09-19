@@ -193,7 +193,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/actuator/health/readiness',
                   port: 8080,
                 },
-                initialDelaySeconds: 120,
+                initialDelaySeconds: 90,
                 timeoutSeconds: 30,
                 periodSeconds: 10,
                 failureThreshold: 10,
