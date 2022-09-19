@@ -570,39 +570,39 @@ const createNSPsforTeam = async (team) => {
     },
   };
 
-  const nsAllowWithinNS = {
-    kind: 'NetworkPolicy',
-    apiVersion: 'networking.k8s.io/v1',
-    metadata: {
-      name: 'allow-same-namespace',
-      namespace: `t-${team}`,
-    },
-    spec: {
-      podSelector: {
-        matchLabels: {
-          team: `${team}`,
-        },
-      },
-      ingress: [
-        {
-          from: [
-            {
-              podSelector: {
-                matchLabels: {
-                  team: `${team}`,
-                },
-              },
-            },
-          ],
-          ports: [
-            {
-              port: 8080,
-            },
-          ],
-        },
-      ],
-    },
-  };
+  // const nsAllowWithinNS = {
+  //   kind: 'NetworkPolicy',
+  //   apiVersion: 'networking.k8s.io/v1',
+  //   metadata: {
+  //     name: 'allow-same-namespace',
+  //     namespace: `t-${team}`,
+  //   },
+  //   spec: {
+  //     podSelector: {
+  //       matchLabels: {
+  //         team: `${team}`,
+  //       },
+  //     },
+  //     ingress: [
+  //       {
+  //         from: [
+  //           {
+  //             podSelector: {
+  //               matchLabels: {
+  //                 team: `${team}`,
+  //               },
+  //             },
+  //           },
+  //         ],
+  //         ports: [
+  //           {
+  //             port: 8080,
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // };
 
   const nsAllowOnlyDNS = {
     apiVersion: 'networking.k8s.io/v1',
