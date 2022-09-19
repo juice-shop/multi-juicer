@@ -295,7 +295,6 @@ async function createAWSTeam(req, res) {
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
 
-
   try {
     logger.info(`Creating virtualdesktop Deployment for team '${team}'`);
     await createDesktopDeploymentForTeam({ team, passcodeHash: hash });

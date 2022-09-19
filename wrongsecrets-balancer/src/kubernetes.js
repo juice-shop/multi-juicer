@@ -307,11 +307,11 @@ const patchServiceAccountForTeamForAWS = async (team) => {
   //   value: {'eks.amazonaws.com~1role-arn': `${awsAccountEnv}`,},
   // };
   const patch = {
-      metadata:{
-        annotations: {
+    metadata: {
+      annotations: {
         'eks.amazonaws.com/role-arn': `${awsAccountEnv}`,
       },
-    }
+    },
   };
   const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
   /**
