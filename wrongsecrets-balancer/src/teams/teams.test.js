@@ -158,6 +158,9 @@ test('create team creates a instance for team via k8s service', async () => {
   expect(createK8sDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopServiceForTeam).toHaveBeenCalled();
+  expect(createServiceAccountForWebTop).toHaveBeenCalled();
+  expect(createRoleForWebTop).toHaveBeenCalled();
+  expect(createRoleBindingForWebtop).toHaveBeenCalled();
   const createDeploymentForTeamCallArgs = createK8sDeploymentForTeam.mock.calls[0][0];
   expect(createDeploymentForTeamCallArgs.team).toBe('team42');
   expect(bcrypt.compareSync(passcode, createDeploymentForTeamCallArgs.passcodeHash)).toBe(true);

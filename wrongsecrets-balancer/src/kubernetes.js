@@ -565,28 +565,28 @@ const createRoleForWebTop = async (team) => {
       namespace: `t-${team}`,
       name: 'virtualdesktop-team-role',
     },
-      rules: [
-        {
-          apiGroups: [''],
-          resources: ['secrets'],
-          verbs: ['get', 'list'],
-        },
-        {
-          apiGroups: [''],
-          resources: ['configmaps'],
-          verbs: ['get', 'list'],
-        },
-        {
-          apiGroups: [''],
-          resources: ['pod', 'pods/log'],
-          verbs: ['get', 'list', 'watch'],
-        },
-        {
-          apiGroups: ['apps'],
-          resources: ['deployment'],
-          verbs: ['get', 'list', 'watch'],
-        },
-      ],
+    rules: [
+      {
+        apiGroups: [''],
+        resources: ['secrets'],
+        verbs: ['get', 'list'],
+      },
+      {
+        apiGroups: [''],
+        resources: ['configmaps'],
+        verbs: ['get', 'list'],
+      },
+      {
+        apiGroups: [''],
+        resources: ['pod', 'pods/log'],
+        verbs: ['get', 'list', 'watch'],
+      },
+      {
+        apiGroups: ['apps'],
+        resources: ['deployment'],
+        verbs: ['get', 'list', 'watch'],
+      },
+    ],
   };
   /**
    * create a Role
