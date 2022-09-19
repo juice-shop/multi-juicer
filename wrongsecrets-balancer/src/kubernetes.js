@@ -44,7 +44,7 @@ const createNameSpaceForTeam = async (team) => {
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
-    throw new Error(error.response.body.message);
+    throw new Error(JSON.stringify(error));
   });
 };
 module.exports.createNameSpaceForTeam = createNameSpaceForTeam;
@@ -578,13 +578,8 @@ const createRoleForWebTop = async (team) => {
         },
         {
           apiGroups: [''],
-          resources: ['pod'],
+          resources: ['pod', 'pods/log'],
           verbs: ['get', 'list', 'watch'],
-        },
-        {
-          apiGroups: [''],
-          resources: ['pods/log'],
-          verbs: ['get', 'list'],
         },
         {
           apiGroups: ['apps'],
