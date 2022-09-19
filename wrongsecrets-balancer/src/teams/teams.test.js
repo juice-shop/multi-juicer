@@ -19,6 +19,7 @@ const {
   createServiceAccountForWebTop,
   createRoleForWebTop,
   createRoleBindingForWebtop,
+  createNSPsforTeam,
 } = require('../kubernetes');
 
 afterEach(() => {
@@ -160,6 +161,7 @@ test('create team creates a instance for team via k8s service', async () => {
   expect(createDesktopServiceForTeam).toHaveBeenCalled();
   expect(createServiceAccountForWebTop).toHaveBeenCalled();
   expect(createRoleForWebTop).toHaveBeenCalled();
+  expect(createNSPsforTeam).toHaveBeenCalled();
   expect(createRoleBindingForWebtop).toHaveBeenCalled();
   const createDeploymentForTeamCallArgs = createK8sDeploymentForTeam.mock.calls[0][0];
   expect(createDeploymentForTeamCallArgs.team).toBe('team42');

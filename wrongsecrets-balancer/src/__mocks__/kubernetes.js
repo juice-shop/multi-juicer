@@ -8,6 +8,7 @@ module.exports = {
   createServiceForTeam: jest.fn(),
   createDesktopServiceForTeam: jest.fn(),
   createServiceAccountForWebTop: jest.fn(),
+  createNSPsforTeam: jest.fn(),
   createRoleForWebTop: jest.fn(),
   createRoleBindingForWebtop: jest.fn(),
   getJuiceShopInstanceForTeamname: jest.fn(() => ({

@@ -540,19 +540,75 @@ const createNSPsforTeam = async (team) => {
     kind: 'NetworkPolicy',
     metadata: {
       name: 'default-deny-all',
-      namespace: 'wrongsecrets-test',
+      namespace: `t-${team}`,
     },
     spec: {
       podSelector: {},
-      policyTypes: [{ Ingresss }, { Egress }],
+      policyTypes: ['Ingress', 'Egress'],
     },
   };
-  const nspDenyMetadataSP = {
+  const nspDenyOtherNS = {
+    kind: 'NetworkPolicy',
+    apiVersion: 'networking.k8s.io/v1',
+    metadata: {
+      name: 'deny-traffic-from-other-namespaces',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      podSelector: {
+        matchLabels: null,
+      },
+      ingress: [
+        {
+          from: [
+            {
+              podSelector: {},
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  const nsAllowWithinNS = {
+    kind: 'NetworkPolicy',
+    apiVersion: 'networking.k8s.io/v1',
+    metadata: {
+      name: 'allow-same-namespace',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      podSelector: {
+        matchLabels: {
+          team: `${team}`,
+        },
+      },
+      ingress: [
+        {
+          from: [
+            {
+              podSelector: {
+                matchLabels: {
+                  team: `${team}`,
+                },
+              },
+            },
+          ],
+          ports: [
+            {
+              port: 8080,
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  const nsAllowOnlyDNS = {
     apiVersion: 'networking.k8s.io/v1',
     kind: 'NetworkPolicy',
-    metadata:{
-      name: 'block-metadata-service',
-      namespace: 'wrongsecrets-test',
+    metadata: {
+      name: 'deny-all-egress-excpet-dns',
     },
     spec: {
       podSelector: {
@@ -560,32 +616,43 @@ const createNSPsforTeam = async (team) => {
           app: 'wrongsecrets-no-vault',
         },
       },
-      policyTypes: [
-        {Egress},
+      policyTypes: ['Egress'],
+      egress: [
+        {
+          ports: [
+            {
+              port: 53,
+              protocol: 'UDP',
+            },
+            {
+              port: 53,
+              protocol: 'TCP',
+            },
+          ],
+        },
       ],
-      egress: {
-        action: 'deny',
-        [
-          {
-            to: 
-            [
-              {
-                ipBlock:{
-                  cidr: '169.254.169.254/32',
-                },
-              },
-            ],
-            ports: [
-              {
-                protocol: 'tcp',
-                port: '80',
-              },
-            ],
-          },
-        ],
-      },
     },
-  }
+  };
+  await k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nspDefaultDeny)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+  await k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nspDenyOtherNS)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+  // await k8sNetworkingApi
+  //   .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWithinNS)
+  //   .catch((error) => {
+  //     throw new Error(JSON.stringify(error));
+  //   });
+  return k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowOnlyDNS)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
 };
 
 module.exports.createNSPsforTeam = createNSPsforTeam;

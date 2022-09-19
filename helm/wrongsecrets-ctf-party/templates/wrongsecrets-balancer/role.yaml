@@ -38,3 +38,6 @@ rules:
   - apiGroups: ['secrets-store.csi.x-k8s.io'] 
     resources: ['secretproviderclasses']
     verbs: ['create', 'get', 'list', 'delete']
+  - apiGroups: ['networking.k8s.io'] 
+    resources: ['networkpolicies']
+    verbs: ['create', 'get', 'list', 'delete']
