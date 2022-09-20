@@ -776,4 +776,3 @@ message StatefulSetUpdateStrategy {
   // +optional
   optional RollingUpdateStatefulSetStrategy rollingUpdate = 2;
 }
-

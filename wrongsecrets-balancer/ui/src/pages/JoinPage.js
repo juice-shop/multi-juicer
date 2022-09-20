@@ -87,7 +87,7 @@ export const JoinPage = injectIntl(({ intl }) => {
     });
   },[]);
 
- 
+
 
 
 
@@ -113,7 +113,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         values={{
           strong: (msg) => <strong>{msg}</strong>,
         }}/>
-        <ul> 
+        <ul>
           <li>This domain: here is where you can do your exercises</li>
           <li>The domain where you provide your responses in exchange for a CTF key: <a href={dynamics.heroku_wrongsecret_ctf_url}>{dynamics.heroku_wrongsecret_ctf_url}</a></li>
           <li>The domain where you provide your CTF key: <a href={dynamics.ctfd_url}>{dynamics.ctfd_url}</a></li>

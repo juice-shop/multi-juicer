@@ -13,4 +13,3 @@ some reserved characters incorrectly escaped by net/url (see [issue 5684](https:
 ## License
 
 Go license (BSD-3-Clause)
-

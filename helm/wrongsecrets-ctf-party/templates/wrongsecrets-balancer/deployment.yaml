@@ -44,14 +44,14 @@ spec:
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
               value: {{ .Values.balancer.env.REACT_APP_MOVING_GIF_LOGO }}
-            - name: REACT_APP_HEROKU_WRONGSECRETS_URL 
-              value: {{ .Values.balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL }} 
+            - name: REACT_APP_HEROKU_WRONGSECRETS_URL
+              value: {{ .Values.balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL }}
             - name: REACT_APP_CTFD_URL
-              value: {{ .Values.balancer.env.REACT_APP_CTFD_URL }} 
+              value: {{ .Values.balancer.env.REACT_APP_CTFD_URL }}
             - name: REACT_APP_S3_BUCKET_URL
-              value: {{ .Values.balancer.env.REACT_APP_S3_BUCKET_URL }} 
-            - name: K8S_ENV 
-              value: {{ .Values.balancer.env.K8S_ENV }} 
+              value: {{ .Values.balancer.env.REACT_APP_S3_BUCKET_URL }}
+            - name: K8S_ENV
+              value: {{ .Values.balancer.env.K8S_ENV }}
             - name: IRSA_ROLE
               value: "arn:aws:iam::233483431651:role/wrongsecrets-secret-manager" #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
             - name: COOKIEPARSER_SECRET

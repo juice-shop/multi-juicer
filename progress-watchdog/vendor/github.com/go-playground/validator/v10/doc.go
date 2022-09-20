@@ -1228,7 +1228,7 @@ Although empty value and Local value are allowed by time.LoadLocation golang fun
 More information on https://golang.org/pkg/time/#LoadLocation
 
 	Usage: timezone
-  
+
 
 Alias Validators and Tags
 

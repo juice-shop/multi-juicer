@@ -2136,7 +2136,7 @@ or network CIDRs from where clients which their request headers related to clien
 IP can be trusted. They can be IPv4 addresses, IPv4 CIDRs, IPv6 addresses or
 IPv6 CIDRs.
 
-**Attention:** Gin trust all proxies by default if you don't specify a trusted 
+**Attention:** Gin trust all proxies by default if you don't specify a trusted
 proxy using the function above, **this is NOT safe**. At the same time, if you don't
 use any proxy, you can disable this feature by using `Engine.SetTrustedProxies(nil)`,
 then `Context.ClientIP()` will return the remote address directly to avoid some
@@ -2166,7 +2166,7 @@ func main() {
 ```
 
 **Notice:** If you are using a CDN service, you can set the `Engine.TrustedPlatform`
-to skip TrustedProxies check, it has a higher priority than TrustedProxies. 
+to skip TrustedProxies check, it has a higher priority than TrustedProxies.
 Look at the example below:
 ```go
 import (

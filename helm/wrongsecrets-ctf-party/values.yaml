@@ -37,7 +37,7 @@ balancer:
   repository: jeroenwillemsen/wrongsecrets-balancer
   tag: 0.69aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
-  replicas: 1
+  replicas: 3
   service:
     # -- Kubernetes service type
     type: ClusterIP
@@ -121,7 +121,7 @@ wrongsecrets:
   #    cpu: 100m
   #    memory: 200Mi
   # -- Optional securityContext definitions to set for each JuiceShop instance
-  securityContext: 
+  securityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     runAsNonRoot: true

@@ -82,7 +82,7 @@ module "eks" {
     disk_type       = "gp3"
     disk_throughput = 150
     disk_iops       = 3000
-    instance_types  = ["t3a.large"]
+    instance_types  = ["t3a.xlarge"]
 
     iam_role_additional_policies = [
       "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
@@ -97,9 +97,9 @@ module "eks" {
     bottlerocket_default = {
       create_launch_template = false
       launch_template_name   = ""
-      min_size     = 1
-      max_size     = 50
-      desired_size = 1
+      min_size               = 1
+      max_size               = 50
+      desired_size           = 1
 
       capacity_type = "SPOT"
 

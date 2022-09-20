@@ -2,11 +2,11 @@
 # Setup SSL for multi-juicer with Microsoft Azure
 
 Following this guide, you should be able to setup a https ingress with certificates from letsencrypt. https://docs.microsoft.com/en-us/azure/aks/ingress-tls?tabs=azure-cli .
-This guide is based on the official microsoft guide and tested on azure. 
+This guide is based on the official microsoft guide and tested on azure.
 
 Please note: Make sure that you haven't setup an ingress already. There is an option for configuring an ingress when installing multi-juicer with your own `values.yaml`. This guide require that you haven't ventured down that path.
 
-## 1. Create the Container registry 
+## 1. Create the Container registry
 
 First create a container registry where you will be storing the images for your cert-manager and nginx controller
 
@@ -174,7 +174,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: my-wrongsecrets-ctf-party
-  annotations: 
+  annotations:
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: nginx
@@ -216,4 +216,3 @@ NAME         READY   SECRET       AGE
 tls-secret   True    tls-secret   11m
 ```
 Test that the ingress is working by opening a browser and trying the host address. Make sure that you use https
-

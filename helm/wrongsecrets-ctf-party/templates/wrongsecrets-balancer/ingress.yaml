@@ -33,7 +33,7 @@ spec:
             backend:
               service:
                 name: wrongsecrets-balancer
-                port: 
+                port:
                   number: {{ $svcPort }}
         {{- end }}
   {{- end }}
