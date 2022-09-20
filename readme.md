@@ -24,11 +24,15 @@ We currently only support minikube and AWS EKS (_**But the latter needs you to u
 For minikube, run:
 
 ```shell
-minikube start
+
+minikube start --cni calico
 eval $(minikube docker-env)
 ./build-an-deploy
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
+
 ```
+
+For AWS EKS follow the instrucrtions in the `/eks` folder.
 
 Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
 

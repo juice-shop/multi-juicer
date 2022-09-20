@@ -37,7 +37,7 @@ balancer:
   repository: jeroenwillemsen/wrongsecrets-balancer
   tag: 0.69aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
-  replicas: 3
+  replicas: 1
   service:
     # -- Kubernetes service type
     type: ClusterIP
@@ -54,7 +54,7 @@ balancer:
       memory: 256Mi
       cpu: 400m
     limits:
-      memory: 512Mi
+      memory: 1024Mi
       cpu: 800m
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
