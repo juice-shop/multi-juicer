@@ -89,7 +89,7 @@ balancer:
 
 wrongsecrets:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
-  maxInstances: 100
+  maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsens/wrongsecrets
   tag: 1.5.3-no-vault
@@ -191,7 +191,7 @@ wrongsecrets:
 #the virtual desktop for the deploymebt
 virtualdesktop:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
-  maxInstances: 100
+  maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsen/wrongsecrets-desktop
   tag: latest
