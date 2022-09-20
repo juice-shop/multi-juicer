@@ -27,7 +27,7 @@ if z.DecBasicHandle().MapValueReset {
 	{{else if not decElemKindImmutable}}{{var "mg"}} = true
 	{{end}} }
 if {{var "l"}} != 0 {
-	{{var "hl"}} := {{var "l"}} > 0 
+	{{var "hl"}} := {{var "l"}} > 0
 	for {{var "j"}} := 0; ({{var "hl"}} && {{var "j"}} < {{var "l"}}) || !({{var "hl"}} || z.DecCheckBreak()); {{var "j"}}++ {
 	z.DecReadMapElemKey()
 	{{ $x := printf "%vmk%v" .TempVar .Rand }}{{ decLineVarK $x -}}
@@ -41,7 +41,7 @@ if {{var "l"}} != 0 {
     {{end -}}
 	if {{var "mg"}} {
 		{{if decElemKindPtr -}}
-        {{var "mv"}}, {{var "mok"}} = {{var "v"}}[{{var "mk"}}] 
+        {{var "mv"}}, {{var "mok"}} = {{var "v"}}[{{var "mk"}}]
 		if {{var "mok"}} {
 			{{var "ms"}} = false
 		}
@@ -107,7 +107,7 @@ if {{var "l"}} == 0 {
 	}
 	}
     {{end -}}
-	var {{var "j"}} int 
+	var {{var "j"}} int
     {{/* // var {{var "dn"}} bool */ -}}
 	for {{var "j"}} = 0; ({{var "hl"}} && {{var "j"}} < {{var "l"}}) || !({{var "hl"}} || z.DecCheckBreak()); {{var "j"}}++ { // bounds-check-elimination
 		{{if not isArray}} if {{var "j"}} == 0 && {{var "v"}} == nil {
@@ -117,7 +117,7 @@ if {{var "l"}} == 0 {
 				{{var "rl"}} = {{if isSlice}}8{{else if isChan}}64{{end}}
 			}
 			{{var "v"}} = make({{if isSlice}}[]{{ .Typ }}{{else if isChan}}{{.CTyp}}{{end}}, {{var "rl"}})
-			{{var "c"}} = true 
+			{{var "c"}} = true
 		}
         {{end -}}
 		{{var "h"}}.ElemContainerState({{var "j"}})
@@ -150,7 +150,7 @@ if {{var "l"}} == 0 {
     {{end -}}
 }
 {{var "h"}}.End()
-{{if not isArray }}if {{var "c"}} { 
+{{if not isArray }}if {{var "c"}} {
 	*{{ .Varname }} = {{var "v"}}
 }
 {{end -}}

@@ -10,7 +10,7 @@ import "fmt"
 
 // TestMammoth has all the different paths optimized in fast-path
 // It has all the primitives, slices and maps.
-// 
+//
 // For each of those types, it has a pointer and a non-pointer field.
 
 func init() { _ = fmt.Printf } // so we can include fmt as needed
@@ -55,24 +55,24 @@ func doTestMammothSlices(t *testing.T, h Handle) {
     //   - encode ptr to the value
     //   - check if encode bytes are same
     //   - decode into ptrs to: nil, then 1-elem slice, equal-length, then large len slice
-    //   - decode into non-addressable slice of equal length, then larger len 
+    //   - decode into non-addressable slice of equal length, then larger len
     //   - for each decode, compare elem-by-elem to the original slice
-    //   - 
+    //   -
     //   - rinse and repeat for a MapBySlice version
-    //   - 
+    //   -
     */ -}}
     var v{{$i}}v1, v{{$i}}v2 []{{ .Elem }}
     var bs{{$i}} []byte
 	v{{$i}}v1 = v
 	bs{{$i}} = testMarshalErr(v{{$i}}v1, h, t, "enc-slice-v{{$i}}")
-	if v != nil {	
+	if v != nil {
 	if v == nil { v{{$i}}v2 = nil } else { v{{$i}}v2 = make([]{{ .Elem }}, len(v)) }
 	testUnmarshalErr(v{{$i}}v2, bs{{$i}}, h, t, "dec-slice-v{{$i}}")
 	testDeepEqualErr(v{{$i}}v1, v{{$i}}v2, t, "equal-slice-v{{$i}}")
 	if v == nil { v{{$i}}v2 = nil } else { v{{$i}}v2 = make([]{{ .Elem }}, len(v)) }
 	testUnmarshalErr(rv4i(v{{$i}}v2), bs{{$i}}, h, t, "dec-slice-v{{$i}}-noaddr") // non-addressable value
 	testDeepEqualErr(v{{$i}}v1, v{{$i}}v2, t, "equal-slice-v{{$i}}-noaddr")
-	}	
+	}
 	// ...
 	bs{{$i}} = testMarshalErr(&v{{$i}}v1, h, t, "enc-slice-v{{$i}}-p")
 	v{{$i}}v2 = nil

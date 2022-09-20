@@ -10,10 +10,10 @@ package codec
 import "encoding"
 
 // GenVersion is the current version of codecgen.
-const GenVersion = {{ .Version }} 
+const GenVersion = {{ .Version }}
 
-// This file is used to generate helper code for codecgen. 
-// The values here i.e. genHelper(En|De)coder are not to be used directly by 
+// This file is used to generate helper code for codecgen.
+// The values here i.e. genHelper(En|De)coder are not to be used directly by
 // library users. They WILL change continuously and without notice.
 
 {{/*
@@ -30,7 +30,7 @@ const GenVersion = {{ .Version }}
 func GenHelperEncoder(e *Encoder) (ge genHelperEncoder, ee genHelperEncDriver) {
 	ge = genHelperEncoder{e: e}
 	ee = genHelperEncDriver{encDriver: e.e}
-	return 
+	return
 }
 
 // GenHelperDecoder is exported so that it can be used externally by codecgen.
@@ -53,14 +53,14 @@ type genHelperDecDriver struct {
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 type genHelperEncoder struct {
 	M must
-	F fastpathT 
+	F fastpathT
 	e *Encoder
 }
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 type genHelperDecoder struct {
 	C checkOverflow
-	F fastpathT 
+	F fastpathT
 	d *Decoder
 }
 
@@ -198,7 +198,7 @@ func (f genHelperDecoder) DecRaw() []byte {	return f.d.rawBytes() }
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) IsJSONHandle() bool {
-	return f.d.js 
+	return f.d.js
 }
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) I2Rtid(v interface{}) uintptr {
@@ -238,4 +238,3 @@ func (f genHelperDecoder) DecReadMapElemValue() { f.d.mapElemValue() }
 func (f genHelperDecoder) DecDecodeFloat32() float32 { return f.d.decodeFloat32() }
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
 func (f genHelperDecoder) DecCheckBreak() bool { return f.d.checkBreak() }
-

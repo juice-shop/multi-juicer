@@ -43,13 +43,17 @@ spec:
               port: http
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
-              value: "https://i.gifer.com/9kGQ.gif" #REPLACE WITH CTF THEME AND DO SO IN CONTAINER DEF AS WELL!
+              value: {{ .Values.balancer.env.REACT_APP_MOVING_GIF_LOGO }}
             - name: REACT_APP_HEROKU_WRONGSECRETS_URL
-              value: "https://wrongsecrets.herokuapp.com/"
+              value: {{ .Values.balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL }}
             - name: REACT_APP_CTFD_URL
-              value: "https://ctfd.io"
+              value: {{ .Values.balancer.env.REACT_APP_CTFD_URL }}
             - name: REACT_APP_S3_BUCKET_URL
-              value: "s3://funstuff"
+              value: {{ .Values.balancer.env.REACT_APP_S3_BUCKET_URL }}
+            - name: K8S_ENV
+              value: {{ .Values.balancer.env.K8S_ENV }}
+            - name: IRSA_ROLE
+              value: "arn:aws:iam::233483431651:role/wrongsecrets-secret-manager" #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:

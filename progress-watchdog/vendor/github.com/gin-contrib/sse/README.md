@@ -41,7 +41,7 @@ data: some data\\nmore data
 id: 124
 event: message
 data: {"content":"hi!","date":1431540810,"user":"manu"}
- 
+
 ```
 
 ## Content-Type

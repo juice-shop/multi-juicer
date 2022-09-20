@@ -8,7 +8,7 @@ const { get } = require('../config');
 const {
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
-  createDeploymentForTeam,
+  createK8sDeploymentForTeam,
   createDesktopDeploymentForTeam,
   createServiceForTeam,
   createNameSpaceForTeam,
@@ -16,6 +16,9 @@ const {
   changePasscodeHashForTeam,
   createConfigmapForTeam,
   createSecretsfileForTeam,
+  createServiceAccountForWebTop,
+  createRoleForWebTop,
+  createRoleBindingForWebtop,
 } = require('../kubernetes');
 
 afterEach(() => {
@@ -152,10 +155,13 @@ test('create team creates a instance for team via k8s service', async () => {
   expect(createConfigmapForTeam).toHaveBeenCalled();
   expect(createSecretsfileForTeam).toHaveBeenCalled();
   expect(createNameSpaceForTeam).toHaveBeenCalled();
-  expect(createDeploymentForTeam).toHaveBeenCalled();
+  expect(createK8sDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopServiceForTeam).toHaveBeenCalled();
-  const createDeploymentForTeamCallArgs = createDeploymentForTeam.mock.calls[0][0];
+  expect(createServiceAccountForWebTop).toHaveBeenCalled();
+  expect(createRoleForWebTop).toHaveBeenCalled();
+  expect(createRoleBindingForWebtop).toHaveBeenCalled();
+  const createDeploymentForTeamCallArgs = createK8sDeploymentForTeam.mock.calls[0][0];
   expect(createDeploymentForTeamCallArgs.team).toBe('team42');
   expect(bcrypt.compareSync(passcode, createDeploymentForTeamCallArgs.passcodeHash)).toBe(true);
   expect(createServiceForTeam).toBeCalledWith('team42');
