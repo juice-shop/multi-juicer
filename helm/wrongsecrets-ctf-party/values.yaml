@@ -121,7 +121,7 @@ wrongsecrets:
   #    cpu: 100m
   #    memory: 200Mi
   # -- Optional securityContext definitions to set for each JuiceShop instance
-  securityContext: 
+  securityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     runAsNonRoot: true

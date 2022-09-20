@@ -115,7 +115,7 @@ const SiteHeader = styled.h1`
   margin-top: 38px;
   font-size: 40px;
   font-weight: normal;
-  
+
   @media (max-width: 720px) {
     margin-top: 16px;
     margin-bottom: 0;

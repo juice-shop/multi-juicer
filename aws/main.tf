@@ -97,9 +97,9 @@ module "eks" {
     bottlerocket_default = {
       create_launch_template = false
       launch_template_name   = ""
-      min_size     = 1
-      max_size     = 50
-      desired_size = 1
+      min_size               = 1
+      max_size               = 50
+      desired_size           = 1
 
       capacity_type = "SPOT"
 

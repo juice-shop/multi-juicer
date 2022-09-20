@@ -377,4 +377,3 @@ message UncountedTerminatedPods {
   // +optional
   repeated string failed = 2;
 }
-

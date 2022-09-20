@@ -54,8 +54,8 @@ v2.6.0
 - solved issue #304, make operation names unique
 
 2017-01-30
- 
-	[IMPORTANT] For swagger users, change your import statement to:	
+
+	[IMPORTANT] For swagger users, change your import statement to:
 	swagger "github.com/emicklei/go-restful-swagger12"
 
 - moved swagger 1.2 code to go-restful-swagger12
@@ -65,7 +65,7 @@ v2.6.0
 
 - remove defer request body close
 - expose Dispatch for testing filters and Routefunctions
-- swagger response model cannot be array 
+- swagger response model cannot be array
 - created TAG 1.0.0
 
 2016-12-22
@@ -85,7 +85,7 @@ v2.6.0
 2016-02-14
 
 - take the qualify factor of the Accept header mediatype into account when deciding the contentype of the response
-- add constructors for custom entity accessors for xml and json 
+- add constructors for custom entity accessors for xml and json
 
 2015-09-27
 
@@ -148,7 +148,7 @@ v2.6.0
 - fixed problem with greedy CurlyRouter
 - (api add) Access-Control-Max-Age in CORS
 - add tracing functionality (injectable) for debugging purposes
-- support JSON parse 64bit int 
+- support JSON parse 64bit int
 - fix empty parameters for swagger
 - WebServicesUrl is now optional for swagger
 - fixed duplicate AccessControlAllowOrigin in CORS
@@ -175,7 +175,7 @@ v2.6.0
 
 2014-02-26
 
-- (api add) Request now provides information about the matched Route, see method SelectedRoutePath 
+- (api add) Request now provides information about the matched Route, see method SelectedRoutePath
 
 2014-02-17
 
@@ -233,8 +233,8 @@ Important API changes:
 
 - (api remove) package variable DoNotRecover no longer works ; use restful.DefaultContainer.DoNotRecover(true) instead.
 - (api remove) package variable EnableContentEncoding no longer works ; use restful.DefaultContainer.EnableContentEncoding(true) instead.
- 
- 
+
+
 2013-07-06
 
 - (api add) Added support for response encoding (gzip and deflate(zlib)). This feature is disabled on default (for backwards compatibility). Use restful.EnableContentEncoding = true in your initialization to enable this feature.
@@ -253,7 +253,7 @@ Important API changes:
 - (optimize) Cache the RegExp compilation of Paths.
 
 2013-05-22
-	
+
 - (api add) Added support for request/response filter functions
 
 2013-05-18
@@ -263,11 +263,9 @@ Important API changes:
 - (api change) Moved Swagger Webservice to swagger package (see example restful-user)
 
 [2012-11-14 .. 2013-05-18>
- 
+
 - See https://github.com/emicklei/go-restful/commits
 
 2012-11-14
 
 - Initial commit
-
-

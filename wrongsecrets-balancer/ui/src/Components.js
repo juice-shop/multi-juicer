@@ -97,4 +97,3 @@ export const CenteredCard = styled(BodyCard)`
   justify-content: center;
   align-items: center;
 `;
-

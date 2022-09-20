@@ -97,4 +97,3 @@ message Quantity {
 message QuantityValue {
   optional string string = 1;
 }
-
