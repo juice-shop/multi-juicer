@@ -37,7 +37,7 @@ balancer:
   repository: jeroenwillemsen/wrongsecrets-balancer
   tag: 0.69aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
-  replicas: 1
+  replicas: 3
   service:
     # -- Kubernetes service type
     type: ClusterIP
