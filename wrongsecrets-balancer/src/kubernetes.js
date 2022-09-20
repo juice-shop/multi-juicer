@@ -18,6 +18,7 @@ const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
 
 const { get } = require('./config');
+const { logger } = require('./logger');
 
 //used for owner ref, not used now:
 // const lodashGet = require('lodash/get');
@@ -296,20 +297,7 @@ const createAWSSecretsProviderForTeam = async (team) => {
 };
 module.exports.createAWSSecretsProviderForTeam = createAWSSecretsProviderForTeam;
 
-// kubectl patch sa default -n t-team -v8 -p='{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"foo"}}}'
-//below does not
 const patchServiceAccountForTeamForAWS = async (team) => {
-  // const patch = {
-  //   op: 'add',
-  //   path: 'Annotations/eks.amazonaws.com~1role-arn',
-  //   value: `${awsAccountEnv}`,
-  // };
-
-  // const patch = {
-  //   op: 'add',
-  //   path: 'Annotations',
-  //   value: {'eks.amazonaws.com~1role-arn': `${awsAccountEnv}`,},
-  // };
   const patch = {
     metadata: {
       annotations: {
@@ -318,17 +306,7 @@ const patchServiceAccountForTeamForAWS = async (team) => {
     },
   };
   const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
-  /**
-   * partially update the specified ServiceAccount
-   * @param name name of the ServiceAccount
-   * @param namespace object name and auth scope, such as for teams and projects
-   * @param body
-   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
-   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
-   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint. This field is required for apply requests (application/apply-patch) but optional for non-apply patch types (JsonPatch, MergePatch, StrategicMergePatch).
-   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
-   * @param force Force is going to \&quot;force\&quot; Apply requests. It means user will re-acquire conflicting fields owned by other people. Force flag must be unset for non-apply patch requests.
-   */
+
   return k8sCoreApi
     .patchNamespacedServiceAccount(
       'default',
@@ -346,8 +324,6 @@ const patchServiceAccountForTeamForAWS = async (team) => {
     });
 };
 module.exports.patchServiceAccountForTeamForAWS = patchServiceAccountForTeamForAWS;
-
-//todo before AWS completed; kubectl annotate --overwrite sa default -n t-workit1 eks.amazonaws.com/role-arn="$(terraform output -raw irsa_role)"
 
 const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
@@ -666,15 +642,6 @@ const createServiceAccountForWebTop = async (team) => {
       namespace: `t-${team}`,
     },
   };
-  /**
-   * create a ServiceAccount
-   * @param namespace object name and auth scope, such as for teams and projects
-   * @param body
-   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
-   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
-   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
-   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
-   */
   return k8sCoreApi.createNamespacedServiceAccount(`t-${team}`, webtopSA).catch((error) => {
     throw new Error(JSON.stringify(error));
   });
@@ -713,15 +680,6 @@ const createRoleForWebTop = async (team) => {
       },
     ],
   };
-  /**
-   * create a Role
-   * @param namespace object name and auth scope, such as for teams and projects
-   * @param body
-   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
-   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
-   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
-   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
-   */
   return k8sRBACAPI.createNamespacedRole(`t-${team}`, roleDefinitionForWebtop).catch((error) => {
     throw new Error(JSON.stringify(error));
   });
@@ -743,15 +701,6 @@ const createRoleBindingForWebtop = async (team) => {
       apiGroup: 'rbac.authorization.k8s.io',
     },
   };
-  /**
-   * create a RoleBinding
-   * @param namespace object name and auth scope, such as for teams and projects
-   * @param body
-   * @param pretty If \&#39;true\&#39;, then the output is pretty printed.
-   * @param dryRun When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
-   * @param fieldManager fieldManager is a name associated with the actor or entity that is making these changes. The value must be less than or 128 characters long, and only contain printable characters, as defined by https://golang.org/pkg/unicode/#IsPrint.
-   * @param fieldValidation fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields, provided that the &#x60;ServerSideFieldValidation&#x60; feature gate is also enabled. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23 and is the default behavior when the &#x60;ServerSideFieldValidation&#x60; feature gate is disabled. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default when the &#x60;ServerSideFieldValidation&#x60; feature gate is enabled. - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.
-   */
   return k8sRBACAPI
     .createNamespacedRoleBinding(`t-${team}`, roleBindingforWebtop)
     .catch((error) => {
@@ -945,14 +894,6 @@ module.exports.createDesktopServiceForTeam = createDesktopServiceForTeam;
 
 const getJuiceShopInstances = () =>
   k8sAppsApi
-    //namespace: string, pretty?: string, allowWatchBookmarks?: boolean, _continue?: string, fieldSelector?: string, labelSelector?: string, limit?: number, resourceVersion?: string, resourceVersionMatch?: string, timeoutSeconds?: number, watch?: boolean
-    // .listDeploymentForAllNamespaces(
-    //   get('namespace'), //namespace
-    //   true, //alowwatchbookmarks
-    //   undefined,//fieldselector
-    //   undefined, //labelSelector
-    //   undefined, //limit
-    //   `app=wrongsecrets,deployment-context=${get('deploymentContext')}`
     .listDeploymentForAllNamespaces(
       true,
       undefined,
@@ -961,39 +902,17 @@ const getJuiceShopInstances = () =>
       200
     )
     .catch((error) => {
-      console.log(error);
+      logger.info(error);
       throw new Error(error.response.body.message);
     });
 module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
 const deleteNamespaceForTeam = async (team) => {
-  // await k8sAppsApi
-  //   .deleteNamespacedDeployment(`t-${team}-wrongsecrets`, `t-${team}`)
-  //   .catch((error) => {
-  //     throw new Error(error.response.body.message);
-  //   });
-  // await k8sAppsApi
-  //   .deleteNamespacedDeployment(`t-${team}-virtualdesktop`, `t-${team}`)
-  //   .catch((error) => {
-  //     throw new Error(error.response.body.message);
-  //   });
   await k8sCoreApi.deleteNamespace(`t-${team}`).catch((error) => {
     throw new Error(error.response.body.message);
   });
 };
 module.exports.deleteNamespaceForTeam = deleteNamespaceForTeam;
-
-// const deleteServiceForTeam = async (team) => {
-//   await k8sCoreApi.deleteNamespacedService(`t-${team}-wrongsecrets`, `t-${team}`).catch((error) => {
-//     throw new Error(error.response.body.message);
-//   });
-//   await k8sCoreApi
-//     .deleteNamespacedService(`t-${team}-virtualdesktop`, `t-${team}`)
-//     .catch((error) => {
-//       throw new Error(error.response.body.message);
-//     });
-// };
-// module.exports.deleteServiceForTeam = deleteServiceForTeam;
 
 const deletePodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
@@ -1055,7 +974,7 @@ const getJuiceShopInstanceForTeamname = (teamname) =>
 module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;
 
 const updateLastRequestTimestampForTeam = (teamname) => {
-  const headers = { 'content-type': 'application/strategic-merge-patch+json' };
+  const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
   return k8sAppsApi.patchNamespacedDeployment(
     `t-${teamname}-wrongsecrets`,
     `t-${teamname}`,
@@ -1071,13 +990,14 @@ const updateLastRequestTimestampForTeam = (teamname) => {
     undefined,
     undefined,
     undefined,
-    { headers }
+    undefined,
+    options
   );
 };
 module.exports.updateLastRequestTimestampForTeam = updateLastRequestTimestampForTeam;
 
 const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
-  const headers = { 'content-type': 'application/strategic-merge-patch+json' };
+  const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
   const deploymentPatch = {
     metadata: {
       annotations: {
@@ -1094,7 +1014,8 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
     undefined,
     undefined,
     undefined,
-    { headers }
+    undefined,
+    options
   );
 };
 module.exports.changePasscodeHashForTeam = changePasscodeHashForTeam;
