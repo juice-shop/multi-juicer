@@ -546,39 +546,43 @@ const createNSPsforTeam = async (team) => {
     },
   };
 
-  // const nsAllowWithinNS = {
-  //   kind: 'NetworkPolicy',
-  //   apiVersion: 'networking.k8s.io/v1',
-  //   metadata: {
-  //     name: 'allow-same-namespace',
-  //     namespace: `t-${team}`,
-  //   },
-  //   spec: {
-  //     podSelector: {
-  //       matchLabels: {
-  //         team: `${team}`,
-  //       },
-  //     },
-  //     ingress: [
-  //       {
-  //         from: [
-  //           {
-  //             podSelector: {
-  //               matchLabels: {
-  //                 team: `${team}`,
-  //               },
-  //             },
-  //           },
-  //         ],
-  //         ports: [
-  //           {
-  //             port: 8080,
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  // };
+  const nsAllowWithinNS = {
+    kind: 'NetworkPolicy',
+    apiVersion: 'networking.k8s.io/v1',
+    metadata: {
+      name: 'allow-same-namespace-and-defaults',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      podSelector: {
+        matchLabels: {
+          team: `${team}`,
+        },
+      },
+      ingress: [
+        {
+          from: [
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': `${team}`,
+                  'kubernetes.io/metadata.name': 'default',
+                },
+              },
+            },
+          ],
+          ports: [
+            {
+              port: 8080,
+            },
+            {
+              port: 3000,
+            },
+          ],
+        },
+      ],
+    },
+  };
 
   const nsAllowOnlyDNS = {
     apiVersion: 'networking.k8s.io/v1',
@@ -619,11 +623,11 @@ const createNSPsforTeam = async (team) => {
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
-  // await k8sNetworkingApi
-  //   .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWithinNS)
-  //   .catch((error) => {
-  //     throw new Error(JSON.stringify(error));
-  //   });
+  await k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWithinNS)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
   return k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nsAllowOnlyDNS)
     .catch((error) => {
