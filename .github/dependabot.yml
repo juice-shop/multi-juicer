@@ -22,7 +22,7 @@ updates:
     schedule:
       interval: "monthly"
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/wrongsecrets-balancer"
     schedule:
       interval: "monthly"
   - package-ecosystem: "terraform"
