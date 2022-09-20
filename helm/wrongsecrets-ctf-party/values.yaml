@@ -35,7 +35,7 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 0.70aws
+  tag: 0.74aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
   replicas: 1
   service:
@@ -55,7 +55,7 @@ balancer:
       cpu: 400m
     limits:
       memory: 1024Mi
-      cpu: 800m
+      cpu: 1000m
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)

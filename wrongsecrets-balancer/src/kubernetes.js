@@ -492,7 +492,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 limits: {
                   memory: '512Mi',
-                  cpu: '200m',
+                  cpu: '1000m',
                 },
               },
               volumeMounts: [
