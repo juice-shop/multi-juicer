@@ -48,19 +48,14 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 5. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 6. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
 7. Do `export KUBECONFIG=~/.kube/wrongsecrets`
-8. Run `./k8s-vault-aws-start.sh`
+8. Run `cd .. && ./build-and-deploy-aws.sh` to install the helm chart for the wrongsecrets-ctf-party.
 
 Your EKS cluster should be visible in [EU-West-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
 Are you done playing? Please run `terraform destroy` twice to clean up.
 
 ### Test it
-
-Run `AWS_PROFILE=<your_profile> k8s-vault-aws-start.sh` and connect to [http://localhost:8080](http://localhost:8080) when it's ready to accept connections (you'll read the line `Forwarding from 127.0.0.1:8080 -> 8080` in your console). Now challenge 9 and 10 should be available as well.
-
-### Resume it
-
-When you stopped the `k8s-vault-aws-start.sh` script and want to resume the port forward run: `k8s-vault-aws-resume.sh`. This is because if you run the start script again it will replace the secret in the vault and not update the secret-challenge application with the new secret.
+When you have completed the installation steps, you can do `kubectl port-forward service/wrongsecrets-balancer 3000:3000` and then go to [http://localhost:3000](http://localhost:3000).
 
 ### Clean it up
 
