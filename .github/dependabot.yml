@@ -21,3 +21,11 @@ updates:
     directory: "/cleaner" # Location of package manifests
     schedule:
       interval: "monthly"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "terraform"
+    directory: "/aws"
+    schedule:
+      interval: "monthly"
