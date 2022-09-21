@@ -84,6 +84,7 @@ module "eks" {
     disk_iops       = 3000
     instance_types  = ["t3a.xlarge"]
 
+    #todo: ADD iam_role_permissions_boundary = "arn"
     iam_role_additional_policies = [
       "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
       "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",

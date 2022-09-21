@@ -523,28 +523,6 @@ const createNSPsforTeam = async (team) => {
       policyTypes: ['Ingress', 'Egress'],
     },
   };
-  const nspDenyOtherNS = {
-    kind: 'NetworkPolicy',
-    apiVersion: 'networking.k8s.io/v1',
-    metadata: {
-      name: 'deny-traffic-from-other-namespaces',
-      namespace: `t-${team}`,
-    },
-    spec: {
-      podSelector: {
-        matchLabels: null,
-      },
-      ingress: [
-        {
-          from: [
-            {
-              podSelector: {},
-            },
-          ],
-        },
-      ],
-    },
-  };
 
   const nsAllowWithinNS = {
     kind: 'NetworkPolicy',
@@ -566,6 +544,67 @@ const createNSPsforTeam = async (team) => {
               namespaceSelector: {
                 matchLabels: {
                   'kubernetes.io/metadata.name': `${team}`,
+                },
+              },
+            },
+          ],
+          ports: [
+            {
+              port: 8080,
+              protocol: 'TCP',
+            },
+            {
+              port: 3000,
+              protocol: 'TCP',
+            },
+          ],
+        },
+      ],
+    },
+    egress: [
+      {
+        to: [
+          {
+            namespaceSelector: {
+              matchLabels: {
+                'kubernetes.io/metadata.name': `${team}`,
+              },
+            },
+          },
+        ],
+        ports: [
+          {
+            port: 8080,
+            protocol: 'TCP',
+          },
+          {
+            port: 3000,
+            protocol: 'TCP',
+          },
+        ],
+      },
+    ],
+  };
+
+  const nsAllowToTalkToDefault = {
+    kind: 'NetworkPolicy',
+    apiVersion: 'networking.k8s.io/v1',
+    metadata: {
+      name: 'allow-namespace-and-defaults',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      podSelector: {
+        matchLabels: {
+          team: `${team}`,
+        },
+      },
+      ingress: [
+        {
+          from: [
+            {
+              namespaceSelector: {
+                matchLabels: {
                   'kubernetes.io/metadata.name': 'default',
                 },
               },
@@ -574,9 +613,74 @@ const createNSPsforTeam = async (team) => {
           ports: [
             {
               port: 8080,
+              protocol: 'TCP',
             },
             {
               port: 3000,
+              protocol: 'TCP',
+            },
+          ],
+        },
+      ],
+    },
+    egress: [
+      {
+        to: [
+          {
+            namespaceSelector: {
+              matchLabels: {
+                'kubernetes.io/metadata.name': 'default',
+              },
+            },
+          },
+        ],
+        ports: [
+          {
+            port: 8080,
+            protocol: 'TCP',
+          },
+          {
+            port: 3000,
+            protocol: 'TCP',
+          },
+        ],
+      },
+    ],
+  };
+
+  const nsAllowToDoKubeCTLFromWebTop = {
+    apiVersion: 'networking.k8s.io/v1',
+    kind: 'NetworkPolicy',
+    metadata: {
+      name: 'allow-webtop-to-talk-tokubesystem',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      podSelector: {
+        matchLabels: {
+          app: 'virtualdesktop',
+        },
+      },
+      policyTypes: ['Egress'],
+      egress: [
+        {
+          to: [
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'kube-system',
+                },
+              },
+            },
+          ],
+          ports: [
+            {
+              port: 8443,
+              protocol: 'TCP',
+            },
+            {
+              port: 443,
+              protocol: 'TCP',
             },
           ],
         },
@@ -589,11 +693,12 @@ const createNSPsforTeam = async (team) => {
     kind: 'NetworkPolicy',
     metadata: {
       name: 'deny-all-egress-excpet-dns',
+      namespace: `t-${team}`,
     },
     spec: {
-      podSelector: {
+      namespaceSelector: {
         matchLabels: {
-          app: 'wrongsecrets-no-vault',
+          'kubernetes.io/metadata.name': `${team}`,
         },
       },
       policyTypes: ['Egress'],
@@ -619,17 +724,22 @@ const createNSPsforTeam = async (team) => {
       throw new Error(JSON.stringify(error));
     });
   await k8sNetworkingApi
-    .createNamespacedNetworkPolicy(`t-${team}`, nspDenyOtherNS)
-    .catch((error) => {
-      throw new Error(JSON.stringify(error));
-    });
-  await k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWithinNS)
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
-  return k8sNetworkingApi
+  await k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowToTalkToDefault)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+  await k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nsAllowOnlyDNS)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+  return k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowToDoKubeCTLFromWebTop)
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
