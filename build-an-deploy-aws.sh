@@ -5,7 +5,11 @@ echo "Make sure you have updated your AWS credentials and your kubeconfig prior 
 echo "For this to work the AWS kubernetes cluster must have access to the same local registry / image cache which 'docker build ...' writes its image to"
 echo "For example docker-desktop with its included k8s cluster"
 
-echo "Usage: ./build-and-deploy-aws.sh"
+echo "NOTE: WE ARE WORKING HERE WITH A 5 LEGGED BALANCER on aWS which costs money by themselves!"
+
+echo "NOTE2: please replace balancer.cookie.cookieParserSecret witha value you fanchy and ensure you have TLS on (see outdated guides)."
+
+echo "Usage: ./build-an-deploy-aws.sh"
 
 version="$(uuidgen)"
 AWS_REGION="eu-west-1"
@@ -29,4 +33,4 @@ aws ssm put-parameter --name wrongsecretvalue --overwrite --type SecureString --
 wait
 
 #TODO: REWRITE ABOVE, REWRITE THE HARDCODED DEPLOYMENT VALS INTO VALUES AND OVERRIDE THEM HERE!
-helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=0.76aws" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"
+helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=0.76aws" --set="balancer.replicas=5" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"
