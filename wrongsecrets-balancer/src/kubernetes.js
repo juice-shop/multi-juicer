@@ -97,7 +97,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
       name: `t-${team}-wrongsecrets`,
       labels: {
         app: 'wrongsecrets',
-        team,
+        team: `${team}`,
         'deployment-context': get('deploymentContext'),
       },
       annotations: {
@@ -113,7 +113,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
       selector: {
         matchLabels: {
           app: 'wrongsecrets',
-          team,
+          team: `${team}`,
           'deployment-context': get('deploymentContext'),
         },
       },
@@ -121,7 +121,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
         metadata: {
           labels: {
             app: 'wrongsecrets',
-            team,
+            team: `${team}`,
             'deployment-context': get('deploymentContext'),
           },
         },
@@ -332,7 +332,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
       name: `t-${team}-wrongsecrets`,
       labels: {
         app: 'wrongsecrets',
-        team,
+        team: `${team}`,
         'deployment-context': get('deploymentContext'),
       },
       annotations: {
@@ -348,7 +348,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
       selector: {
         matchLabels: {
           app: 'wrongsecrets',
-          team,
+          team: `${team}`,
           'deployment-context': get('deploymentContext'),
         },
       },
@@ -356,7 +356,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
         metadata: {
           labels: {
             app: 'wrongsecrets',
-            team,
+            team: `${team}`,
             'deployment-context': get('deploymentContext'),
           },
         },
@@ -528,7 +528,7 @@ const createNSPsforTeam = async (team) => {
     kind: 'NetworkPolicy',
     apiVersion: 'networking.k8s.io/v1',
     metadata: {
-      name: 'allow-same-namespace-and-defaults',
+      name: 'allow-same-namespace',
       namespace: `t-${team}`,
     },
     spec: {
@@ -590,7 +590,7 @@ const createNSPsforTeam = async (team) => {
     kind: 'NetworkPolicy',
     apiVersion: 'networking.k8s.io/v1',
     metadata: {
-      name: 'allow-namespace-and-defaults',
+      name: 'allow-ns-to-default-and-back',
       namespace: `t-${team}`,
     },
     spec: {
@@ -652,7 +652,7 @@ const createNSPsforTeam = async (team) => {
     apiVersion: 'networking.k8s.io/v1',
     kind: 'NetworkPolicy',
     metadata: {
-      name: 'allow-webtop-to-talk-tokubesystem',
+      name: 'allow-webtop-kubesystem',
       namespace: `t-${team}`,
     },
     spec: {

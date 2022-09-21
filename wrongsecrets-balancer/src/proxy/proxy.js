@@ -126,7 +126,7 @@ function proxyTrafficToJuiceShop(req, res) {
     req.path === '/files/socket.io/' ||
     req.path === '/files/socket.io/socket.io.js.map'
   ) {
-    logger.info('we have a desktop entry for team ' + teamname);
+    // logger.info('we have a desktop entry for team ' + teamname);
     target = {
       target: `http://${teamname}-virtualdesktop.${teamname}.svc:8080`,
       ws: true,
@@ -137,7 +137,7 @@ function proxyTrafficToJuiceShop(req, res) {
       ws: true,
     };
   }
-  // logger.info(target.target);
+   logger.info(`we got ${teamname} requesting ${target.target}`);
 
   //TODO: FIX THAT THIS WILL WORK IN THE FUTURE!
   if (req.path === '/guaclite') {
