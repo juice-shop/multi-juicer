@@ -37,7 +37,7 @@ The bucket name should be in the output. Please use that to configure the Terraf
 
 The terraform code is loosely based on [this EKS managed Node Group TF example](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/examples/eks_managed_node_group).
 
-**Note**: Applying the Terraform means you are creating cloud infrastructure which actually costs you money. The authors are not responsible for any cost coming from following the instructions below.
+**Note**: Applying the Terraform means you are creating cloud infrastructure which actually costs you money. **_the current boundary is 50 t3a-Xlarge nodes_**. Please adapt the servers you deploy to in `main.tf` in this folder to your liking to reduce possible costs. Note that this project can run on a single T3A-Large instance, but this would require reducing the amount of wrongsecretbalancers to 1 (`balancer.replicas=1`). **_The authors are not responsible for any cost coming from following the instructions below_**.
 
 **Note-II**: The cluster you create has its access bound to the public IP of the creator. In other words: the cluster you create with this code has its access bound to your public IP-address if you apply it locally.
 
