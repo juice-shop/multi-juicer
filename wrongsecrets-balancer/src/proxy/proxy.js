@@ -137,7 +137,7 @@ function proxyTrafficToJuiceShop(req, res) {
       ws: true,
     };
   }
-  logger.info(target.target);
+  // logger.info(target.target);
 
   //TODO: FIX THAT THIS WILL WORK IN THE FUTURE!
   if (req.path === '/guaclite') {
@@ -146,9 +146,9 @@ function proxyTrafficToJuiceShop(req, res) {
     server.on('upgrade', function (req, socket, head) {
       cookieParser(get('cookieParser.secret'))(req, null, () => {});
 
-      logger.info(
-        `we have cookies: ${JSON.stringify(req.cookies)} and  ${JSON.stringify(req.signedCookies)}`
-      );
+      // logger.info(
+      //   `we have cookies: ${JSON.stringify(req.cookies)} and  ${JSON.stringify(req.signedCookies)}`
+      // );
       const upgradeTeamname = extractTeamName(req);
       logger.info(`proxying upgrade request for: ${req.url} with team ${upgradeTeamname}`);
       proxy.ws(req, socket, head, {

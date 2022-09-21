@@ -543,7 +543,7 @@ const createNSPsforTeam = async (team) => {
             {
               namespaceSelector: {
                 matchLabels: {
-                  'kubernetes.io/metadata.name': `${team}`,
+                  'kubernetes.io/metadata.name': `t-${team}`,
                 },
               },
             },
@@ -567,7 +567,7 @@ const createNSPsforTeam = async (team) => {
           {
             namespaceSelector: {
               matchLabels: {
-                'kubernetes.io/metadata.name': `${team}`,
+                'kubernetes.io/metadata.name': `t-${team}`,
               },
             },
           },
@@ -679,8 +679,47 @@ const createNSPsforTeam = async (team) => {
               protocol: 'TCP',
             },
             {
+              port: 8443,
+              protocol: 'UDP',
+            },
+            {
               port: 443,
               protocol: 'TCP',
+            },
+            {
+              port: 443,
+              protocol: 'UDP',
+            },
+          ],
+        },
+      ],
+      ingress: [
+        {
+          from: [
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'kube-system',
+                },
+              },
+            },
+          ],
+          ports: [
+            {
+              port: 8443,
+              protocol: 'TCP',
+            },
+            {
+              port: 8443,
+              protocol: 'UDP',
+            },
+            {
+              port: 443,
+              protocol: 'TCP',
+            },
+            {
+              port: 443,
+              protocol: 'UDP',
             },
           ],
         },
@@ -698,7 +737,7 @@ const createNSPsforTeam = async (team) => {
     spec: {
       namespaceSelector: {
         matchLabels: {
-          'kubernetes.io/metadata.name': `${team}`,
+          'kubernetes.io/metadata.name': `t-${team}`,
         },
       },
       policyTypes: ['Egress'],
