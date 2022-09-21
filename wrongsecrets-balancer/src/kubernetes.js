@@ -524,38 +524,28 @@ const createNSPsforTeam = async (team) => {
     },
   };
 
-  const nsAllowWithinNS = {
+  const nsAllowWrongSecretstoVirtualDesktop = {
     kind: 'NetworkPolicy',
     apiVersion: 'networking.k8s.io/v1',
     metadata: {
-      name: 'allow-same-namespace',
+      name: 'allow-wrongsecrets-access',
       namespace: `t-${team}`,
     },
     spec: {
       podSelector: {
         matchLabels: {
-          team: `${team}`,
+          app: 'wrongsecrets',
         },
       },
       ingress: [
         {
           from: [
             {
-              namespaceSelector: {
+              podSelector: {
                 matchLabels: {
-                  'kubernetes.io/metadata.name': `t-${team}`,
+                  app: 'virtualdesktop',
                 },
               },
-            },
-          ],
-          ports: [
-            {
-              port: 8080,
-              protocol: 'TCP',
-            },
-            {
-              port: 3000,
-              protocol: 'TCP',
             },
           ],
         },
@@ -565,59 +555,39 @@ const createNSPsforTeam = async (team) => {
       {
         to: [
           {
-            namespaceSelector: {
+            podSelector: {
               matchLabels: {
-                'kubernetes.io/metadata.name': `t-${team}`,
+                app: 'virtualdesktop',
               },
             },
-          },
-        ],
-        ports: [
-          {
-            port: 8080,
-            protocol: 'TCP',
-          },
-          {
-            port: 3000,
-            protocol: 'TCP',
           },
         ],
       },
     ],
   };
 
-  const nsAllowToTalkToDefault = {
+  const nsAllowVirtualDesktoptoWrongSecrets = {
     kind: 'NetworkPolicy',
     apiVersion: 'networking.k8s.io/v1',
     metadata: {
-      name: 'allow-ns-to-default-and-back',
+      name: 'allow-virtualdesktop-access',
       namespace: `t-${team}`,
     },
     spec: {
       podSelector: {
         matchLabels: {
-          team: `${team}`,
+          app: 'virtualdesktop',
         },
       },
       ingress: [
         {
           from: [
             {
-              namespaceSelector: {
+              podSelector: {
                 matchLabels: {
-                  'kubernetes.io/metadata.name': 'default',
+                  app: 'wrongsecrets',
                 },
               },
-            },
-          ],
-          ports: [
-            {
-              port: 8080,
-              protocol: 'TCP',
-            },
-            {
-              port: 3000,
-              protocol: 'TCP',
             },
           ],
         },
@@ -627,21 +597,11 @@ const createNSPsforTeam = async (team) => {
       {
         to: [
           {
-            namespaceSelector: {
+            podSelector: {
               matchLabels: {
-                'kubernetes.io/metadata.name': 'default',
+                app: 'wrongsecrets',
               },
             },
-          },
-        ],
-        ports: [
-          {
-            port: 8080,
-            protocol: 'TCP',
-          },
-          {
-            port: 3000,
-            protocol: 'TCP',
           },
         ],
       },
@@ -763,12 +723,12 @@ const createNSPsforTeam = async (team) => {
       throw new Error(JSON.stringify(error));
     });
   await k8sNetworkingApi
-    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWithinNS)
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWrongSecretstoVirtualDesktop)
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
   await k8sNetworkingApi
-    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowToTalkToDefault)
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowVirtualDesktoptoWrongSecrets)
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
