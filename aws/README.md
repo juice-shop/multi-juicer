@@ -48,7 +48,8 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 5. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 6. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
 7. Do `export KUBECONFIG=~/.kube/wrongsecrets`
-8. Run `cd .. && ./build-an-deploy-aws.sh` to install the helm chart for the wrongsecrets-ctf-party.
+8. Run `cd ..`
+9. Run `./build-an-deploy-aws.sh` to install the helm chart for the wrongsecrets-ctf-party.
 
 Your EKS cluster should be visible in [EU-West-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 

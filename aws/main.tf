@@ -77,6 +77,7 @@ module "eks" {
 
   enable_irsa = true
 
+  # apply when available: iam_role_permissions_boundary = "arn:aws:iam::${local.account_id}:policy/service-user-creation-permission-boundary"
   eks_managed_node_group_defaults = {
     disk_size       = 50
     disk_type       = "gp3"
@@ -84,7 +85,6 @@ module "eks" {
     disk_iops       = 3000
     instance_types  = ["t3a.xlarge"]
 
-    #todo: ADD iam_role_permissions_boundary = "arn"
     iam_role_additional_policies = [
       "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
       "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
