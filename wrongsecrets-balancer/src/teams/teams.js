@@ -397,7 +397,7 @@ async function createAWSTeam(req, res) {
     logger.error(`Error while network security policies for team ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
-  
+
   try {
     loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
