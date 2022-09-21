@@ -6,7 +6,7 @@ const promClient = require('prom-client');
 const basicAuth = require('basic-auth-connect');
 const onFinished = require('on-finished');
 
-const { get } = require('./config');
+const { get, extractTeamName } = require('./config');
 
 const app = express();
 
@@ -61,10 +61,7 @@ app.get('/balancer/dynamics', (req, res) =>
 app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());
 app.use((req, res, next) => {
-  const teamname =
-    process.env['NODE_ENV'] === 'test'
-      ? req.cookies[get('cookieParser.cookieName')]
-      : req.signedCookies[get('cookieParser.cookieName')];
+  const teamname = extractTeamName(req);
 
   req.teamname = teamname;
   if (teamname) {

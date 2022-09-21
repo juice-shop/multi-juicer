@@ -1,8 +1,9 @@
 const express = require('express');
 const httpProxy = require('http-proxy');
 const proxy = httpProxy.createProxyServer();
+const cookieParser = require('cookie-parser');
 
-const { get } = require('../config');
+const { get, extractTeamName } = require('../config');
 const { logger } = require('../logger');
 const {
   getJuiceShopInstanceForTeamname,
@@ -125,7 +126,7 @@ function proxyTrafficToJuiceShop(req, res) {
     req.path === '/files/socket.io/' ||
     req.path === '/files/socket.io/socket.io.js.map'
   ) {
-    logger.info('we have a desktop entry for team ' + teamname);
+    // logger.info('we have a desktop entry for team ' + teamname);
     target = {
       target: `http://${teamname}-virtualdesktop.${teamname}.svc:8080`,
       ws: true,
@@ -136,22 +137,30 @@ function proxyTrafficToJuiceShop(req, res) {
       ws: true,
     };
   }
-  logger.info(target.target);
+  logger.info(`we got ${teamname} requesting ${target.target}`);
 
+  //TODO: FIX THAT THIS WILL WORK IN THE FUTURE!
   if (req.path === '/guaclite') {
-    let server = res.connection.server;
+    let server = res.socket.server;
     logger.info('putting ws through for /quaclite');
     server.on('upgrade', function (req, socket, head) {
-      logger.info('proxying upgrade request for: ' + req.url);
+      cookieParser(get('cookieParser.secret'))(req, null, () => {});
+
+      // logger.info(
+      //   `we have cookies: ${JSON.stringify(req.cookies)} and  ${JSON.stringify(req.signedCookies)}`
+      // );
+      const upgradeTeamname = extractTeamName(req);
+      logger.info(`proxying upgrade request for: ${req.url} with team ${upgradeTeamname}`);
       proxy.ws(req, socket, head, {
-        target: `ws://${teamname}-virtualdesktop.${teamname}.svc:8080`,
+        target: `ws://${upgradeTeamname}-virtualdesktop.${upgradeTeamname}.svc:8080`,
         ws: true,
       });
     });
     server.on('connect', function (req, socket, head) {
-      logger.info('proxying connect request for: ' + req.url);
+      const connectTeamname = extractTeamName(req);
+      logger.info(`proxying upgrade request for: ${req.url} with team ${connectTeamname}`);
       proxy.ws(req, socket, head, {
-        target: `ws://${teamname}-virtualdesktop.${teamname}.svc:8080`,
+        target: `ws://${connectTeamname}-virtualdesktop.${connectTeamname}.svc:8080`,
         ws: true,
       });
     });

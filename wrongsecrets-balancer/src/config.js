@@ -13,3 +13,10 @@ const fetchConfigValue = (name, defaultValue) => {
 
 const get = memoize(fetchConfigValue);
 module.exports.get = get;
+
+const extractTeamName = (req) => {
+  return process.env['NODE_ENV'] === 'test'
+    ? req.cookies[get('cookieParser.cookieName')]
+    : req.signedCookies[get('cookieParser.cookieName')];
+};
+module.exports.extractTeamName = extractTeamName;

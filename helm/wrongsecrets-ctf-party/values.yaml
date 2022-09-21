@@ -35,9 +35,9 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 0.69aws
+  tag: 0.76aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
-  replicas: 3
+  replicas: 1
   service:
     # -- Kubernetes service type
     type: ClusterIP
@@ -54,8 +54,8 @@ balancer:
       memory: 256Mi
       cpu: 400m
     limits:
-      memory: 512Mi
-      cpu: 800m
+      memory: 1024Mi
+      cpu: 1000m
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -89,7 +89,7 @@ balancer:
 
 wrongsecrets:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
-  maxInstances: 100
+  maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsens/wrongsecrets
   tag: 1.5.3-no-vault
@@ -191,7 +191,7 @@ wrongsecrets:
 #the virtual desktop for the deploymebt
 virtualdesktop:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
-  maxInstances: 100
+  maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsen/wrongsecrets-desktop
   tag: latest
