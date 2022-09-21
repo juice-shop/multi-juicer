@@ -27,7 +27,7 @@ For minikube, run:
 
 minikube start --network-plugin=cni --cni=calico
 eval $(minikube docker-env)
-./build-an-deploy
+./build-an-deploy.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
