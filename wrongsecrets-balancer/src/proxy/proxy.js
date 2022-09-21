@@ -137,7 +137,7 @@ function proxyTrafficToJuiceShop(req, res) {
       ws: true,
     };
   }
-   logger.info(`we got ${teamname} requesting ${target.target}`);
+  logger.info(`we got ${teamname} requesting ${target.target}`);
 
   //TODO: FIX THAT THIS WILL WORK IN THE FUTURE!
   if (req.path === '/guaclite') {
