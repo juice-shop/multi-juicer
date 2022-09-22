@@ -6,7 +6,7 @@
     "@formatjs/intl-utils": "^3.8.4",
     "axios": "^0.26.0",
     "promise-retry": "^2.0.1",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
     "react-data-table-component": "^7.5.3",
     "react-dom": "^17.0.2",
     "react-intl": "^6.1.1",
