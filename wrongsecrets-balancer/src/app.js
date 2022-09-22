@@ -29,6 +29,8 @@ if (get('metrics.enabled')) {
     next();
   });
 
+  app.disable('x-powered-by');
+
   app.get(
     '/balancer/metrics',
     basicAuth(get('metrics.basicAuth.username'), get('metrics.basicAuth.password')),
