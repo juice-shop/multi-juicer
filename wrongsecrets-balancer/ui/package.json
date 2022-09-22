@@ -5,6 +5,7 @@
   "dependencies": {
     "@formatjs/intl-utils": "^3.8.4",
     "axios": "^0.27.2",
+    "crypto-js": "^4.1.1",
     "promise-retry": "^2.0.1",
     "react": "^18.2.0",
     "react-data-table-component": "^7.5.3",
