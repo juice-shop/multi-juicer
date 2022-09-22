@@ -31,10 +31,10 @@ const WSLogo = styled.img`
 
 WSLogo.defaultProps = {
   src: wrongsecretsLogo,
-}
+};
 
 const HeaderCard = styled(Card)`
-  width: ${props => props.wide ? "70vw" : "50vw"};
+  width: ${(props) => (props.wide ? '70vw' : '50vw')};
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -120,7 +120,7 @@ const SiteHeader = styled.h1`
     margin-top: 16px;
     margin-bottom: 0;
   }
-`
+`;
 
 export function Layout({ children, footer, siteHeader = null, wide = false }) {
   return (
@@ -129,13 +129,9 @@ export function Layout({ children, footer, siteHeader = null, wide = false }) {
       <Wrapper>
         <Header>
           <HeaderCard wide={wide}>
-          <WSLogo alt="WrongSecretsLogo"/> WrongSecrets CTF, powered by
+            <WSLogo alt="WrongSecretsLogo" /> WrongSecrets CTF, powered by
             <MJLogo alt="MultiJuicer Logo" />
-            {siteHeader ? (
-              <SiteHeader>
-                WrongSecrets CTF, powered by{siteHeader}
-              </SiteHeader>
-            ) : null}
+            {siteHeader ? <SiteHeader>WrongSecrets CTF, powered by{siteHeader}</SiteHeader> : null}
           </HeaderCard>
         </Header>
         <Body>

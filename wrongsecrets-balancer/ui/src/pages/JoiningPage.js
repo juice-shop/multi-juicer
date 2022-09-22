@@ -8,9 +8,8 @@ import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 export const JoiningPage = () => {
   const [passcode, setPasscode] = useState('');
   const [failed, setFailed] = useState(false);
-  const navigate = useNavigate()
-  const { team } = useParams()
-
+  const navigate = useNavigate();
+  const { team } = useParams();
 
   async function sendJoinRequest() {
     try {

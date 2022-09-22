@@ -36,13 +36,6 @@ const StyledSpinner = styled.svg`
 
 export const Spinner = () => (
   <StyledSpinner viewBox="0 0 30 30">
-    <circle
-      className="path"
-      cx="15"
-      cy="15"
-      r="13"
-      fill="none"
-      strokeWidth="2"
-    />
+    <circle className="path" cx="15" cy="15" r="13" fill="none" strokeWidth="2" />
   </StyledSpinner>
 );

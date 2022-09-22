@@ -162,7 +162,12 @@ function PlaceDisplay({ place }) {
     case 3:
       return <ThirdPlace height="32" />;
     default:
-      return <><small>#</small>{place}</>;
+      return (
+        <>
+          <small>#</small>
+          {place}
+        </>
+      );
   }
 }
 
@@ -175,14 +180,14 @@ export const ScoreBoard = injectIntl(() => {
   const [teams, setTeams] = useState([]);
   useEffect(() => {
     fetch('/balancer/score-board/top')
-        .then(response => response.json())
-        .then(({ teams }) => {
-          setTeams(teams);
-        });
+      .then((response) => response.json())
+      .then(({ teams }) => {
+        setTeams(teams);
+      });
 
     const timer = setInterval(() => {
       fetch('/balancer/score-board/top')
-        .then(response => response.json())
+        .then((response) => response.json())
         .then(({ teams }) => {
           setTeams(teams);
         });
@@ -191,7 +196,7 @@ export const ScoreBoard = injectIntl(() => {
     return () => {
       clearInterval(timer);
     };
-  }, [])
+  }, []);
 
   return (
     <>
