@@ -524,6 +524,58 @@ const createNSPsforTeam = async (team) => {
     },
   };
 
+  const nsAllowBalancer = {
+    kind: 'NetworkPolicy',
+    apiVersion: 'networking.k8s.io/v1',
+    metadata: {
+      name: 'balancer-access-to-namespace',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      podSelector: {},
+      ingress: [
+        {
+          from: [
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'default',
+                },
+              },
+            },
+            {
+              podSelector: {
+                matchLabels: {
+                  'app.kubernetes.io/name': 'wrongsecrets-ctf-party',
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
+    egress: [
+      {
+        to: [
+          {
+            namespaceSelector: {
+              matchLabels: {
+                'kubernetes.io/metadata.name': 'default',
+              },
+            },
+          },
+          {
+            podSelector: {
+              matchLabels: {
+                'app.kubernetes.io/name': 'wrongsecrets-ctf-party',
+              },
+            },
+          },
+        ],
+      },
+    ],
+  };
+
   const nsAllowWrongSecretstoVirtualDesktop = {
     kind: 'NetworkPolicy',
     apiVersion: 'networking.k8s.io/v1',
@@ -723,17 +775,22 @@ const createNSPsforTeam = async (team) => {
       throw new Error(JSON.stringify(error));
     });
   await k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowOnlyDNS)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+  await k8sNetworkingApi
+    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowBalancer)
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+  await k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nsAllowWrongSecretstoVirtualDesktop)
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
   await k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nsAllowVirtualDesktoptoWrongSecrets)
-    .catch((error) => {
-      throw new Error(JSON.stringify(error));
-    });
-  await k8sNetworkingApi
-    .createNamespacedNetworkPolicy(`t-${team}`, nsAllowOnlyDNS)
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
