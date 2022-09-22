@@ -151,6 +151,7 @@ export const JoinPage = injectIntl(({ intl }) => {
           id="getting_started_text"
           defaultMessage={`
               Choose a teamname so that we will be able to recognize you back.
+              Please make sure to use the same teamname here as you do in CTFD, as your team might otherwise get deleted.
               If you want to team up with other people you can join up under the same teamname.
             `}
           values={{
