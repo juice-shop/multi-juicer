@@ -25,7 +25,7 @@
     "lodash": "^4.17.21",
     "on-finished": "^2.4.1",
     "prom-client": "^14.1.0",
-    "winston": "^3.6.0"
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@types/hapi__joi": "^17.1.8",
