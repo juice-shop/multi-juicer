@@ -217,7 +217,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 limits: {
                   memory: '512Mi',
-                  cpu: '200m',
+                  cpu: '500m',
                 },
               },
 
@@ -871,7 +871,17 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
               image: 'jeroenwillemsen/wrongsecrets-desktop:1.5.4RC8',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
-              resources: get('virtualdesktop.resources'),
+              resources: {
+                requests: {
+                  memory: '2G',
+                  cpu: '800m',
+                },
+                limits: {
+                  memory: '2500M',
+                  cpu: '1200m',
+                },
+              },
+              // resources: get('virtualdesktop.resources'),
               securityContext: {
                 // allowPrivilegeEscalation: false,
                 // readOnlyRootFilesystem: true,
