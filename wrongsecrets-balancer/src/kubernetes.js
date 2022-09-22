@@ -214,10 +214,12 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 requests: {
                   memory: '512Mi',
                   cpu: '200m',
+                  'ephemeral-storage': '1Gi',
                 },
                 limits: {
                   memory: '512Mi',
                   cpu: '500m',
+                  'ephemeral-storage': '4Gi',
                 },
               },
 
@@ -229,7 +231,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 // },
                 {
                   mountPath: '/tmp',
-                  name: 'cache-volume',
+                  name: 'ephemeral',
                 },
                 // ...get('wrongsecrets.volumeMounts', []),
               ],
@@ -243,7 +245,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
             //   },
             // },
             {
-              name: 'cache-volume',
+              name: 'ephemeral',
               emptyDir: {},
             },
             // ...get('wrongsecrets.volumes', []),
@@ -379,7 +381,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
             },
             {
-              name: 'cache-volume',
+              name: 'ephemeral',
               emptyDir: {},
             },
           ],
@@ -465,10 +467,12 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 requests: {
                   memory: '512Mi',
                   cpu: '200m',
+                  'ephemeral-storage': '1Gi',
                 },
                 limits: {
                   memory: '512Mi',
                   cpu: '1000m',
+                  'ephemeral-storage': '4Gi',
                 },
               },
               volumeMounts: [
@@ -479,7 +483,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 // },
                 {
                   mountPath: '/tmp',
-                  name: 'cache-volume',
+                  name: 'ephemeral',
                 },
                 {
                   name: 'secrets-store-inline',
@@ -875,10 +879,12 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 requests: {
                   memory: '2G',
                   cpu: '800m',
+                  'ephemeral-storage': '2Gi',
                 },
                 limits: {
-                  memory: '2500M',
-                  cpu: '1200m',
+                  memory: '3G',
+                  cpu: '2000m',
+                  'ephemeral-storage': '6Gi',
                 },
               },
               // resources: get('virtualdesktop.resources'),
@@ -910,10 +916,8 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
-              volumeMounts: [{ mountPath: '/tmp', name: 'cache-volume' }],
             },
           ],
-          volumes: [{ name: 'cache-volume', emptyDir: {} }],
           tolerations: get('virtualdesktop.tolerations'),
           affinity: get('virtualdesktop.affinity'),
           runtimeClassName: get('virtualdesktop.runtimeClassName')
