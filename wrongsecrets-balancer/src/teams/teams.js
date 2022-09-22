@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const cryptoRandomString = require('crypto-random-string');
 
 const Joi = require('@hapi/joi');
@@ -82,6 +83,28 @@ async function interceptAdminLogin(req, res, next) {
   }
 
   return next();
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+async function validateHMAC(req, res, next) {
+  try {
+    const { team } = req.params;
+    const { hmacvalue } = req.body;
+    const validationValue = crypto
+      .createHmac('sha256', 'hardcodedkey')
+      .update(`${team}`, 'utf-8')
+      .digest('hex');
+    if (validationValue === hmacvalue) {
+      return next();
+    }
+    res.status(403).send({ message: 'Invalid validation, please stop doing this!' });
+  } catch (error) {
+    res.status(500).send({ message: 'Invalid validation, please stop doing this!' });
+  }
 }
 
 /**
@@ -506,6 +529,7 @@ const paramsSchema = Joi.object({
     .regex(/^[a-z0-9]([-a-z0-9])+[a-z0-9]$/),
 });
 const bodySchema = Joi.object({
+  hmacvalue: Joi.string().hex().length(64),
   passcode: Joi.string().alphanum().uppercase().length(8),
 });
 
@@ -518,6 +542,7 @@ router.post(
   interceptAdminLogin,
   joinIfTeamAlreadyExists,
   checkIfMaxJuiceShopInstancesIsReached,
+  validateHMAC,
   createTeam
 );
 

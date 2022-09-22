@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
+import cryptoJS from 'crypto-js';
 
 import styled from 'styled-components';
 
@@ -45,12 +46,15 @@ export const JoinPage = injectIntl(({ intl }) => {
   const { formatMessage } = intl;
 
   async function sendJoinRequest() {
-    if (window.confirm('Are you ready?')){
+    if (window.confirm('Are you ready?')) {
       try {
+        const hmacvalue = cryptoJS
+          .HmacSHA256(`${teamname}`, 'hardcodedkey')
+          .toString(cryptoJS.enc.Hex);
         const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
           passcode,
+          hmacvalue,
         });
-  
         navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode } });
       } catch (error) {
         if (
@@ -62,7 +66,7 @@ export const JoinPage = injectIntl(({ intl }) => {
           setFailed(true);
         }
       }
-    }    
+    }
   }
 
   function onSubmit(event) {
