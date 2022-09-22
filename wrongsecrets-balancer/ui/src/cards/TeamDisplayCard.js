@@ -54,7 +54,7 @@ const PasscodeResetButton = ({ teamname }) => {
 
   async function resetPasscode() {
     const { data } = await axios.post('/balancer/teams/reset-passcode');
-    navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode, reset: true }});
+    navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode, reset: true } });
   }
 
   return (

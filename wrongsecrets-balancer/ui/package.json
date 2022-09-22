@@ -4,18 +4,18 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@formatjs/intl-utils": "^3.8.4",
-    "axios": "^0.26.0",
+    "axios": "^0.27.2",
     "promise-retry": "^2.0.1",
-    "react": "^17.0.2",
-    "react-data-table-component": "^7.4.7",
+    "react": "^18.2.0",
+    "react-data-table-component": "^7.5.3",
     "react-dom": "^17.0.2",
-    "react-intl": "^5.24.6",
-    "react-router-dom": "^6.2.1",
+    "react-intl": "^6.1.1",
+    "react-router-dom": "^6.4.1",
     "reactjs-popup": "^2.0.5",
-    "styled-components": "^5.3.3"
+    "styled-components": "^5.3.5"
   },
   "devDependencies": {
-    "react-scripts": "^5.0.0",
+    "react-scripts": "^5.0.1",
     "source-map-explorer": "^2.5.2"
   },
   "scripts": {

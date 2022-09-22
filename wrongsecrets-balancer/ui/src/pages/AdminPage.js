@@ -112,7 +112,6 @@ function RestartInstanceButton({ team }) {
   );
 }
 
-
 function RestartDesktopInstanceButton({ team }) {
   const [restarting, setRestarting] = useState(false);
 
@@ -131,7 +130,6 @@ function RestartDesktopInstanceButton({ team }) {
     </SmallSecondary>
   );
 }
-
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -235,8 +233,10 @@ export default function AdminPage() {
       cell: ({ team }) => {
         return (
           <>
-            <DeleteInstanceButton team={team} /><br/>
-            <RestartInstanceButton team={team} /><br/>
+            <DeleteInstanceButton team={team} />
+            <br />
+            <RestartInstanceButton team={team} />
+            <br />
             <RestartDesktopInstanceButton team={team} />
           </>
         );

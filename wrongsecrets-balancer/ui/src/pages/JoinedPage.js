@@ -6,8 +6,8 @@ import { InstanceStatusCard } from '../cards/InstanceStatusCard';
 import { PasscodeDisplayCard } from '../cards/PassCodeDisplayCard';
 
 export const JoinedPage = () => {
-  const location = useLocation()
-  const { team } = useParams()
+  const location = useLocation();
+  const { team } = useParams();
 
   return (
     <>
