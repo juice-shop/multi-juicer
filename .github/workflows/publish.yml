@@ -7,7 +7,7 @@ jobs:
     name: "Package Helm Chart"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: "Install yq"
         run: |
           sudo snap install yq
@@ -35,7 +35,7 @@ jobs:
           - wrongsecrets-balancer
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Docker Meta
         id: docker_meta
