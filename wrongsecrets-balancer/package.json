@@ -24,7 +24,7 @@
     "http-proxy-middleware": "^2.0.6",
     "lodash": "^4.17.21",
     "on-finished": "^2.4.1",
-    "prom-client": "^14.0.1",
+    "prom-client": "^14.1.0",
     "winston": "^3.6.0"
   },
   "devDependencies": {
