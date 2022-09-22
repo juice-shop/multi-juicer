@@ -219,7 +219,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 limits: {
                   memory: '512Mi',
                   cpu: '500m',
-                  'ephemeral-storage': '4Gi',
+                  'ephemeral-storage': '2Gi',
                 },
               },
 
@@ -471,8 +471,8 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 limits: {
                   memory: '512Mi',
-                  cpu: '1000m',
-                  'ephemeral-storage': '4Gi',
+                  cpu: '500m',
+                  'ephemeral-storage': '2Gi',
                 },
               },
               volumeMounts: [
@@ -884,7 +884,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 limits: {
                   memory: '3G',
                   cpu: '2000m',
-                  'ephemeral-storage': '6Gi',
+                  'ephemeral-storage': '4Gi',
                 },
               },
               // resources: get('virtualdesktop.resources'),

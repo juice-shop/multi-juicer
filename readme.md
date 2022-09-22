@@ -13,6 +13,16 @@ Note that we:
 ## Special thanks
 Special thanks to Madhu Akula, Ben de Haan, and Mike Woudenberg for making this port a reality!
 
+
+## What you need to know
+This environment uses a webtop and an instance of wrongsecrets per user. This means that you need per user:
+- 2.5 CPU (min = 1 , limit = 2.5)
+- 3.5 GB RAM (min 2.5GB, limit = 3.5GB)
+- 8GB HD (min 3 GB, limit = 8GB)
+
+A 6 contestant game can be played on a local minikube with updated cpu & memory settings.
+A 100 contestant game can be played on the AWS setup, which will require at least 200 CPUs, 3500 GB Ram, and 800 GB of storage available in the cluster. 
+
 ## Status
 
 **This is by no means ready for anything, and work in progress.**
