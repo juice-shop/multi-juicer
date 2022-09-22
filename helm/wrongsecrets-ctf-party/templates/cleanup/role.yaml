@@ -13,4 +13,7 @@ rules:
   - apiGroups: [''] # "" indicates the core API group
     resources: ['services']
     verbs: ['get', 'delete']
+  - apiGroups: [''] # "" indicates the core API group
+    resources: ['namespaces']
+    verbs: ['get', 'delete']
 {{- end }}
