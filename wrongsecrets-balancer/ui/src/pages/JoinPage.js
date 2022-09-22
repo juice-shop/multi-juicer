@@ -46,23 +46,25 @@ export const JoinPage = injectIntl(({ intl }) => {
   const { formatMessage } = intl;
 
   async function sendJoinRequest() {
-    try {
-      const hmacvalue = cryptoJS
-        .HmacSHA256(`${teamname}`, 'hardcodedkey')
-        .toString(cryptoJS.enc.Hex);
-      const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
-        passcode,
-        hmacvalue,
-      });
-      navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode } });
-    } catch (error) {
-      if (
-        error.response.status === 401 &&
-        error.response.data.message === 'Team requires authentication to join'
-      ) {
-        navigate(`/teams/${teamname}/joining/`);
-      } else {
-        setFailed(true);
+    if (window.confirm('Are you ready?')) {
+      try {
+        const hmacvalue = cryptoJS
+          .HmacSHA256(`${teamname}`, 'hardcodedkey')
+          .toString(cryptoJS.enc.Hex);
+        const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
+          passcode,
+          hmacvalue,
+        });
+        navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode } });
+      } catch (error) {
+        if (
+          error.response.status === 401 &&
+          error.response.data.message === 'Team requires authentication to join'
+        ) {
+          navigate(`/teams/${teamname}/joining/`);
+        } else {
+          setFailed(true);
+        }
       }
     }
   }
