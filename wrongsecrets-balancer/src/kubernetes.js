@@ -773,6 +773,75 @@ const createNSPsforTeam = async (team) => {
       ],
     },
   };
+
+  const broaderallow = {
+    apiVersion: 'networking.k8s.io/v1',
+    kind: 'NetworkPolicy',
+    metadata: {
+      name: 'kubectl-policy',
+      namespace: 't-admin1',
+    },
+    spec: {
+      podSelector: {
+        matchLabels: {
+          app: 'virtualdesktop',
+        },
+      },
+      policyTypes: ['Ingress', 'Egress'],
+      ingress: [
+        {
+          from: [
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'kube-system',
+                },
+              },
+              podSelector: {},
+            },
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'default',
+                },
+              },
+              podSelector: {},
+            },
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 't-admin1',
+                },
+              },
+              podSelector: {},
+            },
+          ],
+        },
+      ],
+      egress: [
+        {
+          to: [
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'kube-system',
+                },
+              },
+              podSelector: {},
+            },
+            {
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 't-admin1',
+                },
+              },
+              podSelector: {},
+            },
+          ],
+        },
+      ],
+    },
+  };
   await k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nspDefaultDeny)
     .catch((error) => {
@@ -798,6 +867,10 @@ const createNSPsforTeam = async (team) => {
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
+  await k8sNetworkingApi.createNamespacedNetworkPolicy(`t-${team}`, broaderallow)
+  .catch((error) => {
+    throw new Error(JSON.stringify(error));
+  });
   return k8sNetworkingApi
     .createNamespacedNetworkPolicy(`t-${team}`, nsAllowToDoKubeCTLFromWebTop)
     .catch((error) => {
