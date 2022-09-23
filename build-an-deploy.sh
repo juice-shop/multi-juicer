@@ -4,7 +4,10 @@ echo "This Script can be used to 'easily' build all WrongSecrets CTF party Compo
 echo "For this to work the local kubernetes cluster must have access to the same local registry / image cache which 'docker build ...' writes its image to"
 echo "For example docker-desktop with its included k8s cluster"
 
-echo "Usage: ./build-and-deploy.sh"
+echo "Usage: ./build-an-deploy.sh"
+
+source ./scripts/check-available-commands.sh
+checkCommandsAvailable helm docker kubectl
 
 version="$(uuidgen)"
 

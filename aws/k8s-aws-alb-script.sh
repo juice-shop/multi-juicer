@@ -3,9 +3,8 @@
 # set -o pipefail
 # set -o nounset
 
-#TODO; PORT BELOW!
-# source ../scripts/check-available-commands.sh
-# checkCommandsAvailable helm jq vault sed grep docker grep cat aws curl eksctl kubectl
+source ../scripts/check-available-commands.sh
+checkCommandsAvailable helm jq vault sed grep docker grep cat aws curl eksctl kubectl
 
 if test -n "${AWS_REGION-}"; then
   echo "AWS_REGION is set to <$AWS_REGION>"

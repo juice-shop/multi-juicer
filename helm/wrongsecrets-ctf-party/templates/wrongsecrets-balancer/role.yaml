@@ -10,7 +10,7 @@ rules:
     verbs: ['get', 'create', 'list', 'delete', 'patch', 'watch', 'update']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['services']
-    verbs: ['get', 'create', 'delete']
+    verbs: ['get', 'list', 'create', 'delete']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['pod', 'pods', 'pods/log']
     verbs: ['create', 'get', 'list', 'delete', 'watch']
@@ -41,3 +41,7 @@ rules:
   - apiGroups: ['networking.k8s.io'] 
     resources: ['networkpolicies']
     verbs: ['create', 'get', 'list', 'delete']
+  - apiGroups: ['']
+    resources: ['endpoints']
+    verbs: [ 'get', 'list']
+    
