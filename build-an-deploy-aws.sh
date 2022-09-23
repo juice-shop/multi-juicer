@@ -15,10 +15,17 @@ source ./scripts/check-available-commands.sh
 checkCommandsAvailable helm aws kubectl
 
 version="$(uuidgen)"
+
 AWS_REGION="eu-west-1"
 
 helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
-helm upgrade --install -n kube-system csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver --set enableSecretRotation=true --set rotationPollInterval=60s
+helm list --namespace kube-system | grep 'csi-secrets-store' &>/dev/null
+if [ $? == 0 ]; then
+  echo "CSI driver is already installed"
+else
+  helm upgrade --install -n kube-system csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver --set enableSecretRotation=true --set rotationPollInterval=60s
+fi
+
 echo "Install ACSP"
 kubectl apply -f https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml
 
