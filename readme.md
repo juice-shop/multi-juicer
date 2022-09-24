@@ -29,7 +29,7 @@ A 100 contestant game can be played on the AWS setup, which will require at leas
 
 Still want to play? Ok, here we go:
 
-We currently only support minikube and AWS EKS (_**But the latter needs you to understand what to do as the guides section is not updated yet**_).
+We currently only support minikube and AWS EKS (_**Please follow the readme in the aws folder, as the guides section is not updated yet**_).
 
 ## How to use it
 
