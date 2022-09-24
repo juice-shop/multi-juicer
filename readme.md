@@ -31,6 +31,15 @@ Still want to play? Ok, here we go:
 
 We currently only support minikube and AWS EKS (_**But the latter needs you to understand what to do as the guides section is not updated yet**_).
 
+## How to use it
+
+You need 3 things:
+- This infrastructure
+- The actual place where correct answers are exchanged for CTFD-flags. This can be your fly.dev/heroku/etc. or local container of WrongSecrets running in CTF mode with the additional key setup for challenge 8.
+- A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application.
+
+### Action with Minikube:
+
 For minikube, run:
 
 ```shell
@@ -41,6 +50,10 @@ eval $(minikube docker-env)
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
+
+### Action with AWS EKSS:
+
+** NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your AWS bill. **
 
 For AWS EKS follow the instrucrtions in the `/eks` folder.
 
