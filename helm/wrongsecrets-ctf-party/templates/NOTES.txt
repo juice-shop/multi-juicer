@@ -1,12 +1,11 @@
 Wrongsecrets ctf party deployed! 🎉🥳
 
 This doesn't come with a default way to expose it to the world.
-You can find guides for specific cloud providers here: https://github.com/iteratec/multi-juicer/tree/main/guides
 
 To test it locally run:
 $ kubectl port-forward service/wrongsecrets-balancer 3000:3000
 You'll then be able to access the JuiceBalancer in your browser under http://localhost:3000
 
-To administrate the cluster you can log into the JuiceBalancer with the admin account:
+To administrate the cluster you can log into the wrongsecretsbalancer with the admin account:
 Username: admin
 Password: ${kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode}
