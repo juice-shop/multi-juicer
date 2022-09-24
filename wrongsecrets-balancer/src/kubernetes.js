@@ -16,6 +16,7 @@ const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
 const k8sRBACAPI = kc.makeApiClient(RbacAuthorizationV1Api);
 const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
+const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL || 'not_ets';
 
 const { get } = require('./config');
 const { logger } = require('./logger');
@@ -136,7 +137,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'wrongsecrets',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:1.5.4-no-vault',
+              image: 'jeroenwillemsen/wrongsecrets:1.5.5RC1-no-vault',
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
@@ -160,6 +161,10 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   name: 'K8S_ENV',
                   value: 'k8s',
+                },
+                {
+                  name: 'CTF_SERVER_ADDRESS',
+                  value: `${heroku_wrongsecret_ctf_url}`,
                 },
                 {
                   name: 'challenge_acht_ctf_to_provide_to_host_value',
