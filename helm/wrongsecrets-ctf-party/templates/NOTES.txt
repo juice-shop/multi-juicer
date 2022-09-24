@@ -1,6 +1,6 @@
-MultiJuicer deployed! 🎉🥳
+Wrongsecrets ctf party deployed! 🎉🥳
 
-MultiJuicer doesn't come with a default way to expose it to the world.
+This doesn't come with a default way to expose it to the world.
 You can find guides for specific cloud providers here: https://github.com/iteratec/multi-juicer/tree/main/guides
 
 To test it locally run:
