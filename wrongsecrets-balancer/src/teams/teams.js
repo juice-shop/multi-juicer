@@ -6,6 +6,7 @@ const cryptoRandomString = require('crypto-random-string');
 const Joi = require('@hapi/joi');
 const expressJoiValidation = require('express-joi-validation');
 const promClient = require('prom-client');
+const accessPassword = process.env.REACT_APP_ACCESS_PASSWORD;
 
 const validator = expressJoiValidation.createValidator();
 const k8sEnv = process.env.K8S_ENV || 'k8s';
@@ -104,6 +105,32 @@ async function validateHMAC(req, res, next) {
     res.status(403).send({ message: 'Invalid validation, please stop doing this!' });
   } catch (error) {
     res.status(500).send({ message: 'Invalid validation, please stop doing this!' });
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+async function validatePassword(req, res, next) {
+  const { team } = req.params;
+  const { password } = req.body;
+  logger.info(
+    `checking password for team ${team}, submitted: ${password}, needed: ${accessPassword}`
+  );
+  try {
+    if (!accessPassword || accessPassword.length === 0) {
+      next();
+    } else {
+      if (password === accessPassword) {
+        next();
+      } else {
+        res.status(403).send({ message: 'Go home pizzaboy!' });
+      }
+    }
+  } catch (error) {
+    res.status(500).send({ message: 'Go home pizzaboy!' });
   }
 }
 
@@ -531,6 +558,7 @@ const paramsSchema = Joi.object({
 const bodySchema = Joi.object({
   hmacvalue: Joi.string().hex().length(64),
   passcode: Joi.string().alphanum().uppercase().length(8),
+  password: Joi.string().alphanum().max(64),
 });
 
 router.post('/logout', logout);
@@ -542,6 +570,7 @@ router.post(
   interceptAdminLogin,
   joinIfTeamAlreadyExists,
   checkIfMaxJuiceShopInstancesIsReached,
+  validatePassword,
   validateHMAC,
   createTeam
 );

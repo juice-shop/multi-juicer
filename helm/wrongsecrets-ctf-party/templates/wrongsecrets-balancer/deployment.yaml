@@ -44,6 +44,8 @@ spec:
           env:
             - name: REACT_APP_MOVING_GIF_LOGO
               value: {{ .Values.balancer.env.REACT_APP_MOVING_GIF_LOGO }}
+            - name: REACT_APP_ACCESS_PASSWORD
+              value: {{ .Values.balancer.env.REACT_APP_ACCESS_PASSWORD }}
             - name: REACT_APP_HEROKU_WRONGSECRETS_URL
               value: {{ .Values.balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL }}
             - name: REACT_APP_CTFD_URL

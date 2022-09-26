@@ -7,6 +7,7 @@ const basicAuth = require('basic-auth-connect');
 const onFinished = require('on-finished');
 
 const { get, extractTeamName } = require('./config');
+const { logger } = require('./logger');
 
 const app = express();
 
@@ -51,14 +52,23 @@ const adminRoutes = require('./admin/admin');
 const proxyRoutes = require('./proxy/proxy');
 const scoreBoard = require('./score-board/score-board');
 
-app.get('/balancer/dynamics', (req, res) =>
+app.get('/balancer/dynamics', (req, res) => {
+  const accessPassword = process.env['REACT_APP_ACCESS_PASSWORD'];
+  logger.info(`password: ${accessPassword}`);
+  var usePassword = false;
+  if (!accessPassword || accessPassword.length === 0) {
+    //nothign for now
+  } else {
+    usePassword = true;
+  }
   res.json({
     react_gif_logo: process.env['REACT_APP_MOVING_GIF_LOGO'],
     heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
     ctfd_url: process.env['REACT_APP_CTFD_URL'],
     s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
-  })
-);
+    enable_password: usePassword,
+  });
+});
 
 app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());

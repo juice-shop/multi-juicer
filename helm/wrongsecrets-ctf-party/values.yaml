@@ -68,6 +68,7 @@ balancer:
     REACT_APP_CTFD_URL : 'https://ctfd.io'
     REACT_APP_S3_BUCKET_URL : 's3://funstuff'
     K8S_ENV: 'k8s' #oraws
+    REACT_APP_ACCESS_PASSWORD: '' #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
