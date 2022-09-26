@@ -9,14 +9,78 @@ echo "NOTE: WE ARE WORKING HERE WITH A 5 LEGGED BALANCER on aWS which costs mone
 
 echo "NOTE2: please replace balancer.cookie.cookieParserSecret witha value you fanchy and ensure you have TLS on (see outdated guides)."
 
-echo "Usage: ./build-an-deploy-aws.sh"
+echo "Usage: ./build-an-deploy-aws.sh "
 
-source ./scripts/check-available-commands.sh
-checkCommandsAvailable helm aws kubectl
+source ./../scripts/check-available-commands.sh
+checkCommandsAvailable helm aws kubectl eksctl sed
+
+if test -n "${AWS_REGION-}"; then
+  echo "AWS_REGION is set to <$AWS_REGION>"
+else
+  AWS_REGION=eu-west-1
+  echo "AWS_REGION is not set or empty, defaulting to ${AWS_REGION}"
+fi
+
+if test -n "${CLUSTERNAME-}"; then
+  secho "CLUSTERNAME is set to <$CLUSTERNAME> which is different than the default. Please update the cluster-autoscaler-policy.json."
+else
+  CLUSTERNAME=wrongsecrets-exercise-cluster
+  echo "CLUSTERNAME is not set or empty, defaulting to ${CLUSTERNAME}"
+fi
+
+ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' -r)
+echo "ACCOUNT_ID=${ACCOUNT_ID}"
+
 
 version="$(uuidgen)"
 
 AWS_REGION="eu-west-1"
+
+echo "Install autoscaler first!"
+echo "If the below output is different than expected: please hard stop this script (running aws sts get-caller-identity first)"
+
+aws sts get-caller-identity
+
+echo "Giving you 4 seconds before we add autoscaling"
+
+sleep 4
+
+echo "Installing policies and service accounts"
+
+aws iam create-policy \
+    --policy-name AmazonEKSClusterAutoscalerPolicy \
+    --policy-document file://cluster-autoscaler-policy.json
+
+echo "Installing iamserviceaccount"
+
+eksctl create iamserviceaccount \
+  --cluster=$CLUSTERNAME \
+  --region=$AWS_REGION \
+  --namespace=kube-system \
+  --name=cluster-autoscaler \
+  --attach-policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/AmazonEKSClusterAutoscalerPolicy \
+  --override-existing-serviceaccounts \
+  --approve
+
+echo "Deploying the k8s autoscaler for eks through kubectl"
+
+curl -o cluster-autoscaler-autodiscover.yaml https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+sed -i -e "s|<YOUR CLUSTER NAME>|$CLUSTERNAME|g" cluster-autoscaler-autodiscover.yaml
+
+kubectl apply -f cluster-autoscaler-autodiscover.yaml
+
+echo "annotating service account for cluster-autoscaler"
+kubectl annotate serviceaccount cluster-autoscaler \
+  -n kube-system \
+  eks.amazonaws.com/role-arn=arn:aws:iam::${ACCOUNT_ID}:role/AmazonEKSClusterAutoscalerRole
+
+kubectl patch deployment cluster-autoscaler \
+  -n kube-system \
+  -p '{"spec":{"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict": "false"}}}}}'
+
+kubectl set image deployment cluster-autoscaler \
+  -n kube-system \
+  cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.25.0
 
 helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 helm list --namespace kube-system | grep 'csi-secrets-store' &>/dev/null

@@ -83,7 +83,7 @@ module "eks" {
     disk_type       = "gp3"
     disk_throughput = 150
     disk_iops       = 3000
-    instance_types  = ["t3a.xlarge"]
+    instance_types  = ["t3a.large"]
 
     iam_role_additional_policies = [
       "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
@@ -121,7 +121,9 @@ module "eks" {
   }
 
   tags = {
-    Environment = "test"
-    Application = "wrongsecrets"
+    Environment                                               = "test"
+    Application                                               = "wrongsecrets"
+    "k8s.io/cluster-autoscaler/wrongsecrets-exercise-cluster" = "owned"
+    "k8s.io/cluster-autoscaler/enabled"                       = true
   }
 }

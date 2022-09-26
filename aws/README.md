@@ -37,7 +37,7 @@ The bucket name should be in the output. Please use that to configure the Terraf
 
 The terraform code is loosely based on [this EKS managed Node Group TF example](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/examples/eks_managed_node_group).
 
-**Note**: Applying the Terraform means you are creating cloud infrastructure which actually costs you money. **_the current boundary is 50 t3a-Xlarge nodes_**. Please adapt the servers you deploy to in `main.tf` in this folder to your liking to reduce possible costs. Note that this project can run on a single T3A-Large instance, but this would require reducing the amount of wrongsecretbalancers to 1 (`balancer.replicas=1`). **_The authors are not responsible for any cost coming from following the instructions below_**.
+**Note**: Applying the Terraform means you are creating cloud infrastructure which actually costs you money. **_the current boundary is 50 t3a-(X)large nodes_**. Please adapt the servers you deploy to in `main.tf` in this folder to your liking to reduce possible costs. Note that this project can run on a single T3A-Large instance, but this would require reducing the amount of wrongsecretbalancers to 1 (`balancer.replicas=1`). **_The authors are not responsible for any cost coming from following the instructions below_**.
 
 **Note-II**: The cluster you create has its access bound to the public IP of the creator. In other words: the cluster you create with this code has its access bound to your public IP-address if you apply it locally.
 
@@ -48,8 +48,7 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 5. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 6. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
 7. Do `export KUBECONFIG=~/.kube/wrongsecrets`
-8. Run `cd ..`
-9. Run `./build-an-deploy-aws.sh` to install the helm chart for the wrongsecrets-ctf-party.
+8. Run `./build-an-deploy-aws.sh` to install all the required materials (helm for calico, secrets management, autoscaling, etc.)
 
 Your EKS cluster should be visible in [EU-West-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
@@ -63,11 +62,12 @@ When you have completed the installation steps, you can do `kubectl port-forward
 When you're done:
 
 1. Kill the port forward.
-2. Run `terraform destroy` to clean up the infrastructure.
+2. Run the cleanup script: `cleanup-aws-loadbalancing-and-helm.sh`
+3. Run `terraform destroy` to clean up the infrastructure.
     1. If you've deployed the `shared-state` s3 bucket, also `cd shared-state` and `terraform destroy` there.
-3. Run `unset KUBECONFIG` to unset the KUBECONFIG env var.
-4. Run `rm ~/.kube/wrongsecrets` to remove the kubeconfig file.
-5. Run `rm terraform.tfstate*` to remove local state files.
+4. Run `unset KUBECONFIG` to unset the KUBECONFIG env var.
+5. Run `rm ~/.kube/wrongsecrets` to remove the kubeconfig file.
+6. Run `rm terraform.tfstate*` to remove local state files.
 
 ### A few things to consider
 
