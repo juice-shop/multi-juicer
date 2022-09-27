@@ -55,7 +55,7 @@ spec:
             - name: K8S_ENV
               value: {{ .Values.balancer.env.K8S_ENV }}
             - name: IRSA_ROLE
-              value: "arn:aws:iam::233483431651:role/wrongsecrets-secret-manager" #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
+              value: {{ .Values.balancer.env.IRSA_ROLE }} #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
