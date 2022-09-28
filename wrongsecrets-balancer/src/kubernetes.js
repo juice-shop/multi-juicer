@@ -15,11 +15,11 @@ const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
 const k8sRBACAPI = kc.makeApiClient(RbacAuthorizationV1Api);
 const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
-const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
-const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1 || 'wrongsecret';
-const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2 || 'wrongsecret-2';
-const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG || '1.5.4-no-vault';
-const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL || 'not_ets';
+const awsAccountEnv = process.env.IRSA_ROLE;
+const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1;
+const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2;
+const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG;
+const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL;
 
 const { get } = require('./config');
 const { logger } = require('./logger');
@@ -418,6 +418,18 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   name: 'K8S_ENV',
                   value: 'aws',
+                },
+                {
+                  name: 'CTF_SERVER_ADDRESS',
+                  value: `${heroku_wrongsecret_ctf_url}`,
+                },
+                {
+                  name: 'FILENAME_CHALLENGE9',
+                  value: `${secretsmanagerSecretName1}`,
+                },
+                {
+                  name: 'FILENAME_CHALLENGE10',
+                  value: `${secretsmanagerSecretName2}`,
                 },
                 {
                   name: 'challenge_acht_ctf_to_provide_to_host_value',
