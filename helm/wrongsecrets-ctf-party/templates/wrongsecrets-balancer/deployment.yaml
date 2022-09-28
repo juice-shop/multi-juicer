@@ -56,6 +56,12 @@ spec:
               value: {{ .Values.balancer.env.K8S_ENV }}
             - name: IRSA_ROLE
               value: {{ .Values.balancer.env.IRSA_ROLE }} #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
+            - name: WRONGSECRETS_TAG
+              value: {{ .Values.wrongsecrets.tag}}
+            - name: SECRETS_MANAGER_SECRET_ID_1
+              value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_1 }}
+            - name: SECRETS_MANAGER_SECRET_ID_2
+              value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_2 }}
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:

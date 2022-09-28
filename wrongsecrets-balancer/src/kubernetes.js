@@ -16,6 +16,9 @@ const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
 const k8sRBACAPI = kc.makeApiClient(RbacAuthorizationV1Api);
 const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE || 'youdidnotprovideanirsarole,goodluck';
+const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1 || 'wrongsecret';
+const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2 || 'wrongsecret-2';
+const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG || '1.5.4-no-vault';
 const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL || 'not_ets';
 
 const { get } = require('./config');
@@ -136,8 +139,7 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
           containers: [
             {
               name: 'wrongsecrets',
-              //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:1.5.5RC1-no-vault',
+              image: `jeroenwillemsen/wrongsecrets:${wrongSecretsContainterTag}`,
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
@@ -285,8 +287,7 @@ const createAWSSecretsProviderForTeam = async (team) => {
     spec: {
       provider: 'aws',
       parameters: {
-        objects:
-          '- objectName: "wrongsecret"\n  objectType: "secretsmanager"\n- objectName: "wrongsecret-2"\n  objectType: "secretsmanager"\n',
+        objects: `- objectName: "${secretsmanagerSecretName1}"\n  objectType: "secretsmanager"\n- objectName: "${secretsmanagerSecretName2}"\n  objectType: "secretsmanager"\n`,
       },
     },
   };
@@ -393,8 +394,7 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
           containers: [
             {
               name: 'wrongsecrets',
-              //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets:1.5.4-no-vault',
+              image: `jeroenwillemsen/wrongsecrets:${wrongSecretsContainterTag}`,
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
               // resources: get('wrongsecrets.resources'),
               securityContext: {
