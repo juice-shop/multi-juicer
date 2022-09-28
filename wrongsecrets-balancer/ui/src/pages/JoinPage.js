@@ -52,6 +52,10 @@ export const JoinPage = injectIntl(({ intl }) => {
 
   async function sendJoinRequest() {
     try {
+      if(!teamname || teamname.length === 0){
+        setFailed(true);
+        return;
+      }
       if (dynamics.enable_password) {
         const hmacvalue = cryptoJS
           .HmacSHA256(`${teamname}`, 'hardcodedkey')
@@ -207,7 +211,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             <FormattedMessage id="password" defaultMessage="Password" />
           </Label>
           <Input
-            type="text"
+            type="password"
             id="password"
             data-test-id="password-input"
             name="password"
