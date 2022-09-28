@@ -1340,9 +1340,9 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
     },
   };
 
-  await k8sAppsApi.patchNamespacedDeployment(
+  return k8sAppsApi.patchNamespacedDeployment(
     `${teamname}-wrongsecrets`,
-    `t-${teamname}`,
+    `${teamname}`,
     deploymentPatch,
     undefined,
     undefined,
