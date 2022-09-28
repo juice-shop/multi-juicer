@@ -69,6 +69,9 @@ balancer:
     REACT_APP_S3_BUCKET_URL : 's3://funstuff'
     K8S_ENV: 'k8s' #oraws
     REACT_APP_ACCESS_PASSWORD: '' #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
+    IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager
+    SECRETS_MANAGER_SECRET_ID_1: 'wrongsecret'
+    SECRETS_MANAGER_SECRET_ID_2: 'wrongsecret-2'
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
@@ -93,7 +96,7 @@ wrongsecrets:
   maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsens/wrongsecrets
-  tag: 1.5.3-no-vault
+  tag: 1.5.5-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/commjoen/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
