@@ -1092,18 +1092,18 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'virtualdesktop',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets-desktop:1.5.4RC8',
+              image: 'jeroenwillemsen/wrongsecrets-desktop:latest',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: {
                 requests: {
                   memory: '2G',
                   cpu: '800m',
-                  'ephemeral-storage': '2Gi',
+                  'ephemeral-storage': '4Gi',
                 },
                 limits: {
                   memory: '3G',
                   cpu: '2000m',
-                  'ephemeral-storage': '4Gi',
+                  'ephemeral-storage': '16Gi',
                 },
               },
               // resources: get('virtualdesktop.resources'),
@@ -1117,6 +1117,28 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   containerPort: 3000,
                 },
+              ],
+              volumeMounts:[
+                {
+                  mountPath: '/config',
+                  name: 'ephemeral-1',
+                },
+                // {
+                //   mountPath: '/defaults',
+                //   name: 'ephemeral-2',
+                // },
+                // {
+                //   mountPath: '/etc',
+                //   name: 'ephemeral-3',
+                // },
+                // {
+                //   mountPath: '/app',
+                //   name: 'ephemeral-4',
+                // },
+                // {
+                //   mountPath: '/run',
+                //   name: 'ephemeral-5',
+                // },
               ],
               readinessProbe: {
                 httpGet: {
@@ -1136,6 +1158,28 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 periodSeconds: 15,
               },
             },
+          ],
+          volumes: [
+            {
+              name: 'ephemeral-1',
+              emptyDir: {},
+            },
+            // {
+            //   name: 'ephemeral-2',
+            //   emptyDir: {},
+            // },
+            // {
+            //   name: 'ephemeral-3',
+            //   emptyDir: {},
+            // },
+            // {
+            //   name: 'ephemeral-4',
+            //   emptyDir: {},
+            // },
+            // {
+            //   name: 'ephemeral-5',
+            //   emptyDir: {},
+            // },
           ],
           tolerations: get('virtualdesktop.tolerations'),
           affinity: get('virtualdesktop.affinity'),
