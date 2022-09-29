@@ -1107,7 +1107,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 limits: {
                   memory: '3G',
                   cpu: '2000m',
-                  'ephemeral-storage': '16Gi',
+                  'ephemeral-storage': '8Gi',
                 },
               },
               // resources: get('virtualdesktop.resources'),

@@ -21,7 +21,7 @@ This environment uses a webtop and an instance of wrongsecrets per user. This me
 - 8GB HD (min 3 GB, limit = 8GB)
 
 A 6 contestant game can be played on a local minikube with updated cpu & memory settings.
-A 100 contestant game can be played on the AWS setup, which will require at least 200 CPUs, 3500 GB Ram, and 800 GB of storage available in the cluster. 
+A 100 contestant game can be played on the AWS setup, which will require at least 200 CPUs, 350 GB Ram, and 800 GB of storage available in the cluster. 
 
 ## Status
 
