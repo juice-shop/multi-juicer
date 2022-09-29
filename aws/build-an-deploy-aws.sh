@@ -103,10 +103,12 @@ aws secretsmanager put-secret-value --secret-id wrongsecret-2 --secret-string "$
 echo "Generate Parameter store challenge secret"
 aws ssm put-parameter --name wrongsecretvalue --overwrite --type SecureString --value "$(openssl rand -base64 24)" --region $AWS_REGION --output json --no-cli-pager
 
+echo "Installing metrics api-server"
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
 wait
 
 DEFAULT_PASSWORD=thankyou
 #TODO: REWRITE ABOVE, REWRITE THE HARDCODED DEPLOYMENT VALS INTO VALUES AND OVERRIDE THEM HERE!
 echo "default password is ${DEFAULT_PASSWORD}"
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set"balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=0.89aws" --set="balancer.replicas=4" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set"balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=0.92aws" --set="balancer.replicas=4" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"

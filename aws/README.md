@@ -57,6 +57,13 @@ Are you done playing? Please run `terraform destroy` twice to clean up.
 ### Test it
 When you have completed the installation steps, you can do `kubectl port-forward service/wrongsecrets-balancer 3000:3000` and then go to [http://localhost:3000](http://localhost:3000).
 
+Want to know how well your cluster is holding up? Check with 
+
+```sh
+    kubectl top nodes
+    kubectl top pods
+```
+
 ### Clean it up
 
 When you're done:

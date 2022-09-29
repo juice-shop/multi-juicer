@@ -9,7 +9,6 @@ Note that we:
 - A working admin interface which can restart both or delete both (by deleting the full namespace)
 - Do not support any progress watchdog as you will have access to it, we therefore disabled it.
 
-
 ## Special thanks
 Special thanks to Madhu Akula, Ben de Haan, and Mike Woudenberg for making this port a reality!
 
@@ -20,8 +19,11 @@ This environment uses a webtop and an instance of wrongsecrets per user. This me
 - 3.5 GB RAM (min 2.5GB, limit = 3.5GB)
 - 8GB HD (min 3 GB, limit = 8GB)
 
-A 6 contestant game can be played on a local minikube with updated cpu & memory settings.
-A 100 contestant game can be played on the AWS setup, which will require at least 200 CPUs, 3500 GB Ram, and 800 GB of storage available in the cluster. 
+### Running this on minikube
+A 3-6 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 CPUs, 9 GB ram).
+
+### Running this on AWS EKS with larger groups
+A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. If you see heavy under-utilization as players are not very actively engaged: you can often scale down the amount of nodes required.
 
 ## Status
 
@@ -49,6 +51,13 @@ eval $(minikube docker-env)
 ./build-an-deploy.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
+```
+Want to know whether your system is holding up? use 
+
+```shell
+minikube addons enable metrics-server
+kubectl top nodes
+kubectl top pods
 ```
 
 ### Action with AWS EKSS:
