@@ -420,6 +420,10 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                   value: 'aws',
                 },
                 {
+                  name: 'APP_VERSION',
+                  value: `${wrongSecretsContainterTag}-ctf`,
+                },
+                {
                   name: 'CTF_SERVER_ADDRESS',
                   value: `${heroku_wrongsecret_ctf_url}`,
                 },
@@ -1121,7 +1125,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
               volumeMounts:[
                 {
                   mountPath: '/config',
-                  name: 'ephemeral-1',
+                  name: 'ephemeral',
                 },
                 // {
                 //   mountPath: '/defaults',
@@ -1161,8 +1165,9 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
           ],
           volumes: [
             {
-              name: 'ephemeral-1',
+              name: 'ephemeral',
               emptyDir: {},
+              sizeLimit: '4Gi'
             },
             // {
             //   name: 'ephemeral-2',
