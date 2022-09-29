@@ -103,6 +103,8 @@ aws secretsmanager put-secret-value --secret-id wrongsecret-2 --secret-string "$
 echo "Generate Parameter store challenge secret"
 aws ssm put-parameter --name wrongsecretvalue --overwrite --type SecureString --value "$(openssl rand -base64 24)" --region $AWS_REGION --output json --no-cli-pager
 
+echo "Installing metrics api-server"
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
 wait
 

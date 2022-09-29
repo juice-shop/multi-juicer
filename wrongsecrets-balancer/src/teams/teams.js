@@ -498,7 +498,9 @@ async function resetPasscode(req, res) {
       return res.status(404).send({ message: 'No instance to reset the passcode for.' });
     }
     logger.error(
-      `Encountered unknown error while resetting passcode hash for deployment: ${JSON.stringify(error)}`
+      `Encountered unknown error while resetting passcode hash for deployment: ${JSON.stringify(
+        error
+      )}`
     );
     // logger.error(error.message);
     return res.status(500).send({ message: 'Unknown error while resetting passcode.' });

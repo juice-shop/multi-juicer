@@ -1096,7 +1096,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'virtualdesktop',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets-desktop:latest',
+              image: 'jeroenwillemsen/wrongsecrets-desktop:test3',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: {
                 requests: {
@@ -1122,11 +1122,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   containerPort: 3000,
                 },
               ],
-              volumeMounts:[
-                {
-                  mountPath: '/config',
-                  name: 'ephemeral',
-                },
+              volumeMounts: [
+                // {
+                //   mountPath: '/config',
+                //   name: 'ephemeral',
+                // },
                 // {
                 //   mountPath: '/defaults',
                 //   name: 'ephemeral-2',
@@ -1164,11 +1164,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             },
           ],
           volumes: [
-            {
-              name: 'ephemeral',
-              emptyDir: {},
-              sizeLimit: '4Gi'
-            },
+            // {
+            //   name: 'ephemeral',
+            //   emptyDir: {},
+            //   sizeLimit: '4Gi',
+            // },
             // {
             //   name: 'ephemeral-2',
             //   emptyDir: {},
