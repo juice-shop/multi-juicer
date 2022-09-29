@@ -1096,7 +1096,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               name: 'virtualdesktop',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets-desktop:test3',
+              image: 'jeroenwillemsen/wrongsecrets-desktop:latest',
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: {
                 requests: {
