@@ -52,6 +52,13 @@ eval $(minikube docker-env)
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
+Want to know whether your system is holding up? use 
+
+```shell
+minikube addons enable metrics-server
+kubectl top nodes
+kubectl top pods
+```
 
 ### Action with AWS EKSS:
 
