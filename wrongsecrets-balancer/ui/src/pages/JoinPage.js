@@ -26,7 +26,7 @@ const CenterLogo = styled.img`
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 50%;
+  width: 75%;
 `;
 
 export const JoinPage = injectIntl(({ intl }) => {
@@ -52,7 +52,7 @@ export const JoinPage = injectIntl(({ intl }) => {
 
   async function sendJoinRequest() {
     try {
-      if(!teamname || teamname.length === 0){
+      if (!teamname || teamname.length === 0) {
         setFailed(true);
         return;
       }
@@ -142,26 +142,36 @@ export const JoinPage = injectIntl(({ intl }) => {
           <li>This domain: here is where you can do your exercises</li>
           <li>
             The domain where you provide your responses in exchange for a CTF key:{' '}
-            <a href={dynamics.heroku_wrongsecret_ctf_url}>{dynamics.heroku_wrongsecret_ctf_url}</a>
+            <a style={{ color: 'white' }} href={dynamics.heroku_wrongsecret_ctf_url}>
+              {dynamics.heroku_wrongsecret_ctf_url}
+            </a>
           </li>
           <li>
             The domain where you provide your CTF key:{' '}
-            <a href={dynamics.ctfd_url}>{dynamics.ctfd_url}</a>
+            <a style={{ color: 'white' }} href={dynamics.ctfd_url}>
+              {dynamics.ctfd_url}
+            </a>
           </li>
           <li>
             Optionally: the storage bucket with Terraform state for the cloud challneges:{' '}
-            <a href={dynamics.s3_bucket_url}>{dynamics.s3_bucket_url}</a>
+            <a style={{ color: 'white' }} href={dynamics.s3_bucket_url}>
+              {dynamics.s3_bucket_url}
+            </a>
+            . For this you will need credentials that will be provided to you as part of the CTF
+            instructions.
           </li>
         </ul>
         <FormattedMessage
           id="welcome_text_2"
           defaultMessage={`
-          We need multiple domains, as you will be able to steal the CTF key after a few challenges.
+          We need to usse multiple domains, as you will be able to steal the CTF key after a few challenges.
         `}
           values={{
             strong: (msg) => <strong>{msg}</strong>,
           }}
         />
+        <br />
+        <br />
 
         <H2>
           <FormattedMessage id="getting_started" defaultMessage="Getting Started" />
@@ -179,6 +189,20 @@ export const JoinPage = injectIntl(({ intl }) => {
           }}
         />
 
+        {dynamics.enable_password ? (
+          <p>
+            <FormattedMessage
+              id="getting_started_password"
+              defaultMessage={`
+              In the password field you have to enter the password you received as part of your CTF instructions.
+              This can be different from the CTFD passswords.
+            `}
+              values={{
+                strong: (msg) => <strong>{msg}</strong>,
+              }}
+            />
+          </p>
+        ) : null}
         {failed ? (
           <p>
             <strong>
@@ -206,24 +230,24 @@ export const JoinPage = injectIntl(({ intl }) => {
             onChange={({ target }) => setTeamname(target.value)}
           />
           {dynamics.enable_password ? (
-          <p>
-            <Label htmlFor="password">
-            <FormattedMessage id="password" defaultMessage="Password" />
-          </Label>
-          <Input
-            type="password"
-            id="password"
-            data-test-id="password-input"
-            name="password"
-            disabled={!dynamics.enable_password}
-            value={password}
-            title={formatMessage(messages.passwordValidationConstraints)}
-            pattern="^[a-zA-Z0-9]([-a-z-A-Z0-9])+[a-zA-Z0-9]$"
-            maxLength="64"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-          </p>
-        ) : null}          
+            <p>
+              <Label htmlFor="password">
+                <FormattedMessage id="password" defaultMessage="Password" />
+              </Label>
+              <Input
+                type="password"
+                id="password"
+                data-test-id="password-input"
+                name="password"
+                disabled={!dynamics.enable_password}
+                value={password}
+                title={formatMessage(messages.passwordValidationConstraints)}
+                pattern="^[a-zA-Z0-9]([-a-z-A-Z0-9])+[a-zA-Z0-9]$"
+                maxLength="64"
+                onChange={({ target }) => setPassword(target.value)}
+              />
+            </p>
+          ) : null}
           <Button data-test-id="create-join-team-button" type="submit">
             <FormattedMessage id="create_or_join_team_label" defaultMessage="Create / Join Team" />
           </Button>
