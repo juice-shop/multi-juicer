@@ -43,11 +43,17 @@ export const InstanceRestartingCard = ({ teamname }) => {
             />
           </span>
         </CenteredText>
-        <LinkButton data-test-id="start-hacking-button" href="/">
+        <LinkButton data-test-id="start-hacking-button" href="/" target="_blank">
           <FormattedMessage
             id="instance_status_back_to_hacking"
             defaultMessage="Get back to Hacking"
           />
+        </LinkButton>
+        <LinkButton data-test-id="start-desktop-button" href="/?desktop" target="_blank">
+            <FormattedMessage
+              id="instance_status_start_vm"
+              defaultMessage="Start your Webtop, might require refresh"
+            />
         </LinkButton>
       </BodyCard>
     );
