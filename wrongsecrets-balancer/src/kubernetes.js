@@ -19,6 +19,7 @@ const awsAccountEnv = process.env.IRSA_ROLE;
 const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1;
 const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2;
 const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG;
+const wrongSecretsDekstopTag = process.env.WRONGSECRETS_DESKTOP_TAG;
 const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL;
 
 const { get } = require('./config');
@@ -1086,26 +1087,20 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           serviceAccountName: 'webtop-sa',
-          //automountServiceAccountToken: false,
-          // securityContext: {
-          //   runAsUser: 911,
-          //   runAsGroup: 911,
-          //   fsGroup: 911,
-          // },
           containers: [
             {
               name: 'virtualdesktop',
               //TODO REPLACE HARDCODED BELOW WITH PROPPER GETS: image: `${get('wrongsecrets.image')}:${get('wrongsecrets.tag')}`,
-              image: 'jeroenwillemsen/wrongsecrets-desktop:test19',
+              image: `jeroenwillemsen/wrongsecrets-desktop-k8s:${wrongSecretsDekstopTag}`,
               imagePullPolicy: get('virtualdesktop.imagePullPolicy'),
               resources: {
                 requests: {
-                  memory: '2G',
+                  memory: '2.5G',
                   cpu: '800m',
                   'ephemeral-storage': '4Gi',
                 },
                 limits: {
-                  memory: '3G',
+                  memory: '3.5G',
                   cpu: '2000m',
                   'ephemeral-storage': '8Gi',
                 },
@@ -1125,24 +1120,8 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
               volumeMounts: [
                 {
                   mountPath: '/config',
-                  name: 'ephemeral',
+                  name: 'config-fs',
                 },
-                // {
-                //   mountPath: '/defaults',
-                //   name: 'ephemeral-2',
-                // },
-                // {
-                //   mountPath: '/etc',
-                //   name: 'ephemeral-3',
-                // },
-                // {
-                //   mountPath: '/app',
-                //   name: 'ephemeral-4',
-                // },
-                // {
-                //   mountPath: '/run',
-                //   name: 'ephemeral-5',
-                // },
               ],
               readinessProbe: {
                 httpGet: {
@@ -1165,26 +1144,12 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
           ],
           volumes: [
             {
-              name: 'ephemeral',
-              emptyDir: {},
-              sizeLimit: '4Gi',
+              emptyDir: {
+                medium: 'Memory',
+                sizeLimit: '128Mi',
+              },
+              name: 'config-fs',
             },
-            // {
-            //   name: 'ephemeral-2',
-            //   emptyDir: {},
-            // },
-            // {
-            //   name: 'ephemeral-3',
-            //   emptyDir: {},
-            // },
-            // {
-            //   name: 'ephemeral-4',
-            //   emptyDir: {},
-            // },
-            // {
-            //   name: 'ephemeral-5',
-            //   emptyDir: {},
-            // },
           ],
           tolerations: get('virtualdesktop.tolerations'),
           affinity: get('virtualdesktop.affinity'),

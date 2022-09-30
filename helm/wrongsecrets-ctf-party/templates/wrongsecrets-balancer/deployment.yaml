@@ -58,6 +58,8 @@ spec:
               value: {{ .Values.balancer.env.IRSA_ROLE }} #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
             - name: WRONGSECRETS_TAG
               value: {{ .Values.wrongsecrets.tag}}
+            - name: WRONGSECRETS_DESKTOP_TAG
+              value: 1.5.7RC1
             - name: SECRETS_MANAGER_SECRET_ID_1
               value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_1 }}
             - name: SECRETS_MANAGER_SECRET_ID_2
