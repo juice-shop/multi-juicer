@@ -132,7 +132,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         <FormattedMessage
           id="welcome_text"
           defaultMessage={`
-          Welcome to the WrongSecrets CTF Party! This CTF uses 3 domains:
+          Welcome to the WrongSecrets CTF Party! This CTF uses 2 domains:
         `}
           values={{
             strong: (msg) => <strong>{msg}</strong>,
@@ -141,13 +141,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         <ul>
           <li>This domain: here is where you can do your exercises</li>
           <li>
-            The domain where you provide your responses in exchange for a CTF key:{' '}
-            <a style={{ color: 'white' }} href={dynamics.heroku_wrongsecret_ctf_url}>
-              {dynamics.heroku_wrongsecret_ctf_url}
-            </a>
-          </li>
-          <li>
-            The domain where you provide your CTF key:{' '}
+            The domain where you provide your answer found in exchange for points:{' '}
             <a style={{ color: 'white' }} href={dynamics.ctfd_url}>
               {dynamics.ctfd_url}
             </a>
