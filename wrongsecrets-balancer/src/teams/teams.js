@@ -10,7 +10,6 @@ const accessPassword = process.env.REACT_APP_ACCESS_PASSWORD;
 
 const validator = expressJoiValidation.createValidator();
 const k8sEnv = process.env.K8S_ENV || 'k8s';
-const hmac_key = process.env.REACT_APP_CREATE_TEAM_HMAC_KEY;
 const router = express.Router();
 
 const {
@@ -95,6 +94,10 @@ async function validateHMAC(req, res, next) {
   try {
     const { team } = req.params;
     const { hmacvalue } = req.body;
+    var hmac_key = process.env.REACT_APP_CREATE_TEAM_HMAC_KEY;
+    if (hmac_key === undefined || hmac_key === '') {
+      hmac_key = 'hardcodedkey';
+    }
     const validationValue = crypto
       .createHmac('sha256', hmac_key)
       .update(`${team}`, 'utf-8')
