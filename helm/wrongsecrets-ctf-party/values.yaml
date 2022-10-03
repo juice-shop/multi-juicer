@@ -96,7 +96,7 @@ wrongsecrets:
   maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsens/wrongsecrets
-  tag: 1.5.5-no-vault
+  tag: 1.5.7-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/commjoen/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file

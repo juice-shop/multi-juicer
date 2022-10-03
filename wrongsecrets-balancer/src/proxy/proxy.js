@@ -152,6 +152,11 @@ function proxyTrafficToJuiceShop(req, res) {
       //   `we have cookies: ${JSON.stringify(req.cookies)} and  ${JSON.stringify(req.signedCookies)}`
       // );
       const upgradeTeamname = extractTeamName(req);
+      const regex = new RegExp('^[a-z0-9]([-a-z0-9])+[a-z0-9]$', 'i');
+      if (!regex.test(upgradeTeamname)) {
+        logger.info(`Got malformed teamname: ${upgradeTeamname}s`);
+        return res.redirect('/balancer/');
+      }
       logger.info(`proxying upgrade request for: ${req.url} with team ${upgradeTeamname}`);
       proxy.ws(req, socket, head, {
         target: `ws://${upgradeTeamname}-virtualdesktop.${upgradeTeamname}.svc:8080`,
