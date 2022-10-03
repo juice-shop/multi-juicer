@@ -80,7 +80,7 @@ const createSecretsfileForTeam = async (team) => {
   const secret = {
     apiVersion: 'v1',
     data: {
-      funnier: 'RmxhZzogYXJlIHlvdSBoYXZpbmcgZnVuIHlldD8K',
+      funnier: 'RmxhZzogYXJlIHlvdSBoYXZpbmcgZnVuIHlldD8=',
     },
     kind: 'Secret',
     type: 'Opaque',
