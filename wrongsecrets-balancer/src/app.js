@@ -66,6 +66,7 @@ app.get('/balancer/dynamics', (req, res) => {
     heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
     ctfd_url: process.env['REACT_APP_CTFD_URL'],
     s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
+    hmac_key: process.env['REACT_APP_CREATE_TEAM_HMAC_KEY'],
     enable_password: usePassword,
   });
 });
