@@ -61,7 +61,7 @@ const createConfigmapForTeam = async (team) => {
   const configmap = {
     apiVersion: 'v1',
     data: {
-      'funny.entry': 'thisIsK8SConfigMap',
+      'funny.entry': 'helloCTF-configmap',
     },
     kind: 'ConfigMap',
     metadata: {
@@ -80,7 +80,7 @@ const createSecretsfileForTeam = async (team) => {
   const secret = {
     apiVersion: 'v1',
     data: {
-      funnier: 'dGhpcyBpcyBhcGFzc3dvcmQ=',
+      funnier: 'RmxhZzogYXJlIHlvdSBoYXZpbmcgZnVuIHlldD8K',
     },
     kind: 'Secret',
     type: 'Opaque',
