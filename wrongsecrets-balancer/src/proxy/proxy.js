@@ -105,7 +105,11 @@ async function updateLastConnectTimestamp(req, res, next) {
  */
 function proxyTrafficToJuiceShop(req, res) {
   const teamname = req.teamname;
-  //TODO: FIX THE PORT!
+  const regex = new RegExp('^[a-z0-9]([-a-z0-9])+[a-z0-9]$', 'i');
+  if (!regex.test(teamname)) {
+    logger.info(`Got malformed teamname: ${teamname}s`);
+    return res.redirect('/balancer/');
+  }
   const currentReferrerForDesktop = '/?desktop';
   logger.debug(
     `Proxying request ${req.method.toLocaleUpperCase()} ${
@@ -126,7 +130,6 @@ function proxyTrafficToJuiceShop(req, res) {
     req.path === '/files/socket.io/' ||
     req.path === '/files/socket.io/socket.io.js.map'
   ) {
-    // logger.info('we have a desktop entry for team ' + teamname);
     target = {
       target: `http://${teamname}-virtualdesktop.${teamname}.svc:8080`,
       ws: true,
@@ -139,7 +142,6 @@ function proxyTrafficToJuiceShop(req, res) {
   }
   logger.info(`we got ${teamname} requesting ${target.target}`);
 
-  //TODO: FIX THAT THIS WILL WORK IN THE FUTURE!
   if (req.path === '/guaclite') {
     let server = res.socket.server;
     logger.info('putting ws through for /quaclite');
@@ -158,6 +160,11 @@ function proxyTrafficToJuiceShop(req, res) {
     });
     server.on('connect', function (req, socket, head) {
       const connectTeamname = extractTeamName(req);
+      const regex = new RegExp('^[a-z0-9]([-a-z0-9])+[a-z0-9]$', 'i');
+      if (!regex.test(connectTeamname)) {
+        logger.info(`Got malformed teamname: ${teamname}s`);
+        return res.redirect('/balancer/');
+      }
       logger.info(`proxying upgrade request for: ${req.url} with team ${connectTeamname}`);
       proxy.ws(req, socket, head, {
         target: `ws://${connectTeamname}-virtualdesktop.${connectTeamname}.svc:8080`,
