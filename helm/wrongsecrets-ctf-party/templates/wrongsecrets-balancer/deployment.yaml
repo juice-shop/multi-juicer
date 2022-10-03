@@ -60,6 +60,8 @@ spec:
               value: {{ .Values.wrongsecrets.tag}}
             - name: WRONGSECRETS_DESKTOP_TAG
               value: 1.5.7RC1
+            - name: REACT_APP_CREATE_TEAM_HMAC_KEY
+              value: hardcodedkey
             - name: SECRETS_MANAGER_SECRET_ID_1
               value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_1 }}
             - name: SECRETS_MANAGER_SECRET_ID_2

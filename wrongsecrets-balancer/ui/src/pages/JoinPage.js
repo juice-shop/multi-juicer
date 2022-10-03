@@ -58,7 +58,7 @@ export const JoinPage = injectIntl(({ intl }) => {
       }
       if (dynamics.enable_password) {
         const hmacvalue = cryptoJS
-          .HmacSHA256(`${teamname}`, 'hardcodedkey')
+          .HmacSHA256(`${teamname}`, dynamics.hmac_key)
           .toString(cryptoJS.enc.Hex);
         const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
           passcode,
@@ -68,7 +68,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode } });
       } else {
         const hmacvalue = cryptoJS
-          .HmacSHA256(`${teamname}`, 'hardcodedkey')
+          .HmacSHA256(`${teamname}`, dynamics.hmac_key)
           .toString(cryptoJS.enc.Hex);
         const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
           passcode,
@@ -99,6 +99,7 @@ export const JoinPage = injectIntl(({ intl }) => {
     heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
     ctfd_url: process.env['REACT_APP_CTFD_URL'],
     s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
+    hmac_key: process.env['REACT_APP_CREATE_TEAM_HMAC_KEY'],
     enable_password: false,
   };
 

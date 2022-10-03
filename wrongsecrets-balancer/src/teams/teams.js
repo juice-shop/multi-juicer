@@ -7,10 +7,10 @@ const Joi = require('@hapi/joi');
 const expressJoiValidation = require('express-joi-validation');
 const promClient = require('prom-client');
 const accessPassword = process.env.REACT_APP_ACCESS_PASSWORD;
+const hmac_key = process.env.REACT_APP_CREATE_TEAM_HMAC_KEY || 'hardcodedkey';
 
 const validator = expressJoiValidation.createValidator();
 const k8sEnv = process.env.K8S_ENV || 'k8s';
-
 const router = express.Router();
 
 const {
@@ -96,7 +96,7 @@ async function validateHMAC(req, res, next) {
     const { team } = req.params;
     const { hmacvalue } = req.body;
     const validationValue = crypto
-      .createHmac('sha256', 'hardcodedkey')
+      .createHmac('sha256', hmac_key)
       .update(`${team}`, 'utf-8')
       .digest('hex');
     if (validationValue === hmacvalue) {
