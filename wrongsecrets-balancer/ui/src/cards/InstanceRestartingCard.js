@@ -50,10 +50,10 @@ export const InstanceRestartingCard = ({ teamname }) => {
           />
         </LinkButton>
         <LinkButton data-test-id="start-desktop-button" href="/?desktop" target="_blank">
-            <FormattedMessage
-              id="instance_status_start_vm"
-              defaultMessage="Start your Webtop, might require refresh"
-            />
+          <FormattedMessage
+            id="instance_status_start_vm"
+            defaultMessage="Start your Webtop, might require refresh"
+          />
         </LinkButton>
       </BodyCard>
     );
