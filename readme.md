@@ -25,16 +25,19 @@ A 3-6 contestant game can be played on a local minikube with updated cpu & memor
 ### Running this on AWS EKS with larger groups
 A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. If you see heavy under-utilization as players are not very actively engaged: you can often scale down the amount of nodes required.
 
-## Status
-
-**This is by no means ready for anything, and work in progress.**
-
-Still want to play? Ok, here we go:
+## Status - Experimental release
 
 We currently only support minikube and AWS EKS (_**Please follow the readme in the aws folder, as the guides section is not updated yet**_).
 
 ## How to use it
 
+### Manual setup:
+
+<TBA>
+
+### Automated setup
+
+<TBA>
 You need 3 things:
 - This infrastructure
 - The actual place where correct answers are exchanged for CTFD-flags. This can be your fly.dev/heroku/etc. or local container of WrongSecrets running in CTF mode with the additional key setup for challenge 8.
