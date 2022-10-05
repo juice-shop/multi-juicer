@@ -12,18 +12,25 @@ source check-available-commands.sh
 checkCommandsAvailable kubectl jq awk
 IFS=$'
 '
-USERS=($(awk -F , '{print $3}' users.csv))
+USERS=($(awk -F , '{print tolower($3)}' users.csv))
+TEAMS=($(awk -F , '{print tolower($3)}' teams.csv))
 unset IFS
 for NAMESPACE in `kubectl get ns | grep t- |  awk '{print $1;}'`
 do
 echo "found $NAMESPACE"
-NO_TDASH_NAMESPACE=${NAMESPACE:2}
+CUT_NAMESPACE=${NAMESPACE:2}
+NO_TDASH_NAMESPACE=`echo $CUT_NAMESPACE | awk '{print tolower($0)}'`
 echo "checking list for $NO_TDASH_NAMESPACE"
 if [[ " ${USERS[*]} " =~ " ${NO_TDASH_NAMESPACE} " ]]; then
-    echo "FOUND $NO_TDASH_NAMESPACE in users, skipping it"
+    echo "FOUND $NO_TDASH_NAMESPACE in users"
 else
-    echo "did not find $NO_TDASH_NAMESPACE in users, deleting it now!"
-    kubectl delete ns $NAMESPACE
-    echo "deleted $NAMESPACE"
+    if [[ " ${TEAMS[*]} " =~ " ${NO_TDASH_NAMESPACE} " ]]; then
+        echo "FOUND $NO_TDASH_NAMESPACE in teams"
+    else
+        echo "did NOT find $NO_TDASH_NAMESPACE in users and teams. Deletig it now!"
+        kubectl delete ns $NAMESPACE
+        echo "deleted $NAMESPACE"
+    fi
+    
 fi
 done
