@@ -2,7 +2,8 @@ FROM node:18-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
-RUN npm ci --production
+RUN npm install
+RUN npm ci --omit=dev
 
 FROM node:18-alpine as ui
 RUN mkdir -p /home/app
