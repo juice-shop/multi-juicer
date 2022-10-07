@@ -176,21 +176,6 @@ wrongsecrets:
   runtimeClassName: null
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
-#progressWatchdog:
-#  repository: iteratec/unusued-progress-watchdog
-#  tag: null
-#  resources:
-#    requests:
-#      memory: 48Mi
-#      cpu: 20m
-#    limits:
-#      memory: 48Mi
-#      cpu: 20m
-#  securityContext: {}
-#  # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-#  affinity: {}
-#  # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-#  tolerations: []
 
 #the virtual desktop for the deploymebt
 virtualdesktop:
