@@ -58,6 +58,7 @@ eksctl create iamserviceaccount \
   --region=$AWS_REGION \
   --namespace=kube-system \
   --name=cluster-autoscaler \
+  --role-name=AmazonEKSClusterAutoscalerRole \
   --attach-policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/AmazonEKSClusterAutoscalerPolicy \
   --override-existing-serviceaccounts \
   --approve
@@ -111,4 +112,4 @@ wait
 DEFAULT_PASSWORD=thankyou
 #TODO: REWRITE ABOVE, REWRITE THE HARDCODED DEPLOYMENT VALS INTO VALUES AND OVERRIDE THEM HERE!
 echo "default password is ${DEFAULT_PASSWORD}"
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set"balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=1.0aws" --set="balancer.replicas=4" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set="balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=1.0aws" --set="balancer.replicas=4" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"

@@ -37,6 +37,11 @@
     "prettier": "^2.7.1",
     "supertest": "^6.2.4"
   },
+  "overrides": {
+    "@kubernetes/client-node": {
+      "openid-client": "v5.1.10"
+    }
+  },
   "jest": {
     "setupFiles": [
       "jest-date-mock"
