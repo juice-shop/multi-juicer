@@ -57,7 +57,7 @@ Are you done playing? Please run `terraform destroy` twice to clean up.
 ### Test it
 When you have completed the installation steps, you can do `kubectl port-forward service/wrongsecrets-balancer 3000:3000` and then go to [http://localhost:3000](http://localhost:3000).
 
-Want to know how well your cluster is holding up? Check with 
+Want to know how well your cluster is holding up? Check with
 
 ```sh
     kubectl top nodes
@@ -69,7 +69,7 @@ Want to know how well your cluster is holding up? Check with
 When you're done:
 
 1. Kill the port forward.
-2. Run the cleanup script: `cleanup-aws-loadbalancing-and-helm.sh`
+2. Run the cleanup script: `cleanup-aws-autoscaling-and-helm.sh`
 3. Run `terraform destroy` to clean up the infrastructure.
     1. If you've deployed the `shared-state` s3 bucket, also `cd shared-state` and `terraform destroy` there.
 4. Run `unset KUBECONFIG` to unset the KUBECONFIG env var.
