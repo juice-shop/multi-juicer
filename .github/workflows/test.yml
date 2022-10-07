@@ -1,4 +1,6 @@
 on: [push, pull_request]
+permissions:
+  contents: read
 name: "Run Tests"
 jobs:
   cleaner:
