@@ -1,0 +1,41 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Test minikube script (k8s)
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test-minikube:
+    name: Test with minikube
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v3
+      - name: Start minikube
+        uses: medyagh/setup-minikube@master
+        with:
+          minikube-version: 1.27.0
+          driver: docker
+          kubernetes-version: v1.23.12
+      - name: test script
+        run: |
+          eval $(minikube docker-env)  
+          ./build-an-deploy.sh
+          while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
+          kubectl logs deployments/wrongsecrets-balancer -f >> pod.log &
+          echo "port forwarding"
+          kubectl port-forward service/wrongsecrets-balancer 3000:3000 &
+          echo "Awaiting the first forward to be ready"
+          sleep 10
+          curl http://localhost:3000/balancer/
+          echo "logs from pod to make sure:"
+          cat pod.log

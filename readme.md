@@ -1,39 +1,46 @@
 # WrongSecrets CTF Party
 _Powered by MultiJuicer_
 
-This is a fork of MultiJuicer, which is now being rebuilt in order to server WrongSecret in creating CTFs. The tracking isssue of the first endavour can be found at https://github.com/commjoen/wrongsecrets/issues/403 .
+Want to play OWASP WrongSecrets in a large group in CTF mode, but not go over all the hassle of setting up local copies of OWASP WrongSecrets? Here is OWASP WrongSecrets CTF Party! This is a fork of OWASP MultiJuicer, which is adapted to become a dynamic multi-tenant setup for doing a CTF together!
 
 Note that we:
-- have a Webtop integrated
-- have a WrongSecrets instance integrated
+- have a [Webtop](https://docs.linuxserver.io/images/docker-webtop) integrated for each player
+- have a WrongSecrets instance integrated for each player
 - A working admin interface which can restart both or delete both (by deleting the full namespace)
 - Do not support any progress watchdog as you will have access to it, we therefore disabled it.
 
 ## Special thanks
-Special thanks to Madhu Akula, Ben de Haan, and Mike Woudenberg for making this port a reality!
+Special thanks to [@madhuakula](https://github.com/madhuakula), [@bendehaan](https://github.com/bendehaan) , and [@mikewoudenberg](https://github.com/mikewoudenberg) for making this port a reality!
 
 
 ## What you need to know
 This environment uses a webtop and an instance of wrongsecrets per user. This means that you need per user:
-- 2.5 CPU (min = 1 , limit = 2.5)
-- 3.5 GB RAM (min 2.5GB, limit = 3.5GB)
+- 2.5 CPU (min = 0.5 , limit = 2.5)
+- 3.5 GB RAM (min 1 GB, limit = 3.5GB)
 - 8GB HD (min 3 GB, limit = 8GB)
 
 ### Running this on minikube
-A 3-6 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 CPUs, 9 GB ram).
+A 3-6 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 virtual CPUs, 9 GB ram).
 
 ### Running this on AWS EKS with larger groups
-A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. If you see heavy under-utilization as players are not very actively engaged: you can often scale down the amount of nodes required.
+A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. Note that this is only the case when all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Very often, you will see that you are using just 25% of what is painted here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
 
-## Status
+## Status - Experimental release
 
-**This is by no means ready for anything, and work in progress.**
-
-Still want to play? Ok, here we go:
-
-We currently only support minikube and AWS EKS (_**Please follow the readme in the aws folder, as the guides section is not updated yet**_).
+This is an experimental release. It showed to work at 2 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we only support using Minikube and AWS EKS (_**Please follow the readme in the AWS folder if you want to use EKS, as the guides section is not updated yet**_).
 
 ## How to use it
+
+In general, we have two type of setups: one is the "manual" setup, for which you need to put all the answers 
+
+### Automated setup
+
+<TBA>
+
+### Manual setup:
+
+<TBA>
+
 
 You need 3 things:
 - This infrastructure
