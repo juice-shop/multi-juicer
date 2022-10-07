@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: wrongsecrets-balancer
   labels:
+    app: wrongsecrets-balancer
     {{- include "wrongsecrets-ctf-party.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.balancer.replicas }}
@@ -15,6 +16,7 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/wrongsecrets-balancer/config-map.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/wrongsecrets-balancer/secret.yaml") . | sha256sum }}
       labels:
+        app: wrongsecrets-balancer
         {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
