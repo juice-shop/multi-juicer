@@ -31,23 +31,25 @@ This is an experimental release. It showed to work at 2 CTFs already, we just di
 
 ## How to use it
 
-In general, we have two type of setups: one is the "manual" setup, for which you need to put all the answers 
+The different setups are explained in [OWASP WrongSecrets CTF-instructions](https://github.com/commjoen/wrongsecrets/blob/master/ctf-instructions.md). With the 3-domain approach you generate flags for CTFD automatically, while with the 2-domain setup you need to set it up manually.
 
-### Automated setup
-
-<TBA>
-
-### Manual setup:
-
-<TBA>
-
+### Approach 1: 3-domain setup
 
 You need 3 things:
 - This infrastructure
 - The actual place where correct answers are exchanged for CTFD-flags. This can be your fly.dev/heroku/etc. or local container of WrongSecrets running in CTF mode with the additional key setup for challenge 8.
 - A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application.
 
-### Action with Minikube:
+### Approach 2: 2-domain setup
+
+You need 2 things:
+- This infrastructure
+- A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application.
+
+
+
+
+### Play with Minikube:
 
 For minikube, run:
 
@@ -67,7 +69,7 @@ kubectl top nodes
 kubectl top pods
 ```
 
-### Action with AWS EKSS:
+### Play with AWS EKS:
 
 ** NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your AWS bill. **
 

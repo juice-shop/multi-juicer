@@ -1,17 +1,21 @@
-![MultiJuicer, Multi User Juice Shop Platform](https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-cover.svg)
+![WrongSecrets CTF Party, to use WrongSecrets for CTF or online Education](https://raw.githubusercontent.com/commjoen/wrongsecrets/master/icon.png)
+_Powered by MultiJuicer_
 
-Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
-Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
+Running CTFs and Security Trainings with [OWASP WrongSecrets](https://github.com/commjoen/wrongsecrets) is usually quite tricky, WrongSecrets can be used by multiple users at one time, but this can cause issues when people start fuzzing.
+Instructing everybody how to start WrongSecrets on their own machine works ok, but takes away too much valuable time.
+Next, installing the additional tools required to learn basics of reverse-engineering might take to much time as well.
 
-MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
+WrongSecrets CTF Party gives you the ability to run separate WrongSecrets instances for every participant on a central kubernetes cluster, to run events without the need for local WrongSecrets instances.
 
 **What it does:**
 
-- dynamically create new Juice Shop instances when needed
-- runs on a single domain, comes with a LoadBalancer sending the traffic to the participants Juice Shop instance
+- dynamically create new WrongSecrets instance when needed
+- dynamically create new WrongSecret virtual desktop instances with all the addiontal tooling required to do the CTF/training when needed
+- runs on a single domain, comes with a LoadBalancer sending the traffic to the participants WrongSecrets instance
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
+It follows the same architecture as MultiJuicer below:
 ![MultiJuicer, High Level Architecture Diagram](https://raw.githubusercontent.com/iteratec/multi-juicer/main/high-level-architecture.svg)
 
 ## Configuration

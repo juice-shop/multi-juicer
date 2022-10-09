@@ -25,21 +25,6 @@ const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL
 const { get } = require('./config');
 const { logger } = require('./logger');
 
-//used for owner ref, not used now:
-// const lodashGet = require('lodash/get');
-// const once = require('lodash/once');
-
-//used for owner ref, not used now:
-// Gets the Deployment uid for the JuiceBalancer
-// This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
-// const getJuiceBalancerDeploymentUid = once(async () => {
-//   const deployment = await k8sAppsApi.readNamespacedDeployment(
-//     'wrongsecrets-balancer',
-//     get('namespace')
-//   );
-//   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
-// });
-
 const createNameSpaceForTeam = async (team) => {
   const namedNameSpace = {
     apiVersion: 'v1',
@@ -112,7 +97,6 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/challengesSolved': '0',
         'wrongsecrets-ctf-party/challenges': '[]',
       },
-      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -351,7 +335,6 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/challengesSolved': '0',
         'wrongsecrets-ctf-party/challenges': '[]',
       },
-      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -1066,7 +1049,6 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/passcode': passcodeHash,
         'wrongsecrets-ctf-party/challengesSolved': '0',
       },
-      // ...(await getOwnerReference()),
     },
     spec: {
       selector: {
@@ -1181,7 +1163,6 @@ const createServiceForTeam = async (teamname) =>
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        // ...(await getOwnerReference()),
       },
       spec: {
         selector: {
@@ -1212,7 +1193,6 @@ const createDesktopServiceForTeam = async (teamname) =>
           team: teamname,
           'deployment-context': get('deploymentContext'),
         },
-        // ...(await getOwnerReference()),
       },
       spec: {
         selector: {
@@ -1232,25 +1212,6 @@ const createDesktopServiceForTeam = async (teamname) =>
       throw new Error(error.response.body.message);
     });
 module.exports.createDesktopServiceForTeam = createDesktopServiceForTeam;
-
-//used for owner ref, not used now as we cannot do clusterwide owning of namespaced items:
-// async function getOwnerReference() {
-//   if (get('skipOwnerReference') === true) {
-//     return {};
-//   }
-//   return {
-//     ownerReferences: [
-//       {
-//         apiVersion: 'apps/v1',
-//         blockOwnerDeletion: true,
-//         controller: true,
-//         kind: 'Deployment',
-//         name: 'wrongsecrets-balancer',
-//         uid: await getJuiceBalancerDeploymentUid(),
-//       },
-//     ],
-//   };
-// }
 
 const getJuiceShopInstances = () =>
   k8sAppsApi
