@@ -1,4 +1,4 @@
-const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
+const { KubeConfig, AppsV1Api } = require('@kubernetes/client-node');
 
 const { parseTimeDurationString, msToHumanReadable } = require('./time');
 
@@ -6,7 +6,6 @@ const kc = new KubeConfig();
 kc.loadFromCluster();
 
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
-const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
 const MaxInactiveDuration = process.env['MAX_INACTIVE_DURATION'];
 const MaxInactiveDurationInMs = parseTimeDurationString(MaxInactiveDuration);
@@ -67,16 +66,13 @@ async function main() {
       );
       var teamname = instance.metadata.labels.team;
       console.log(`Instance belongs to namespace ${teamname}`);
-      s
       try {
-        console.log(`not yet implemented, but would be deleting namespace ${teamname} now`)
+        console.log(`not yet implemented, but would be deleting namespace ${teamname} now`);
         // await k8sAppsApi.deleteNamespacedDeployment(instanceName, teamname);
         counts.successful.deployments++;
       } catch (error) {
         counts.failed.deployments++;
-        console.error(
-          `Failed to delete namespace '${teamname}'`
-        );
+        console.error(`Failed to delete namespace '${teamname}'`);
         console.error(error);
       }
     } else {
