@@ -8,6 +8,7 @@ Note that we:
 - have a WrongSecrets instance integrated for each player
 - A working admin interface which can restart both or delete both (by deleting the full namespace)
 - Do not support any progress watchdog as you will have access to it, we therefore disabled it.
+- It can cleanup old & unused namespaces automatically.
 
 ## Special thanks
 Special thanks to [@madhuakula](https://github.com/madhuakula), [@bendehaan](https://github.com/bendehaan) , and [@mikewoudenberg](https://github.com/mikewoudenberg) for making this port a reality!
@@ -19,11 +20,12 @@ This environment uses a webtop and an instance of wrongsecrets per user. This me
 - 3.5 GB RAM (min 1 GB, limit = 3.5GB)
 - 8GB HD (min 3 GB, limit = 8GB)
 
+
 ### Running this on minikube
 A 3-6 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 virtual CPUs, 9 GB ram).
 
 ### Running this on AWS EKS with larger groups
-A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. Note that this is only the case when all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Very often, you will see that you are using just 25% of what is painted here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
+A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
 
 ## Status - Experimental release
 
@@ -61,7 +63,7 @@ eval $(minikube docker-env)
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
-Want to know whether your system is holding up? use 
+Want to know whether your system is holding up? use
 
 ```shell
 minikube addons enable metrics-server
@@ -87,24 +89,8 @@ Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun
 
 
 
+ORIGINAL README:
 
-Original readme:
-
-
-
-![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
-
-Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
-Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
-
-MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
-
-**What it does:**
-
-- dynamically create new Juice Shop instances when needed
-- runs on a single domain, comes with a LoadBalancer sending the traffic to the participants Juice Shop instance
-- backup and auto apply challenge progress in case of Juice Shop container restarts
-- cleanup old & unused instances automatically
 
 ![MultiJuicer, High Level Architecture Diagram](./images/high-level-architecture.svg)
 

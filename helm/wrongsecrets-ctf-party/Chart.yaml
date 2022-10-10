@@ -1,7 +1,7 @@
 apiVersion: v2
 name: wrongsecrets-ctf-party
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
-icon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only.png
+icon: https://github.com/commjoen/wrongsecrets/blob/master/icon.png?raw=true
 
 home: https://github.com/
 sources:
@@ -28,10 +28,10 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 5.0.0-beta.0
+version: 0.1.0-alpha
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 5.0.0-beta.0
+appVersion: 1.5.8
 
 dependencies: []
