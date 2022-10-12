@@ -3,18 +3,15 @@ kind: Deployment
 metadata:
   name: 'progress-watchdog'
   labels:
-    app: 'progress-watchdog'
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.progress-watchdog.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: 'progress-watchdog'
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "multi-juicer.progress-watchdog.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: 'progress-watchdog'
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "multi-juicer.progress-watchdog.labels" . | nindent 8 }}
     spec:
       serviceAccountName: progress-watchdog
       {{- with .Values.progressWatchdog.securityContext }}

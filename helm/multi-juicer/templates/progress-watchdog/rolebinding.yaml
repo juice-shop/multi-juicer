@@ -4,7 +4,7 @@ metadata:
   name: progress-watchdog
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.progress-watchdog.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
     name: progress-watchdog # Name is case sensitive

@@ -4,7 +4,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   name: juice-balancer
   labels:
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.juice-balancer.labels" . | nindent 4 }}
 rules:
   - apiGroups: ['apps']
     resources: ['deployments']

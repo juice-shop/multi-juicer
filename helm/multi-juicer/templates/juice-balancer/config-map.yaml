@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: juice-balancer-config
   labels:
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.juice-balancer.labels" . | nindent 4 }}
 data:
   config.json: |
     {

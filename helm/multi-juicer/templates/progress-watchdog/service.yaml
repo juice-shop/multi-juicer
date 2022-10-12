@@ -3,8 +3,7 @@ kind: Service
 metadata:
   name: progress-watchdog
   labels:
-    app.kubernetes.io/name: 'progress-watchdog'
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "multi-juicer.progress-watchdog.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   ports:
@@ -13,5 +12,4 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app.kubernetes.io/name: 'progress-watchdog'
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "multi-juicer.progress-watchdog.selectorLabels" . | nindent 4 }}

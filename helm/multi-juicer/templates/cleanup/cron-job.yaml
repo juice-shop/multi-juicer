@@ -7,6 +7,8 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: 'cleanup-job'
+  labels:
+    {{- include "multi-juicer.cleaner.labels" . | nindent 4 }}
 spec:
   schedule: {{ .Values.juiceShopCleanup.cron }}
   successfulJobsHistoryLimit: {{ .Values.juiceShopCleanup.successfulJobsHistoryLimit }}
@@ -16,8 +18,7 @@ spec:
       template:
         metadata:
           labels:
-            name: 'cleanup-job'
-            helm.sh/chart: {{ include "multi-juicer.chart" . }}
+            {{- include "multi-juicer.cleaner.labels" . | nindent 12 }}
         spec:
           serviceAccountName: 'juice-cleaner'
           {{- with .Values.juiceShopCleanup.securityContext }}

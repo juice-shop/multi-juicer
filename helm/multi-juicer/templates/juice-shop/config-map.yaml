@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: juice-shop-config
   labels:
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.juice-shop.labels" . | nindent 4 }}
 data:
   multi-juicer.yaml: |-
 {{ .Values.juiceShop.config | indent 4 }}

@@ -5,7 +5,7 @@ metadata:
   name: juice-cleaner
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    helm.sh/chart: {{ include "multi-juicer.chart" . }}
+    {{- include "multi-juicer.cleaner.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
     name: juice-cleaner # Name is case sensitive
