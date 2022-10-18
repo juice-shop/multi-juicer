@@ -7,13 +7,21 @@ echo "For example docker-desktop with its included k8s cluster"
 echo "Usage: ./build-an-deploy.sh"
 
 source ./scripts/check-available-commands.sh
-checkCommandsAvailable helm docker kubectl
+checkCommandsAvailable helm docker kubectl yq
 
 version="$(uuidgen)"
-
+WRONGSECRETS_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecrets.image')
+WRONGSECRETS_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecrets.tag')
+WEBTOP_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.virtualdesktop.image')
+WEBTOP_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.virtualdesktop.tag')
+echo "Pulling in required images to actually run $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG & $WEBTOP_IMAGE:$WEBTOP_TAG." 
+echo "If you see an authentication failure: pull them manually by the following 2 commands"
+echo "'docker pull $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG'" 
+echo "'docker pull jeroenwillemsen/jeroenwillemsen/$WEBTOP_IMAGE:$WEBTOP_TAG'" &
+docker pull $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG &
+docker pull jeroenwillemsen/jeroenwillemsen/$WEBTOP_IMAGE:$WEBTOP_TAG &
 docker build -t local/wrongsecrets-balancer:$version ./wrongsecrets-balancer &
 docker build -t local/cleaner:$version ./cleaner &
-docker pull jeroenwillemsen/wrongsecrets:1.5.8-no-vault 
 wait
 
 helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Never" --set="balancer.repository=local/wrongsecrets-balancer" --set="balancer.tag=$version" --set="wrongsecretsCleanup.repository=local/cleaner" --set="wrongsecretsCleanup.tag=$version"
