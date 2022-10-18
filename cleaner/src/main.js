@@ -76,6 +76,7 @@ async function main() {
         console.error(error);
       }
     } else {
+      var teamname = instance.metadata.labels.team;
       console.log(
         `Not deleting Instance: '${instanceName}' from '${teamname}'. Been last active ${msToHumanReadable(
           timeDifference

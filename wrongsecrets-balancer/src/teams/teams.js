@@ -126,11 +126,11 @@ async function validatePassword(req, res, next) {
       if (password === accessPassword) {
         next();
       } else {
-        res.status(403).send({ message: 'Go home pizzaboy!' });
+        res.status(403).send({ message: 'Go home pizzaboy! https://www.youtube.com/watch?v=qyTj4WnPE9M' });
       }
     }
   } catch (error) {
-    res.status(500).send({ message: 'Go home pizzaboy!' });
+    res.status(500).send({ message: 'Go home pizzaboy! https://www.youtube.com/watch?v=qyTj4WnPE9M' });
   }
 }
 

@@ -1047,7 +1047,6 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
         'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
         'wrongsecrets-ctf-party/passcode': passcodeHash,
-        'wrongsecrets-ctf-party/challengesSolved': '0',
       },
     },
     spec: {
