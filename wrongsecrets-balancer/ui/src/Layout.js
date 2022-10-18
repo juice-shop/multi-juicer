@@ -131,7 +131,9 @@ export function Layout({ children, footer, siteHeader = null, wide = false }) {
           <HeaderCard wide={wide}>
             <WSLogo alt="WrongSecretsLogo" /> WrongSecrets CTF, powered by
             <MJLogo alt="MultiJuicer Logo" />
-            {siteHeader ? <SiteHeader>WrongSecrets CTF, powered by MultiJuicer - {siteHeader}</SiteHeader> : null}
+            {siteHeader ? (
+              <SiteHeader>WrongSecrets CTF, powered by MultiJuicer - {siteHeader}</SiteHeader>
+            ) : null}
           </HeaderCard>
         </Header>
         <Body>
