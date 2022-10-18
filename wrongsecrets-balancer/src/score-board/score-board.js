@@ -7,6 +7,7 @@ const { logger } = require('../logger');
 
 // Generated via curl https://wrongsecrets-ctf.herokuapp.com/api/challenges | jq '.data | map({ key: .key, value: .difficulty }) | from_entries'
 const keyDifficultyMapping = Object.freeze({
+  challenge0: 1,
   challenge1: 1,
   challenge2: 1,
   challenge3: 1,
@@ -31,6 +32,9 @@ const keyDifficultyMapping = Object.freeze({
   challenge22: 5,
   challenge23: 1,
   challenge24: 2,
+  challenge25: 2,
+  challenge26: 2,
+  challenge27: 2,
 });
 
 /**

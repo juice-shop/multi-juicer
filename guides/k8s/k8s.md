@@ -1,6 +1,8 @@
 # Example Setup with kubernetes(k8s)
 
 **WARNING:** It takes into account that you already have k8s cluster setup.
+**WARNING-2:** this document is not yet up to date, it will be fixed in [https://github.com/commjoen/wrongsecrets-ctf-party/issues/79](https://github.com/commjoen/wrongsecrets-ctf-party/issues/79).
+
 
 ## Prerequisites
 

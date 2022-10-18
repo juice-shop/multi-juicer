@@ -15,5 +15,5 @@ rules:
     verbs: ['get', 'delete']
   - apiGroups: [''] # "" indicates the core API group
     resources: ['namespaces']
-    verbs: ['get', 'delete']
+    verbs: ['get', 'delete', 'list']
 {{- end }}

@@ -1,14 +1,11 @@
-const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
+const { KubeConfig, AppsV1Api } = require('@kubernetes/client-node');
 
 const { parseTimeDurationString, msToHumanReadable } = require('./time');
-
-const Namespace = process.env['NAMESPACE'];
 
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
-const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
 const MaxInactiveDuration = process.env['MAX_INACTIVE_DURATION'];
 const MaxInactiveDurationInMs = parseTimeDurationString(MaxInactiveDuration);
@@ -36,7 +33,7 @@ async function main() {
   };
 
   console.log(
-    `Looking for WrongSecerets Instances which have been inactive for more than ${MaxInactiveDuration}.`
+    `Looking for Instances & namespaces which have been inactive for more than ${MaxInactiveDuration}.`
   );
   const instances = await k8sAppsApi.listDeploymentForAllNamespaces(
     true,
@@ -51,7 +48,7 @@ async function main() {
   for (const instance of instances.body.items) {
     const instanceName = instance.metadata.name;
     const lastConnectTimestamps = parseInt(
-      instance.metadata.annotations['wrongsecrets.owasp.dev/lastRequest'],
+      instance.metadata.annotations['wrongsecrets-ctf-party/lastRequest'],
       10
     );
 
@@ -60,33 +57,26 @@ async function main() {
     const currentTime = new Date().getTime();
 
     const timeDifference = currentTime - lastConnectTimestamps;
-
+    var teamname = instance.metadata.labels.team;
     if (timeDifference > MaxInactiveDurationInMs) {
       console.log(
-        `Deleting Instance: '${instanceName}'. Instance hasn't been used in ${msToHumanReadable(
+        `Instance: '${instanceName}'. Instance hasn't been used in ${msToHumanReadable(
           timeDifference
         )}.`
       );
+      console.log(`Instance belongs to namespace ${teamname}`);
       try {
-        await k8sAppsApi.deleteNamespacedDeployment(instanceName, Namespace);
+        console.log(`not yet implemented, but would be deleting namespace ${teamname} now`);
+        // await k8sAppsApi.deleteNamespacedDeployment(instanceName, teamname);
         counts.successful.deployments++;
       } catch (error) {
         counts.failed.deployments++;
-        console.error(
-          `Failed to delete deployment: '${instanceName}' from namespace '${Namespace}'`
-        );
+        console.error(`Failed to delete namespace '${teamname}'`);
         console.error(error);
-      }
-      try {
-        await k8sCoreApi.deleteNamespacedService(instanceName, Namespace);
-        counts.successful.services++;
-      } catch (error) {
-        counts.failed.services++;
-        console.error(`Failed to delete service: '${instanceName}' from namespace '${Namespace}'`);
       }
     } else {
       console.log(
-        `Not deleting Instance: '${instanceName}'. Been last active ${msToHumanReadable(
+        `Not deleting Instance: '${instanceName}' from '${teamname}'. Been last active ${msToHumanReadable(
           timeDifference
         )} ago.`
       );

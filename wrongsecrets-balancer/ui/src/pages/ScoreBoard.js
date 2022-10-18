@@ -201,6 +201,8 @@ export const ScoreBoard = injectIntl(() => {
   return (
     <>
       <NoPaddingBodyCard>
+        Please note that the scoreboard is currently not functioning. It does tell you which other
+        players play, but it is not yet ready to be used.
         <Table>
           <Thead>
             <Tr>

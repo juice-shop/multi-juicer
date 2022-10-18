@@ -63,15 +63,16 @@ balancer:
   # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
   skipOwnerReference: false
   env:
-    REACT_APP_MOVING_GIF_LOGO : 'https://i.gifer.com/9kGQ.gif'
-    REACT_APP_HEROKU_WRONGSECRETS_URL : 'https://wrongsecrets-ctf.herokuapp.com'
-    REACT_APP_CTFD_URL : 'https://ctfd.io'
-    REACT_APP_S3_BUCKET_URL : 's3://funstuff'
-    K8S_ENV: 'k8s' #oraws
+    REACT_APP_MOVING_GIF_LOGO : 'https://i.gifer.com/9kGQ.gif' #displayed at the frontend when you enter the CTF
+    REACT_APP_HEROKU_WRONGSECRETS_URL : 'https://wrongsecrets-ctf.herokuapp.com' #required for 3 domain setup
+    REACT_APP_CTFD_URL : 'https://ctfd.io' #requierd for 2 and 3 domain setup
+    REACT_APP_S3_BUCKET_URL : 's3://funstuff' #the s3 bucket you use for teh aws challenges, don't forget to make it accessible!
+    K8S_ENV: 'k8s' #or 'aws'
     REACT_APP_ACCESS_PASSWORD: '' #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
-    IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager
-    SECRETS_MANAGER_SECRET_ID_1: 'wrongsecret'
-    SECRETS_MANAGER_SECRET_ID_2: 'wrongsecret-2'
+    REACT_APP_CREATE_TEAM_HMAC_KEY: 'hardcodedkey'
+    IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
+    SECRETS_MANAGER_SECRET_ID_1: 'wrongsecret' #only change if you need non-default AWS SM entries
+    SECRETS_MANAGER_SECRET_ID_2: 'wrongsecret-2' #only change if you need non-default AWS SM entries
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
@@ -96,7 +97,7 @@ wrongsecrets:
   maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsens/wrongsecrets
-  tag: 1.5.7-no-vault
+  tag: 1.5.8-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/commjoen/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
@@ -176,29 +177,14 @@ wrongsecrets:
   runtimeClassName: null
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
-#progressWatchdog:
-#  repository: iteratec/unusued-progress-watchdog
-#  tag: null
-#  resources:
-#    requests:
-#      memory: 48Mi
-#      cpu: 20m
-#    limits:
-#      memory: 48Mi
-#      cpu: 20m
-#  securityContext: {}
-#  # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-#  affinity: {}
-#  # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-#  tolerations: []
 
 #the virtual desktop for the deploymebt
 virtualdesktop:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 500
   # -- Juice Shop Image to use
-  image: jeroenwillemsen/wrongsecrets-desktop
-  tag: test2
+  image: jeroenwillemsen/wrongsecrets-desktop-k8s
+  tag: 1.5.8
   repository: commjoenie/wrongSecrets
   resources:
     request:
