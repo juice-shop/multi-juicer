@@ -38,5 +38,23 @@
     },
     "tolerations": [],
     "affinity": {}
+  },
+  "virtualdesktop": {
+    "image": "jeroenwillemsen/wrongsecrets-desktop-k8s",
+    "tag": "latest-no-vault",
+    "imagePullPolicy": "IfNotPresent",
+    "nodeEnv": "wrongsecrets-ctf-party",
+    "resources:": {
+      "requests": {
+        "memory": "256Mi",
+        "cpu": "200m"
+      },
+      "limits": {
+        "memory": "256Mi",
+        "cpu": "200m"
+      }
+    },
+    "tolerations": [],
+    "affinity": {}
   }
 }

@@ -24,7 +24,7 @@ data:
         "enabled": true
       },
   {{- end }}
-      "juiceShop": {
+      "wrongsecrets": {
         "image": {{ .Values.wrongsecrets.image | quote }},
         "tag": {{ .Values.wrongsecrets.tag | quote }},
         "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},

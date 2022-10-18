@@ -49,7 +49,16 @@ You need 2 things:
 - A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application.
 
 
+### General Helm usage
 
+This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the AWS Challenges, do:
+
+```shell
+
+helm upgrade --install mj ./helm/wrongsecrets-ctf-party 
+
+```
+from this repo. We will host the helm chart soon for you.
 
 ### Play with Minikube:
 
@@ -80,46 +89,14 @@ For AWS EKS follow the instrucrtions in the `/eks` folder.
 Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
 
 
+### Some production notes
 
-
-
-
-
-
-
-
-
-ORIGINAL README:
-
-
-![MultiJuicer, High Level Architecture Diagram](./images/high-level-architecture.svg)
-
-## Installation
-
-MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh).
-
-```sh
-helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
-
-helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
-```
-
-See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
-
-### Installation Guides for specific Cloud Providers / Environments
-
-Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with MultiJuicer installed for some specific Cloud providers.
-
-- [Digital Ocean](./guides/digital-ocean/digital-ocean.md)
-- [AWS](./guides/aws/aws.md)
-- [OpenShift](./guides/openshift/openshift.md)
-- [Plain Kubernetes](./guides/k8s/k8s.md)
-- [Azure](./guides/azure/azure.md)
+See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using Wrongsecrets-ctf-party in proper events.
 
 ### Customizing the Setup
 
-You got some options on how to setup the stack, with some option to customize the JuiceShop instances to your own liking.
-You can find the default config values under: [helm/multi-juicer/values.yaml](helm/wrongsecrets-ctf-party/values.yaml)
+You got some options on how to setup the stack, with some option to customize the WrongSecrets and Virtual desktop instances to your own liking.
+You can find the default config values under: [helm/wrongsecrets-ctf-party/values.yaml](helm/wrongsecrets-ctf-party/values.yaml)
 
 Download & Save the file and tell helm to use your config file over the default by running:
 
@@ -134,21 +111,6 @@ helm delete wrongsecrets-ctf-party
 ```
 
 ## FAQ
-
-### How much compute resources will the cluster require?
-
-To be on the safe side calculate with:
-
-- _1GB memory & 1CPU overhead_, for the balancer & co
-- _200MB & 0.2CPU \* number of participants_, for the individual JuiceShop Instances
-
-The numbers above reflect the default resource limits. These can be tweaked, see: [Customizing the Setup](#customizing-the-setup)
-
-### How many users can MultiJuicer handle?
-
-There is no real fixed limit. (Even thought you can configure one 😉)
-The custom LoadBalancer, through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
-You can also attach a [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to automatically scale the LoadBalancer.
 
 ### Why a custom LoadBalancer?
 
@@ -168,14 +130,17 @@ There are some pretty good reasons for this:
 - To ensure that pods are still properly associated with teams after a pod gets recreated. This is a non problem with separate deployment and really hard with scaled deployments.
 - The ability to embed the team name in the deployment name. This seems like a stupid reason but make debugging SOOO much easier, with just using `kubectl`.
 
-### How to manage JuiceShop easily using `kubectl`?
+### How to manage WrongSecrets easily using `kubectl`?
 
-You can list all JuiceShops with relevant information using the custom-columns feature of kubectl.
-You'll need to down load the juiceShop.txt from the repository first:
+You can list all WrongSecrets with relevant information using the custom-columns feature of kubectl.
+You'll need to down load the wrongsecrets.txt from the repository first:
 
 ```bash
-kubectl get -l app=wrongsecrets -o custom-columns-file=juiceShop.txt deployments
+kubectl get -l app=wrongsecrets -o custom-columns-file=wrongsecrets.txt deployments
 ```
+
+There are a few more ways how you can check whether all is going well: have a look in the [/scripts](/scripts/) folder for various tools that can help you to see if there are too many namespaces created for instance. This does require you to export the teams and players from ctfd.
+
 
 ### Did somebody actually ask any of these questions?
 
@@ -183,4 +148,4 @@ No 😉
 
 ## Talk with Us!
 
-You can reach us in the `#project-juiceshop` channel of the OWASP Slack Workspace. We'd love to hear any feedback or usage reports you got. If you are not already in the OWASP Slack Workspace, you can join via [this link](https://owasp.slack.com/join/shared_invite/enQtNjExMTc3MTg0MzU4LWQ2Nzg3NGJiZGQ2MjRmNzkzN2Q4YzU1MWYyZTdjYjA2ZTA5M2RkNzE2ZjdkNzI5ZThhOWY5MjljYWZmYmY4ZjM)
+You can reach us in the `#project-wrongsecrets` channel of the OWASP Slack Workspace. We'd love to hear any feedback or usage reports you got. If you are not already in the OWASP Slack Workspace, you can join via [this link](https://owasp.slack.com/join/shared_invite/enQtNjExMTc3MTg0MzU4LWQ2Nzg3NGJiZGQ2MjRmNzkzN2Q4YzU1MWYyZTdjYjA2ZTA5M2RkNzE2ZjdkNzI5ZThhOWY5MjljYWZmYmY4ZjM)
