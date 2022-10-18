@@ -57,14 +57,13 @@ async function main() {
     const currentTime = new Date().getTime();
 
     const timeDifference = currentTime - lastConnectTimestamps;
-
+    var teamname = instance.metadata.labels.team;
     if (timeDifference > MaxInactiveDurationInMs) {
       console.log(
         `Instance: '${instanceName}'. Instance hasn't been used in ${msToHumanReadable(
           timeDifference
         )}.`
       );
-      var teamname = instance.metadata.labels.team;
       console.log(`Instance belongs to namespace ${teamname}`);
       try {
         console.log(`not yet implemented, but would be deleting namespace ${teamname} now`);
@@ -76,7 +75,6 @@ async function main() {
         console.error(error);
       }
     } else {
-      var teamname = instance.metadata.labels.team;
       console.log(
         `Not deleting Instance: '${instanceName}' from '${teamname}'. Been last active ${msToHumanReadable(
           timeDifference
