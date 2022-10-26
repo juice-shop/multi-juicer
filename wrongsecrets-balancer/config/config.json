@@ -22,7 +22,7 @@
   },
   "wrongsecrets": {
     "image": "jeroenwillemsen/wrongsecrets",
-    "tag": "1.5.8-no-vault",
+    "tag": "1.5.9-no-vault",
     "imagePullPolicy": "IfNotPresent",
     "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
     "nodeEnv": "wrongsecrets-ctf-party",
@@ -41,7 +41,7 @@
   },
   "virtualdesktop": {
     "image": "jeroenwillemsen/wrongsecrets-desktop-k8s",
-    "tag": "1.5.8",
+    "tag": "1.5.9",
     "imagePullPolicy": "IfNotPresent",
     "nodeEnv": "wrongsecrets-ctf-party",
     "resources:": {
