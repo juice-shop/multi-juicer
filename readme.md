@@ -88,7 +88,7 @@ kubectl top pods
 
 ** NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your AWS bill. **
 
-For AWS EKS follow the instrucrtions in the `/eks` folder.
+For AWS EKS follow the instrucrtions in the `/aws` folder.
 
 Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
 
