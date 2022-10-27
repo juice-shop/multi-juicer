@@ -271,6 +271,7 @@ const updateLastRequestTimestampForTeam = (teamname) => {
     undefined,
     undefined,
     undefined,
+    undefined,
     { headers }
   );
 };
@@ -290,6 +291,7 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
     `${teamname}-juiceshop`,
     get('namespace'),
     deploymentPatch,
+    undefined,
     undefined,
     undefined,
     undefined,
