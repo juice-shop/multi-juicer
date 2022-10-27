@@ -44,7 +44,7 @@ async function main() {
     undefined,
     undefined,
     undefined,
-    'app=juice-shop'
+    'app.kubernetes.io/name=juice-shop'
   );
 
   console.log(`Found ${instances.body.items.length} instances. Checking their activity.`);

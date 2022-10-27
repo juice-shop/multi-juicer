@@ -22,9 +22,13 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
     metadata: {
       name: `t-${team}-juiceshop`,
       labels: {
-        app: 'juice-shop',
         team,
-        'deployment-context': get('deploymentContext'),
+        'app.kubernetes.io/version': get('juiceShop.tag'),
+        'app.kubernetes.io/component': 'vulnerable-app',
+        'app.kubernetes.io/managed-by': get('deploymentContext'),
+        'app.kubernetes.io/name': 'juice-shop',
+        'app.kubernetes.io/instance': `juice-shop-${get('deploymentContext')}`,
+        'app.kubernetes.io/part-of': 'multi-juicer',
       },
       annotations: {
         'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
@@ -38,17 +42,21 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
     spec: {
       selector: {
         matchLabels: {
-          app: 'juice-shop',
           team,
-          'deployment-context': get('deploymentContext'),
+          'app.kubernetes.io/name': 'juice-shop',
+          'app.kubernetes.io/managed-by': get('deploymentContext'),
         },
       },
       template: {
         metadata: {
           labels: {
-            app: 'juice-shop',
             team,
-            'deployment-context': get('deploymentContext'),
+            'app.kubernetes.io/version': get('juiceShop.tag'),
+            'app.kubernetes.io/name': 'juice-shop',
+            'app.kubernetes.io/managed-by': get('deploymentContext'),
+            'app.kubernetes.io/component': 'vulnerable-app',
+            'app.kubernetes.io/instance': `juice-shop-${get('deploymentContext')}`,
+            'app.kubernetes.io/part-of': 'multi-juicer',
           },
         },
         spec: {
@@ -142,17 +150,21 @@ const createServiceForTeam = async (teamname) =>
       metadata: {
         name: `t-${teamname}-juiceshop`,
         labels: {
-          app: 'juice-shop',
           team: teamname,
-          'deployment-context': get('deploymentContext'),
+          'app.kubernetes.io/version': get('juiceShop.tag'),
+          'app.kubernetes.io/name': 'juice-shop',
+          'app.kubernetes.io/managed-by': get('deploymentContext'),
+          'app.kubernetes.io/component': 'vulnerable-app',
+          'app.kubernetes.io/instance': `juice-shop-${get('deploymentContext')}`,
+          'app.kubernetes.io/part-of': 'multi-juicer',
         },
         ...(await getOwnerReference()),
       },
       spec: {
         selector: {
-          app: 'juice-shop',
           team: teamname,
-          'deployment-context': get('deploymentContext'),
+          'app.kubernetes.io/name': 'juice-shop',
+          'app.kubernetes.io/managed-by': get('deploymentContext'),
         },
         ports: [
           {
@@ -192,7 +204,10 @@ const getJuiceShopInstances = () =>
       undefined,
       undefined,
       undefined,
-      `app=juice-shop,deployment-context=${get('deploymentContext')}`
+      [
+        `app.kubernetes.io/name=juice-shop`,
+        `app.kubernetes.io/managed-by=${get('deploymentContext')}`,
+      ].join(',')
     )
     .catch((error) => {
       throw new Error(error.response.body.message);
@@ -224,7 +239,11 @@ const deletePodForTeam = async (team) => {
     undefined,
     undefined,
     undefined,
-    `app=juice-shop,team=${team},deployment-context=${get('deploymentContext')}`
+    [
+      `team=${team}`,
+      `app.kubernetes.io/name=juice-shop`,
+      `app.kubernetes.io/managed-by=${get('deploymentContext')}`,
+    ].join(',')
   );
 
   const pods = res.body.items;

@@ -10,8 +10,8 @@ spec:
     - team
   selector:
     matchLabels:
-      app: juice-shop
-      deployment-context: {{ .Release.Name | quote }}
+      app.kubernetes.io/name: 'juice-shop'
+      app.kubernetes.io/managed-by: {{ .Release.Name | quote }}
   endpoints:
     - targetPort: 3000
 {{- end }}
