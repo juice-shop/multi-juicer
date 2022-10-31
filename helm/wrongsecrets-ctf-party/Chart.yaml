@@ -1,11 +1,11 @@
 apiVersion: v2
 name: wrongsecrets-ctf-party
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
-icon: https://github.com/commjoen/wrongsecrets/blob/master/icon.png?raw=true
+icon: https://github.com/OWASP/wrongsecrets/blob/master/icon.png?raw=true
 
 home: https://github.com/
 sources:
-  - https://github.com/commjoen/wrongsecrets-ctf-party
+  - https://github.com/OWASP/wrongsecrets-ctf-party
 
 keywords:
   - security

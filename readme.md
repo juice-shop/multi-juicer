@@ -1,9 +1,9 @@
 # WrongSecrets CTF Party
 _Powered by MultiJuicer_
-[![CodeQL](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/codeql-analysis.yml)
-[![Pre-commit check](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/pre-commit.yml)
-[![Run Tests](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/test.yml/badge.svg)](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/test.yml)
-[![Test minikube script (k8s)](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/minikube-k8s-test.yml/badge.svg)](https://github.com/commjoen/wrongsecrets-ctf-party/actions/workflows/minikube-k8s-test.yml)
+[![CodeQL](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/codeql-analysis.yml)
+[![Pre-commit check](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/pre-commit.yml)
+[![Run Tests](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/test.yml/badge.svg)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/test.yml)
+[![Test minikube script (k8s)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/minikube-k8s-test.yml/badge.svg)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/minikube-k8s-test.yml)
 
 Want to play OWASP WrongSecrets in a large group in CTF mode, but not go over all the hassle of setting up local copies of OWASP WrongSecrets? Here is OWASP WrongSecrets CTF Party! This is a fork of OWASP MultiJuicer, which is adapted to become a dynamic multi-tenant setup for doing a CTF together!
 
@@ -37,7 +37,7 @@ This is an experimental release. It showed to work at 2 CTFs already, we just di
 
 ## How to use it
 
-The different setups are explained in [OWASP WrongSecrets CTF-instructions](https://github.com/commjoen/wrongsecrets/blob/master/ctf-instructions.md). With the 3-domain approach you generate flags for CTFD automatically, while with the 2-domain setup you need to set it up manually.
+The different setups are explained in [OWASP WrongSecrets CTF-instructions](https://github.com/OWASP/wrongsecrets/blob/master/ctf-instructions.md). With the 3-domain approach you generate flags for CTFD automatically, while with the 2-domain setup you need to set it up manually.
 
 ### Approach 1: 3-domain setup
 
