@@ -17,6 +17,26 @@ Note that we:
 ## Special thanks
 Special thanks to [@madhuakula](https://github.com/madhuakula), [@bendehaan](https://github.com/bendehaan) , and [@mikewoudenberg](https://github.com/mikewoudenberg) for making this port a reality!
 
+### Sponsorships
+
+We would like to thank the following parties for helping us out:
+
+[![gitguardian_logo.png](images/gitguardian_logo.jpeg)](https://blog.gitguardian.com/gitguardian-is-proud-sponsor-of-owasp/)
+
+[GitGuardian](https://blog.gitguardian.com/gitguardian-is-proud-sponsor-of-owasp/) for their sponsorship which allows us to pay the bills for our cloud-accounts.
+
+[![jetbrains_logo.png](images/jetbrains_logo.png)](https://www.jetbrains.com/)
+
+[Jetbrains](https://www.jetbrains.com/) for licensing an instance of Intellij IDEA Ultimate edition to the project leads. We could not have been this fast with the development without it!
+
+[![docker_logo.png](images/docker_logo.png)](https://www.docker.com)
+
+[Docker](https://www.docker.com) for granting us their Docker Open Source Sponsored program.
+
+[![1password_logo.png](images/1password_logo.png)](https://github.com/1Password/1password-teams-open-source/pull/552)
+
+[1Password](https://github.com/1Password/1password-teams-open-source/pull/552) for granting us an open source license to 1Password for the secret detection testbed.
+
 
 ## What you need to know
 This environment uses a webtop and an instance of wrongsecrets per user. This means that you need per user:
