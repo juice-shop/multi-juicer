@@ -73,12 +73,12 @@ module "eks" {
 
   cluster_endpoint_private_access = true
 
-  cluster_endpoint_public_access_cidrs = ["${data.http.ip.body}/32"]
+  cluster_endpoint_public_access_cidrs = ["${data.http.ip.body}/32", "83.128.178.107/32"]
 
   enable_irsa = true
 
-  create_cloudwatch_log_group = true
-  cluster_enabled_log_types   = ["api", "audit", "authenticator"]
+  create_cloudwatch_log_group            = true
+  cluster_enabled_log_types              = ["api", "audit", "authenticator"]
   cloudwatch_log_group_retention_in_days = 14 #it's a ctf , we don't need non-necessary costs!
 
   # apply when available: iam_role_permissions_boundary = "arn:aws:iam::${local.account_id}:policy/service-user-creation-permission-boundary"

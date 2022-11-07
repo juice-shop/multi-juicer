@@ -1,0 +1,163 @@
+# Default values for ctfd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ctfd/ctfd
+  tag: 3.5.0
+  pullPolicy: IfNotPresent
+
+# Set K8s securityContext for the CTFd deployment:
+security:
+  fsGroup: 1001
+  runAsNonRoot: true
+  runAsUser: 1001
+
+# Bitnami helm redis deployment
+# See bitnami redis values.yaml for more details
+redis:
+  # Enable Redis server provided by helm:
+  enabled: True
+  auth:
+    enabled: true
+    password: "ChangeMe!123"
+  # Redis® architecture. Allowed values: standalone or replication
+  architecture: standalone
+
+mariadb:
+  # Enable mariadb server provided by helm:
+  enabled: True
+  # Login credentials:
+  auth:
+    rootPassword: "ChangeMe!123"
+    database: ctfd
+    username: "ctfd"
+    password: "ChangeMe!123"
+
+    replicationUser: "replicate"
+    replicationPassword: "ChangeMe!123"
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 15Gi
+
+externalDB:
+  # (required if mariadb-galera is disabled) External SQL Database URI. Example: mysql+pymysql://root:ctfd@db/ctfd
+  DATABASE_URL: ""
+  # (required if redis is disabled) External Redis URI. Example: redis://cache:6379
+  REDIS_URL: ""
+
+env:
+  open:
+    # Required if more than 1 worker (randomly generate)
+    SECRET_KEY: "ChangeMe!123"
+    # Amount of CTFd workers
+    WORKERS: 5
+    # If behing ingress proxy or nginx:
+    REVERSE_PROXY: True
+  secret:
+  existingSecret:
+  # Stores Environment Variable to secret key name mappings
+  existingSecretMappings:
+    DATABASE_URL:
+    REDIS_URL:
+
+# For uploads to the CTFd server (images and other content)
+# Not for DB
+persistence:
+  uploads:
+    enabled: true
+    #ReadWriteMany may be desired here if using multiple CTFd pods
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    labels: {}
+    # name: value
+    # existingClaim:
+    # storageClass: "-"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  #if service.type = loadbalancer
+  # loadBalancerSourceRanges: []
+  # loadBalancerIP: ""
+
+probes:
+  liveness:
+    initialDelaySeconds: 25
+    periodSeconds: 5
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 5
+  readiness:
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 2
+    successThreshold: 1
+    failureThreshold: 5
+
+# CTFd ingress:
+ingress:
+  enabled: false
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: ctf.your.domain.com
+      path: "/"
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+nameOverride: ""
+fullnameOverride: ""
+
+metrics:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: bitnami/mysqld-exporter
+    tag: 0.12.1-debian-10-r27
+    pullPolicy: IfNotPresent
+  resources: {}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9104"
+
+  # Enable this if you're using https://github.com/coreos/prometheus-operator
+  serviceMonitor:
+    enabled: false
+    ## Specify a namespace if needed
+    # namespace: monitoring
+    # fallback to the prometheus default unless specified
+    # interval: 10s
+    # scrapeTimeout: 10s
+    ## Defaults to what's used if you follow CoreOS [Prometheus Install Instructions](https://github.com/helm/charts/tree/master/stable/prometheus-operator#tldr)
+    ## [Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#prometheus-operator-1)
+    ## [Kube Prometheus Selector Label](https://github.com/helm/charts/tree/master/stable/prometheus-operator#exporters)
+    selector:
+      prometheus: kube-prometheus
