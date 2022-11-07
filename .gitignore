@@ -12,3 +12,6 @@ aws/cluster-autoscaler-autodiscover.yaml-e
 
 .idea
 .DS_Store
+.letsencrypt
+
+*.auto.tfvars

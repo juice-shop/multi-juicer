@@ -73,7 +73,7 @@ module "eks" {
 
   cluster_endpoint_private_access = true
 
-  cluster_endpoint_public_access_cidrs = ["${data.http.ip.body}/32", "83.128.178.107/32"]
+  cluster_endpoint_public_access_cidrs = compact(concat(["${data.http.ip.body}/32"], var.extra_allowed_ip_ranges))
 
   enable_irsa = true
 
