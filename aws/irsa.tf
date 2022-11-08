@@ -118,4 +118,52 @@ data "aws_iam_policy_document" "user_policy" {
     ]
     resources = ["*"]
   }
+
+  statement {
+    sid    = "canassume"
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = [aws_iam_role.secret_reader.arn]
+  }
+}
+
+resource "aws_iam_role" "secret_reader" {
+  assume_role_policy = data.aws_iam_policy_document.assume_role_for_secret_reader.json
+}
+
+data "aws_iam_policy_document" "assume_role_for_secret_reader" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.user_role.arn]
+    }
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role_policy" "user_secret_reader" {
+  name   = "saywhatnow"
+  role   = aws_iam_role.secret_reader.id
+  policy = data.aws_iam_policy_document.user_secret_reader.json
+}
+
+data "aws_iam_policy_document" "user_secret_reader" {
+  statement {
+    sid    = "readsecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:Describe*",
+      "secretsmanager:Get*",
+      "secretsmanager:List*",
+      "ssm:DescribeParameters",
+      "ssm:GetParameter*"
+    ]
+
+    resources = ["*"]
+  }
 }
