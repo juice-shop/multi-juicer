@@ -119,10 +119,8 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" \
   --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" \
   --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" \
-  --set="balancer.tag=1.0aws"\
   --set="balancer.replicas=4" \
   --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" \
-  --set="wrongsecretsCleanup.tag=0.2" \
   --set="wrongsecrets.ctfKey=test"
 
 # Install CTFd
