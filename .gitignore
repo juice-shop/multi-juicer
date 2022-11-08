@@ -9,6 +9,9 @@ aws/terraform.tfstate.backup
 aws/.terraform.tfstate.lock.info
 aws/cluster-autoscaler-autodiscover.yaml
 aws/cluster-autoscaler-autodiscover.yaml-e
-
+db.zip
 .idea
 .DS_Store
+.letsencrypt
+
+*.auto.tfvars

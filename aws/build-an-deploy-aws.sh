@@ -112,4 +112,24 @@ wait
 DEFAULT_PASSWORD=thankyou
 #TODO: REWRITE ABOVE, REWRITE THE HARDCODED DEPLOYMENT VALS INTO VALUES AND OVERRIDE THEM HERE!
 echo "default password is ${DEFAULT_PASSWORD}"
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party --set="imagePullPolicy=Always" --set="balancer.env.K8S_ENV=aws" --set="balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" --set="balancer.tag=1.0aws" --set="balancer.replicas=4" --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" --set="wrongsecretsCleanup.tag=0.2"
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+  --set="imagePullPolicy=Always" \
+  --set="balancer.env.K8S_ENV=aws" \
+  --set="balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" \
+  --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" \
+  --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" \
+  --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" \
+  --set="balancer.replicas=4" \
+  --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" \
+  --set="wrongsecrets.ctfKey=test"
+
+# Install CTFd
+
+export HELM_EXPERIMENTAL_OCI=1
+kubectl create namespace ctfd
+helm -n ctfd install ctfd oci://ghcr.io/bman46/ctfd/ctfd \
+  --set="redis.auth.password=${$(openssl rand -base64 24)}" \
+  --set="mariadb.auth.rootPassword=${$(openssl rand -base64 24)}" \
+  --set="mariadb.auth.password=${$(openssl rand -base64 24)}" \
+  --set="mariadb.auth.replicationPassword=${$(openssl rand -base64 24)}" \
+  --set="env.open.SECRET_KEY=test"

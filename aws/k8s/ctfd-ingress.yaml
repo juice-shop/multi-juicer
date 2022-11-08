@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: default
-  name: wrongsecrets-balancer
+  namespace: ctfd
+  name: ctfd
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: instance
@@ -21,6 +21,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: wrongsecrets-balancer
+                name: ctfd
                 port:
                   number: 80

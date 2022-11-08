@@ -26,7 +26,7 @@ const CenterLogo = styled.img`
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 75%;
+  width: 85%;
 `;
 
 export const JoinPage = injectIntl(({ intl }) => {
@@ -145,20 +145,20 @@ export const JoinPage = injectIntl(({ intl }) => {
             <li>
               The domain where you can have to submit your answers in exchange for answers that are
               worth points:{' '}
-              <a style={{ color: 'white' }} href={dynamics.heroku_wrongsecret_ctf_url}>
+              <a href={dynamics.heroku_wrongsecret_ctf_url}>
                 {dynamics.heroku_wrongsecret_ctf_url}
               </a>
             </li>
           ) : null}
           <li>
             The domain where you provide your answer found in exchange for points:{' '}
-            <a style={{ color: 'white' }} href={dynamics.ctfd_url}>
+            <a href={dynamics.ctfd_url}>
               {dynamics.ctfd_url}
             </a>
           </li>
           <li>
             Optionally: the storage bucket with Terraform state for the cloud challneges:{' '}
-            <a style={{ color: 'white' }} href={dynamics.s3_bucket_url}>
+            <a href={dynamics.s3_bucket_url}>
               {dynamics.s3_bucket_url}
             </a>
             . For this you will need credentials that will be provided to you as part of the CTF
@@ -168,7 +168,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         <FormattedMessage
           id="welcome_text_2"
           defaultMessage={`
-          We need to usse multiple domains, as you will be able to steal the CTF key after a few challenges.
+          We need to use multiple domains, as you will be able to steal the CTF key after a few challenges.
         `}
           values={{
             strong: (msg) => <strong>{msg}</strong>,

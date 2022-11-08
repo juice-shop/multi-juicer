@@ -15,3 +15,9 @@ variable "cluster_name" {
   type        = string
   default     = "wrongsecrets-exercise-cluster"
 }
+
+variable "extra_allowed_ip_ranges" {
+  description = "Allowed IP ranges in addition to creator IP"
+  type        = list(string)
+  default     = []
+}

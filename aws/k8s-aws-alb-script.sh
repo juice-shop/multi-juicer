@@ -102,9 +102,12 @@ echo "apply -f k8s/wrongsecrets-balancer-ingress.yml in 10 s"
 sleep 10
 kubectl apply -f k8s/wrongsecrets-balancer-ingress.yml
 
+kubectl apply -f k8s/ctfd-service.yaml
+kubectl apply -f k8s/ctfd-ingress.yaml
 
 echo "waiting 10 s for loadBalancer"
 sleep 10
-echo "http://$(kubectl get ingress wrongsecrets-balancer -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+echo "Wrongsecrets ingress: http://$(kubectl get ingress wrongsecrets-balancer -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+echo "ctfd ingress: http://$(kubectl get ingress -n ctfd ctfd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 
 echo "Do not forget to cleanup afterwards! Run k8s-aws-alb-script-cleanup.sh"
