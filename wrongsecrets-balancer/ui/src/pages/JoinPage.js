@@ -168,7 +168,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         <FormattedMessage
           id="welcome_text_2"
           defaultMessage={`
-          We need to usse multiple domains, as you will be able to steal the CTF key after a few challenges.
+          We need to use multiple domains, as you will be able to steal the CTF key after a few challenges.
         `}
           values={{
             strong: (msg) => <strong>{msg}</strong>,
