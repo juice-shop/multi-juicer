@@ -35,7 +35,7 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 1.1aws
+  tag: 1.2aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
   replicas: 1
   service:
@@ -203,10 +203,10 @@ virtualdesktop:
   envFrom: [ ]
   tolerations: [ ]
 
-# Deletes unused JuiceShop instances after a configurable period of inactivity
+# Deletes unused Wrongsecrets namespaces after a configurable period of inactivity
 wrongsecretsCleanup:
   repository: jeroenwillemsen/wrongsecrets-ctf-cleaner
-  tag: null
+  tag: 0.3
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
   gracePeriod: 2d

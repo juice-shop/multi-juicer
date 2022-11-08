@@ -60,12 +60,14 @@ const GlobalStyles = createGlobalStyle`
     --background-highlight: #fff;
     --font-color: #000;
     --font-color-highlight: #000;
+    --link-color: #000;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --background: #1a202c;
       --background-highlight: #2d3848;
       --font-color: #fefefe;
+      --link-color: #fefefe;
       --font-color-highlight: #CBD5DF;
     }
   }
@@ -81,6 +83,9 @@ const GlobalStyles = createGlobalStyle`
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     background-color: var(--background);
     color: var(--font-color);
+  }
+  a {
+    color: var(--link-color);
   }
 `;
 
