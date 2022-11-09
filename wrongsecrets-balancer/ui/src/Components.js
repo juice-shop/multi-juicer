@@ -76,7 +76,7 @@ export const BodyCard = styled(Card)`
   min-width: 400px;
   max-width: 900px;
   margin-bottom: 32px;
-  
+
 
   @media (max-width: 1280px) {
     min-width: 328px;

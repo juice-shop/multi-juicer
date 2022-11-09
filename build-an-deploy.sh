@@ -14,9 +14,9 @@ WRONGSECRETS_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecr
 WRONGSECRETS_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecrets.tag')
 WEBTOP_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.virtualdesktop.image')
 WEBTOP_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.virtualdesktop.tag')
-echo "Pulling in required images to actually run $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG & $WEBTOP_IMAGE:$WEBTOP_TAG." 
+echo "Pulling in required images to actually run $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG & $WEBTOP_IMAGE:$WEBTOP_TAG."
 echo "If you see an authentication failure: pull them manually by the following 2 commands"
-echo "'docker pull $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG'" 
+echo "'docker pull $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG'"
 echo "'docker pull jeroenwillemsen/jeroenwillemsen/$WEBTOP_IMAGE:$WEBTOP_TAG'" &
 docker pull $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG &
 docker pull jeroenwillemsen/jeroenwillemsen/$WEBTOP_IMAGE:$WEBTOP_TAG &

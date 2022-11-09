@@ -121,7 +121,7 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" \
   --set="balancer.replicas=4" \
   --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" \
-  --set="wrongsecrets.ctfKey=test"
+  --set="wrongsecrets.ctfKey=test" # this key isn't actually necessary in a setup with CTFd
 
 # Install CTFd
 
@@ -132,4 +132,4 @@ helm -n ctfd install ctfd oci://ghcr.io/bman46/ctfd/ctfd \
   --set="mariadb.auth.rootPassword=${$(openssl rand -base64 24)}" \
   --set="mariadb.auth.password=${$(openssl rand -base64 24)}" \
   --set="mariadb.auth.replicationPassword=${$(openssl rand -base64 24)}" \
-  --set="env.open.SECRET_KEY=test"
+  --set="env.open.SECRET_KEY=test" # this key isn't actually necessary in a setup with CTFd

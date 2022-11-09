@@ -31,6 +31,6 @@ else
         kubectl delete ns $NAMESPACE
         echo "deleted $NAMESPACE"
     fi
-    
+
 fi
 done
