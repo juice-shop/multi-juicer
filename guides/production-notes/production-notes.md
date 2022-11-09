@@ -32,4 +32,3 @@ juiceShop:
   maxInstances: 42
   ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
 ```
-
