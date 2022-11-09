@@ -78,7 +78,7 @@ Follow the following steps:
 
 Now visit the CTFd instance and setup your CTF. If you haven't set up a load balancer/ingress, the you can use `kubectl port-forward -n ctfd $(kubectl get pods --namespace ctfd -l "app.kubernetes.io/name=ctfd,app.kubernetes.io/instance=ctfd" -o jsonpath="{.items[0].metadata.name}") 8000:8000` and go to `localhost:8000` to visit CTFd.
 
-_!!NOTE:_ **The following can be dangerous if you use CTFd `>= 3.5.0` Check the `challenges.json` and make sure it's 1-indexed - a 0-indexed file will break CTFd!** _/NOTE!!_
+_!!NOTE:_ **The following can be dangerous if you use CTFd `>= 3.5.0` with wrongsecrets `< 1.5.11`. Check the `challenges.json` and make sure it's 1-indexed - a 0-indexed file will break CTFd!** _/NOTE!!_
 
 Then use the administrative backup function to import the zipfile you created with the juice-shop-ctf command.
 After that you will still need to override the flags with their actual values if you do use the 2-domain configuration.
