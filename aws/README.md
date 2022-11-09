@@ -79,6 +79,7 @@ Follow the following steps:
 Now visit the CTFd instance and setup your CTF. If you haven't set up a load balancer/ingress, the you can use `kubectl port-forward -n ctfd $(kubectl get pods --namespace ctfd -l "app.kubernetes.io/name=ctfd,app.kubernetes.io/instance=ctfd" -o jsonpath="{.items[0].metadata.name}") 8000:8000` and go to `localhost:8000` to visit CTFd.
 
 Then use the administrative backup function to import the zipfile you created with the juice-shop-ctf command.
+After that you will still need to override the flags with their actual values if you do use the 2-domain configuration.
 Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
 
 ### Clean it up
