@@ -8,14 +8,14 @@ Please make sure that the account in which you run this exercise has either Clou
 
 Have the following tools installed:
 
--   AWS CLI - [Installation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
--   EKS CTL - [Installation](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)
--   Tfenv (Optional) - [Installation](https://github.com/tfutils/tfenv)
--   Terraform CLI - [Installation](https://learn.hashicorp.com/tutorials/terraform/install-cli)
--   Wget - [Installation](https://www.jcchouinard.com/wget/)
--   Helm [Installation](https://helm.sh/docs/intro/install/)
--   Kubectl [Installation](https://kubernetes.io/docs/tasks/tools/)
--   jq [Installation](https://stedolan.github.io/jq/download/)
+- AWS CLI - [Installation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+- EKS CTL - [Installation](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)
+- Tfenv (Optional) - [Installation](https://github.com/tfutils/tfenv)
+- Terraform CLI - [Installation](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+- Wget - [Installation](https://www.jcchouinard.com/wget/)
+- Helm [Installation](https://helm.sh/docs/intro/install/)
+- Kubectl [Installation](https://kubernetes.io/docs/tasks/tools/)
+- jq [Installation](https://stedolan.github.io/jq/download/)
 
 Make sure you have an active account at AWS for which you have configured the credentials on the system where you will execute the steps below. In this example we stored the credentials under an aws profile as `awsuser`.
 
@@ -55,6 +55,7 @@ Your EKS cluster should be visible in [EU-West-1](https://eu-west-1.console.aws.
 Are you done playing? Please run `terraform destroy` twice to clean up.
 
 ### Test it
+
 When you have completed the installation steps, you can do `kubectl port-forward service/wrongsecrets-balancer 3000:3000` and then go to [http://localhost:3000](http://localhost:3000).
 
 Want to know how well your cluster is holding up? Check with
@@ -64,6 +65,22 @@ Want to know how well your cluster is holding up? Check with
     kubectl top pods
 ```
 
+### Configuring CTFd
+
+You can use the [Juiceshop CTF CLI](https://github.com/juice-shop/juice-shop-ctf) to generate CTFd configuration files.
+
+Follow the following steps:
+
+```shell
+    npm install -g juice-shop-ctf-cli@9.1.2
+    juice-shop-ctf #choose ctfd and https://wrongsecrets-ctf.herokuapp.com as domain. No trailing slash! The key is 'test', by default feel free to enable hints. We do not support snippets or links/urls to code or hints.
+```
+
+Now visit the CTFd instance and setup your CTF. If you haven't set up a load balancer/ingress, the you can use `kubectl port-forward -n ctfd $(kubectl get pods --namespace ctfd -l "app.kubernetes.io/name=ctfd,app.kubernetes.io/instance=ctfd" -o jsonpath="{.items[0].metadata.name}") 8000:8000` and go to `localhost:8000` to visit CTFd.
+
+Then use the administrative backup function to import the zipfile you created with the juice-shop-ctf command.
+Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
+
 ### Clean it up
 
 When you're done:
@@ -71,7 +88,7 @@ When you're done:
 1. Kill the port forward.
 2. Run the cleanup script: `cleanup-aws-autoscaling-and-helm.sh`
 3. Run `terraform destroy` to clean up the infrastructure.
-    1. If you've deployed the `shared-state` s3 bucket, also `cd shared-state` and `terraform destroy` there.
+   1. If you've deployed the `shared-state` s3 bucket, also `cd shared-state` and `terraform destroy` there.
 4. Run `unset KUBECONFIG` to unset the KUBECONFIG env var.
 5. Run `rm ~/.kube/wrongsecrets` to remove the kubeconfig file.
 6. Run `rm terraform.tfstate*` to remove local state files.
@@ -96,6 +113,7 @@ Do the following:
 Note that you might have to do some manual cleanups after that.
 
 ## Terraform documentation
+
 The documentation below is auto-generated to give insight on what's created via Terraform.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -120,8 +138,8 @@ The documentation below is auto-generated to give insight on what's created via 
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | 18.29.0 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 3.14.4 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | 18.30.2 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 3.18.1 |
 
 ## Resources
 
@@ -130,7 +148,9 @@ The documentation below is auto-generated to give insight on what's created via 
 | [aws_iam_policy.secret_deny](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.secret_manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.irsa_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.user_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy.user_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy_attachment.irsa_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.user_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_secretsmanager_secret.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
@@ -143,10 +163,12 @@ The documentation below is auto-generated to give insight on what's created via 
 | [random_password.password2](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.assume_role_for_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.assume_role_with_oidc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.secret_manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.user_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.user_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [http_http.ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
@@ -154,7 +176,8 @@ The documentation below is auto-generated to give insight on what's created via 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The EKS cluster name | `string` | `"wrongsecrets-exercise-cluster"` | no |
-| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The EKS cluster version to use | `string` | `"1.22"` | no |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The EKS cluster version to use | `string` | `"1.23"` | no |
+| <a name="input_extra_allowed_ip_ranges"></a> [extra\_allowed\_ip\_ranges](#input\_extra\_allowed\_ip\_ranges) | Allowed IP ranges in addition to creator IP | `list(string)` | `[]` | no |
 | <a name="input_region"></a> [region](#input\_region) | The AWS region to use | `string` | `"eu-west-1"` | no |
 
 ## Outputs

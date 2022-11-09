@@ -28,7 +28,7 @@ jobs:
           kubernetes-version: v1.23.12
       - name: test script
         run: |
-          eval $(minikube docker-env)  
+          eval $(minikube docker-env)
           ./build-an-deploy.sh
           while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
           kubectl logs deployments/wrongsecrets-balancer -f >> pod.log &

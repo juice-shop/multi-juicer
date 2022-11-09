@@ -1,4 +1,5 @@
 # WrongSecrets CTF Party
+
 _Powered by MultiJuicer_
 [![CodeQL](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/codeql-analysis.yml)
 [![Pre-commit check](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/OWASP/wrongsecrets-ctf-party/actions/workflows/pre-commit.yml)
@@ -8,6 +9,7 @@ _Powered by MultiJuicer_
 Want to play OWASP WrongSecrets in a large group in CTF mode, but not go over all the hassle of setting up local copies of OWASP WrongSecrets? Here is OWASP WrongSecrets CTF Party! This is a fork of OWASP MultiJuicer, which is adapted to become a dynamic multi-tenant setup for doing a CTF together!
 
 Note that we:
+
 - have a [Webtop](https://docs.linuxserver.io/images/docker-webtop) integrated for each player
 - have a WrongSecrets instance integrated for each player
 - A working admin interface which can restart both or delete both (by deleting the full namespace)
@@ -15,6 +17,7 @@ Note that we:
 - It can cleanup old & unused namespaces automatically.
 
 ## Special thanks
+
 Special thanks to [@madhuakula](https://github.com/madhuakula), [@bendehaan](https://github.com/bendehaan) , and [@mikewoudenberg](https://github.com/mikewoudenberg) for making this port a reality!
 
 ### Sponsorships
@@ -37,18 +40,20 @@ We would like to thank the following parties for helping us out:
 
 [1Password](https://github.com/1Password/1password-teams-open-source/pull/552) for granting us an open source license to 1Password for the secret detection testbed.
 
-
 ## What you need to know
+
 This environment uses a webtop and an instance of wrongsecrets per user. This means that you need per user:
+
 - 2.5 CPU (min = 0.5 , limit = 2.5)
 - 3.5 GB RAM (min 1 GB, limit = 3.5GB)
 - 8GB HD (min 3 GB, limit = 8GB)
 
-
 ### Running this on minikube
+
 A 3-6 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 virtual CPUs, 9 GB ram).
 
 ### Running this on AWS EKS with larger groups
+
 A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
 
 ## Status - Experimental release
@@ -62,6 +67,7 @@ The different setups are explained in [OWASP WrongSecrets CTF-instructions](http
 ### Approach 1: 3-domain setup
 
 You need 3 things:
+
 - This infrastructure
 - The actual place where correct answers are exchanged for CTFD-flags. This can be your fly.dev/heroku/etc. or local container of WrongSecrets running in CTF mode with the additional key setup for challenge 8.
 - A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application.
@@ -69,9 +75,9 @@ You need 3 things:
 ### Approach 2: 2-domain setup
 
 You need 2 things:
-- This infrastructure
-- A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application.
 
+- This infrastructure
+- A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application (this can be the helm chart included in the EKS installation script)
 
 ### General Helm usage
 
@@ -79,9 +85,10 @@ This setup works best if you have Calico installed as your CNI, if you want to u
 
 ```shell
 
-helm upgrade --install mj ./helm/wrongsecrets-ctf-party 
+helm upgrade --install mj ./helm/wrongsecrets-ctf-party
 
 ```
+
 from this repo. We will host the helm chart soon for you.
 
 ### Play with Minikube:
@@ -96,6 +103,7 @@ eval $(minikube docker-env)
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
+
 Want to know whether your system is holding up? use
 
 ```shell
@@ -108,10 +116,9 @@ kubectl top pods
 
 ** NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your AWS bill. **
 
-For AWS EKS follow the instrucrtions in the `/aws` folder.
+For AWS EKS follow the instructions in the `/aws` folder. This setup also includes a helm installation of CTFd.
 
 Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
-
 
 ### Some production notes
 
@@ -121,6 +128,8 @@ See [production notes](./guides/production-notes/production-notes.md) for a chec
 
 You got some options on how to setup the stack, with some option to customize the WrongSecrets and Virtual desktop instances to your own liking.
 You can find the default config values under: [helm/wrongsecrets-ctf-party/values.yaml](helm/wrongsecrets-ctf-party/values.yaml)
+
+The default ctfd config values are here: [aws/k8s/ctfd-values.yaml](aws/k8s/ctfd-values.yaml). Note that these values are not used, and instead only se in the file [aws/build-an-deploy-aws.sh](aws/build-an-deploy-aws.sh).
 
 Download & Save the file and tell helm to use your config file over the default by running:
 
@@ -132,6 +141,12 @@ helm install -f values.yaml wrongsecrets-ctf-party ./wrongsecrets-ctf-party/helm
 
 ```sh
 helm delete wrongsecrets-ctf-party
+```
+
+And if you are running AWS (including CTFd):
+
+```sh
+helm delete ctfd -n ctfd
 ```
 
 ## FAQ
@@ -164,7 +179,6 @@ kubectl get -l app=wrongsecrets -o custom-columns-file=wrongsecrets.txt deployme
 ```
 
 There are a few more ways how you can check whether all is going well: have a look in the [/scripts](/scripts/) folder for various tools that can help you to see if there are too many namespaces created for instance. This does require you to export the teams and players from ctfd.
-
 
 ### Did somebody actually ask any of these questions?
 

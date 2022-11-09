@@ -26,6 +26,6 @@ else
         echo "did NOT find $NO_TDASH_NAMESPACE in users and teams"
         echo $NAMESPACE >> unusedteams.txt
     fi
-    
+
 fi
 done
