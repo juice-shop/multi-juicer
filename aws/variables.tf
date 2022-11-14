@@ -21,3 +21,8 @@ variable "extra_allowed_ip_ranges" {
   type        = list(string)
   default     = []
 }
+
+variable "state_bucket_arn" {
+  description = "ARN of the state bucket to grant access to the s3 user"
+  type = string
+}

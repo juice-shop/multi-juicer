@@ -83,11 +83,11 @@ module "eks" {
 
   # apply when available: iam_role_permissions_boundary = "arn:aws:iam::${local.account_id}:policy/service-user-creation-permission-boundary"
   eks_managed_node_group_defaults = {
-    disk_size       = 50
+    disk_size       = 256
     disk_type       = "gp3"
     disk_throughput = 150
     disk_iops       = 3000
-    instance_types  = ["t3a.large"]
+    instance_types  = ["t3a.medium"]
 
     iam_role_additional_policies = [
       "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
@@ -102,11 +102,11 @@ module "eks" {
     bottlerocket_default = {
       create_launch_template = false
       launch_template_name   = ""
-      min_size               = 1
+      min_size               = 3
       max_size               = 50
-      desired_size           = 1
+      desired_size           = 3
 
-      capacity_type = "SPOT"
+      capacity_type = "ON_DEMAND"
 
       ami_type = "BOTTLEROCKET_x86_64"
       platform = "bottlerocket"
