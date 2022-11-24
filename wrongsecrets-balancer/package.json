@@ -1,7 +1,7 @@
 {
   "name": "wrongsecrets-balancer",
-  "version": "1.0.0",
-  "description": "Run Capture the Flags and Security Trainings with OWASP Wrongsecrets (based on multijuicer from Iteratec)",
+  "version": "1.1.0",
+  "description": "Run Capture the Flags and Security Trainings with OWASP Wrongsecrets (based on multijuicer from Iteratec). Requires node18",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint --config .eslintrc src/**",
@@ -11,7 +11,6 @@
   "author": "Project OWASP WrongSecrets",
   "license": "Apache-2.0",
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
     "@kubernetes/client-node": "^0.17.1",
     "basic-auth-connect": "^1.0.0",
     "bcryptjs": "^2.4.3",
@@ -22,20 +21,22 @@
     "express-joi-validation": "^5.0.1",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "^2.0.6",
+    "joi": "^17.7.0",
     "lodash": "^4.17.21",
     "on-finished": "^2.4.1",
     "prom-client": "^14.1.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "minimatch": "^3.0.5"
   },
   "devDependencies": {
-    "@types/hapi__joi": "^17.1.8",
     "cookie-signature": "^1.2.0",
     "eslint": "^8.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "jest": "^29.2.2",
     "jest-date-mock": "^1.0.8",
     "prettier": "^2.7.1",
-    "supertest": "^6.3.1"
+    "supertest": "^6.3.1",
+    "minimatch": "^3.0.5"
   },
   "overrides": {
     "@kubernetes/client-node": {
