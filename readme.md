@@ -44,17 +44,17 @@ We would like to thank the following parties for helping us out:
 
 This environment uses a webtop and an instance of wrongsecrets per user. This means that you need per user:
 
-- 2.5 CPU (min = 0.5 , limit = 2.5)
-- 3.5 GB RAM (min 1 GB, limit = 3.5GB)
-- 8GB HD (min 3 GB, limit = 8GB)
+- 1.5 CPU (min = 0.5 , limit = 2.5)
+- 2 GB RAM (min 1 GB, limit = 3.5GB)
+- 4GB HD (min 3 GB, limit = 8GB)
 
 ### Running this on minikube
 
-A 3-6 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 virtual CPUs, 9 GB ram).
+A 4-10 contestant game can be played on a local minikube with updated cpu & memory settings (e.g. 6 virtual CPUs, 9 GB ram).
 
 ### Running this on AWS EKS with larger groups
 
-A 100 contestant game can be played on the AWS setup, which will require around 200 (100-250) CPUs, 300 (250-350) GB Ram, and 800 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
+A 100 contestant game can be played on the AWS setup, which will require around 150 (100-250) CPUs, 200 (150-350) GB Ram, and 400 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
 
 ## Status - Experimental release
 

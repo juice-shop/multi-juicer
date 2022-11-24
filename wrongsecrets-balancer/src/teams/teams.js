@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const cryptoRandomString = require('crypto-random-string');
 
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 const expressJoiValidation = require('express-joi-validation');
 const promClient = require('prom-client');
 const accessPassword = process.env.REACT_APP_ACCESS_PASSWORD;
