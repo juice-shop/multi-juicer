@@ -11,10 +11,13 @@ IFS=$'
 USERS=($(awk -F , '{print tolower($3)}' users.csv))
 TEAMS=($(awk -F , '{print tolower($3)}' teams.csv))
 unset IFS
+NAMESPACES=$(kubectl get ns | grep t- |  awk '{print $1;}')
+count=0
 for NAMESPACE in `kubectl get ns | grep t- |  awk '{print $1;}'`
 do
 echo "found $NAMESPACE"
 CUT_NAMESPACE=${NAMESPACE:2}
+let count++
 NO_TDASH_NAMESPACE=`echo $CUT_NAMESPACE | awk '{print tolower($0)}'`
 echo "checking list for $NO_TDASH_NAMESPACE"
 if [[ " ${USERS[*]} " =~ " ${NO_TDASH_NAMESPACE} " ]]; then
@@ -29,3 +32,5 @@ else
 
 fi
 done
+unregistered=$(wc -l unusedteams.txt)
+echo "${count} namespaces active where not registered ${unregistered}"
