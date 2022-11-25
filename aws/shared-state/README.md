@@ -36,5 +36,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | Name of the terraform state bucket |
 | <a name="output_s3_bucket_name"></a> [s3\_bucket\_name](#output\_s3\_bucket\_name) | Name of the terraform state bucket |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
