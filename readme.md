@@ -105,7 +105,7 @@ For minikube, run:
 
 minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico
 eval $(minikube docker-env)
-./build-an-deploy.sh
+./build-an-deploy-container.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
@@ -117,6 +117,18 @@ minikube addons enable metrics-server
 kubectl top nodes
 kubectl top pods
 ```
+
+### Develop with Minikube
+
+```shell
+
+minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico
+eval $(minikube docker-env)
+./build-an-deploy.sh
+kubectl port-forward service/wrongsecrets-balancer 3000:3000
+
+```
+
 
 ### Play with AWS EKS:
 
