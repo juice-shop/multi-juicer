@@ -11,7 +11,9 @@ provider "aws" {
   region = var.region
 }
 
-resource "aws_s3_bucket" "state" {}
+resource "aws_s3_bucket" "state" {
+  force_destroy = true
+}
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
   bucket = aws_s3_bucket.state.id
