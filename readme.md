@@ -18,7 +18,7 @@ Note that we:
 
 ## Special thanks
 
-Special thanks to [@madhuakula](https://github.com/madhuakula), [@bendehaan](https://github.com/bendehaan) , and [@mikewoudenberg](https://github.com/mikewoudenberg) for making this port a reality!
+Special thanks to [@commjoen](https://github.com/commjoen), [@madhuakula](https://github.com/madhuakula), [@bendehaan](https://github.com/bendehaan) , and [@mikewoudenberg](https://github.com/mikewoudenberg) for making this port a reality!
 
 ### Sponsorships
 
