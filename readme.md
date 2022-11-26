@@ -54,6 +54,12 @@ A 4-10 contestant game can be played on a local minikube with updated cpu & memo
 
 ### Running this on AWS EKS with larger groups
 
+#### Small Game
+
+We recently played a small CTF with 40 relatively active players using version 1.5.10 of wrongSecrets and the T6 version of the virtualdesktop-k8s. This could have easily ran on 5 T3A-X2large nodes for a day.
+
+#### Large Numbers
+
 A 100 contestant game can be played on the AWS setup, which will require around 150 (100-250) CPUs, 200 (150-350) GB Ram, and 400 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
 
 ## Status - Experimental release
