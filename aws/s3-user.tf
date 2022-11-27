@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "state_user_policy" {
 resource "aws_secretsmanager_secret" "state_user_access_keys" {
   name                    = "s3-state-user"
   description             = "The access keys for S3 access"
-  recovery_window_in_days = 7
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "state_user_access_keys" {
