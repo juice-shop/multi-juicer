@@ -84,6 +84,8 @@ Then use the administrative backup function to import the zipfile you created wi
 After that you will still need to override the flags with their actual values if you do use the 2-domain configuration.
 Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
 
+Want to make the CTFD instance look pretty? Include the fragment logated at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
+
 ### Clean it up
 
 When you're done:
