@@ -4,7 +4,7 @@
 # set -o nounset
 
 source ../scripts/check-available-commands.sh
-checkCommandsAvailable helm jq vault sed grep docker grep cat aws curl eksctl kubectl
+checkCommandsAvailable helm jq sed grep docker grep cat aws curl eksctl kubectl
 
 if test -n "${AWS_REGION-}"; then
   echo "AWS_REGION is set to <$AWS_REGION>"
