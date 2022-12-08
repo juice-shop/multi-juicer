@@ -83,7 +83,7 @@ Now visit the CTFd instance and setup your CTF. If you haven't set up a load bal
 _!!NOTE:_ **The following can be dangerous if you use CTFd `>= 3.5.0` with wrongsecrets `< 1.5.11`. Check the `challenges.json` and make sure it's 1-indexed - a 0-indexed file will break CTFd!** _/NOTE!!_
 
 Then use the administrative backup function to import the zipfile you created with the juice-shop-ctf command.
-After that you will still need to override the flags with their actual values if you do use the 2-domain configuration.
+After that you will still need to override the flags with their actual values if you do use the 2-domain configuration. For a guide on how to do this see the 2-domain setup steps in the general [README](../readme.md)
 Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
 
 Want to make the CTFD instance look pretty? Include the fragment located at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
