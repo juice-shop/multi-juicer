@@ -32,6 +32,7 @@ terraform apply
 ```
 
 The bucket name should be in the output. Please use that to configure the Terraform backend in `main.tf`.
+The bucket ARN will be printed, make a note of this as it will be used in the next steps.
 
 ## Installation
 
@@ -44,11 +45,12 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 1. export your AWS credentials (`export AWS_PROFILE=awsuser`)
 2. check whether you have the right profile by doing `aws sts get-caller-identity` and make sure you have enough rights with the caller its identity and that the actual accountnumber displayed is the account designated for you to apply this TF to.
 3. Do `terraform init` (if required, use tfenv to select TF 0.13.1 or higher )
-4. Do `terraform plan`
-5. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
-6. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
-7. Do `export KUBECONFIG=~/.kube/wrongsecrets`
-8. Run `./build-an-deploy-aws.sh` to install all the required materials (helm for calico, secrets management, autoscaling, etc.)
+4. The bucket ARN will be asked for in the next 2 steps. Take the one provided to you and add `arn:aws:s3:::` to the start. e.g. ``arn:aws:s3:::terraform-20221208123456789100000001`
+5. Do `terraform plan`
+6. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
+7. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
+8. Do `export KUBECONFIG=~/.kube/wrongsecrets`
+9. Run `./build-an-deploy-aws.sh` to install all the required materials (helm for calico, secrets management, autoscaling, etc.)
 
 Your EKS cluster should be visible in [EU-West-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
@@ -84,14 +86,14 @@ Then use the administrative backup function to import the zipfile you created wi
 After that you will still need to override the flags with their actual values if you do use the 2-domain configuration.
 Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
 
-Want to make the CTFD instance look pretty? Include the fragment logated at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
+Want to make the CTFD instance look pretty? Include the fragment located at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
 
 ### Clean it up
 
 When you're done:
 
 1. Kill the port forward.
-2. Run the cleanup script: `cleanup-aws-autoscaling-and-helm.sh`
+2. Run the cleanup script: `./cleanup-aws-autoscaling-and-helm.sh`
 3. Run `terraform destroy` to clean up the infrastructure.
    1. If you've deployed the `shared-state` s3 bucket, also `cd shared-state` and `terraform destroy` there.
 4. Run `unset KUBECONFIG` to unset the KUBECONFIG env var.
@@ -112,8 +114,8 @@ We added additional scripts for adding an ALB and ingress so that you can use yo
 Do the following:
 
 1. Follow the installation section first.
-2. Run `k8s-aws-alb-script.sh` and the script will return the url at which you can reach the application.
-3. When you are done, before you do cleanup, first run `k8s-aws-alb-script-cleanup.sh`.
+2. Run `./k8s-aws-alb-script.sh` and the script will return the url at which you can reach the application. (Be aware this opens the url's to the internet in general, if you'd like to limit the access please do this using the security groups in AWS)
+3. When you are done, before you do cleanup, first run `./k8s-aws-alb-script-cleanup.sh`.
 
 Note that you might have to do some manual cleanups after that.
 
