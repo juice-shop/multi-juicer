@@ -28,6 +28,20 @@ else
   echo "CLUSTERNAME is not set or empty, defaulting to ${CLUSTERNAME}"
 fi
 
+echo "Checking for compatible shell"
+case "$SHELL" in
+*bash*)
+    echo "BASH detected"
+    ;;
+*zsh*)
+    echo "ZSH detected"
+    ;;
+*)
+    echo "🛑🛑 Unknown shell $SHELL, this script has only been tested on BASH and ZSH. Please be aware there may be some issues 🛑🛑"
+    sleep 2
+    ;;
+esac
+
 ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' -r)
 echo "ACCOUNT_ID=${ACCOUNT_ID}"
 
@@ -128,8 +142,8 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
 export HELM_EXPERIMENTAL_OCI=1
 kubectl create namespace ctfd
 helm -n ctfd install ctfd oci://ghcr.io/bman46/ctfd/ctfd \
-  --set="redis.auth.password=${$(openssl rand -base64 24)}" \
-  --set="mariadb.auth.rootPassword=${$(openssl rand -base64 24)}" \
-  --set="mariadb.auth.password=${$(openssl rand -base64 24)}" \
-  --set="mariadb.auth.replicationPassword=${$(openssl rand -base64 24)}" \
+  --set="redis.auth.password=$(openssl rand -base64 24)" \
+  --set="mariadb.auth.rootPassword=$(openssl rand -base64 24)" \
+  --set="mariadb.auth.password=$(openssl rand -base64 24)" \
+  --set="mariadb.auth.replicationPassword=$(openssl rand -base64 24)" \
   --set="env.open.SECRET_KEY=test" # this key isn't actually necessary in a setup with CTFd

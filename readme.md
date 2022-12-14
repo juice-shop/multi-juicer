@@ -85,6 +85,13 @@ You need 2 things:
 - This infrastructure
 - A CTFD/Facebook-CTF host which is populated with the challenges based on your secondary hosted WrongSecrets application (this can be the helm chart included in the EKS installation script)
 
+To use the 2 domain setup with CTFD:
+
+1. Set up the CTFD and WrongSecrets instances using your preferred method and docs e.g. AWS and the docs [here](aws/README.md).
+2. Set up a team with spoilers available (On AWS this can be done by changing the deployment of a team you have created and setting ctf-mode=false).
+3. Use these spoilers to manually copy the answers from WrongSecrets to CTFD.]
+4. Delete the team used to get these spoilers (On AWS you can delete the entire namespace of the team)
+
 ### General Helm usage
 
 This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the AWS Challenges, do:
