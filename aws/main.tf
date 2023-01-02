@@ -1,11 +1,11 @@
 terraform {
   # Set your region and bucket name (output from shared state) in the placeholder below
   # Then uncomment and apply!
-  # backend "s3" {
-  #   region = "eu-west-1" # Change if desired
-  #   bucket = "" # Put your bucket name here
-  #   key    = "wrongsecrets/terraform.tfstate" # Change if desired
-  # }
+  backend "s3" {
+    region = "eu-west-1" # Change if desired
+    bucket = "terraform-20230102231352749300000001" # Put your bucket name here
+    key    = "wrongsecrets/terraform.tfstate" # Change if desired
+  }
 }
 
 locals {
@@ -72,6 +72,7 @@ module "eks" {
 
 
   cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
 
   cluster_endpoint_public_access_cidrs = compact(concat(["${data.http.ip.response_body}/32"], var.extra_allowed_ip_ranges))
 
@@ -89,19 +90,18 @@ module "eks" {
     disk_iops       = 3000
     instance_types  = ["t3a.medium"]
 
-    iam_role_additional_policies = [
-      "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-      "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-      "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-      "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-      "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-    ]
+    iam_role_additional_policies = {
+      AmazonEKSWorkerNodePolicy: "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+      AmazonEKS_CNI_Policy: "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+      AmazonEC2ContainerRegistryReadOnly: "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+      AmazonSSMManagedInstanceCore: "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+      AmazonEKSVPCResourceController: "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+    }
   }
 
   eks_managed_node_groups = {
     bottlerocket_default = {
-      create_launch_template = false
-      launch_template_name   = ""
+      use_custom_launch_template = false
       min_size               = 3
       max_size               = 50
       desired_size           = 3
