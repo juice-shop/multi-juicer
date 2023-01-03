@@ -45,7 +45,7 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 1. export your AWS credentials (`export AWS_PROFILE=awsuser`)
 2. check whether you have the right profile by doing `aws sts get-caller-identity` and make sure you have enough rights with the caller its identity and that the actual accountnumber displayed is the account designated for you to apply this TF to.
 3. Do `terraform init` (if required, use tfenv to select TF 0.13.1 or higher )
-4. The bucket ARN will be asked for in the next 2 steps. Take the one provided to you and add `arn:aws:s3:::` to the start. e.g. ``arn:aws:s3:::terraform-20221208123456789100000001`
+4. The bucket ARN will be asked for in the next 2 steps. Take the one provided to you and add `arn:aws:s3:::` to the start. e.g. ``arn:aws:s3:::terraform-20230102231352749300000001`
 5. Do `terraform plan`
 6. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 7. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
