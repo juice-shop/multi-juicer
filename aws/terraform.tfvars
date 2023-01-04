@@ -1,3 +1,3 @@
-cluster_version = "1.22"
+cluster_version = "1.23"
 region          = "eu-west-1"
-# state_bucket_arn = "...."
+# state_bucket_arn = "..."

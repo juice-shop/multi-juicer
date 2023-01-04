@@ -6,7 +6,10 @@
             "Effect": "Allow",
             "Action": [
                 "autoscaling:SetDesiredCapacity",
-                "autoscaling:TerminateInstanceInAutoScalingGroup"
+                "autoscaling:TerminateInstanceInAutoScalingGroup",
+                "ec2:DescribeImages",
+                "ec2:GetInstanceTypesFromInstanceRequirements",
+                "eks:DescribeNodegroup"
             ],
             "Resource": "*",
             "Condition": {
@@ -19,11 +22,13 @@
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": [
-                "autoscaling:DescribeAutoScalingInstances",
                 "autoscaling:DescribeAutoScalingGroups",
-                "ec2:DescribeLaunchTemplateVersions",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DescribeScalingActivities",
                 "autoscaling:DescribeTags",
-                "autoscaling:DescribeLaunchConfigurations"
+                "ec2:DescribeInstanceTypes",
+                "ec2:DescribeLaunchTemplateVersions"
             ],
             "Resource": "*"
         }

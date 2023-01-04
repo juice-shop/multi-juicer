@@ -7,7 +7,7 @@ resource "aws_iam_access_key" "state_user_key" {
 }
 
 resource "aws_iam_user_policy" "state_user_policy" {
-  user   = aws_iam_user.state_user.id
+  user   = aws_iam_user.state_user.name
   policy = data.aws_iam_policy_document.state_user_policy.json
 }
 
