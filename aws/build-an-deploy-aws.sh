@@ -139,6 +139,24 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
 
 # Install CTFd
 
+echo "Installing EBS CSI driver"
+eksctl create iamserviceaccount \
+  --name ebs-csi-controller-sa \
+  --namespace kube-system \
+  --cluster $CLUSTERNAME \
+  --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+  --approve \
+  --role-only \
+  --role-name AmazonEKS_EBS_CSI_DriverRole
+  --region $AWS_REGION
+
+echo "managing EBS CSI Driver as a separate eks addon"
+eksctl create addon --name aws-ebs-csi-driver \
+  --cluster $CLUSTERNAME \
+  --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/AmazonEKS_EBS_CSI_DriverRole \
+  --force \
+  --region $AWS_REGION
+
 export HELM_EXPERIMENTAL_OCI=1
 kubectl create namespace ctfd
 helm -n ctfd install ctfd oci://ghcr.io/bman46/ctfd/ctfd \
