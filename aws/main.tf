@@ -2,9 +2,9 @@ terraform {
   # Set your region and bucket name (output from shared state) in the placeholder below
   # Then uncomment and apply!
   backend "s3" {
-    region = "eu-west-1" # Change if desired
-    bucket = "terraform-20230102231352749300000001" # Put your bucket name here
-    key    = "wrongsecrets/terraform.tfstate" # Change if desired
+    region = "eu-west-1"                            # Change if desired
+    bucket = "terraform-20230105182940038600000001" # Put your bucket name here
+    key    = "wrongsecrets/terraform.tfstate"       # Change if desired
   }
 }
 
@@ -70,6 +70,12 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
+  cluster_addons = {
+    aws-ebs-csi-driver = {
+      most_recent = true
+    }
+  }
+
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
@@ -91,20 +97,20 @@ module "eks" {
     instance_types  = ["t3a.medium"]
 
     iam_role_additional_policies = {
-      AmazonEKSWorkerNodePolicy: "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-      AmazonEKS_CNI_Policy: "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-      AmazonEC2ContainerRegistryReadOnly: "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-      AmazonSSMManagedInstanceCore: "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-      AmazonEKSVPCResourceController: "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+      AmazonEKSWorkerNodePolicy : "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+      AmazonEKS_CNI_Policy : "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+      AmazonEC2ContainerRegistryReadOnly : "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+      AmazonSSMManagedInstanceCore : "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+      AmazonEKSVPCResourceController : "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
     }
   }
 
   eks_managed_node_groups = {
     bottlerocket_default = {
       use_custom_launch_template = false
-      min_size               = 3
-      max_size               = 50
-      desired_size           = 3
+      min_size                   = 3
+      max_size                   = 50
+      desired_size               = 3
 
       capacity_type = "ON_DEMAND"
 
@@ -129,5 +135,53 @@ module "eks" {
     Application                                               = "wrongsecrets"
     "k8s.io/cluster-autoscaler/wrongsecrets-exercise-cluster" = "owned"
     "k8s.io/cluster-autoscaler/enabled"                       = true
+  }
+}
+
+# Cluster Autoscaler IRSA
+module "cluster_autoscaler_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.9.0"
+
+
+  role_name                        = "wrongsecrets-cluster-autoscaler"
+  attach_cluster_autoscaler_policy = true
+  cluster_autoscaler_cluster_ids   = [module.eks.cluster_name]
+
+  oidc_providers = {
+    cluster = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:cluster-autoscaler"]
+    }
+  }
+}
+
+module "ebs_csi_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.9.0"
+
+  role_name             = "wrongsecrets-ebs-csi"
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
+}
+
+module "load_balancer_controller_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.9.0"
+
+  role_name                              = "wrongsecrets-load-balancer-controller"
+  attach_load_balancer_controller_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+    }
   }
 }

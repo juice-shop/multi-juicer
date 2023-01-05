@@ -8,9 +8,14 @@ output "cluster_security_group_id" {
   value       = module.eks.cluster_security_group_id
 }
 
-output "irsa_role" {
+output "irsa_role_arn" {
   description = "The role ARN used in the IRSA setup"
   value       = aws_iam_role.irsa_role.arn
+}
+
+output "irsa_role" {
+  description = "The role name used in the IRSA setup"
+  value       = aws_iam_role.irsa_role.name
 }
 
 output "secrets_manager_secret_name" {
@@ -22,4 +27,24 @@ output "secrets_manager_secret_name" {
 output "cluster_id" {
   description = "The id of the cluster"
   value       = module.eks.cluster_id
+}
+
+output "cluster_name" {
+  description = "The EKS cluster name"
+  value       = module.eks.cluster_name
+}
+
+output "ebs_role" {
+  description = "EBS CSI driver role"
+  value       = module.ebs_csi_irsa_role.iam_role_name
+}
+
+output "ebs_role_arn" {
+  description = "EBS CSI driver role"
+  value       = module.ebs_csi_irsa_role.iam_role_arn
+}
+
+output "state_bucket_name" {
+  description = "Terraform s3 state bucket name"
+  value       = split(":", var.state_bucket_arn)[length(split(":", var.state_bucket_arn)) - 1]
 }
