@@ -5,5 +5,5 @@ output "s3_bucket_name" {
 
 output "s3_bucket_arn" {
   description = "Name of the terraform state bucket"
-  value       = aws_s3_bucket.state.id
+  value       = aws_s3_bucket.state.arn
 }

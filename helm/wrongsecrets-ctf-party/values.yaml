@@ -3,19 +3,18 @@
 # Declare variables to be passed into your templates.
 
 imagePullPolicy: Always
-nodeSelector: { }
+nodeSelector: {}
 
 ingress:
   enabled: false
-  annotations:
-    { }
+  annotations: {}
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
   hosts:
     - host: wrongsecrets-ctf-party.local
       paths:
         - "/"
-  tls: [ ]
+  tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -37,7 +36,7 @@ balancer:
   repository: jeroenwillemsen/wrongsecrets-balancer
   tag: 1.7aws
   # -- Number of replicas of the wrongsecrets-balancer deployment
-  replicas: 1
+  replicas: 4
   service:
     # -- Kubernetes service type
     type: ClusterIP
@@ -57,22 +56,22 @@ balancer:
       memory: 1024Mi
       cpu: 1000m
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: { }
+  affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: [ ]
+  tolerations: []
   # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
   skipOwnerReference: false
   env:
-    REACT_APP_MOVING_GIF_LOGO : 'https://i.gifer.com/9kGQ.gif' #displayed at the frontend when you enter the CTF
-    REACT_APP_HEROKU_WRONGSECRETS_URL : 'https://wrongsecrets-ctf.herokuapp.com' #required for 3 domain setup
-    REACT_APP_CTFD_URL : 'https://ctfd.io' #requierd for 2 and 3 domain setup
-    REACT_APP_S3_BUCKET_URL : 's3://funstuff' #the s3 bucket you use for teh aws challenges, don't forget to make it accessible!
-    K8S_ENV: 'k8s' #or 'aws'
-    REACT_APP_ACCESS_PASSWORD: '' #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
-    REACT_APP_CREATE_TEAM_HMAC_KEY: 'hardcodedkey'
+    REACT_APP_MOVING_GIF_LOGO: "https://i.gifer.com/9kGQ.gif" #displayed at the frontend when you enter the CTF
+    REACT_APP_HEROKU_WRONGSECRETS_URL: "https://wrongsecrets-ctf.herokuapp.com" #required for 3 domain setup
+    REACT_APP_CTFD_URL: "https://ctfd.io" #requierd for 2 and 3 domain setup
+    REACT_APP_S3_BUCKET_URL: "s3://funstuff" #the s3 bucket you use for teh aws challenges, don't forget to make it accessible!
+    K8S_ENV: "k8s" #or 'aws'
+    REACT_APP_ACCESS_PASSWORD: "" #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
+    REACT_APP_CREATE_TEAM_HMAC_KEY: "hardcodedkey"
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
-    SECRETS_MANAGER_SECRET_ID_1: 'wrongsecret' #only change if you need non-default AWS SM entries
-    SECRETS_MANAGER_SECRET_ID_2: 'wrongsecret-2' #only change if you need non-default AWS SM entries
+    SECRETS_MANAGER_SECRET_ID_1: "wrongsecret" #only change if you need non-default AWS SM entries
+    SECRETS_MANAGER_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default AWS SM entries
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
@@ -151,9 +150,9 @@ wrongsecrets:
   #         key: FOO
   #         name: secret-resource
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
-  envFrom: [ ]
+  envFrom: []
   # -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumes: [ ]
+  volumes: []
   # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
   # then switch out the logo parameter in the wrongsecrets config section above to the mounted filename.
   # volumes:
@@ -161,7 +160,7 @@ wrongsecrets:
   #   configMap:
   #     name: custom-logo
   # -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumeMounts: [ ]
+  volumeMounts: []
   # volumeMounts:
   # - name: logo
   #   mountPath: /wrongsecrets/frontend/dist/frontend/assets/public/images/custom.png
@@ -169,9 +168,9 @@ wrongsecrets:
   #   readOnly: true
 
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: { }
+  affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: [ ]
+  tolerations: []
 
   # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
   runtimeClassName: null
@@ -197,11 +196,11 @@ virtualdesktop:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     runAsNonRoot: true
-  runtimeClassName: { }
-  affinity: { }
+  runtimeClassName: {}
+  affinity: {}
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
-  envFrom: [ ]
-  tolerations: [ ]
+  envFrom: []
+  tolerations: []
 
 # Deletes unused Wrongsecrets namespaces after a configurable period of inactivity
 wrongsecretsCleanup:
@@ -219,8 +218,8 @@ wrongsecretsCleanup:
       memory: 256Mi
     limits:
       memory: 256Mi
-  securityContext: { }
+  securityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the wrongsecretsCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: { }
+  affinity: {}
   # -- Optional Configure kubernetes toleration for the wrongsecretsCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: [ ]
+  tolerations: []

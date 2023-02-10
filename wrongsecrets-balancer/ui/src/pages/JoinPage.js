@@ -157,7 +157,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             </a>
           </li>
           <li>
-            Optionally: the storage bucket with Terraform state for the cloud challneges:{' '}
+            Optionally: the storage bucket with Terraform state for the cloud challenges:{' '}
             <a href={dynamics.s3_bucket_url}>
               {dynamics.s3_bucket_url}
             </a>

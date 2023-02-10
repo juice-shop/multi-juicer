@@ -5,9 +5,10 @@ echo "Make sure you have updated your AWS credentials and your kubeconfig prior 
 echo "For this to work the AWS kubernetes cluster must have access to the same local registry / image cache which 'docker build ...' writes its image to"
 echo "For example docker-desktop with its included k8s cluster"
 
-echo "NOTE: WE ARE WORKING HERE WITH A 5 LEGGED BALANCER on aWS which costs money by themselves!"
+echo "NOTE: WE ARE WORKING HERE WITH A 5 LEGGED LOAD BALANCER on AWS which costs money by themselves!"
 
-echo "NOTE2: please replace balancer.cookie.cookieParserSecret witha value you fanchy and ensure you have TLS on (see outdated guides)."
+echo "NOTE 2: You can replace balancer.cookie.cookieParserSecret with a value you fancy."
+echo "Note 3: Ensure you turn TLS on :)."
 
 echo "Usage: ./build-an-deploy-aws.sh "
 
@@ -17,15 +18,8 @@ checkCommandsAvailable helm aws kubectl eksctl sed
 if test -n "${AWS_REGION-}"; then
   echo "AWS_REGION is set to <$AWS_REGION>"
 else
-  AWS_REGION=eu-west-1
+  export AWS_REGION=eu-west-1
   echo "AWS_REGION is not set or empty, defaulting to ${AWS_REGION}"
-fi
-
-if test -n "${CLUSTERNAME-}"; then
-  secho "CLUSTERNAME is set to <$CLUSTERNAME> which is different than the default. Please update the cluster-autoscaler-policy.json."
-else
-  CLUSTERNAME=wrongsecrets-exercise-cluster
-  echo "CLUSTERNAME is not set or empty, defaulting to ${CLUSTERNAME}"
 fi
 
 echo "Checking for compatible shell"
@@ -45,12 +39,18 @@ esac
 ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' -r)
 echo "ACCOUNT_ID=${ACCOUNT_ID}"
 
+CLUSTERNAME="$(terraform output -raw cluster_name)"
+STATE_BUCKET="$(terraform output -raw state_bucket_name)"
+IRSA_ROLE_ARN="$(terraform output -raw irsa_role_arn)"
+EBS_ROLE_ARN="$(terraform output -raw ebs_role_arn)"
+
+echo "CLUSTERNAME=${CLUSTERNAME}"
+echo "STATE_BUCKET=${STATE_BUCKET}"
+echo "IRSA_ROLE_ARN=${IRSA_ROLE_ARN}"
+echo "EBS_ROLE_ARN=${EBS_ROLE_ARN}"
 
 version="$(uuidgen)"
 
-AWS_REGION="eu-west-1"
-
-echo "Install autoscaler first!"
 echo "If the below output is different than expected: please hard stop this script (running aws sts get-caller-identity first)"
 
 aws sts get-caller-identity
@@ -59,23 +59,23 @@ echo "Giving you 4 seconds before we add autoscaling"
 
 sleep 4
 
-echo "Installing policies and service accounts"
+# echo "Installing policies and service accounts"
 
-aws iam create-policy \
-    --policy-name AmazonEKSClusterAutoscalerPolicy \
-    --policy-document file://cluster-autoscaler-policy.json
+# aws iam create-policy \
+#     --policy-name AmazonEKSClusterAutoscalerPolicy \
+#     --policy-document file://cluster-autoscaler-policy.json
 
-echo "Installing iamserviceaccount"
+# echo "Installing iamserviceaccount"
 
-eksctl create iamserviceaccount \
-  --cluster=$CLUSTERNAME \
-  --region=$AWS_REGION \
-  --namespace=kube-system \
-  --name=cluster-autoscaler \
-  --role-name=AmazonEKSClusterAutoscalerRole \
-  --attach-policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/AmazonEKSClusterAutoscalerPolicy \
-  --override-existing-serviceaccounts \
-  --approve
+# eksctl create iamserviceaccount \
+#   --cluster=$CLUSTERNAME \
+#   --region=$AWS_REGION \
+#   --namespace=kube-system \
+#   --name=cluster-autoscaler \
+#   --role-name=AmazonEKSClusterAutoscalerRole \
+#   --attach-policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/AmazonEKSClusterAutoscalerPolicy \
+#   --override-existing-serviceaccounts \
+#   --approve
 
 echo "Deploying the k8s autoscaler for eks through kubectl"
 
@@ -87,7 +87,7 @@ kubectl apply -f cluster-autoscaler-autodiscover.yaml
 echo "annotating service account for cluster-autoscaler"
 kubectl annotate serviceaccount cluster-autoscaler \
   -n kube-system \
-  eks.amazonaws.com/role-arn=arn:aws:iam::${ACCOUNT_ID}:role/AmazonEKSClusterAutoscalerRole
+  eks.amazonaws.com/role-arn=${CLUSTER_AUTOSCALER}
 
 kubectl patch deployment cluster-autoscaler \
   -n kube-system \
@@ -123,43 +123,62 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 
 wait
 
-DEFAULT_PASSWORD=thankyou
-#TODO: REWRITE ABOVE, REWRITE THE HARDCODED DEPLOYMENT VALS INTO VALUES AND OVERRIDE THEM HERE!
-echo "default password is ${DEFAULT_PASSWORD}"
+# if passed as arguments, use those
+# otherwise, create new default values
+
+if [[ -z $APP_PASSWORD ]]; then
+  echo "No app password passed, creating a new one"
+  APP_PASSWORD="$(uuidgen)"
+else
+  echo "App password already set"
+fi
+
+if [[ -z $CREATE_TEAM_HMAC ]]; then
+  CREATE_TEAM_HMAC="$(openssl rand -base64 24)"
+else
+  echo "Create team HMAC already set"
+fi
+
+if [[ -z $COOKIE_PARSER_SECRET ]]; then
+  COOKIE_PARSER_SECRET="$(openssl rand -base64 24)"
+else
+  echo "Cookie parser secret already set"
+fi
+
+echo "App password is ${APP_PASSWORD}"
 helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
-  --set="imagePullPolicy=Always" \
   --set="balancer.env.K8S_ENV=aws" \
-  --set="balancer.env.IRSA_ROLE=arn:aws:iam::${ACCOUNT_ID}:role/wrongsecrets-secret-manager" \
-  --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${DEFAULT_PASSWORD}" \
-  --set="balancer.cookie.cookieParserSecret=thisisanewrandomvaluesowecanworkatit" \
-  --set="balancer.repository=jeroenwillemsen/wrongsecrets-balancer" \
-  --set="balancer.replicas=4" \
-  --set="wrongsecretsCleanup.repository=jeroenwillemsen/wrongsecrets-ctf-cleaner" \
-  --set="wrongsecrets.ctfKey=test" # this key isn't actually necessary in a setup with CTFd
+  --set="balancer.env.IRSA_ROLE=${IRSA_ROLE_ARN}" \
+  --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
+  --set="balancer.env.REACT_APP_S3_BUCKET_URL=s3://${STATE_BUCKET}" \
+  --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
+  --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}"
+
+# echo "Installing EBS CSI driver"
+# eksctl create iamserviceaccount \
+#   --name ebs-csi-controller-sa \
+#   --namespace kube-system \
+#   --cluster $CLUSTERNAME \
+#   --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+#   --approve \
+#   --role-only \
+#   --role-name AmazonEKS_EBS_CSI_DriverRole
+#   --region $AWS_REGION
+
+# echo "managing EBS CSI Driver as a separate eks addon"
+# eksctl create addon --name aws-ebs-csi-driver \
+#   --cluster $CLUSTERNAME \
+#   --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/AmazonEKS_EBS_CSI_DriverRole \
+#   --force \
+#   --region $AWS_REGION
 
 # Install CTFd
 
-echo "Installing EBS CSI driver"
-eksctl create iamserviceaccount \
-  --name ebs-csi-controller-sa \
-  --namespace kube-system \
-  --cluster $CLUSTERNAME \
-  --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
-  --approve \
-  --role-only \
-  --role-name AmazonEKS_EBS_CSI_DriverRole
-  --region $AWS_REGION
-
-echo "managing EBS CSI Driver as a separate eks addon"
-eksctl create addon --name aws-ebs-csi-driver \
-  --cluster $CLUSTERNAME \
-  --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/AmazonEKS_EBS_CSI_DriverRole \
-  --force \
-  --region $AWS_REGION
+echo "Installing CTFd"
 
 export HELM_EXPERIMENTAL_OCI=1
 kubectl create namespace ctfd
-helm -n ctfd install ctfd oci://ghcr.io/bman46/ctfd/ctfd \
+helm upgrade --install ctfd -n ctfd oci://ghcr.io/bman46/ctfd/ctfd \
   --set="redis.auth.password=$(openssl rand -base64 24)" \
   --set="mariadb.auth.rootPassword=$(openssl rand -base64 24)" \
   --set="mariadb.auth.password=$(openssl rand -base64 24)" \

@@ -19,11 +19,11 @@ Have the following tools installed:
 
 Make sure you have an active account at AWS for which you have configured the credentials on the system where you will execute the steps below. In this example we stored the credentials under an aws profile as `awsuser`.
 
-### Multi-user setup: shared state
+## Installation
 
-If you want to host a multi-user setup, you will probably want to share the state file so that everyone can try related challenges. We have provided a starter to easily do so using a Terraform S3 backend.
+First, we want to create a shared state. We've provided the terraform code for this in the `shared-state` subfolder.
 
-First, create an s3 bucket (optionally add `-var="region=YOUR_DESIRED_REGION"` to the apply to use a region other than the default eu-west-1):
+To create an s3 bucket (optionally add `-var="region=YOUR_DESIRED_REGION"` to the apply to use a region other than the default eu-west-1):
 
 ```bash
 cd shared-state
@@ -32,9 +32,7 @@ terraform apply
 ```
 
 The bucket name should be in the output. Please use that to configure the Terraform backend in `main.tf`.
-The bucket ARN will be printed, make a note of this as it will be used in the next steps.
-
-## Installation
+The bucket ARN will be printed, make a note of this as it will be used in the next steps. It should look something like `arn:aws:s3:::terraform-20230102231352749300000001`.
 
 The terraform code is loosely based on [this EKS managed Node Group TF example](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/examples/eks_managed_node_group).
 
@@ -43,18 +41,18 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 **Note-II**: The cluster you create has its access bound to the public IP of the creator. In other words: the cluster you create with this code has its access bound to your public IP-address if you apply it locally.
 
 1. export your AWS credentials (`export AWS_PROFILE=awsuser`)
-2. check whether you have the right profile by doing `aws sts get-caller-identity` and make sure you have enough rights with the caller its identity and that the actual accountnumber displayed is the account designated for you to apply this TF to.
-3. Do `terraform init` (if required, use tfenv to select TF 0.13.1 or higher )
-4. The bucket ARN will be asked for in the next 2 steps. Take the one provided to you and add `arn:aws:s3:::` to the start. e.g. ``arn:aws:s3:::terraform-20230102231352749300000001`
+2. check whether you have the right profile by doing `aws sts get-caller-identity`. Make sure you have the right account and have the rights to do this.
+3. Do `terraform init` (if required, use tfenv to select TF 0.14.0 or higher )
+4. The bucket ARN will be asked in the next 2 steps. Take the one provided to you in the output earlier (e.g., `arn:aws:s3:::terraform-20230102231352749300000001`).
 5. Do `terraform plan`
 6. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 7. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
 8. Do `export KUBECONFIG=~/.kube/wrongsecrets`
 9. Run `./build-an-deploy-aws.sh` to install all the required materials (helm for calico, secrets management, autoscaling, etc.)
 
-Your EKS cluster should be visible in [EU-West-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
+Your EKS cluster should be visible in [eu-west-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
-Are you done playing? Please run `terraform destroy` twice to clean up.
+Are you done playing? Please run `terraform destroy` twice to clean up (first in the main `aws` folder, then the `shared-state` subfolder).
 
 ### Test it
 
@@ -137,15 +135,18 @@ The documentation below is auto-generated to give insight on what's created via 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.31.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | 3.1.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.48.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.2.1 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | 18.30.2 |
+| <a name="module_cluster_autoscaler_irsa_role"></a> [cluster\_autoscaler\_irsa\_role](#module\_cluster\_autoscaler\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.9.0 |
+| <a name="module_ebs_csi_irsa_role"></a> [ebs\_csi\_irsa\_role](#module\_ebs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.9.0 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | 19.4.2 |
+| <a name="module_load_balancer_controller_irsa_role"></a> [load\_balancer\_controller\_irsa\_role](#module\_load\_balancer\_controller\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.9.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 3.18.1 |
 
 ## Resources
@@ -199,7 +200,13 @@ The documentation below is auto-generated to give insight on what's created via 
 | Name | Description |
 |------|-------------|
 | <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | Endpoint for EKS control plane. |
+| <a name="output_cluster_id"></a> [cluster\_id](#output\_cluster\_id) | The id of the cluster |
+| <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | The EKS cluster name |
 | <a name="output_cluster_security_group_id"></a> [cluster\_security\_group\_id](#output\_cluster\_security\_group\_id) | Security group ids attached to the cluster control plane. |
-| <a name="output_irsa_role"></a> [irsa\_role](#output\_irsa\_role) | The role ARN used in the IRSA setup |
+| <a name="output_ebs_role"></a> [ebs\_role](#output\_ebs\_role) | EBS CSI driver role |
+| <a name="output_ebs_role_arn"></a> [ebs\_role\_arn](#output\_ebs\_role\_arn) | EBS CSI driver role |
+| <a name="output_irsa_role"></a> [irsa\_role](#output\_irsa\_role) | The role name used in the IRSA setup |
+| <a name="output_irsa_role_arn"></a> [irsa\_role\_arn](#output\_irsa\_role\_arn) | The role ARN used in the IRSA setup |
 | <a name="output_secrets_manager_secret_name"></a> [secrets\_manager\_secret\_name](#output\_secrets\_manager\_secret\_name) | The name of the secrets manager secret |
+| <a name="output_state_bucket_name"></a> [state\_bucket\_name](#output\_state\_bucket\_name) | Terraform s3 state bucket name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
