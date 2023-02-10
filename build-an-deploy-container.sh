@@ -15,10 +15,10 @@ WRONGSECRETS_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecr
 WRONGSECRETS_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecrets.tag')
 WEBTOP_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.virtualdesktop.image')
 WEBTOP_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.virtualdesktop.tag')
-WRONGSECRETS_BALANCER_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.balancer.repository') 
-WRONGSECRETS_BALANCER_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.balancer.tag') 
+WRONGSECRETS_BALANCER_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.balancer.repository')
+WRONGSECRETS_BALANCER_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.balancer.tag')
 WRONGSECRETS_CLEANER_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecretsCleanup.repository')
-WRONGSECRETS_CLEANER_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecretsCleanup.tag') 
+WRONGSECRETS_CLEANER_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecretsCleanup.tag')
 echo "Pulling in required images to actually run $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG & $WEBTOP_IMAGE:$WEBTOP_TAG."
 echo "If you see an authentication failure: pull them manually by the following 2 commands"
 echo "'docker pull $WRONGSECRETS_IMAGE:$WRONGSECRETS_TAG'"

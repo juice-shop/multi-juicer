@@ -32,7 +32,7 @@ terraform apply
 ```
 
 The bucket name should be in the output. Please use that to configure the Terraform backend in `main.tf`.
-The bucket ARN will be printed, make a note of this as it will be used in the next steps.
+The bucket ARN will be printed, make a note of this as it will be used in the next steps. It should look something like `arn:aws:s3:::terraform-20230102231352749300000001`.
 
 The terraform code is loosely based on [this EKS managed Node Group TF example](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/examples/eks_managed_node_group).
 
@@ -43,7 +43,7 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 1. export your AWS credentials (`export AWS_PROFILE=awsuser`)
 2. check whether you have the right profile by doing `aws sts get-caller-identity`. Make sure you have the right account and have the rights to do this.
 3. Do `terraform init` (if required, use tfenv to select TF 0.14.0 or higher )
-4. The bucket ARN will be asked in the next 2 steps. Take the one provided to you in the output earlier.
+4. The bucket ARN will be asked in the next 2 steps. Take the one provided to you in the output earlier (e.g., `arn:aws:s3:::terraform-20230102231352749300000001`).
 5. Do `terraform plan`
 6. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 7. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
@@ -122,84 +122,91 @@ Note that you might have to do some manual cleanups after that.
 The documentation below is auto-generated to give insight on what's created via Terraform.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-
 ## Requirements
 
-| Name                                                                     | Version |
-| ------------------------------------------------------------------------ | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement_terraform) | ~> 1.1  |
-| <a name="requirement_aws"></a> [aws](#requirement_aws)                   | ~> 4.1  |
-| <a name="requirement_http"></a> [http](#requirement_http)                | ~> 3.1  |
-| <a name="requirement_random"></a> [random](#requirement_random)          | ~> 3.0  |
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.1 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.1 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.1 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 
 ## Providers
 
-| Name                                                      | Version |
-| --------------------------------------------------------- | ------- |
-| <a name="provider_aws"></a> [aws](#provider_aws)          | 4.31.0  |
-| <a name="provider_http"></a> [http](#provider_http)       | 3.1.0   |
-| <a name="provider_random"></a> [random](#provider_random) | 3.4.3   |
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.48.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.2.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
-| Name                                         | Source                        | Version   |
-| -------------------------------------------- | ----------------------------- | --------- |
-| <a name="module_eks"></a> [eks](#module_eks) | terraform-aws-modules/eks/aws | 18.30.2   |
-| <a name="module_vpc"></a> [vpc](#module_vpc) | terraform-aws-modules/vpc/aws | ~> 3.18.1 |
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_cluster_autoscaler_irsa_role"></a> [cluster\_autoscaler\_irsa\_role](#module\_cluster\_autoscaler\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.9.0 |
+| <a name="module_ebs_csi_irsa_role"></a> [ebs\_csi\_irsa\_role](#module\_ebs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.9.0 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | 19.4.2 |
+| <a name="module_load_balancer_controller_irsa_role"></a> [load\_balancer\_controller\_irsa\_role](#module\_load\_balancer\_controller\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.9.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 3.18.1 |
 
 ## Resources
 
-| Name                                                                                                                                                                  | Type        |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [aws_iam_access_key.state_user_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key)                                       | resource    |
-| [aws_iam_policy.secret_deny](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy)                                                  | resource    |
-| [aws_iam_policy.secret_manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy)                                               | resource    |
-| [aws_iam_role.irsa_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)                                                        | resource    |
-| [aws_iam_role.secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)                                                    | resource    |
-| [aws_iam_role.user_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)                                                        | resource    |
-| [aws_iam_role_policy.user_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy)                                 | resource    |
-| [aws_iam_role_policy_attachment.irsa_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment)         | resource    |
-| [aws_iam_role_policy_attachment.user_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment)         | resource    |
-| [aws_iam_user.state_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user)                                                       | resource    |
-| [aws_iam_user_policy.state_user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy)                                  | resource    |
-| [aws_secretsmanager_secret.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)                                 | resource    |
-| [aws_secretsmanager_secret.secret_2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)                               | resource    |
-| [aws_secretsmanager_secret.state_user_access_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)                 | resource    |
-| [aws_secretsmanager_secret_policy.policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_policy)                   | resource    |
-| [aws_secretsmanager_secret_policy.policy_2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_policy)                 | resource    |
-| [aws_secretsmanager_secret_version.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version)                 | resource    |
-| [aws_secretsmanager_secret_version.state_user_access_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource    |
-| [aws_ssm_parameter.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter)                                                 | resource    |
-| [random_password.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password)                                                   | resource    |
-| [random_password.password2](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password)                                                  | resource    |
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones)                                 | data source |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity)                                         | data source |
-| [aws_iam_policy_document.assume_role_for_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)           | data source |
-| [aws_iam_policy_document.assume_role_with_oidc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)                   | data source |
-| [aws_iam_policy_document.secret_manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)                          | data source |
-| [aws_iam_policy_document.state_user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)                       | data source |
-| [aws_iam_policy_document.user_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)                        | data source |
-| [aws_iam_policy_document.user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)                             | data source |
-| [aws_iam_policy_document.user_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document)                      | data source |
-| [http_http.ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http)                                                                  | data source |
+| Name | Type |
+|------|------|
+| [aws_iam_access_key.state_user_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
+| [aws_iam_policy.secret_deny](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.secret_manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.irsa_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.user_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy.user_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy_attachment.irsa_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.user_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_user.state_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
+| [aws_iam_user_policy.state_user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
+| [aws_secretsmanager_secret.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.secret_2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.state_user_access_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_policy.policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_policy) | resource |
+| [aws_secretsmanager_secret_policy.policy_2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_policy) | resource |
+| [aws_secretsmanager_secret_version.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.state_user_access_keys](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_ssm_parameter.secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
+| [random_password.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [random_password.password2](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.assume_role_for_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.assume_role_with_oidc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.secret_manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.state_user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.user_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.user_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.user_secret_reader](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [http_http.ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
 
-| Name                                                                                                   | Description                                            | Type           | Default                           | Required |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ | -------------- | --------------------------------- | :------: |
-| <a name="input_cluster_name"></a> [cluster_name](#input_cluster_name)                                  | The EKS cluster name                                   | `string`       | `"wrongsecrets-exercise-cluster"` |    no    |
-| <a name="input_cluster_version"></a> [cluster_version](#input_cluster_version)                         | The EKS cluster version to use                         | `string`       | `"1.23"`                          |    no    |
-| <a name="input_extra_allowed_ip_ranges"></a> [extra_allowed_ip_ranges](#input_extra_allowed_ip_ranges) | Allowed IP ranges in addition to creator IP            | `list(string)` | `[]`                              |    no    |
-| <a name="input_region"></a> [region](#input_region)                                                    | The AWS region to use                                  | `string`       | `"eu-west-1"`                     |    no    |
-| <a name="input_state_bucket_arn"></a> [state_bucket_arn](#input_state_bucket_arn)                      | ARN of the state bucket to grant access to the s3 user | `string`       | n/a                               |   yes    |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The EKS cluster name | `string` | `"wrongsecrets-exercise-cluster"` | no |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The EKS cluster version to use | `string` | `"1.23"` | no |
+| <a name="input_extra_allowed_ip_ranges"></a> [extra\_allowed\_ip\_ranges](#input\_extra\_allowed\_ip\_ranges) | Allowed IP ranges in addition to creator IP | `list(string)` | `[]` | no |
+| <a name="input_region"></a> [region](#input\_region) | The AWS region to use | `string` | `"eu-west-1"` | no |
+| <a name="input_state_bucket_arn"></a> [state\_bucket\_arn](#input\_state\_bucket\_arn) | ARN of the state bucket to grant access to the s3 user | `string` | n/a | yes |
 
 ## Outputs
 
-| Name                                                                                                                 | Description                                               |
-| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| <a name="output_cluster_endpoint"></a> [cluster_endpoint](#output_cluster_endpoint)                                  | Endpoint for EKS control plane.                           |
-| <a name="output_cluster_security_group_id"></a> [cluster_security_group_id](#output_cluster_security_group_id)       | Security group ids attached to the cluster control plane. |
-| <a name="output_irsa_role"></a> [irsa_role](#output_irsa_role)                                                       | The role ARN used in the IRSA setup                       |
-| <a name="output_secrets_manager_secret_name"></a> [secrets_manager_secret_name](#output_secrets_manager_secret_name) | The name of the secrets manager secret                    |
-
+| Name | Description |
+|------|-------------|
+| <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | Endpoint for EKS control plane. |
+| <a name="output_cluster_id"></a> [cluster\_id](#output\_cluster\_id) | The id of the cluster |
+| <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | The EKS cluster name |
+| <a name="output_cluster_security_group_id"></a> [cluster\_security\_group\_id](#output\_cluster\_security\_group\_id) | Security group ids attached to the cluster control plane. |
+| <a name="output_ebs_role"></a> [ebs\_role](#output\_ebs\_role) | EBS CSI driver role |
+| <a name="output_ebs_role_arn"></a> [ebs\_role\_arn](#output\_ebs\_role\_arn) | EBS CSI driver role |
+| <a name="output_irsa_role"></a> [irsa\_role](#output\_irsa\_role) | The role name used in the IRSA setup |
+| <a name="output_irsa_role_arn"></a> [irsa\_role\_arn](#output\_irsa\_role\_arn) | The role ARN used in the IRSA setup |
+| <a name="output_secrets_manager_secret_name"></a> [secrets\_manager\_secret\_name](#output\_secrets\_manager\_secret\_name) | The name of the secrets manager secret |
+| <a name="output_state_bucket_name"></a> [state\_bucket\_name](#output\_state\_bucket\_name) | Terraform s3 state bucket name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

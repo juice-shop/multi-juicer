@@ -44,6 +44,11 @@ STATE_BUCKET="$(terraform output -raw state_bucket_name)"
 IRSA_ROLE_ARN="$(terraform output -raw irsa_role_arn)"
 EBS_ROLE_ARN="$(terraform output -raw ebs_role_arn)"
 
+echo "CLUSTERNAME=${CLUSTERNAME}"
+echo "STATE_BUCKET=${STATE_BUCKET}"
+echo "IRSA_ROLE_ARN=${IRSA_ROLE_ARN}"
+echo "EBS_ROLE_ARN=${EBS_ROLE_ARN}"
+
 version="$(uuidgen)"
 
 echo "If the below output is different than expected: please hard stop this script (running aws sts get-caller-identity first)"
