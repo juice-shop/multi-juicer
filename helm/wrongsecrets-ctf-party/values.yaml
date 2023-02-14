@@ -35,7 +35,7 @@ balancer:
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
   tag: 1.7aws
-  # -- Number of replicas of the wrongsecrets-balancer deployment
+  # -- Number of replicas of the wrongsecrets-balancer deployment. Changing this in a commit? PLEASE UPDATE THE GITHUB WORKLFOWS THEN!(NUMBER OF "TRUE")
   replicas: 4
   service:
     # -- Kubernetes service type
