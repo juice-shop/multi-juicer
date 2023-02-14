@@ -30,8 +30,7 @@ jobs:
         run: |
           eval $(minikube docker-env)
           ./build-an-deploy.sh
-          kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}'
-          while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True True True True" ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
+          while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != *"True"* ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
           kubectl logs deployments/wrongsecrets-balancer -f >> pod.log &
           echo "port forwarding"
           kubectl port-forward service/wrongsecrets-balancer 3000:3000 &
