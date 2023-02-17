@@ -33,6 +33,8 @@ spec:
                   value: {{ .Release.Namespace | quote }}
                 - name: MAX_INACTIVE_DURATION
                   value: {{ .Values.wrongsecretsCleanup.gracePeriod }}
+                - name: SHOULD_DELETE
+                  value: {{ .Values.wrongsecretsCleanup.SHOULD_DELETE | quote }}
           restartPolicy: Never
           {{- with .Values.nodeSelector }}
           nodeSelector:

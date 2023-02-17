@@ -209,8 +209,10 @@ wrongsecretsCleanup:
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
   gracePeriod: 2d
-  # -- Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour
-  cron: "0 * * * *"
+  # -- Specifies if the clean up job should delete the outdated namespaces or just report them. Set to false to only report outdated namespaces.
+  SHOULD_DELETE: false
+  # -- Cron in which the clean up job is run. Defaults to once in a quarter. Change this if your grace period if shorter than 15 minutes. See "https://crontab.guru/#0,15,30,45_*_*_*_*" for more details.
+  cron: "0,15,30,45 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   resources:
