@@ -8,7 +8,7 @@ kind: CronJob
 metadata:
   name: 'cleanup-job'
 spec:
-  schedule: {{ .Values.wrongsecretsCleanup.cron }}
+  schedule: {{ .Values.wrongsecretsCleanup.cron | quote }}
   successfulJobsHistoryLimit: {{ .Values.wrongsecretsCleanup.successfulJobsHistoryLimit }}
   failedJobsHistoryLimit: {{ .Values.wrongsecretsCleanup.failedJobsHistoryLimit }}
   jobTemplate:
