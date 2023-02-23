@@ -18,3 +18,5 @@ db.zip
 .letsencrypt
 
 *.auto.tfvars
+node_modules
+.npm

@@ -17,6 +17,11 @@ updates:
     directory: "/wrongsecrets-balancer/ui" # Location of package manifests
     schedule:
       interval: "monthly"
+    # check our npm for dev
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/cleaner" # Location of package manifests
     schedule:
