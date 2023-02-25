@@ -10,7 +10,7 @@
     "react": "^18.2.0",
     "react-data-table-component": "^7.5.3",
     "react-dom": "^18.2.0",
-    "react-intl": "^6.2.8",
+    "react-intl": "^6.2.10",
     "react-router-dom": "^6.8.1",
     "reactjs-popup": "^2.0.5",
     "styled-components": "^5.3.6"
