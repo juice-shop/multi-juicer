@@ -205,7 +205,7 @@ virtualdesktop:
 # Deletes unused Wrongsecrets namespaces after a configurable period of inactivity
 wrongsecretsCleanup:
   repository: jeroenwillemsen/wrongsecrets-ctf-cleaner
-  tag: 0.3
+  tag: 0.4
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
   gracePeriod: 2d
