@@ -34,6 +34,7 @@ const createNameSpaceForTeam = async (team) => {
     },
     labels: {
       name: `t-${team}`,
+      'pod-security.kubernetes.io/enforce': 'restricted',
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
@@ -131,6 +132,8 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
+                capabilities: {drop: [ALL]},
+                seccompProfile: {type: RuntimeDefault},
               },
               env: [
                 {
@@ -385,6 +388,8 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
+                capabilities: {drop: [ALL]},
+                seccompProfile: {type: RuntimeDefault},
               },
               env: [
                 {
@@ -1088,8 +1093,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
               // resources: get('virtualdesktop.resources'),
               securityContext: {
-                // allowPrivilegeEscalation: false,
-                // readOnlyRootFilesystem: true,
+                allowPrivilegeEscalation: false,
+                readOnlyRootFilesystem: true,
+                runAsNonRoot: true,
+                capabilities: {drop: [ALL]},
+                seccompProfile: {type: RuntimeDefault},
               },
               env: [...get('virtualdesktop.env', [])],
               envFrom: get('virtualdesktop.envFrom'),
