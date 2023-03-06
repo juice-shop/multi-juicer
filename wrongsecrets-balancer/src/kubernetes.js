@@ -1073,6 +1073,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           serviceAccountName: 'webtop-sa',
+          securityContext: {
+            runAsUser: 2000,
+            runAsGroup: 2000,
+            fsGroup: 2000,
+          },
           containers: [
             {
               name: 'virtualdesktop',
