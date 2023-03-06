@@ -132,8 +132,8 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
-                capabilities: {drop: [ALL]},
-                seccompProfile: {type: RuntimeDefault},
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [
                 {
@@ -388,8 +388,8 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
-                capabilities: {drop: [ALL]},
-                seccompProfile: {type: RuntimeDefault},
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [
                 {
@@ -1096,8 +1096,8 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
-                capabilities: {drop: [ALL]},
-                seccompProfile: {type: RuntimeDefault},
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [...get('virtualdesktop.env', [])],
               envFrom: get('virtualdesktop.envFrom'),
