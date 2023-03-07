@@ -34,7 +34,8 @@ const createNameSpaceForTeam = async (team) => {
     },
     labels: {
       name: `t-${team}`,
-      'pod-security.kubernetes.io/enforce': 'restricted',
+      'pod-security.kubernetes.io/audit': 'restricted',
+      'pod-security.kubernetes.io/enforce': 'baseline',
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
@@ -1073,11 +1074,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           serviceAccountName: 'webtop-sa',
-          securityContext: {
-            runAsUser: 1000,
-            runAsGroup: 1000,
-            fsGroup: 1000,
-          },
+          // securityContext: {
+          //   runAsUser: 1000,
+          //   runAsGroup: 1000,
+          //   fsGroup: 1000,
+          // },
           containers: [
             {
               name: 'virtualdesktop',
@@ -1098,10 +1099,10 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
               },
               // resources: get('virtualdesktop.resources'),
               securityContext: {
-                allowPrivilegeEscalation: false,
-                readOnlyRootFilesystem: true,
-                runAsNonRoot: true,
-                capabilities: { drop: ['ALL'] },
+                allowPrivilegeEscalation: true,
+                readOnlyRootFilesystem: false,
+                runAsNonRoot: false,
+                capabilities: { drop: ['ALL'], add:['CAP_SETGID','CAP_SETUID','CAP_CHOWN'] },
                 seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [...get('virtualdesktop.env', [])],
@@ -1140,7 +1141,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               emptyDir: {
                 medium: 'Memory',
-                sizeLimit: '128Mi',
+                sizeLimit: '200Mi',
               },
               name: 'config-fs',
             },
