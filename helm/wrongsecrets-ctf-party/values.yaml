@@ -36,7 +36,7 @@ balancer:
   repository: jeroenwillemsen/wrongsecrets-balancer
   tag: 1.7aws
   # -- Number of replicas of the wrongsecrets-balancer deployment. Changing this in a commit? PLEASE UPDATE THE GITHUB WORKLFOWS THEN!(NUMBER OF "TRUE")
-  replicas: 4
+  replicas: 2
   service:
     # -- Kubernetes service type
     type: ClusterIP
@@ -62,6 +62,9 @@ balancer:
     capabilities:
       drop:
         - ALL
+      add:
+        - CAP_NET_ADMIN
+        - CAP_NET_BIND_SERVICE
     seccompProfile:
       type: RuntimeDefault
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)

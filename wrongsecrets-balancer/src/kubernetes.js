@@ -1103,7 +1103,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                 readOnlyRootFilesystem: false,
                 runAsNonRoot: false,
                 capabilities: { drop: ['ALL'], add:['CAP_SETGID','CAP_SETUID','CAP_CHOWN'] },
-                seccompProfile: { type: 'RuntimeDefault' },
+                seccompProfile: { type: 'Unconfined' },
               },
               env: [...get('virtualdesktop.env', [])],
               envFrom: get('virtualdesktop.envFrom'),
