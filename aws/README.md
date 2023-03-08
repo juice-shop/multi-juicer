@@ -190,7 +190,7 @@ The documentation below is auto-generated to give insight on what's created via 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The EKS cluster name | `string` | `"wrongsecrets-exercise-cluster"` | no |
-| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The EKS cluster version to use | `string` | `"1.23"` | no |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The EKS cluster version to use | `string` | `"1.25"` | no |
 | <a name="input_extra_allowed_ip_ranges"></a> [extra\_allowed\_ip\_ranges](#input\_extra\_allowed\_ip\_ranges) | Allowed IP ranges in addition to creator IP | `list(string)` | `[]` | no |
 | <a name="input_region"></a> [region](#input\_region) | The AWS region to use | `string` | `"eu-west-1"` | no |
 | <a name="input_state_bucket_arn"></a> [state\_bucket\_arn](#input\_state\_bucket\_arn) | ARN of the state bucket to grant access to the s3 user | `string` | n/a | yes |
