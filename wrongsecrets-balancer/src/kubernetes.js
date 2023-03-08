@@ -35,7 +35,7 @@ const createNameSpaceForTeam = async (team) => {
     labels: {
       name: `t-${team}`,
       'pod-security.kubernetes.io/audit': 'restricted',
-      // 'pod-security.kubernetes.io/enforce': 'baseline',
+      'pod-security.kubernetes.io/enforce': 'baseline',
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
@@ -128,7 +128,6 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
               name: 'wrongsecrets',
               image: `jeroenwillemsen/wrongsecrets:${wrongSecretsContainterTag}`,
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
-              // resources: get('wrongsecrets.resources'),
               securityContext: {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
@@ -1097,13 +1096,10 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   'ephemeral-storage': '8Gi',
                 },
               },
-              // // resources: get('virtualdesktop.resources'),
               securityContext: {
-                allowPrivilegeEscalation: true,
+                allowPrivilegeEscalation: true, //S6 will capture any weird things
                 readOnlyRootFilesystem: false,
                 runAsNonRoot: false,
-                //   capabilities: { drop: ['ALL'], add:['CAP_SETGID','CAP_SETUID','CAP_CHOWN'] },
-                seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [
                 {
@@ -1151,7 +1147,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               emptyDir: {
                 medium: 'Memory',
-                sizeLimit: '200Mi',
+                sizeLimit: '160Mi',
               },
               name: 'config-fs',
             },
