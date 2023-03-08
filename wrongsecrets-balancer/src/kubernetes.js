@@ -1110,7 +1110,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'PGID',
                   value: '1000',
                 },
-                ...get('virtualdesktop.env', [])
+                ...get('virtualdesktop.env', []),
               ],
               envFrom: get('virtualdesktop.envFrom'),
               ports: [
