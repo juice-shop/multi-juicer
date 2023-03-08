@@ -35,7 +35,7 @@ const createNameSpaceForTeam = async (team) => {
     labels: {
       name: `t-${team}`,
       'pod-security.kubernetes.io/audit': 'restricted',
-      'pod-security.kubernetes.io/enforce': 'baseline',
+      // 'pod-security.kubernetes.io/enforce': 'baseline',
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
@@ -1097,15 +1097,25 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   'ephemeral-storage': '8Gi',
                 },
               },
-              // resources: get('virtualdesktop.resources'),
+              // // resources: get('virtualdesktop.resources'),
               securityContext: {
                 allowPrivilegeEscalation: true,
                 readOnlyRootFilesystem: false,
                 runAsNonRoot: false,
-                capabilities: { drop: ['ALL'], add:['CAP_SETGID','CAP_SETUID','CAP_CHOWN'] },
-                seccompProfile: { type: 'Unconfined' },
+                //   capabilities: { drop: ['ALL'], add:['CAP_SETGID','CAP_SETUID','CAP_CHOWN'] },
+                seccompProfile: { type: 'RuntimeDefault' },
               },
-              env: [...get('virtualdesktop.env', [])],
+              env: [
+                {
+                  name: 'PUID',
+                  value: '1000',
+                },
+                {
+                  name: 'PGID',
+                  value: '1000',
+                },
+                ...get('virtualdesktop.env', [])
+              ],
               envFrom: get('virtualdesktop.envFrom'),
               ports: [
                 {
