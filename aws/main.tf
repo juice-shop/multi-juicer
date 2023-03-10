@@ -1,11 +1,11 @@
 terraform {
   # Set your region and bucket name (output from shared state) in the placeholder below
   # Then uncomment and apply!
-  backend "s3" {
-    region = "eu-west-1"                            # Change if desired
-    bucket = "terraform-20230310093750024400000001" # Put your bucket name here
-    key    = "wrongsecrets/terraform.tfstate"       # Change if desired
-  }
+  # backend "s3" {
+  #   region = "eu-west-1"                            # Change if desired
+  #   bucket = "terraform-20230310093750024400000001" # Put your bucket name here
+  #   key    = "wrongsecrets/terraform.tfstate"       # Change if desired
+  # }
 }
 
 locals {
