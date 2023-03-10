@@ -209,6 +209,8 @@ The documentation below is auto-generated to give insight on what's created via 
 | <a name="output_ebs_role_arn"></a> [ebs\_role\_arn](#output\_ebs\_role\_arn) | EBS CSI driver role |
 | <a name="output_irsa_role"></a> [irsa\_role](#output\_irsa\_role) | The role name used in the IRSA setup |
 | <a name="output_irsa_role_arn"></a> [irsa\_role\_arn](#output\_irsa\_role\_arn) | The role ARN used in the IRSA setup |
+| <a name="output_load_balancer_controller_role"></a> [load\_balancer\_controller\_role](#output\_load\_balancer\_controller\_role) | Load balancer controller role |
+| <a name="output_load_balancer_controller_role_arn"></a> [load\_balancer\_controller\_role\_arn](#output\_load\_balancer\_controller\_role\_arn) | Load balancer controller role arn |
 | <a name="output_secrets_manager_secret_name"></a> [secrets\_manager\_secret\_name](#output\_secrets\_manager\_secret\_name) | The name of the secrets manager secret |
 | <a name="output_state_bucket_name"></a> [state\_bucket\_name](#output\_state\_bucket\_name) | Terraform s3 state bucket name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
