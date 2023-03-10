@@ -42,6 +42,10 @@ echo "do helm eks application"
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
 
+LOAD_BALANCER_CONTROLLER_ROLE_ARN="$(terraform output -raw load_balancer_controller_role_arn)"
+kubectl create serviceaccount -n kube-system aws-load-balancer-controller
+kubectl annotate serviceaccount -n kube-system --overwrite aws-load-balancer-controller eks.amazonaws.com/role-arn=${LOAD_BALANCER_CONTROLLER_ROLE_ARN}
+
 echo "upgrade alb controller with helm"
 helm upgrade -i aws-load-balancer-controller \
   eks/aws-load-balancer-controller \
