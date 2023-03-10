@@ -43,11 +43,13 @@ CLUSTERNAME="$(terraform output -raw cluster_name)"
 STATE_BUCKET="$(terraform output -raw state_bucket_name)"
 IRSA_ROLE_ARN="$(terraform output -raw irsa_role_arn)"
 EBS_ROLE_ARN="$(terraform output -raw ebs_role_arn)"
+CLUSTER_AUTOSCALER_ROLE_ARN="$(terraform output -raw cluster_autoscaler_role_arn)"
 
 echo "CLUSTERNAME=${CLUSTERNAME}"
 echo "STATE_BUCKET=${STATE_BUCKET}"
 echo "IRSA_ROLE_ARN=${IRSA_ROLE_ARN}"
 echo "EBS_ROLE_ARN=${EBS_ROLE_ARN}"
+echo "CLUSTER_AUTOSCALER_ROLE_ARN=${CLUSTER_AUTOSCALER_ROLE_ARN}"
 
 version="$(uuidgen)"
 
@@ -86,8 +88,8 @@ kubectl apply -f cluster-autoscaler-autodiscover.yaml
 
 echo "annotating service account for cluster-autoscaler"
 kubectl annotate serviceaccount cluster-autoscaler \
-  -n kube-system \
-  eks.amazonaws.com/role-arn=${CLUSTER_AUTOSCALER}
+  -n kube-system --overwrite \
+  eks.amazonaws.com/role-arn=${CLUSTER_AUTOSCALER_ROLE_ARN}
 
 kubectl patch deployment cluster-autoscaler \
   -n kube-system \

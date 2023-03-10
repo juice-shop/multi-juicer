@@ -24,7 +24,7 @@ fi
 ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' -r)
 echo "ACCOUNT_ID=${ACCOUNT_ID}"
 
-kubectl delete -f k8s/wrongsecrets-balancer-ingress.yaml
+kubectl delete -f k8s/wrongsecrets-balancer-ingress.yml
 kubectl delete -f k8s/ctfd-ingress.yaml
 
 sleep 5 # Give the controller some time to catch the ingress change
