@@ -34,15 +34,3 @@ helm uninstall aws-load-balancer-controller \
 
 echo "Cleanup k8s ALB"
 kubectl delete -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
-
-echo "Cleanup iam serviceaccount and policy"
-eksctl delete iamserviceaccount \
-  --cluster $CLUSTERNAME \
-  --name aws-load-balancer-controller \
-  --namespace kube-system \
-  --region $AWS_REGION
-
-sleep 5 # Prevents race condition - command below may error out because it's still 'attached'
-
-aws iam delete-policy \
-  --policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/AWSLoadBalancerControllerIAMPolicy

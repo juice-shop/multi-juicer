@@ -26,28 +26,6 @@ echo "ACCOUNT_ID=${ACCOUNT_ID}"
 LBC_VERSION="v2.4.1"
 echo "LBC_VERSION=$LBC_VERSION"
 
-# echo "executing eksctl utils associate-iam-oidc-provider"
-# eksctl utils associate-iam-oidc-provider \
-#     --region ${AWS_REGION} \
-#     --cluster ${CLUSTERNAME} \
-#     --approve
-
-echo "creating iam policy"
-curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/"${LBC_VERSION}"/docs/install/iam_policy.json
-aws iam create-policy \
-  --policy-name AWSLoadBalancerControllerIAMPolicy \
-  --policy-document file://iam_policy.json
-
-echo "creating iam service account for cluster ${CLUSTERNAME}"
-eksctl create iamserviceaccount \
-  --cluster $CLUSTERNAME \
-  --namespace kube-system \
-  --name aws-load-balancer-controller \
-  --attach-policy-arn arn:aws:iam::${ACCOUNT_ID}:policy/AWSLoadBalancerControllerIAMPolicy \
-  --override-existing-serviceaccounts \
-  --region $AWS_REGION \
-  --approve
-
 echo "setting up kubectl"
 
 aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTERNAME --kubeconfig ~/.kube/wrongsecrets
