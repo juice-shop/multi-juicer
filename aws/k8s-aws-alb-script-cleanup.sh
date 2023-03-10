@@ -39,3 +39,5 @@ helm uninstall aws-load-balancer-controller \
 
 echo "Cleanup k8s ALB"
 kubectl delete -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+
+kubectl delete serviceaccount -n kube-system aws-load-balancer-controller
