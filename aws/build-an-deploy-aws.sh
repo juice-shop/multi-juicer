@@ -43,13 +43,19 @@ CLUSTERNAME="$(terraform output -raw cluster_name)"
 STATE_BUCKET="$(terraform output -raw state_bucket_name)"
 IRSA_ROLE_ARN="$(terraform output -raw irsa_role_arn)"
 EBS_ROLE_ARN="$(terraform output -raw ebs_role_arn)"
+CLUSTER_AUTOSCALER_ROLE_ARN="$(terraform output -raw cluster_autoscaler_role_arn)"
 
 echo "CLUSTERNAME=${CLUSTERNAME}"
 echo "STATE_BUCKET=${STATE_BUCKET}"
 echo "IRSA_ROLE_ARN=${IRSA_ROLE_ARN}"
 echo "EBS_ROLE_ARN=${EBS_ROLE_ARN}"
+echo "CLUSTER_AUTOSCALER_ROLE_ARN=${CLUSTER_AUTOSCALER_ROLE_ARN}"
 
 version="$(uuidgen)"
+
+aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTERNAME --kubeconfig ~/.kube/wrongsecrets
+
+export KUBECONFIG=~/.kube/wrongsecrets
 
 echo "If the below output is different than expected: please hard stop this script (running aws sts get-caller-identity first)"
 
@@ -58,24 +64,6 @@ aws sts get-caller-identity
 echo "Giving you 4 seconds before we add autoscaling"
 
 sleep 4
-
-# echo "Installing policies and service accounts"
-
-# aws iam create-policy \
-#     --policy-name AmazonEKSClusterAutoscalerPolicy \
-#     --policy-document file://cluster-autoscaler-policy.json
-
-# echo "Installing iamserviceaccount"
-
-# eksctl create iamserviceaccount \
-#   --cluster=$CLUSTERNAME \
-#   --region=$AWS_REGION \
-#   --namespace=kube-system \
-#   --name=cluster-autoscaler \
-#   --role-name=AmazonEKSClusterAutoscalerRole \
-#   --attach-policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/AmazonEKSClusterAutoscalerPolicy \
-#   --override-existing-serviceaccounts \
-#   --approve
 
 echo "Deploying the k8s autoscaler for eks through kubectl"
 
@@ -86,8 +74,8 @@ kubectl apply -f cluster-autoscaler-autodiscover.yaml
 
 echo "annotating service account for cluster-autoscaler"
 kubectl annotate serviceaccount cluster-autoscaler \
-  -n kube-system \
-  eks.amazonaws.com/role-arn=${CLUSTER_AUTOSCALER}
+  -n kube-system --overwrite \
+  eks.amazonaws.com/role-arn=${CLUSTER_AUTOSCALER_ROLE_ARN}
 
 kubectl patch deployment cluster-autoscaler \
   -n kube-system \
@@ -104,6 +92,9 @@ if [ $? == 0 ]; then
 else
   helm upgrade --install -n kube-system csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver --set enableSecretRotation=true --set rotationPollInterval=60s
 fi
+
+echo "Patching default namespace"
+kubectl apply -f k8s/workspace-psa.yml
 
 echo "Install ACSP"
 kubectl apply -f https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml
@@ -154,33 +145,16 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
   --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}"
 
-# echo "Installing EBS CSI driver"
-# eksctl create iamserviceaccount \
-#   --name ebs-csi-controller-sa \
-#   --namespace kube-system \
-#   --cluster $CLUSTERNAME \
-#   --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
-#   --approve \
-#   --role-only \
-#   --role-name AmazonEKS_EBS_CSI_DriverRole
-#   --region $AWS_REGION
-
-# echo "managing EBS CSI Driver as a separate eks addon"
-# eksctl create addon --name aws-ebs-csi-driver \
-#   --cluster $CLUSTERNAME \
-#   --service-account-role-arn arn:aws:iam::${ACCOUNT_ID}:role/AmazonEKS_EBS_CSI_DriverRole \
-#   --force \
-#   --region $AWS_REGION
-
 # Install CTFd
-
 echo "Installing CTFd"
 
 export HELM_EXPERIMENTAL_OCI=1
 kubectl create namespace ctfd
+
+# Double base64 encoding to prevent weird character errors in ctfd
 helm upgrade --install ctfd -n ctfd oci://ghcr.io/bman46/ctfd/ctfd \
-  --set="redis.auth.password=$(openssl rand -base64 24)" \
-  --set="mariadb.auth.rootPassword=$(openssl rand -base64 24)" \
-  --set="mariadb.auth.password=$(openssl rand -base64 24)" \
-  --set="mariadb.auth.replicationPassword=$(openssl rand -base64 24)" \
+  --set="redis.auth.password=$(openssl rand -base64 24 | base64)" \
+  --set="mariadb.auth.rootPassword=$(openssl rand -base64 24 | base64)" \
+  --set="mariadb.auth.password=$(openssl rand -base64 24 | base64)" \
+  --set="mariadb.auth.replicationPassword=$(openssl rand -base64 24 | base64)" \
   --set="env.open.SECRET_KEY=test" # this key isn't actually necessary in a setup with CTFd

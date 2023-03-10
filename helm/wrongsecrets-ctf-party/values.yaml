@@ -34,9 +34,9 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 1.7aws
+  tag: 1.8aws
   # -- Number of replicas of the wrongsecrets-balancer deployment. Changing this in a commit? PLEASE UPDATE THE GITHUB WORKLFOWS THEN!(NUMBER OF "TRUE")
-  replicas: 4
+  replicas: 2
   service:
     # -- Kubernetes service type
     type: ClusterIP
@@ -55,6 +55,18 @@ balancer:
     limits:
       memory: 1024Mi
       cpu: 1000m
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+      add:
+        - CAP_NET_ADMIN
+        - CAP_NET_BIND_SERVICE
+    seccompProfile:
+      type: RuntimeDefault
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -129,6 +141,11 @@ wrongsecrets:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
   # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env:
     - name: K8S_ENV
@@ -196,9 +213,15 @@ virtualdesktop:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
   runtimeClassName: {}
   affinity: {}
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+
   envFrom: []
   tolerations: []
 
@@ -220,7 +243,6 @@ wrongsecretsCleanup:
       memory: 256Mi
     limits:
       memory: 256Mi
-  securityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the wrongsecretsCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the wrongsecretsCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)

@@ -44,6 +44,26 @@ output "ebs_role_arn" {
   value       = module.ebs_csi_irsa_role.iam_role_arn
 }
 
+output "cluster_autoscaler_role" {
+  description = "Cluster autoscaler role"
+  value       = module.cluster_autoscaler_irsa_role.iam_role_name
+}
+
+output "cluster_autoscaler_role_arn" {
+  description = "Cluster autoscaler role arn"
+  value       = module.cluster_autoscaler_irsa_role.iam_role_arn
+}
+
+output "load_balancer_controller_role" {
+  description = "Load balancer controller role"
+  value       = module.load_balancer_controller_irsa_role.iam_role_name
+}
+
+output "load_balancer_controller_role_arn" {
+  description = "Load balancer controller role arn"
+  value       = module.load_balancer_controller_irsa_role.iam_role_arn
+}
+
 output "state_bucket_name" {
   description = "Terraform s3 state bucket name"
   value       = split(":", var.state_bucket_arn)[length(split(":", var.state_bucket_arn)) - 1]
