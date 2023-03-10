@@ -28,6 +28,11 @@ echo "cleanup k8s ingress and service. This may take a while"
 kubectl delete service wrongsecrets-balancer
 kubectl delete ingress wrongsecrets-balancer
 
+kubectl delete ingress ctfd -n ctfd
+
+# Give some time for the controller to remove cleaned ingresses
+sleep 5
+
 echo "Cleanup helm chart"
 helm uninstall aws-load-balancer-controller \
   -n kube-system
