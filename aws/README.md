@@ -199,6 +199,8 @@ The documentation below is auto-generated to give insight on what's created via 
 
 | Name | Description |
 |------|-------------|
+| <a name="output_cluster_autoscaler_role"></a> [cluster\_autoscaler\_role](#output\_cluster\_autoscaler\_role) | Cluster autoscaler role |
+| <a name="output_cluster_autoscaler_role_arn"></a> [cluster\_autoscaler\_role\_arn](#output\_cluster\_autoscaler\_role\_arn) | Cluster autoscaler role arn |
 | <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | Endpoint for EKS control plane. |
 | <a name="output_cluster_id"></a> [cluster\_id](#output\_cluster\_id) | The id of the cluster |
 | <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | The EKS cluster name |
