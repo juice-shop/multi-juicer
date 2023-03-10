@@ -20,13 +20,22 @@ spec:
             helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
         spec:
           serviceAccountName: 'wrongsecrets-cleaner'
-          {{- with .Values.wrongsecretsCleanup.securityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            runAsUser: 1000
+            runAsGroup: 3000
+            fsGroup: 2000
           containers:
             - image: '{{ .Values.wrongsecretsCleanup.repository }}:{{ .Values.wrongsecretsCleanup.tag | default (printf "v%s" .Chart.Version) }}'
               imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+                seccompProfile:
+                  type: RuntimeDefault
               name: 'cleanup-job'
               env:
                 - name: NAMESPACE

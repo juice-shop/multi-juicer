@@ -34,6 +34,8 @@ const createNameSpaceForTeam = async (team) => {
     },
     labels: {
       name: `t-${team}`,
+      'pod-security.kubernetes.io/audit': 'restricted',
+      'pod-security.kubernetes.io/enforce': 'baseline',
     },
   };
   k8sCoreApi.createNamespace(namedNameSpace).catch((error) => {
@@ -126,11 +128,12 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
               name: 'wrongsecrets',
               image: `jeroenwillemsen/wrongsecrets:${wrongSecretsContainterTag}`,
               imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
-              // resources: get('wrongsecrets.resources'),
               securityContext: {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [
                 {
@@ -385,6 +388,8 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
               },
               env: [
                 {
@@ -1068,6 +1073,11 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           serviceAccountName: 'webtop-sa',
+          // securityContext: {
+          //   runAsUser: 1000,
+          //   runAsGroup: 1000,
+          //   fsGroup: 1000,
+          // },
           containers: [
             {
               name: 'virtualdesktop',
@@ -1086,12 +1096,22 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
                   'ephemeral-storage': '8Gi',
                 },
               },
-              // resources: get('virtualdesktop.resources'),
               securityContext: {
-                // allowPrivilegeEscalation: false,
-                // readOnlyRootFilesystem: true,
+                allowPrivilegeEscalation: true, //S6 will capture any weird things
+                readOnlyRootFilesystem: false,
+                runAsNonRoot: false,
               },
-              env: [...get('virtualdesktop.env', [])],
+              env: [
+                {
+                  name: 'PUID',
+                  value: '1000',
+                },
+                {
+                  name: 'PGID',
+                  value: '1000',
+                },
+                ...get('virtualdesktop.env', []),
+              ],
               envFrom: get('virtualdesktop.envFrom'),
               ports: [
                 {
@@ -1127,7 +1147,7 @@ const createDesktopDeploymentForTeam = async ({ team, passcodeHash }) => {
             {
               emptyDir: {
                 medium: 'Memory',
-                sizeLimit: '128Mi',
+                sizeLimit: '160Mi',
               },
               name: 'config-fs',
             },
