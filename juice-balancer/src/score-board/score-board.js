@@ -108,6 +108,7 @@ const keyDifficultyMapping = Object.freeze({
   nullByteChallenge: 4,
   bullyChatbotChallenge: 1,
   lfrChallenge: 5,
+  closeNotificationsChallenge: 1,
 });
 
 /**
