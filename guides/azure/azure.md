@@ -72,7 +72,8 @@ metadata:
   name: juice-loadbalancer
 spec:
   selector:
-    app.kubernetes.io/name: multi-juicer
+    app.kubernetes.io/instance: juice-balancer-multi-juicer
+    app.kubernetes.io/name: juice-balancer
   ports:
   - protocol: TCP
     port: 80
