@@ -38,6 +38,14 @@ kubectl get pods
 # Wait until both pods are ready
 ```
 
+If the juice-balancer pod is still pending status after a couple of minutes, the cluster may not have the necessary resources to provision the pod.
+
+```bash
+# This show details about the juice-balancer pod. Warnings can be found under Events, and the cluster 
+# does not have the necessary resources if theres is a warning about insufficient CPU or memory.
+kubectl describe pods juice-balancer
+```
+
 ## Step 3. Verify the app is running correctly
 
 This step is optional, but helpful to catch errors quicker.
