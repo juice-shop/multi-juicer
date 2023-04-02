@@ -44,3 +44,6 @@ jobs:
           mv terraform-docs /usr/local/bin/
       - name: Pre-commit checks
         uses: pre-commit/action@v3.0.0
+      - name: pre-commit-ci-lite
+        uses: pre-commit-ci/lite-action@v1.0.1
+        if: always()
