@@ -1298,7 +1298,8 @@ const deleteDesktopPodForTeam = async (team) => {
 };
 module.exports.deleteDesktopPodForTeam = deleteDesktopPodForTeam;
 
-const getJuiceShopInstanceForTeamname = (teamname) =>
+const getJuiceShopInstanceForTeamname = (teamname) => {
+  logger.info('checking readiness');
   k8sAppsApi
     .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, `t-${teamname}`)
     .then((res) => {
@@ -1309,8 +1310,12 @@ const getJuiceShopInstanceForTeamname = (teamname) =>
       };
     })
     .catch((error) => {
+      if (error.response.body.message.contains('No such container')) {
+        return;
+      }
       throw new Error(error.response.body.message);
     });
+};
 module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;
 
 const updateLastRequestTimestampForTeam = (teamname) => {
