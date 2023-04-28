@@ -3,7 +3,7 @@ on:
   release:
     types: [published]
 env:
-  CONTAINER_REGISTRY: ghcr.io/j12934
+  CONTAINER_REGISTRY: ghcr.io
 jobs:
   helmRelease:
     name: "Publish Helm Chart"
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: "Login to Package Registry"
-        run: 'helm registry login --username ${{ github.actor }} --password "${{ secrets.GITHUB_TOKEN }}" ${{ env.CONTAINER_REGISTRY }}/helm/'
+        run: 'helm registry login --username ${{ github.actor }} --password "${{ secrets.GITHUB_TOKEN }}" ${{ env.CONTAINER_REGISTRY }}'
 
       - name: "Package Helm Chart"
         working-directory: helm/multi-juicer/
@@ -28,7 +28,7 @@ jobs:
       - name: "Push Helm Chart"
         working-directory: helm/multi-juicer/
         run: |
-          helm push multi-juicer-*.tgz oci://${{ env.CONTAINER_REGISTRY }}/helm/
+          helm push multi-juicer-*.tgz oci://${{ env.CONTAINER_REGISTRY }}/j12934/helm
 
   dockerBuilds:
     name: "Build"
@@ -50,7 +50,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.CONTAINER_REGISTRY }}/${{ matrix.component }}
+          images: ${{ env.CONTAINER_REGISTRY }}/j12934/multi-juicer/${{ matrix.component }}
           tags: |
             type=semver,pattern={{raw}}
 
