@@ -51,7 +51,7 @@ jobs:
 
       - name: Docker Meta
         id: docker_meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: ${{ env.CONTAINER_REGISTRY }}/j12934/multi-juicer/${{ matrix.component }}
           tags: |
