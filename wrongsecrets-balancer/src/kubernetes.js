@@ -1304,7 +1304,10 @@ const getJuiceShopInstanceForTeamname = (teamname) => {
     .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, `t-${teamname}`)
     .then((res) => {
       logger.info(JSON.stringify(res));
-      if(res.body.hasOwnProperty('metadata') && res.body.metadata.hasOwnProperty('annotations') ){
+      if (
+        Object.prototype.hasOwnProperty.call(res.body, 'metadata') &&
+        Object.prototype.hasOwnProperty.call(res.body.metadata, 'annotations')
+      ) {
         return {
           readyReplicas: res.body.status.readyReplicas,
           availableReplicas: res.body.status.availableReplicas,

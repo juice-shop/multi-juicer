@@ -174,7 +174,11 @@ async function joinIfTeamAlreadyExists(req, res, next) {
       message: 'Team requires authentication to join',
     });
   } catch (error) {
-    if (error.message.includes(`deployments.apps "t-${team}-wrongsecrets" not found`) || error.message==="Cannot destructure property 'passcodeHash' of '(intermediate value)' as it is undefined.") {
+    if (
+      error.message.includes(`deployments.apps "t-${team}-wrongsecrets" not found`) ||
+      error.message ===
+        "Cannot destructure property 'passcodeHash' of '(intermediate value)' as it is undefined."
+    ) {
       logger.info(`Team ${team} doesn't have a WrongSecrets deployment yet`);
       return next();
     } else {
@@ -194,7 +198,7 @@ async function joinIfTeamAlreadyExists(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
-  logger.info("checking for max instances");
+  logger.info('checking for max instances');
   const maxInstances = get('maxJuiceShopInstances');
 
   // If max instances is set to negative numbers it's not capped
@@ -236,7 +240,7 @@ async function generatePasscode() {
  */
 async function createTeam(req, res) {
   const { team } = req.params;
-  logger.info(`creating new team for team '${team}'`)
+  logger.info(`creating new team for team '${team}'`);
   if (k8sEnv === 'aws') {
     logger.info(
       'We will create an AWS deployment see the helm chart/deployment for setting this to k8s'
@@ -246,7 +250,7 @@ async function createTeam(req, res) {
   logger.info(
     'We will create a K8s deployment see the helm chart/deployment for setting this to aws'
   );
-  
+
   const { passcode, hash } = await generatePasscode();
   try {
     logger.info(`Creating Namespace for team '${team}'`);
@@ -523,9 +527,8 @@ async function awaitReadiness(req, res) {
   const { team } = req.params;
 
   logger.info(`Awaiting readiness of wrongsecrets Deployment for team '${team}'`);
-
-  try {
-    for (let i = 0; i < 180; i++) {
+  for (let i = 0; i < 180; i++) {
+    try {
       const { readyReplicas } = await getJuiceShopInstanceForTeamname(team);
 
       if (readyReplicas === 1) {
@@ -535,14 +538,14 @@ async function awaitReadiness(req, res) {
       }
 
       await sleep(1000);
-    }
 
-    logger.error(`Waiting for deployment of team '${team}' timed out`);
-    res.status(500).send({ message: 'Waiting for Deployment Readiness Timed Out' });
-  } catch (error) {
-    logger.error(`Failed to wait for teams '${team}' deployment to get ready: ${error}`);
-    logger.error(error);
-    res.status(500).send({ message: 'Failed to Wait For Deployment Readiness' });
+      logger.error(`Waiting for deployment of team '${team}' timed out`);
+      res.status(500).send({ message: 'Waiting for Deployment Readiness Timed Out' });
+    } catch (error) {
+      logger.error(`Failed to wait for teams '${team}' deployment to get ready: ${error}`);
+      logger.error(error);
+      res.status(500).send({ message: 'Failed to Wait For Deployment Readiness' });
+    }
   }
 }
 
