@@ -31,7 +31,7 @@ jobs:
           RELEASE_VERSION="${GITHUB_REF#refs/*/}"
           # Remove leading 'v' from git tag to create valid semver
           RELEASE_VERSION="${RELEASE_VERSION//v}"
-          helm push "multi-juicer-${RELEASE_VERSION}.tgz" oci://${{ env.CONTAINER_REGISTRY }}/j12934/helm
+          helm push "multi-juicer-${RELEASE_VERSION}.tgz" oci://${{ env.CONTAINER_REGISTRY }}/j12934/multi-juicer/helm
 
   dockerBuilds:
     name: "Build"
