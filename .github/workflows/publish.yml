@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: "Login to Package Registry"
-        run: 'helm registry login --username ${{ github.actor }} --password "${{ secrets.GITHUB_TOKEN }}" ${{ env.CONTAINER_REGISTRY }}'
+        run: 'echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login --username ${{ github.actor }} --password-stdin ${{ env.CONTAINER_REGISTRY }}'
 
       - name: "Package Helm Chart"
         working-directory: helm/multi-juicer/
