@@ -110,12 +110,14 @@ For minikube, run:
 
 ```shell
 
-minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker
+minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
 eval $(minikube docker-env)
 ./build-an-deploy-container.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
+
+or use `build-and-deploy-container-minikube.sh` to do all of the above in one script.
 
 Want to know whether your system is holding up? use
 
@@ -127,14 +129,17 @@ kubectl top pods
 
 ### Develop with Minikube
 
+Please note that we are experiencing some issues with kubernetes.js and teams.js, these are being resolved.
+
 ```shell
 
-minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker
+minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
 eval $(minikube docker-env)
 ./build-an-deploy.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
+or use `build-and-deploy-minikube.sh` to do all of the above in one script.
 
 
 ### Play with AWS EKS:

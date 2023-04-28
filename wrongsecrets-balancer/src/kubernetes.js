@@ -1303,14 +1303,18 @@ const getJuiceShopInstanceForTeamname = (teamname) => {
   k8sAppsApi
     .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, `t-${teamname}`)
     .then((res) => {
-      return {
-        readyReplicas: res.body.status.readyReplicas,
-        availableReplicas: res.body.status.availableReplicas,
-        passcodeHash: res.body.metadata.annotations['wrongsecrets-ctf-party/passcode'],
-      };
+      logger.info(JSON.stringify(res));
+      if(res.body.hasOwnProperty('metadata') && res.body.metadata.hasOwnProperty('annotations') ){
+        return {
+          readyReplicas: res.body.status.readyReplicas,
+          availableReplicas: res.body.status.availableReplicas,
+          passcodeHash: res.body.metadata.annotations['wrongsecrets-ctf-party/passcode'],
+        };
+      }
+      return;
     })
     .catch((error) => {
-      if (error.response.body.message.contains('No such container')) {
+      if (error.response.body.message.includes('No such container')) {
         return;
       }
       throw new Error(error.response.body.message);

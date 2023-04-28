@@ -10,6 +10,7 @@ source ./scripts/check-available-commands.sh
 checkCommandsAvailable helm docker kubectl yq
 
 version="$(uuidgen)"
+eval $(minikube docker-env)
 docker login
 WRONGSECRETS_IMAGE=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecrets.image')
 WRONGSECRETS_TAG=$(cat helm/wrongsecrets-ctf-party/values.yaml| yq '.wrongsecrets.tag')

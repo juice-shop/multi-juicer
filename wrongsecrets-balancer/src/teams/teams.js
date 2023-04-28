@@ -92,6 +92,7 @@ async function interceptAdminLogin(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 async function validateHMAC(req, res, next) {
+  logger.info('validating hmac');
   try {
     const { team } = req.params;
     const { hmacvalue } = req.body;
@@ -147,12 +148,12 @@ async function joinIfTeamAlreadyExists(req, res, next) {
   const { team } = req.params;
   const { passcode } = req.body;
 
-  logger.debug(`Checking if team ${team} already has a WrongSecrets Deployment`);
+  logger.info(`Checking if team ${team} already has a WrongSecrets Deployment`);
 
   try {
     const { passcodeHash } = await getJuiceShopInstanceForTeamname(team);
 
-    logger.debug(`Team ${team} already has a WrongSecrets deployment`);
+    logger.info(`Team ${team} already has a WrongSecrets deployment`);
 
     if (passcode !== undefined && (await bcrypt.compare(passcode, passcodeHash))) {
       // Set cookie, (join team)
@@ -173,7 +174,7 @@ async function joinIfTeamAlreadyExists(req, res, next) {
       message: 'Team requires authentication to join',
     });
   } catch (error) {
-    if (error.message === `deployments.apps "t-${team}-wrongsecrets" not found`) {
+    if (error.message.includes(`deployments.apps "t-${team}-wrongsecrets" not found`) || error.message==="Cannot destructure property 'passcodeHash' of '(intermediate value)' as it is undefined.") {
       logger.info(`Team ${team} doesn't have a WrongSecrets deployment yet`);
       return next();
     } else {
@@ -193,11 +194,12 @@ async function joinIfTeamAlreadyExists(req, res, next) {
  * @param {import("express").NextFunction} next
  */
 async function checkIfMaxJuiceShopInstancesIsReached(req, res, next) {
+  logger.info("checking for max instances");
   const maxInstances = get('maxJuiceShopInstances');
 
   // If max instances is set to negative numbers it's not capped
   if (maxInstances < 0) {
-    logger.debug(`Skipping max instance check, max instances is set to '${maxInstances}'`);
+    logger.info(`Skipping max instance check, max instances is set to '${maxInstances}'`);
     return next();
   }
 
@@ -233,6 +235,8 @@ async function generatePasscode() {
  * @param {import("express").Response} res
  */
 async function createTeam(req, res) {
+  const { team } = req.params;
+  logger.info(`creating new team for team '${team}'`)
   if (k8sEnv === 'aws') {
     logger.info(
       'We will create an AWS deployment see the helm chart/deployment for setting this to k8s'
@@ -242,7 +246,7 @@ async function createTeam(req, res) {
   logger.info(
     'We will create a K8s deployment see the helm chart/deployment for setting this to aws'
   );
-  const { team } = req.params;
+  
   const { passcode, hash } = await generatePasscode();
   try {
     logger.info(`Creating Namespace for team '${team}'`);

@@ -6,9 +6,9 @@ checkCommandsAvailable helm docker kubectl yq minikube
 minikube delete
 minikube start  --cpus=6 --memory=8000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
 eval $(minikube docker-env)
-./build-an-deploy.sh  
+./build-an-deploy-container.sh  
 
-sleep 15
+sleep 5
 
 echo "let's go!"
 
