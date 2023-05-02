@@ -113,7 +113,7 @@ kubectl get pods -n kube-system
 helm delete multi-juicer
 
 # Delete the loadbalancer setup
-kubectl delete -f kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
+kubectl delete -f https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer
