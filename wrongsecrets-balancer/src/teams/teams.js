@@ -537,7 +537,6 @@ async function awaitReadiness(req, res) {
       }
 
       await sleep(4000);
-
     } catch (error) {
       logger.error(`Failed to wait for teams '${team}' deployment to get ready: ${error}`);
       logger.error(error);
