@@ -1299,11 +1299,10 @@ const deleteDesktopPodForTeam = async (team) => {
 module.exports.deleteDesktopPodForTeam = deleteDesktopPodForTeam;
 
 const getJuiceShopInstanceForTeamname = (teamname) => {
-  logger.info('checking readiness');
-  k8sAppsApi
+  logger.info(`checking readiness for ${teamname}`);
+  return k8sAppsApi
     .readNamespacedDeployment(`t-${teamname}-wrongsecrets`, `t-${teamname}`)
     .then((res) => {
-      logger.info(JSON.stringify(res));
       if (
         Object.prototype.hasOwnProperty.call(res.body, 'metadata') &&
         Object.prototype.hasOwnProperty.call(res.body.metadata, 'annotations')
