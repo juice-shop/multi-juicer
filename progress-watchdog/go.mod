@@ -5,10 +5,10 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
+	github.com/speps/go-hashids/v2 v2.0.1
 	github.com/stretchr/testify v1.8.2
 	k8s.io/apimachinery v0.27.1
 	k8s.io/client-go v0.27.1
-	github.com/speps/go-hashids/v2 v2.0.1
 )
 
 require (

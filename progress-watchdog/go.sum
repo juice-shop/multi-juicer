@@ -132,8 +132,6 @@ github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
-github.com/speps/go-hashids v2.0.0+incompatible h1:kSfxGfESueJKTx0mpER9Y/1XHl+FVQjtCqRyYcviFbw=
-github.com/speps/go-hashids v2.0.0+incompatible/go.mod h1:P7hqPzMdnZOfyIk+xrlG1QaSMw+gCBdHKsBDnhpaZvc=
 github.com/speps/go-hashids/v2 v2.0.1 h1:ViWOEqWES/pdOSq+C1SLVa8/Tnsd52XC34RY7lt7m4g=
 github.com/speps/go-hashids/v2 v2.0.1/go.mod h1:47LKunwvDZki/uRVD6NImtyk712yFzIs3UF3KlHohGw=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
