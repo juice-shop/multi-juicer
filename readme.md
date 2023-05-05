@@ -129,8 +129,6 @@ kubectl top pods
 
 ### Develop with Minikube
 
-Please note that we are experiencing some issues with kubernetes.js and teams.js, these are being resolved.
-
 ```shell
 
 minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
