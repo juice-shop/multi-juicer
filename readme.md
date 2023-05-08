@@ -60,7 +60,7 @@ helm delete multi-juicer
 To be on the safe side calculate with:
 
 - _1GB memory & 1CPU overhead_, for the balancer & co
-- _200MB & 0.2CPU \* number of participants_, for the individual JuiceShop Instances
+- _300MB & 0.2CPU \* number of participants_, for the individual JuiceShop Instances
 
 The numbers above reflect the default resource limits. These can be tweaked, see: [Customizing the Setup](#customizing-the-setup)
 
