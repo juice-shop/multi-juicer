@@ -1,5 +1,7 @@
 ![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
 
+> Note: We are currently preparing to move this repository from the [iteratec](https://github.com/iteratec/) organisation into the official [juice-shop](https://github.com/juice-shop) GitHub organisation. With this migration will be an official part of the OWASP Juice Shop project 🥳🧃. The migration will should be done by the end of May 2023.
+
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
