@@ -5,7 +5,6 @@ metadata:
   labels:
     {{- include "multi-juicer.juice-balancer.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.balancer.service.type }}
 {{- if (or (eq .Values.balancer.service.type "ClusterIP") (empty .Values.balancer.service.type)) }}
   type: ClusterIP
   {{- if .Values.balancer.service.clusterIP }}
