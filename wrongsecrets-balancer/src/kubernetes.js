@@ -161,6 +161,10 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                   value: 'provideThisKeyToHostThankyouAlllGoodDoYouLikeRandomLogging?',
                 },
                 {
+                  name: 'challenge_thirty_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostWhenYouRealizeLSIsOK?',
+                },
+                {
                   name: 'SPECIAL_K8S_SECRET',
                   valueFrom: {
                     configMapKeyRef: {
@@ -427,6 +431,10 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 {
                   name: 'challenge_acht_ctf_to_provide_to_host_value',
                   value: 'provideThisKeyToHostThankyouAlllGoodDoYouLikeRandomLogging?',
+                },
+                {
+                  name: 'challenge_thirty_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostWhenYouRealizeLSIsOK?',
                 },
                 {
                   name: 'SPECIAL_K8S_SECRET',
