@@ -4,7 +4,7 @@ WORKDIR /home/app
 COPY package.json package-lock.json ./
 RUN npm ci --production
 
-FROM node:18-alpine as ui
+FROM --platform=$BUILDPLATFORM node:18-alpine as ui
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
