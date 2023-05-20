@@ -1,0 +1,25 @@
+{
+  "name": "charts",
+  "version": "v1.0.0",
+  "description": "Wrongsecrets helm chart",
+  "main": "index.js",
+  "scripts": {
+    "build": "helm package ./wrongsecrets-ctf-party",
+    "subcharts": "helm dependency update ./wrongsecrets-ctf-party",
+    "lint": "helm lint ./wrongsecrets-ctf-party",
+    "validate": "npm run lint && npm run test",
+    "template": "helm template --debug -f ./test-values.yaml myrelease ./wrongsecrets-ctf-party -n myns > test.tmp.yaml",
+    "dry-run": "helm install --dry-run -f ./test-values.yaml unknown ./wrongsecrets-ctf-party",
+    "doc": "helm-docs -s file",
+    "preversion": "git fetch --prune --prune-tags && npm run lint && npm run build",
+    "version": " export version=v$(node -p -e 'require(`./package.json`).version') && export app_version=$(echo $version | cut -d. -f2-).0 && yq e -i '.version=strenv(version)' ./wrongsecrets-ctf-party/Chart.yaml && yq e -i '.appVersion=strenv(app_version)' ./wrongsecrets-ctf-party/Chart.yaml && git add . ",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:OWASP/wrongsecrets-ctf-party.git"
+  },
+  "author": "Wrongsecrets",
+  "license": "Apache License 2.0",
+  "homepage": "https://owasp.org/www-project-wrongsecrets/" 
+}
