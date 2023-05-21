@@ -19,8 +19,8 @@ jobs:
       - name: Test
         run: npm test -- --ci --color --verbose
 
-  balancer:
-    name: Balancer
+  balancer-server:
+    name: Balancer Server
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -30,10 +30,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - name: "Install UI Dependencies"
-        run: npm ci
-      - name: "Build UI"
-        run: npm run build
       - name: Install Backend Dependencies
         run: npm ci
       - name: Lint
@@ -41,7 +37,23 @@ jobs:
       - name: Test Balancer
         run: npm test -- --ci --color --verbose
 
-  progressWatchdog:
+  balancer-ui:
+    name: Balancer UI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: juice-balancer/ui
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: "Install UI Dependencies"
+        run: npm ci
+      - name: "Build UI"
+        run: npm run build
+
+  progress-watchdog:
     name: ProgressWatchdog
     runs-on: ubuntu-latest
     defaults:
