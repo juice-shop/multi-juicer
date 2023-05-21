@@ -19,8 +19,8 @@ jobs:
       - name: Test
         run: npm test -- --ci --color --verbose
 
-  balancer-server:
-    name: Balancer Server
+  balancer:
+    name: Balancer
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,7 +33,7 @@ jobs:
       - name: Install Backend Dependencies
         run: npm ci
       - name: "Install UI Dependencies"
-        working-directory: ui
+        working-directory: juice-balancer/ui
         run: npm ci
       - name: "Build UI"
         working-directory: ui
