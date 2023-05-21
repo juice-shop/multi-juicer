@@ -2,7 +2,7 @@ FROM node:18-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
-RUN npm ci --production
+RUN npm ci --omit=dev
 
 FROM node:18-alpine
 RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
