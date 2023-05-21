@@ -4,49 +4,55 @@ jobs:
   cleaner:
     name: Cleaner
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cleaner
     steps:
       - uses: actions/checkout@v3
-      - name: Install Balancer
-        run: |
-          cd cleaner
-          npm ci
-      - name: Run Linter
-        run: |
-          cd cleaner
-          npm run lint
-      - name: Test Balancer
-        run: |
-          cd cleaner
-          npm test -- --ci --color --verbose
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test -- --ci --color --verbose
+
   balancer:
     name: Balancer
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: juice-balancer
     steps:
       - uses: actions/checkout@v3
-      - name: "Install & Build BalancerUI"
-        run: |
-          cd juice-balancer/ui
-          npm ci
-          npm run build
-      - name: Install Balancer
-        run: |
-          cd juice-balancer
-          npm ci
-      - name: Run Linter
-        run: |
-          cd juice-balancer
-          npm run lint
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: "Install UI Dependencies"
+        run: npm ci
+      - name: "Build UI"
+        run: npm run build
+      - name: Install Backend Dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
       - name: Test Balancer
-        run: |
-          cd juice-balancer
-          npm test -- --ci --color --verbose
+        run: npm test -- --ci --color --verbose
+
   progressWatchdog:
     name: ProgressWatchdog
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: progress-watchdog
     steps:
       - uses: actions/checkout@v3
-      - name: "Test ProgressWatchdog"
-        run: |
-          cd progress-watchdog
-          go vet
-          go test -cover
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+      - name: "Lint"
+        run: go vet
+      - name: "Test"
+        run: go test -cover
