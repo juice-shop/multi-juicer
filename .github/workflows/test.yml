@@ -36,7 +36,7 @@ jobs:
         working-directory: juice-balancer/ui
         run: npm ci
       - name: "Build UI"
-        working-directory: ui
+        working-directory: juice-balancer/ui
         run: npm run build
       - name: Lint
         run: npm run lint
