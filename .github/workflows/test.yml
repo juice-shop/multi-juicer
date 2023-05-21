@@ -1,5 +1,5 @@
 on: [push, pull_request]
-name: "Run Tests"
+name: "Tests"
 jobs:
   cleaner:
     name: Cleaner
@@ -32,26 +32,16 @@ jobs:
           node-version: '18'
       - name: Install Backend Dependencies
         run: npm ci
-      - name: Lint
-        run: npm run lint
-      - name: Test Balancer
-        run: npm test -- --ci --color --verbose
-
-  balancer-ui:
-    name: Balancer UI
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: juice-balancer/ui
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
       - name: "Install UI Dependencies"
+        working-directory: ui
         run: npm ci
       - name: "Build UI"
+        working-directory: ui
         run: npm run build
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test -- --ci --color --verbose
 
   progress-watchdog:
     name: ProgressWatchdog
