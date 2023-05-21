@@ -5,7 +5,7 @@ jobs:
     name: Cleaner
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Install Balancer
         run: |
           cd cleaner
@@ -22,7 +22,7 @@ jobs:
     name: Balancer
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: "Install & Build BalancerUI"
         run: |
           cd juice-balancer/ui
@@ -44,7 +44,7 @@ jobs:
     name: ProgressWatchdog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: "Test ProgressWatchdog"
         run: |
           cd progress-watchdog
