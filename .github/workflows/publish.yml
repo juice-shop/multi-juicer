@@ -1,32 +1,44 @@
+name: "Release Build"
 on:
   release:
     types: [published]
-name: "Publish Docker Images"
+env:
+  CONTAINER_REGISTRY: ghcr.io
 jobs:
   helmRelease:
-    name: "Package Helm Chart"
+    name: "Publish Helm Chart"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v1
-      - name: "Install yq"
-        run: |
-          sudo snap install yq
-      - name: "Patch Chart.yaml to the current released version"
+      - uses: actions/checkout@v3
+
+      - name: "Login to Package Registry"
+        run: 'echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login --username ${{ github.actor }} --password-stdin ${{ env.CONTAINER_REGISTRY }}'
+
+      - name: "Package Helm Chart"
         working-directory: helm/multi-juicer/
         run: |
           RELEASE_VERSION="${GITHUB_REF#refs/*/}"
           # Remove leading 'v' from git tag to create valid semver
           RELEASE_VERSION="${RELEASE_VERSION//v}"
-          # patch the version & appVersion in the Chart.yaml to the release version
-          yq eval -i ".version = \"$RELEASE_VERSION\", .appVersion = \"$RELEASE_VERSION\"" Chart.yaml
-      - uses: J12934/helm-gh-pages-action@v2.0.0
-        with:
-          access-token: ${{ secrets.ACCESS_TOKEN }}
-          charts-folder: helm
-          deploy-branch: gh-pages
+          helm package --version "$RELEASE_VERSION" .
+
+      - name: "Push Helm Chart"
+        working-directory: helm/multi-juicer/
+        run: |
+          RELEASE_VERSION="${GITHUB_REF#refs/*/}"
+          # Remove leading 'v' from git tag to create valid semver
+          RELEASE_VERSION="${RELEASE_VERSION//v}"
+          helm push "multi-juicer-${RELEASE_VERSION}.tgz" oci://${{ env.CONTAINER_REGISTRY }}/j12934/multi-juicer/helm
+
   dockerBuilds:
     name: "Build"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         component:
@@ -35,13 +47,13 @@ jobs:
           - juice-balancer
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Docker Meta
         id: docker_meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
-          images: iteratec/${{ matrix.component }}
+          images: ${{ env.CONTAINER_REGISTRY }}/j12934/multi-juicer/${{ matrix.component }}
           tags: |
             type=semver,pattern={{raw}}
 
@@ -49,15 +61,18 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          driver-opts: |
+            image=moby/buildkit:v0.11.6
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./${{ matrix.component }}
           file: ./${{ matrix.component }}/Dockerfile

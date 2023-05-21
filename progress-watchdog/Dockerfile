@@ -1,4 +1,4 @@
-FROM golang:1.19 as builder
+FROM --platform=$BUILDPLATFORM golang:1.19 as builder
 WORKDIR /src
 COPY go.mod go.sum ./
 # cache deps before building and copying source so that we don't need to re-download as much
@@ -6,8 +6,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY main.go main.go
 COPY internal/ internal/
-ENV CGO_ENABLED 0
-RUN go build
+ARG TARGETOS TARGETARCH
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build
 RUN chmod +x progress-watchdog
 
 FROM gcr.io/distroless/static:nonroot
