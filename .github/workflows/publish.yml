@@ -11,15 +11,11 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write # needed for signing the images with GitHub OIDC Token
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@v3
-
-      - name: Parse Release Version
-        id: release-version
+      - id: release-version
+        name: Parse Release Version
         run: |
           RELEASE_VERSION="${GITHUB_REF#refs/*/}"
           # Remove leading 'v' from git tag to create valid semver
@@ -39,16 +35,13 @@ jobs:
         run: |
           helm push "multi-juicer-${{ steps.release-version.outputs.version }}.tgz" oci://${{ env.CONTAINER_REGISTRY }}/multi-juicer/helm
 
-      - name: Sign Helm Chart with GitHub OIDC Token
-        run: |
-          cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/multi-juicer/helm:${{ steps.release-version.outputs.version }}
-
   dockerBuilds:
     name: "Build"
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+      id-token: write # needed for signing the images with GitHub OIDC Token
     strategy:
       matrix:
         component:
@@ -59,8 +52,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Docker Meta
-        id: docker_meta
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - id: image-metadata
+        name: Container Image Metadata
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.CONTAINER_REGISTRY }}/multi-juicer/${{ matrix.component }}
@@ -81,12 +77,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push
+      - id: build-and-push
+        name: Build and Push
         uses: docker/build-push-action@v4
         with:
           context: ./${{ matrix.component }}
           file: ./${{ matrix.component }}/Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
+          tags: ${{ steps.image-metadata.outputs.tags }}
+          labels: ${{ steps.image-metadata.outputs.labels }}
+
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+          TAGS: ${{ steps.image-metadata.outputs.tags }}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
