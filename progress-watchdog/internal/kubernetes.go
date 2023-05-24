@@ -37,8 +37,8 @@ type UpdateProgressDeploymentMetadata struct {
 
 // UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
 type UpdateProgressDeploymentDiffAnnotations struct {
-	Challenges       string `json:"multi-juicer.iteratec.dev/challenges"`
-	ChallengesSolved string `json:"multi-juicer.iteratec.dev/challengesSolved"`
+	Challenges       string `json:"multi-juicer.owasp-juice.shop/challenges"`
+	ChallengesSolved string `json:"multi-juicer.owasp-juice.shop/challengesSolved"`
 }
 
 func PersistProgress(clientset *kubernetes.Clientset, teamname string, solvedChallenges []ChallengeStatus) {

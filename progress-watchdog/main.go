@@ -8,7 +8,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/iteratec/multi-juicer/progress-watchdog/internal"
+	"github.com/juice-shop/multi-juicer/progress-watchdog/internal"
 	"github.com/op/go-logging"
 
 	"github.com/gin-gonic/gin"
@@ -95,7 +95,7 @@ func main() {
 		}
 
 		challengeStatusJson := "[]"
-		if json, ok := deployment.Annotations["multi-juicer.iteratec.dev/challenges"]; ok {
+		if json, ok := deployment.Annotations["multi-juicer.owasp-juice.shop/challenges"]; ok {
 			challengeStatusJson = json
 		}
 

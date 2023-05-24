@@ -27,7 +27,7 @@ kubectl config current-context
 
 ```bash
 # You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
 
 helm install multi-juicer multi-juicer/multi-juicer
 
@@ -80,7 +80,7 @@ doctl compute certificate list
 
 # We got a example loadbalancer yaml for this example in the repository
 # Edit the cert id in do-lb.yaml to the cert id of your domain
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/digital-ocean/do-lb.yaml
+wget https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/digital-ocean/do-lb.yaml
 vim do-lb.yaml
 
 # Create the loadbalancer

@@ -52,7 +52,7 @@ async function main() {
   for (const instance of instances.body.items) {
     const instanceName = instance.metadata.name;
     const lastConnectTimestamps = parseInt(
-      instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
+      instance.metadata.annotations['multi-juicer.owasp-juice.shop/lastRequest'],
       10
     );
 

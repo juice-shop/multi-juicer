@@ -1,6 +1,6 @@
 # Example Setup with Microsoft Azure
 
-**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/iteratec/multi-juicer/issues/16
+**NOTE:** This Guide is still a "Work in Progress", if you got any recommendations or issues with it, please post them into the related issue: https://github.com/juice-shop/multi-juicer/issues/16
 
 **WARNING:** The resources created in this guid will cost about \$??/month.
 Make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
@@ -27,7 +27,7 @@ kubectl config current-context
 
 ```bash
 # You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
 
 helm install multi-juicer multi-juicer/multi-juicer
 

@@ -122,7 +122,7 @@ async function getTopTeams(req, res) {
 
   const teams = instances.body.items.map((team) => {
     const challengeProgress = JSON.parse(
-      team.metadata.annotations['multi-juicer.iteratec.dev/challenges'] ?? '[]'
+      team.metadata.annotations['multi-juicer.owasp-juice.shop/challenges'] ?? '[]'
     ).map((progress) => {
       const difficulty = keyDifficultyMapping[progress.key];
 

@@ -179,7 +179,7 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 			log.Debugf("Found instance for team %s", teamname)
 
 			var lastChallengeProgress []ChallengeStatus
-			json.Unmarshal([]byte(instance.Annotations["multi-juicer.iteratec.dev/challenges"]), &lastChallengeProgress)
+			json.Unmarshal([]byte(instance.Annotations["multi-juicer.owasp-juice.shop/challenges"]), &lastChallengeProgress)
 
 			progressUpdateJobs <- ProgressUpdateJobs{
 				Teamname:              instance.Labels["team"],

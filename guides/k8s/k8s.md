@@ -21,7 +21,7 @@ kubectl cluster-info
 
 ```bash
 # You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
 
 helm install multi-juicer multi-juicer/multi-juicer
 
@@ -63,7 +63,7 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 kubectl get pods
 
 # We got a example loadbalancer yaml for this example in the repository
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/k8s/k8s-juice-service.yaml
+wget https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/k8s/k8s-juice-service.yaml
 
 # Create the loadbalancer
 # This might take a couple of minutes

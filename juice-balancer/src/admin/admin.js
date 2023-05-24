@@ -45,7 +45,7 @@ async function listInstances(req, res) {
         ready: instance.status.availableReplicas === 1,
         createdAt: instance.metadata.creationTimestamp.getTime(),
         lastConnect: parseInt(
-          instance.metadata.annotations['multi-juicer.iteratec.dev/lastRequest'],
+          instance.metadata.annotations['multi-juicer.owasp-juice.shop/lastRequest'],
           10
         ),
       };

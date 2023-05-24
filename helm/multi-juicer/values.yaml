@@ -89,8 +89,8 @@ juiceShop:
   # @default -- See values.yaml for full details
   config: |
     application:
-      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
-      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+      logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
+      favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
       showVersionNumber: false
       showGitHubLinks: false
     challenges:

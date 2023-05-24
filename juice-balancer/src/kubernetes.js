@@ -31,11 +31,11 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         'app.kubernetes.io/part-of': 'multi-juicer',
       },
       annotations: {
-        'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
-        'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
-        'multi-juicer.iteratec.dev/passcode': passcodeHash,
-        'multi-juicer.iteratec.dev/challengesSolved': '0',
-        'multi-juicer.iteratec.dev/challenges': '[]',
+        'multi-juicer.owasp-juice.shop/lastRequest': `${new Date().getTime()}`,
+        'multi-juicer.owasp-juice.shop/lastRequestReadable': new Date().toString(),
+        'multi-juicer.owasp-juice.shop/passcode': passcodeHash,
+        'multi-juicer.owasp-juice.shop/challengesSolved': '0',
+        'multi-juicer.owasp-juice.shop/challenges': '[]',
       },
       ...(await getOwnerReference()),
     },
@@ -265,7 +265,7 @@ const getJuiceShopInstanceForTeamname = (teamname) =>
       return {
         readyReplicas: res.body.status.readyReplicas,
         availableReplicas: res.body.status.availableReplicas,
-        passcodeHash: res.body.metadata.annotations['multi-juicer.iteratec.dev/passcode'],
+        passcodeHash: res.body.metadata.annotations['multi-juicer.owasp-juice.shop/passcode'],
       };
     })
     .catch((error) => {
@@ -281,8 +281,8 @@ const updateLastRequestTimestampForTeam = (teamname) => {
     {
       metadata: {
         annotations: {
-          'multi-juicer.iteratec.dev/lastRequest': `${new Date().getTime()}`,
-          'multi-juicer.iteratec.dev/lastRequestReadable': new Date().toString(),
+          'multi-juicer.owasp-juice.shop/lastRequest': `${new Date().getTime()}`,
+          'multi-juicer.owasp-juice.shop/lastRequestReadable': new Date().toString(),
         },
       },
     },
@@ -301,7 +301,7 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
   const deploymentPatch = {
     metadata: {
       annotations: {
-        'multi-juicer.iteratec.dev/passcode': passcodeHash,
+        'multi-juicer.owasp-juice.shop/passcode': passcodeHash,
       },
     },
   };

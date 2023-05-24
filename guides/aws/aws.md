@@ -33,7 +33,7 @@ kubectl config current-context
 
 ```sh
 # You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://iteratec.github.io/multi-juicer/
+helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
 
 helm install multi-juicer multi-juicer/multi-juicer
 
@@ -72,7 +72,7 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 Create a loadbalancer which is exposed is achieved by running the following command:
 
 ```sh
-kubectl create -f  https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
+kubectl create -f  https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/aws/loadbalancer.yaml
 ```
 
 You can get the LoadBalancer's DNS record either from the AWS console, or by running:
@@ -113,7 +113,7 @@ kubectl get pods -n kube-system
 helm delete multi-juicer
 
 # Delete the loadbalancer setup
-kubectl delete -f https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/aws/loadbalancer.yaml
+kubectl delete -f https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/aws/loadbalancer.yaml
 
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer

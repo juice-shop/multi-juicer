@@ -1,4 +1,4 @@
-module github.com/iteratec/multi-juicer/progress-watchdog
+module github.com/juice-shop/multi-juicer/progress-watchdog
 
 go 1.19
 

@@ -1,11 +1,11 @@
 apiVersion: v2
 name: multi-juicer
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Juice Shop
-icon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only.png
+icon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only.png
 
-home: https://github.com/iteratec/multi-juicer
+home: https://github.com/juice-shop/multi-juicer
 sources:
-  - https://github.com/iteratec/multi-juicer
+  - https://github.com/juice-shop/multi-juicer
 
 keywords:
   - security
