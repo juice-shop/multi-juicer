@@ -3,7 +3,7 @@ on:
   release:
     types: [published]
 env:
-  CONTAINER_REGISTRY: ghcr.io/j12934
+  CONTAINER_REGISTRY: ghcr.io/juice-shop
 jobs:
   helmRelease:
     name: "Publish Helm Chart"
