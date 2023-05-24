@@ -8,7 +8,7 @@
     "test": "NODE_ENV=test jest"
   },
   "keywords": [],
-  "author": "iteratec GmbH",
+  "author": "iteratec GmbH and multi-juicer contributors",
   "license": "Apache-2.0",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
