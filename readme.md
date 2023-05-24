@@ -1,6 +1,6 @@
 ![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
 
-> Note: We are currently preparing to move this repository from the [iteratec](https://github.com/iteratec/) organisation into the official [juice-shop](https://github.com/juice-shop/) GitHub organisation. With this migration MultiJuicer will be an official part of the OWASP Juice Shop project 🥳🧃. The migration should be done by the end of May 2023.
+> Note: We are currently moving this repository from the [iteratec](https://github.com/iteratec/) organisation into the official [juice-shop](https://github.com/juice-shop/) GitHub organisation. With this migration MultiJuicer will be an official part of the OWASP Juice Shop project 🥳🧃. The migration should be done by the end of May 2023.
 
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
@@ -96,12 +96,19 @@ You can list all JuiceShops with relevant information using the custom-columns f
 You'll need to down load the juiceShop.txt from the repository first:
 
 ```bash
-kubectl get -l app.kubernetes.io/name=juice-shop -o custom-columns-file=juiceShop.txt deployments
+$ https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juiceShop.txt
+
+$ kubectl get -l app.kubernetes.io/name=juice-shop -o custom-columns-file=juiceShop.txt deployments
+TEAM         SOLVED-CHALLENGES   LAST-REQUEST
+foobar       3                   Wed May 4 2042 18:14:22 GMT+0000 (Coordinated Universal Time)
+team-42      0                   Wed May 4 2042 18:14:30 GMT+0000 (Coordinated Universal Time)
+the-empire   0                   Wed May 4 2042 18:14:46 GMT+0000 (Coordinated Universal Time)
 ```
 
-### Did somebody actually ask any of these questions?
+### Where did this project come from
 
-No 😉
+The project start at [iteratec](https://www.iteratec.com), a german based software development company, to run their security trainings for their own developers and their clients.
+The project was then open sourced in [2019](https://github.com/juice-shop/multi-juicer/releases/tag/v1.0.0) and donated to the OWASP organisation / the OWASP Juice Shop project in [2023](https://github.com/juice-shop/multi-juicer/releases/tag/v6.0.0).
 
 ## Talk with Us!
 
