@@ -34,7 +34,7 @@ balancer:
     name: balancer
     # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
     cookieParserSecret: null
-  repository: iteratec/juice-balancer
+  repository: ghcr.io/juice-shop/multi-juicer/juice-balancer
   tag: null
   # -- Number of replicas of the juice-balancer deployment
   replicas: 1
@@ -145,9 +145,9 @@ juiceShop:
   # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
   runtimeClassName: null
 
-# Deletes unused JuiceShop instances after a configurable period of inactivity
+# Collects JuiceShop progress and sends and backs it up to the related kubernetes deployment
 progressWatchdog:
-  repository: iteratec/progress-watchdog
+  repository: ghcr.io/juice-shop/multi-juicer/progress-watchdog
   tag: null
   resources:
     requests:
@@ -164,7 +164,7 @@ progressWatchdog:
 
 # Deletes unused JuiceShop instances after a configurable period of inactivity
 juiceShopCleanup:
-  repository: iteratec/cleaner
+  repository: ghcr.io/juice-shop/multi-juicer/cleaner
   tag: null
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
