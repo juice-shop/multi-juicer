@@ -125,7 +125,7 @@ wrongsecrets:
   # @default -- See values.yaml for full details
   config: |
     K8S_ENV: aws
-  # "aws" is for using the cluster with eks and "k8s" is for using the cluster with miniKube which will enable specific challenges 
+  # "aws" is for using the cluster with eks and "k8s" is for using the cluster with miniKube which will enable specific challenges
   #    application:
   #      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
   #      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
