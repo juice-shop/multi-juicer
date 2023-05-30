@@ -1,11 +1,11 @@
 ![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
 
-> Note: We are currently moving this repository from the [iteratec](https://github.com/iteratec/) organisation into the official [juice-shop](https://github.com/juice-shop/) GitHub organisation. With this migration MultiJuicer will be an official part of the OWASP Juice Shop project 🥳🧃. The migration should be done by the end of May 2023.
-
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
 MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
+
+> Note: MultiJuicer is now a official part of the Juice Shop OWASP Project. For this change the this repo was recently moved from the [iteratec](https://github.com/iteratec/) organisation into the official [juice-shop](https://github.com/juice-shop/) GitHub organisation. If you notice encounter any problems introduced by this change, check the [v6.0.0](https://github.com/juice-shop/multi-juicer/releases/tag/v6.0.0) changelog for possible upgrade steps, if the problems can't be solved by it please reach out via a GitHub discussion or via [slack](#talk-with-us).
 
 **What it does:**
 
@@ -18,12 +18,10 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 
 ## Installation
 
-MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh).
+MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh)(helm >= 3.7 required)
 
 ```sh
-helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
-
-helm install multi-juicer multi-juicer/multi-juicer
+helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer
 ```
 
 See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
