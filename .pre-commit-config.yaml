@@ -7,7 +7,7 @@ repos:
         exclude: ^(helm/wrongsecrets-ctf-party/templates/|test.tmp.yaml)
       - id: check-yaml
         include: ^test.tmp.yaml
-        args: 
+        args:
           - --allow-multiple-documents
       - id: end-of-file-fixer
         exclude: ^(src/test/resources/yourkey.txt|src/test/resources/secondkey.txt)
