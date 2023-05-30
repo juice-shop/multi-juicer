@@ -3,9 +3,9 @@ repos:
     rev: v4.3.0
     hooks:
       - id: check-yaml
-        exclude: ^(helm/wrongsecrets-ctf-party/templates/|test.tmp.yaml)
+        exclude: ^(helm/wrongsecrets-ctf-party/templates/|helm/test.tmp.yaml)
       - id: check-yaml
-        files: ^test.tmp.yaml
+        files: ^helm/test.tmp.yaml
         args:
           - --allow-multiple-documents
       - id: end-of-file-fixer
