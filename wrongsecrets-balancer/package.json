@@ -26,7 +26,7 @@
     "minimatch": "^9.0.0",
     "on-finished": "^2.4.1",
     "prom-client": "^14.2.0",
-    "winston": "^3.8.2"
+    "winston": "^3.9.0"
   },
   "devDependencies": {
     "cookie-signature": "^1.2.1",
