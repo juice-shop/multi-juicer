@@ -26,8 +26,8 @@ metadata:
     helm.sh/chart: wrongsecrets-ctf-party-0.1.0-alpha
 type: Opaque
 data:
-  cookieParserSecret: "WE1KNDN5ejJMYnRLdXViRDZxcTRPSm1Y"
-  adminPassword: "MEVPTlFFUlM="
+  cookieParserSecret: "eWdzMVRMSzhlWHA2bERLak1PZXlJSERn"
+  adminPassword: "Q1NZMjA0SlU="
   metricsBasicAuthUsername: "cHJvbWV0aGV1cy1zY3JhcGVy"
   metricsBasicAuthPassword: "RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k="
 ---
@@ -231,7 +231,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 2a7853a457c2434571059d61cce9505a5afd5736fd1346302daf1ed9205dc39d
-        checksum/secret: e7325b7bb2571e066e14995cae8dc217b73eee6f4b2ebcd0595241be312b8470
+        checksum/secret: 1a1dcaeffddf0f226ff9635934715794c59d9d0ec0b6dbb9c5a23c4de785c944
       labels:
         app: wrongsecrets-balancer
         app.kubernetes.io/name: wrongsecrets-ctf-party
@@ -313,8 +313,8 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           volumeMounts:
-            - name: config-volume
-              mountPath: /home/app/config/
+            - mountPath: /home/app/config/
+              name: config-volume
           resources:
             limits:
               cpu: 1000m
@@ -323,9 +323,9 @@ spec:
               cpu: 400m
               memory: 256Mi
       volumes:
-        - name: config-volume
-          configMap:
+        - configMap:
             name: wrongsecrets-balancer-config
+          name: config-volume
 ---
 # Source: wrongsecrets-ctf-party/templates/cleanup/cron-job.yaml
 apiVersion: batch/v1beta1

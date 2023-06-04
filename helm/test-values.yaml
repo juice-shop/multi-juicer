@@ -126,17 +126,6 @@ wrongsecrets:
   config: |
     K8S_ENV: aws
   # "aws" is for using the cluster with eks and "k8s" is for using the cluster with miniKube which will enable specific challenges
-  #    application:
-  #      logo: https://raw.githubusercontent.com/iteratec/multi-juicer/main/images/multijuicer-icon-only-padding.png
-  #      favicon: https://raw.githubusercontent.com/iteratec/multi-juicer/main/wrongsecrets-balancer/ui/public/favicon.ico
-  #      showVersionNumber: false
-  #      showGitHubLinks: false
-  #    challenges:
-  #      showHints: true
-  #    hackingInstructor:
-  #      isEnabled: true
-  #    ctf:
-  #      showFlagsInNotifications: false
   # -- Specify a custom NODE_ENV for Wrongsecrets. If value is changed to something other than 'wrongsecrets-ctf-party' it's not possible to set a custom config via `wrongsecrets-balancer-config`.
   nodeEnv: "wrongsecrets-ctf-party"
   # -- Optional resources definitions to set for each Wrongsecrets instance
@@ -171,12 +160,6 @@ wrongsecrets:
         secretKeyRef:
           name: funnystuff
           key: funnier
-  # env:
-  #   - name: FOO
-  #     valueFrom:
-  #       secretKeyRef:
-  #         key: FOO
-  #         name: secret-resource
   # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
   envFrom: []
   # -- Optional Volumes to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)

@@ -30,20 +30,24 @@ spec:
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: {{ .Values.balancer.containerPort }}
+          {{- if .Values.balancer.livenessProbe }}
           livenessProbe:
-            httpGet:
-              path: /balancer/
-              port: http
+          {{- toYaml .Values.balancer.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.balancer.readinessProbe }}
           readinessProbe:
-            httpGet:
-              path: /balancer/
-              port: http
+          {{- toYaml .Values.balancer.readinessProbe | nindent 12 }}
+          {{- end }}
           env:
             {{- range $k, $v := .Values.balancer.env}}
             - name: {{ $k }}
               value: {{ $v | quote }}
             {{- end }}
+            - name: WRONGSECRETS_TAG
+              value: {{ .Values.wrongsecrets.tag}}
+            - name: WRONGSECRETS_DESKTOP_TAG
+              value: {{ .Values.virtualdesktop.tag }}
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
@@ -70,15 +74,16 @@ spec:
           securityContext:
             {{- omit . "enabled" | toYaml | nindent 12 }}
           {{- end }}
+          {{- if .Values.balancer.volumeMounts }}
           volumeMounts:
-            - name: config-volume
-              mountPath: /home/app/config/
+            {{- toYaml .Values.balancer.volumeMounts | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.balancer.resources | nindent 12 }}
+      {{- if .Values.balancer.volumes }}
       volumes:
-        - name: config-volume
-          configMap:
-            name: wrongsecrets-balancer-config
+        {{- toYaml .Values.balancer.volumes | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
