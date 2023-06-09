@@ -83,7 +83,7 @@ const createSecretsfileForTeam = async (team) => {
 };
 module.exports.createSecretsfileForTeam = createSecretsfileForTeam;
 
-const createChallenge33SecretForTeam = async(team) => {
+const createChallenge33SecretForTeam = async (team) => {
   const secret = {
     apiVersion: 'v1',
     data: {
@@ -94,22 +94,22 @@ const createChallenge33SecretForTeam = async(team) => {
     metadata: {
       name: 'challenge33',
       namespace: `t-${team}`,
-      annotations:{
-        "kubectl.kubernetes.io/last-applied-configuration": {
-          "apiVersion":"v1",
-          "kind":"Secret",
-          "metadata":{
-            "annotations":{},
-            "name":"challenge33",
-            "namespace":"default"
+      annotations: {
+        'kubectl.kubernetes.io/last-applied-configuration': {
+          apiVersion: 'v1',
+          kind: 'Secret',
+          metadata: {
+            annotations: {},
+            name: 'challenge33',
+            namespace: 'default',
           },
-          "stringData":{"answer":"This was a standardValue as SecureSecret"},
-          "type":"generic"
-        }
+          stringData: { answer: 'This was a standardValue as SecureSecret' },
+          type: 'generic',
+        },
       },
-      creationTimestamp: "2023-05-14T20:58:31Z",
-      resourceVersion: "1891",
-      uid: "02f40c7a-0319-4936-9d3f-f47b8c4eb642",
+      creationTimestamp: '2023-05-14T20:58:31Z',
+      resourceVersion: '1891',
+      uid: '02f40c7a-0319-4936-9d3f-f47b8c4eb642',
     },
   };
   return k8sCoreApi.createNamespacedSecret('t-' + team, secret).catch((error) => {
