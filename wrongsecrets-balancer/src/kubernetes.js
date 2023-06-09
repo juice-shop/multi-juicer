@@ -18,6 +18,7 @@ const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE;
 const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1;
 const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2;
+const challenge33Value = process.env.CHALLENGE33_VALUE;
 const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG;
 const wrongSecretsDekstopTag = process.env.WRONGSECRETS_DESKTOP_TAG;
 const heroku_wrongsecret_ctf_url = process.env.REACT_APP_HEROKU_WRONGSECRETS_URL;
@@ -67,7 +68,7 @@ const createSecretsfileForTeam = async (team) => {
   const secret = {
     apiVersion: 'v1',
     data: {
-      funnier: 'RmxhZzogYXJlIHlvdSBoYXZpbmcgZnVuIHlldD8=',
+      answer: 'RmxhZzogYXJlIHlvdSBoYXZpbmcgZnVuIHlldD8=',
     },
     kind: 'Secret',
     type: 'Opaque',
@@ -81,6 +82,41 @@ const createSecretsfileForTeam = async (team) => {
   });
 };
 module.exports.createSecretsfileForTeam = createSecretsfileForTeam;
+
+const createChallenge33SecretForTeam = async(team) => {
+  const secret = {
+    apiVersion: 'v1',
+    data: {
+      answer: `${challenge33Value}`,
+    },
+    kind: 'Secret',
+    type: 'generic',
+    metadata: {
+      name: 'challenge33',
+      namespace: `t-${team}`,
+      annotations:{
+        "kubectl.kubernetes.io/last-applied-configuration": {
+          "apiVersion":"v1",
+          "kind":"Secret",
+          "metadata":{
+            "annotations":{},
+            "name":"challenge33",
+            "namespace":"default"
+          },
+          "stringData":{"answer":"This was a standardValue as SecureSecret"},
+          "type":"generic"
+        }
+      },
+      creationTimestamp: "2023-05-14T20:58:31Z",
+      resourceVersion: "1891",
+      uid: "02f40c7a-0319-4936-9d3f-f47b8c4eb642",
+    },
+  };
+  return k8sCoreApi.createNamespacedSecret('t-' + team, secret).catch((error) => {
+    throw new Error(error.response.body.message);
+  });
+};
+module.exports.createChallenge33SecretForTeam = createChallenge33SecretForTeam;
 
 const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
@@ -179,6 +215,15 @@ const createK8sDeploymentForTeam = async ({ team, passcodeHash }) => {
                     secretKeyRef: {
                       name: 'funnystuff',
                       key: 'funnier',
+                    },
+                  },
+                },
+                {
+                  name: 'CHALLENGE33',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'challenge33',
+                      key: 'answer',
                     },
                   },
                 },
@@ -451,6 +496,15 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                     secretKeyRef: {
                       name: 'funnystuff',
                       key: 'funnier',
+                    },
+                  },
+                },
+                {
+                  name: 'CHALLENGE33',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'challenge33',
+                      key: 'answer',
                     },
                   },
                 },

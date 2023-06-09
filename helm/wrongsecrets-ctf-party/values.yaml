@@ -84,6 +84,7 @@ balancer:
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
     SECRETS_MANAGER_SECRET_ID_1: "wrongsecret" #only change if you need non-default AWS SM entries
     SECRETS_MANAGER_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default AWS SM entries
+    CHALLENGE33_VALUE: "VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true

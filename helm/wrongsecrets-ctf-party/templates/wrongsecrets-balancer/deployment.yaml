@@ -66,6 +66,8 @@ spec:
               value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_1 }}
             - name: SECRETS_MANAGER_SECRET_ID_2
               value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_2 }}
+            - name: CHALLENGE33_VALUE
+              value: {{ .Values.balancer.env.CHALLENGE33_VALUE }}
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
