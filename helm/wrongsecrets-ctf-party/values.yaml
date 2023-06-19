@@ -226,6 +226,38 @@ virtualdesktop:
   envFrom: []
   tolerations: []
 
+vaultContainer:
+  # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
+  maxInstances: 500
+  # -- Juice Shop Image to use
+  image: hashicorp/vault
+  tag: 1.15.1
+  repository: commjoenie/wrongSecrets
+  resources:
+    request:
+      memory: 128mb
+      cpu: 50m
+    limits:
+      memory: 256mb
+      cpu: 1200m
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+  runtimeClassName: {}
+  affinity: {}
+  # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+
+  envFrom: []
+  tolerations: []
+
+
+
 # Deletes unused Wrongsecrets namespaces after a configurable period of inactivity
 wrongsecretsCleanup:
   repository: jeroenwillemsen/wrongsecrets-ctf-cleaner

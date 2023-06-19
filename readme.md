@@ -212,6 +212,17 @@ There are a few more ways how you can check whether all is going well: have a lo
 
 No 😉
 
+### The webtop cannot reach the Kubernetes API ! Can you help?
+
+Make sure you make the users connect to the right IP and port number. This you can see for the API server by running the following command on your host where you connect to the cluster with:
+
+```shell
+kubectl -n kube-system get pod -l component=kube-apiserver -o=jsonpath="{.items[0].metadata.annotations.kubeadm\.kubernetes\.io/kube-apiserver\.advertise-address\.endpoint}"
+```
+
+Still having trouble to connect to that host at that port? run `./scripts/patch-nsp-for-kubectl.sh` to make sure the NSPs are updated.
+
+
 ## Talk with Us!
 
 You can reach us in the `#project-wrongsecrets` channel of the OWASP Slack Workspace. We'd love to hear any feedback or usage reports you got. If you are not already in the OWASP Slack Workspace, you can join via [this link](https://owasp.slack.com/join/shared_invite/enQtNjExMTc3MTg0MzU4LWQ2Nzg3NGJiZGQ2MjRmNzkzN2Q4YzU1MWYyZTdjYjA2ZTA5M2RkNzE2ZjdkNzI5ZThhOWY5MjljYWZmYmY4ZjM)
