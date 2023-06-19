@@ -16,6 +16,7 @@ const {
   changePasscodeHashForTeam,
   createConfigmapForTeam,
   createSecretsfileForTeam,
+  createChallenge33SecretForTeam,
   createServiceAccountForWebTop,
   createRoleForWebTop,
   createRoleBindingForWebtop,
@@ -156,6 +157,7 @@ test('create team creates a instance for team via k8s service', async () => {
 
   expect(createConfigmapForTeam).toHaveBeenCalled();
   expect(createSecretsfileForTeam).toHaveBeenCalled();
+  expect(createChallenge33SecretForTeam).toHaveBeenCalled();
   expect(createNameSpaceForTeam).toHaveBeenCalled();
   expect(createK8sDeploymentForTeam).toHaveBeenCalled();
   expect(createDesktopDeploymentForTeam).toHaveBeenCalled();

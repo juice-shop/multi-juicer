@@ -34,7 +34,7 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 1.6.4aws
+  tag: 1.6.5aws
   # -- Number of replicas of the wrongsecrets-balancer deployment. Changing this in a commit? PLEASE UPDATE THE GITHUB WORKLFOWS THEN!(NUMBER OF "TRUE")
   replicas: 2
   service:
@@ -84,6 +84,7 @@ balancer:
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
     SECRETS_MANAGER_SECRET_ID_1: "wrongsecret" #only change if you need non-default AWS SM entries
     SECRETS_MANAGER_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default AWS SM entries
+    CHALLENGE33_VALUE: "VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
@@ -108,7 +109,7 @@ wrongsecrets:
   maxInstances: 500
   # -- Wrongsecrets Image to use
   image: jeroenwillemsen/wrongsecrets
-  tag: 1.6.4-no-vault
+  tag: 1.6.5-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/OWASP/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file
@@ -200,7 +201,7 @@ virtualdesktop:
   maxInstances: 500
   # -- Juice Shop Image to use
   image: jeroenwillemsen/wrongsecrets-desktop-k8s
-  tag: 1.6.4
+  tag: 1.6.5
   repository: commjoenie/wrongSecrets
   resources:
     request:
@@ -224,6 +225,38 @@ virtualdesktop:
 
   envFrom: []
   tolerations: []
+
+vaultContainer:
+  # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
+  maxInstances: 500
+  # -- Juice Shop Image to use
+  image: hashicorp/vault
+  tag: 1.15.1
+  repository: commjoenie/wrongSecrets
+  resources:
+    request:
+      memory: 128mb
+      cpu: 50m
+    limits:
+      memory: 256mb
+      cpu: 1200m
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+  runtimeClassName: {}
+  affinity: {}
+  # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+
+  envFrom: []
+  tolerations: []
+
+
 
 # Deletes unused Wrongsecrets namespaces after a configurable period of inactivity
 wrongsecretsCleanup:

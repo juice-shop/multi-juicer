@@ -24,6 +24,7 @@ const {
   createDesktopServiceForTeam,
   createConfigmapForTeam,
   createSecretsfileForTeam,
+  createChallenge33SecretForTeam,
   createAWSDeploymentForTeam,
   createAWSSecretsProviderForTeam,
   patchServiceAccountForTeamForAWS,
@@ -270,6 +271,13 @@ async function createTeam(req, res) {
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
   try {
+    logger.info(`Creating challenge33 for team '${team}'`);
+    await createChallenge33SecretForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating challenge33 secretsfile ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
     logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
     await createK8sDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
@@ -371,6 +379,7 @@ async function createAWSTeam(req, res) {
 
     logger.info(`Creating Secretsfile for team '${team}'`);
     await createSecretsfileForTeam(team);
+    await createChallenge33SecretForTeam(team);
   } catch (error) {
     logger.error(`Error while creating secretsfile or configmap for ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
