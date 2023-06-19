@@ -106,7 +106,7 @@ from this repo. We will host the helm chart soon for you.
 
 ### Play with Minikube:
 
-** NOTE: The below steps requires minikube version v1.30.1 and yq (https://github.com/mikefarah/yq/) version v4.34.1. **
+** NOTE: The below steps require at least minikube version v1.30.1 and yq (https://github.com/mikefarah/yq/) version v4.34.1. **
 
 For minikube, run:
 
