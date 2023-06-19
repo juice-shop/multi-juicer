@@ -95,7 +95,8 @@ const createChallenge33SecretForTeam = async (team) => {
       name: 'challenge33',
       namespace: `t-${team}`,
       annotations: {
-        'kubectl.kubernetes.io/last-applied-configuration': "apiVersion: 'v1',kind: 'Secret', metadata: { annotations: {}, name: 'challenge33', namespace: 'default',},stringData: { answer: 'This was a standardValue as SecureSecret' },type: 'generic',",
+        'kubectl.kubernetes.io/last-applied-configuration':
+          "apiVersion: 'v1',kind: 'Secret', metadata: { annotations: {}, name: 'challenge33', namespace: 'default',},stringData: { answer: 'This was a standardValue as SecureSecret' },type: 'generic',",
       },
     },
   };
