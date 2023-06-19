@@ -106,6 +106,8 @@ from this repo. We will host the helm chart soon for you.
 
 ### Play with Minikube:
 
+** NOTE: The below steps requires minikube version v1.30.1 and yq (https://github.com/mikefarah/yq/) version v4.34.1. **
+
 For minikube, run:
 
 ```shell
@@ -137,8 +139,8 @@ eval $(minikube docker-env)
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
-or use `build-and-deploy-minikube.sh` to do all of the above in one script.
 
+or use `build-and-deploy-minikube.sh` to do all of the above in one script.
 
 ### Play with AWS EKS:
 
