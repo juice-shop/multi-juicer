@@ -226,6 +226,7 @@ virtualdesktop:
   envFrom: []
   tolerations: []
 
+## preps for the vault container: see https://github.com/OWASP/wrongsecrets-ctf-party/issues/250
 vaultContainer:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 500
