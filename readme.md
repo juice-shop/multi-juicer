@@ -106,6 +106,8 @@ from this repo. We will host the helm chart soon for you.
 
 ### Play with Minikube:
 
+** NOTE: The below steps require at least minikube version v1.30.1 and yq (https://github.com/mikefarah/yq/) version v4.34.1. **
+
 For minikube, run:
 
 ```shell
@@ -137,8 +139,8 @@ eval $(minikube docker-env)
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
-or use `build-and-deploy-minikube.sh` to do all of the above in one script.
 
+or use `build-and-deploy-minikube.sh` to do all of the above in one script.
 
 ### Play with AWS EKS:
 
@@ -211,6 +213,17 @@ There are a few more ways how you can check whether all is going well: have a lo
 ### Did somebody actually ask any of these questions?
 
 No 😉
+
+### The webtop cannot reach the Kubernetes API ! Can you help?
+
+Make sure you make the users connect to the right IP and port number. This you can see for the API server by running the following command on your host where you connect to the cluster with:
+
+```shell
+kubectl -n kube-system get pod -l component=kube-apiserver -o=jsonpath="{.items[0].metadata.annotations.kubeadm\.kubernetes\.io/kube-apiserver\.advertise-address\.endpoint}"
+```
+
+Still having trouble to connect to that host at that port? run `./scripts/patch-nsp-for-kubectl.sh` to make sure the NSPs are updated.
+
 
 ## Talk with Us!
 
