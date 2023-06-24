@@ -26,8 +26,8 @@ metadata:
     helm.sh/chart: wrongsecrets-ctf-party-0.1.0-alpha
 type: Opaque
 data:
-  cookieParserSecret: "eWdzMVRMSzhlWHA2bERLak1PZXlJSERn"
-  adminPassword: "Q1NZMjA0SlU="
+  cookieParserSecret: "ZmdDN3ZZdkhYbE9XbmRoT3c2Y0ttY0RK"
+  adminPassword: "RVpCMkFGWkk="
   metricsBasicAuthUsername: "cHJvbWV0aGV1cy1zY3JhcGVy"
   metricsBasicAuthPassword: "RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k="
 ---
@@ -58,7 +58,7 @@ data:
       },
       "wrongsecrets": {
         "image": "jeroenwillemsen/wrongsecrets",
-        "tag": "1.6.4-no-vault",
+        "tag": "1.6.5-no-vault",
         "imagePullPolicy": "IfNotPresent",
         "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
         "nodeEnv": "wrongsecrets-ctf-party",
@@ -230,8 +230,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 2a7853a457c2434571059d61cce9505a5afd5736fd1346302daf1ed9205dc39d
-        checksum/secret: 1a1dcaeffddf0f226ff9635934715794c59d9d0ec0b6dbb9c5a23c4de785c944
+        checksum/config: f3575d7162cebea5a4ee8a5d79c3bbaa9bcc52999b00d5c4a992c13227ee47d4
+        checksum/secret: 81aa6bd591fa658d435e09120e7c93ce0b289d62a779b6d95795d3cd71120b9f
       labels:
         app: wrongsecrets-balancer
         app.kubernetes.io/name: wrongsecrets-ctf-party
@@ -246,7 +246,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: wrongsecrets-ctf-party
-          image: 'jeroenwillemsen/wrongsecrets-balancer:1.6.4aws'
+          image: 'jeroenwillemsen/wrongsecrets-balancer:1.6.5aws'
           imagePullPolicy: "IfNotPresent"
           ports:
             - name: http
@@ -260,6 +260,8 @@ spec:
               path: /balancer/
               port: http
           env:
+            - name: CHALLENGE33_VALUE
+              value: "VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="
             - name: IRSA_ROLE
               value: "arn:aws:iam::233483431651:role/wrongsecrets-secret-manager"
             - name: K8S_ENV
@@ -280,6 +282,10 @@ spec:
               value: "wrongsecret"
             - name: SECRETS_MANAGER_SECRET_ID_2
               value: "wrongsecret-2"
+            - name: WRONGSECRETS_TAG
+              value: 1.6.5-no-vault
+            - name: WRONGSECRETS_DESKTOP_TAG
+              value: 1.6.5
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
