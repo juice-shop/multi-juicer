@@ -20,30 +20,25 @@ spec:
             helm.sh/chart: {{ include "wrongsecrets-ctf-party.chart" . }}
         spec:
           serviceAccountName: 'wrongsecrets-cleaner'
+          {{- if .Values.wrongsecretsCleanup.podSecurityContext.enabled }}
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 3000
-            fsGroup: 2000
+            {{- omit .Values.wrongsecretsCleanup.podSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
           containers:
             - image: '{{ .Values.wrongsecretsCleanup.repository }}:{{ .Values.wrongsecretsCleanup.tag | default (printf "v%s" .Chart.Version) }}'
               imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+              {{- if .Values.wrongsecretsCleanup.containerSecurityContext.enabled }}
               securityContext:
-                allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: true
-                runAsNonRoot: true
-                capabilities:
-                  drop:
-                    - ALL
-                seccompProfile:
-                  type: RuntimeDefault
+                {{- omit .Values.wrongsecretsCleanup.containerSecurityContext "enabled" | toYaml | nindent 16 }}
+              {{- end }}
               name: 'cleanup-job'
               env:
+                {{- range $k, $v := .Values.wrongsecretsCleanup.env}}
+                - name: {{ $k }}
+                  value: {{ $v | quote }}
+                {{- end }}
                 - name: NAMESPACE
                   value: {{ .Release.Namespace | quote }}
-                - name: MAX_INACTIVE_DURATION
-                  value: {{ .Values.wrongsecretsCleanup.gracePeriod }}
-                - name: SHOULD_DELETE
-                  value: {{ .Values.wrongsecretsCleanup.SHOULD_DELETE | quote }}
           restartPolicy: Never
           {{- with .Values.nodeSelector }}
           nodeSelector:

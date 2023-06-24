@@ -30,4 +30,4 @@ spec:
     {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.service.port }}
-      name: web
+      name: {{ .Values.service.portName }}

@@ -7,7 +7,7 @@ metadata:
 data:
   config.json: |
     {
-      "port": 3000,
+      "port": {{ .Values.balancer.containerPort }},
       "namespace": {{ .Release.Namespace | quote }},
       "deploymentContext": {{ .Release.Name | quote }},
       "maxJuiceShopInstances": {{ .Values.wrongsecrets.maxInstances}},
@@ -17,7 +17,7 @@ data:
         "secure": {{ .Values.balancer.cookie.secure }}
       },
       "admin": {
-        "username": "admin"
+        "username": {{ .Values.balancer.basicAuth.username | quote }}
       },
   {{- if .Values.balancer.metrics.enabled }}
       "metrics": {

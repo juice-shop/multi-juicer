@@ -27,6 +27,7 @@ ingress:
 service:
   type: ClusterIP
   port: 3000
+  portName: web
 
 balancer:
   cookie:
@@ -55,6 +56,12 @@ balancer:
     loadBalancerSourceRanges: null
     # -- IP address to assign to load balancer (if supported)
     externalIPs: null
+  # -- Credentials used in wrongsecrets-balancer-secret to authenticate with the wrongsecrets-api
+  basicAuth:
+    # -- Username for the basic auth credentials
+    username: admin
+    # -- Password for the basic auth credentials (will be generated if not set)
+    # adminPassword: admin
   # -- Probes settings for the balancer pods
   # -- livenessProbe: Checks if the balancer pod is still alive
   livenessProbe:
@@ -99,8 +106,12 @@ balancer:
       # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards
       enabled: false
     serviceMonitor:
-      # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
+      # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Wrongsecrets instances
       enabled: false
+      # -- Target port for the ServiceMonitor to scrape
+      targetPort: 3000
+      # -- Path to scrape for metrics
+      path: '/balancer/metrics'
     basicAuth:
       username: prometheus-scraper
       # -- Should be changed when metrics are enabled.
@@ -200,9 +211,9 @@ wrongsecrets:
 
 #the virtual desktop for the deploymebt
 virtualdesktop:
-  # -- Specifies how many Wrongsecrets instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
+  # -- Specifies how many Wrongsecrets instances balancer should start at max. Set to -1 to remove the max Wrongsecrets instance cap
   maxInstances: 500
-  # -- Juice Shop Image to use
+  # -- Wrongsecrets Image to use
   image: jeroenwillemsen/wrongsecrets-desktop-k8s
   tag: 1.6.5
   repository: commjoenie/wrongSecrets
@@ -267,14 +278,13 @@ wrongsecretsCleanup:
   repository: jeroenwillemsen/wrongsecrets-ctf-cleaner
   tag: 0.4
   enabled: true
-  # -- Specifies when Juice Shop instances will be deleted when unused for that period.
-  gracePeriod: 2d
-  # -- Specifies if the clean up job should delete the outdated namespaces or just report them. Set to false to only report outdated namespaces.
-  SHOULD_DELETE: false
   # -- Cron in which the clean up job is run. Defaults to once in a quarter. Change this if your grace period if shorter than 15 minutes. See "https://crontab.guru/#0,15,30,45_*_*_*_*" for more details.
   cron: "0,15,30,45 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
+  env:
+    SHOULD_DELETE: false # -- Specifies if the clean up job should delete the outdated namespaces or just report them. Set to false to only report outdated namespaces.
+    MAX_INACTIVE_DURATION: 2d # -- Specifies when Wrongsecrets instances will be deleted when unused for that period.
   resources:
     requests:
       memory: 256Mi
@@ -284,3 +294,20 @@ wrongsecretsCleanup:
   affinity: {}
   # -- Optional Configure kubernetes toleration for the wrongsecretsCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
+  podSecurityContext:
+    # -- If true, sets the securityContext on the created pods. This is required for the podSecurityPolicy to work
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+  containerSecurityContext:
+    # -- If true, sets the securityContext on the created containers. This is required for the podSecurityPolicy to work
+    enabled: true
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault

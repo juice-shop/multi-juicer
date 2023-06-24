@@ -20,9 +20,9 @@ spec:
         {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: wrongsecrets-balancer
-      {{- with .Values.balancer.podSecurityContext }}
+      {{- if .Values.balancer.podSecurityContext.enabled }}
       securityContext:
-        {{- omit . "enabled" | toYaml | nindent 8 }}
+        {{- omit .Values.balancer.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -70,9 +70,9 @@ spec:
                   name: wrongsecrets-balancer-secret
                   key: metricsBasicAuthPassword
             {{- end }}
-          {{- with .Values.balancer.containerSecurityContext }}
+          {{- if .Values.balancer.containerSecurityContext.enabled }}
           securityContext:
-            {{- omit . "enabled" | toYaml | nindent 12 }}
+            {{- omit .Values.balancer.containerSecurityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
           {{- if .Values.balancer.volumeMounts }}
           volumeMounts:

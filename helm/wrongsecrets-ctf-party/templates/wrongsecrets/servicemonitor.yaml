@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: juice-shops
+  name: wrongsecrets-metrics
 spec:
   targetLabels:
     - team
@@ -11,5 +11,5 @@ spec:
       app: wrongsecrets
       deployment-context: {{ .Release.Name | quote }}
   endpoints:
-    - targetPort: 3000
+    - targetPort: {{ .Values.balancer.metrics.serviceMonitor.targetPort }}
 {{- end }}
