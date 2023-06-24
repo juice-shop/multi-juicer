@@ -1,7 +1,7 @@
 {
   "name": "charts",
   "version": "v1.0.0",
-  "description": "Wrongsecrets helm chart",
+  "description": "WrongSecrets helm chart",
   "main": "index.js",
   "scripts": {
     "build": "helm package ./wrongsecrets-ctf-party",
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git@github.com:OWASP/wrongsecrets-ctf-party.git"
   },
-  "author": "Wrongsecrets",
+  "author": "WrongSecrets",
   "license": "Apache License 2.0",
   "homepage": "https://owasp.org/www-project-wrongsecrets/"
 }
