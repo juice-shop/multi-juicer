@@ -14,4 +14,12 @@ docker build -t local/progress-watchdog:$version ./progress-watchdog &
 
 wait
 
+if [ "$(kubectl config current-context)" = "kind-kind" ]; then
+  kind load docker-image "local/progress-watchdog:$version" &
+  kind load docker-image "local/cleaner:$version" &
+  kind load docker-image "local/juice-balancer:$version" &
+
+  wait
+fi
+
 helm upgrade --install mj ./helm/multi-juicer --set="imagePullPolicy=Never" --set="balancer.repository=local/juice-balancer" --set="balancer.tag=$version" --set="progressWatchdog.repository=local/progress-watchdog" --set="progressWatchdog.tag=$version" --set="juiceShopCleanup.repository=local/cleaner" --set="juiceShopCleanup.tag=$version"
