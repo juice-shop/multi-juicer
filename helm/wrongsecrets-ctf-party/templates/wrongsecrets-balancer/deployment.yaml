@@ -19,55 +19,35 @@ spec:
         app: wrongsecrets-balancer
         {{- include "wrongsecrets-ctf-party.selectorLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 3000
-        fsGroup: 2000
-        seccompProfile:
-          type: RuntimeDefault
       serviceAccountName: wrongsecrets-balancer
+      {{- with .Values.balancer.podSecurityContext }}
+      securityContext:
+        {{- omit . "enabled" | toYaml | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: {{ .Values.balancer.containerPort }}
+          {{- if .Values.balancer.livenessProbe }}
           livenessProbe:
-            httpGet:
-              path: /balancer/
-              port: http
+          {{- toYaml .Values.balancer.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.balancer.readinessProbe }}
           readinessProbe:
-            httpGet:
-              path: /balancer/
-              port: http
+          {{- toYaml .Values.balancer.readinessProbe | nindent 12 }}
+          {{- end }}
           env:
-            - name: REACT_APP_MOVING_GIF_LOGO
-              value: {{ .Values.balancer.env.REACT_APP_MOVING_GIF_LOGO }}
-            - name: REACT_APP_ACCESS_PASSWORD
-              value: {{ .Values.balancer.env.REACT_APP_ACCESS_PASSWORD }}
-            - name: REACT_APP_HEROKU_WRONGSECRETS_URL
-              value: {{ .Values.balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL }}
-            - name: REACT_APP_CTFD_URL
-              value: {{ .Values.balancer.env.REACT_APP_CTFD_URL }}
-            - name: REACT_APP_S3_BUCKET_URL
-              value: {{ .Values.balancer.env.REACT_APP_S3_BUCKET_URL }}
-            - name: K8S_ENV
-              value: {{ .Values.balancer.env.K8S_ENV }}
-            - name: IRSA_ROLE
-              value: {{ .Values.balancer.env.IRSA_ROLE }} #REPLACE WITH THE ACTUAL AWS ROLE IF IN AWS MODE
+            {{- range $k, $v := .Values.balancer.env}}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
             - name: WRONGSECRETS_TAG
               value: {{ .Values.wrongsecrets.tag}}
             - name: WRONGSECRETS_DESKTOP_TAG
               value: {{ .Values.virtualdesktop.tag }}
-            - name: REACT_APP_CREATE_TEAM_HMAC_KEY
-              value: hardcodedkey
-            - name: SECRETS_MANAGER_SECRET_ID_1
-              value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_1 }}
-            - name: SECRETS_MANAGER_SECRET_ID_2
-              value: {{ .Values.balancer.env.SECRETS_MANAGER_SECRET_ID_2 }}
-            - name: CHALLENGE33_VALUE
-              value: {{ .Values.balancer.env.CHALLENGE33_VALUE }}
             - name: COOKIEPARSER_SECRET
               valueFrom:
                 secretKeyRef:
@@ -90,27 +70,20 @@ spec:
                   name: wrongsecrets-balancer-secret
                   key: metricsBasicAuthPassword
             {{- end }}
+          {{- with .Values.balancer.containerSecurityContext }}
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            capabilities:
-              drop:
-                - ALL
-              add:
-                - CAP_NET_ADMIN
-                - CAP_NET_BIND_SERVICE
-            seccompProfile:
-              type: RuntimeDefault
+            {{- omit . "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.balancer.volumeMounts }}
           volumeMounts:
-            - name: config-volume
-              mountPath: /home/app/config/
+            {{- toYaml .Values.balancer.volumeMounts | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.balancer.resources | nindent 12 }}
+      {{- if .Values.balancer.volumes }}
       volumes:
-        - name: config-volume
-          configMap:
-            name: wrongsecrets-balancer-config
+        {{- toYaml .Values.balancer.volumes | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
