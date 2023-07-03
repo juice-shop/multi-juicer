@@ -142,7 +142,7 @@ wrongsecrets:
   maxInstances: 500
   # -- Wrongsecrets Image to use
   image: jeroenwillemsen/wrongsecrets
-  tag: 1.6.7RC1-no-vault
+  tag: 1.6.7RC3-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/OWASP/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Wrongsecrets config.yaml. See the Wrongsecrets Docs for any needed ENVs: https://github.com/OWASP/wrongsecrets
