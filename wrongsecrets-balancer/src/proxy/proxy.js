@@ -165,7 +165,7 @@ function proxyTrafficToJuiceShop(req, res) {
     });
     server.on('connect', function (req, socket, head) {
       const connectTeamname = extractTeamName(req);
-      const regex = new RegExp('^[a-z0-9-]+$', 'i');
+      const regex = new RegExp('^[a-z0-9]([-a-z0-9])+[a-z0-9]$', 'i');
       if (!regex.test(connectTeamname)) {
         logger.info(`Got malformed teamname: ${teamname}s`);
         return res.redirect('/balancer/');
