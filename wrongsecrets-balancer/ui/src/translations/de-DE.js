@@ -4,8 +4,7 @@ const germanTranslations = {
   getting_started: "Los geht's",
   join_failed_text: 'Das team konnte nicht erstellt / beigetreten werden.',
   teamname: 'Teamname',
-  teamname_validation_constraints:
-    "Teamname muss aus kleinen Buchstaben, Nummern oder einem '-' bestehen",
+  teamname_validation_constraints: 'Teamname muss aus kleinen Buchstaben, Nummern oder einem - bestehen',
   create_or_join_team_label: 'Team erstellen / beitreten',
   change_language: 'Sprache ändern',
   joining_team: 'Team {team} beitreten',
@@ -37,6 +36,7 @@ const germanTranslations = {
   'admin_table.noActiveTeams': 'Keine aktiven Teams',
   'admin_table.restarting': 'Wird neu gestartet',
   'admin_table.restart': 'Neustarten',
+  'welcome_title': 'Wilkommen!'
 };
 
 export default germanTranslations;

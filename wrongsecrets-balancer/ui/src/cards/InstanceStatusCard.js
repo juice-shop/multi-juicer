@@ -7,7 +7,7 @@ import promiseRetry from 'promise-retry';
 import { BodyCard, CenteredCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
 
-const LinkButton = Button.withComponent('a');
+const LinkButton = styled(Button).attrs({ as: 'a' })``;;
 
 const CenteredText = styled.span`
   text-align: center;

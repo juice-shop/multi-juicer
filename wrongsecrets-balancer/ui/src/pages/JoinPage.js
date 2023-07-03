@@ -229,7 +229,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             name="teamname"
             value={teamname}
             title={formatMessage(messages.teamnameValidationConstraints)}
-            pattern="^[a-z0-9]([-a-z0-9])+[a-z0-9]$"
+            pattern="^[a-z0-9][a-z0-9\-]+[a-z0-9]$"
             maxLength="16"
             onChange={({ target }) => setTeamname(target.value)}
           />

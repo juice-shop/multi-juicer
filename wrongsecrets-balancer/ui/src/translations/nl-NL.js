@@ -4,7 +4,7 @@ const dutchTranslations = {
   getting_started: 'Starten',
   join_failed_text: 'Het team kan niet hersteld of bereikt worden.',
   teamname: 'Teamnaam',
-  teamname_validation_constraints: "Teamnaam moet uit kleine letters, nummers of '-' bestaan",
+  teamname_validation_constraints: 'Teamnaam moet uit kleine letters, nummers of - bestaan',
   create_or_join_team_label: 'Team aanmaken of joinen',
   change_language: 'Kies taal',
   joining_team: 'Team {team} joinen',
@@ -30,6 +30,7 @@ const dutchTranslations = {
   'admin_table.noActiveTeams': 'Geen actieve teams',
   'admin_table.restarting': 'Wordt nu opnieuw gestart',
   'admin_table.restart': 'Herstarten',
+  'welcome_title': "Welkom!",
 };
 
 export default dutchTranslations;
