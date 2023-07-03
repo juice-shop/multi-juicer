@@ -573,7 +573,7 @@ const paramsSchema = Joi.object({
   team: Joi.string()
     .required()
     .max(16)
-    .regex(/^[a-z0-9-]+$/),
+    .regex(/^[a-z0-9]([-a-z0-9])+[a-z0-9]$/),
 });
 const bodySchema = Joi.object({
   hmacvalue: Joi.string().hex().length(64),
