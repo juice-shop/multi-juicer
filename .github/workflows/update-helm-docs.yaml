@@ -1,0 +1,35 @@
+name: Helm Docs
+
+on: [push]
+jobs:
+  helmDoc:
+    name: "Update Helm Docs"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: install helm-docs
+        env:
+          HELM_DOCS_VERSION: "1.7.0"
+        run: |
+          cd /tmp
+          wget https://github.com/norwoodj/helm-docs/releases/download/v${{env.HELM_DOCS_VERSION}}/helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          tar -xvf helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/sbin
+      - name: Generate and Release Helm Docs
+        run: |
+          helm-docs -t helm/wrongsecrets-ctf-party/README.md.gotmpl -o README.md
+          cp helm/wrongsecrets-ctf-party/README.md /tmp/README.md
+      - name: Commit and push changes (if any)
+        run: |
+          if git diff --exit-code; then
+            echo "No changes detected."
+          else
+            echo "Changes detected."
+            git add helm/wrongsecrets-ctf-party/README.md
+            git commit -m "Update README.md"
+            git push
+          fi

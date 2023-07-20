@@ -8,6 +8,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: install helm-docs
+        env:
+          HELM_DOCS_VERSION: "1.7.0"
+        run: |
+          cd /tmp
+          wget https://github.com/norwoodj/helm-docs/releases/download/v${{env.HELM_DOCS_VERSION}}/helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          tar -xvf helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/sbin
+      - name: Generate and Release Helm Docs
+        run: |
+          helm-docs -t helm/wrongsecrets-ctf-party/README.md.gotmpl -o README.md
+          cp helm/wrongsecrets-ctf-party/README.md /tmp/README.md
+      - name: Update gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Copy README.md to gh-pages
+        run: |
+          cp /tmp/README.md README.md
+      - name: Commit and push changes (if any)
+        run: |
+          if git diff --exit-code; then
+            echo "No changes detected."
+          else
+            echo "Changes detected."
+            git add README.md
+            git commit -m "Update README.md"
+            git push
+          fi
+      - name: Get back to original branch
+        uses: actions/checkout@v3
       - name: "Install yq"
         run: |
           sudo snap install yq
@@ -19,11 +55,12 @@ jobs:
           RELEASE_VERSION="${RELEASE_VERSION//v}"
           # patch the version & appVersion in the Chart.yaml to the release version
           yq eval -i ".version = \"$RELEASE_VERSION\", .appVersion = \"$RELEASE_VERSION\"" Chart.yaml
-      - uses: J12934/helm-gh-pages-action@v2.0.0
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
         with:
-          access-token: ${{ secrets.ACCESS_TOKEN }}
-          charts-folder: helm
-          deploy-branch: gh-pages
+          charts_dir: helm
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
   dockerBuilds:
     name: "Build"
     runs-on: ubuntu-latest
