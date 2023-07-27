@@ -5,6 +5,9 @@ metadata:
   name: juice-shops
   labels:
     {{- include "multi-juicer.juice-shop.labels" . | nindent 4 }}
+    {{- with .Values.balancer.metrics.serviceMonitor.additionalLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   targetLabels:
     - team
