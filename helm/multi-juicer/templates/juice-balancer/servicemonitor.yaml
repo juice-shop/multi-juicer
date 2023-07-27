@@ -5,6 +5,9 @@ metadata:
   name: juice-balancer
   labels:
     {{ include "multi-juicer.juice-balancer.labels" . | nindent 4 }}
+    {{- with .Values.balancer.metrics.serviceMonitor.additionalLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   selector:
     matchLabels:

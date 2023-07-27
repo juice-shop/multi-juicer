@@ -74,6 +74,9 @@ balancer:
     serviceMonitor:
       # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
       enabled: false
+      # -- Allows to add additional labels. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
+      # -- If you use the Kube-Prometheus-Stack Helm-Chart, the default label looked for is `release=<Kube-Prometheus-Release-Name>
+      additionalLabels: {}
     basicAuth:
       username: prometheus-scraper
       # -- Should be changed when metrics are enabled.
