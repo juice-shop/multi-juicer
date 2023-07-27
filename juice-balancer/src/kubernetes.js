@@ -58,6 +58,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             'app.kubernetes.io/instance': `juice-shop-${get('deploymentContext')}`,
             'app.kubernetes.io/part-of': 'multi-juicer',
           },
+          annotations: get('juiceShop.additionalAnnotations')
         },
         spec: {
           automountServiceAccountToken: false,

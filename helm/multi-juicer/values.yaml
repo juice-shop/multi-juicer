@@ -146,7 +146,8 @@ juiceShop:
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
-
+  # -- Optional Additional annotations for the Juice Shop pods.
+  additionalAnnotations: {}
   # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
   runtimeClassName: null
 
