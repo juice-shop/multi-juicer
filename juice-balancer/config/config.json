@@ -37,6 +37,7 @@
       }
     },
     "tolerations": [],
-    "affinity": {}
+    "affinity": {},
+    "additionalAnnotations": {}
   }
 }

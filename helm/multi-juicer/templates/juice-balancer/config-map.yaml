@@ -38,6 +38,7 @@ data:
         "volumeMounts": {{ .Values.juiceShop.volumeMounts | toJson }},
         "affinity": {{ .Values.juiceShop.affinity | toJson }},
         "tolerations": {{ .Values.juiceShop.tolerations | toJson }},
-        "runtimeClassName": {{ .Values.juiceShop.runtimeClassName | toJson }}
+        "runtimeClassName": {{ .Values.juiceShop.runtimeClassName | toJson }},
+        "additionalAnnotations": {{ .Values.juiceShop.additionalAnnotations | toJson }}
       }
     }
