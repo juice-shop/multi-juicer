@@ -12,6 +12,17 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: "Install yq"
+        run: |
+          sudo snap install yq
+      - name: "Patch Chart.yaml to the current released version"
+        working-directory: helm/wrongsecrets-ctf-party/
+        run: |
+          RELEASE_VERSION="${GITHUB_REF#refs/*/}"
+          # Remove leading 'v' from git tag to create valid semver
+          RELEASE_VERSION="${RELEASE_VERSION//v}"
+          # patch the version & appVersion in the Chart.yaml to the release version
+          yq eval -i ".version = \"$RELEASE_VERSION\", .appVersion = \"$RELEASE_VERSION\"" Chart.yaml
       - name: install helm-docs
         env:
           HELM_DOCS_VERSION: "1.7.0"
@@ -22,7 +33,7 @@ jobs:
           sudo mv helm-docs /usr/local/sbin
       - name: Generate and Release Helm Docs
         run: |
-          helm-docs -t helm/wrongsecrets-ctf-party/README.md.gotmpl -o README.md
+          helm-docs -t helm/wrongsecrets-ctf-party/README.md.gotmpl -t helm/wrongsecrets-ctf-party/_template.gotmpl -o README.md
           cp helm/wrongsecrets-ctf-party/README.md /tmp/README.md
       - name: Update gh-pages branch
         uses: actions/checkout@v3
@@ -44,17 +55,6 @@ jobs:
           fi
       - name: Get back to original branch
         uses: actions/checkout@v3
-      - name: "Install yq"
-        run: |
-          sudo snap install yq
-      - name: "Patch Chart.yaml to the current released version"
-        working-directory: helm/wrongsecrets-ctf-party/
-        run: |
-          RELEASE_VERSION="${GITHUB_REF#refs/*/}"
-          # Remove leading 'v' from git tag to create valid semver
-          RELEASE_VERSION="${RELEASE_VERSION//v}"
-          # patch the version & appVersion in the Chart.yaml to the release version
-          yq eval -i ".version = \"$RELEASE_VERSION\", .appVersion = \"$RELEASE_VERSION\"" Chart.yaml
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
         with:
