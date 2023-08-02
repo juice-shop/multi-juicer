@@ -37,7 +37,7 @@ data "aws_availability_zones" "available" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0.0"
+  version = "~> 5.1.1"
 
   name                 = "${var.cluster_name}-vpc"
   cidr                 = local.vpc_cidr
@@ -62,7 +62,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.15.3"
+  version = "19.15.4"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
@@ -142,7 +142,7 @@ module "eks" {
 # Cluster Autoscaler IRSA
 module "cluster_autoscaler_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.24.0"
+  version = "~> 5.28.0"
 
 
   role_name                        = "wrongsecrets-cluster-autoscaler"
@@ -159,7 +159,7 @@ module "cluster_autoscaler_irsa_role" {
 
 module "ebs_csi_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.24.0"
+  version = "~> 5.28.0"
 
   role_name             = "wrongsecrets-ebs-csi"
   attach_ebs_csi_policy = true
@@ -174,7 +174,7 @@ module "ebs_csi_irsa_role" {
 
 module "load_balancer_controller_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.24.0"
+  version = "~> 5.28.0"
 
   role_name                              = "wrongsecrets-load-balancer-controller"
   attach_load_balancer_controller_policy = true
