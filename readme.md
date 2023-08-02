@@ -97,14 +97,13 @@ To use the 2 domain setup with CTFD:
 This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the AWS Challenges, do:
 
 ```shell
+helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
 
-helm upgrade --install mj ./helm/wrongsecrets-ctf-party
+helm upgrade --install my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-party
 
 ```
 
-from this repo. We will host the helm chart soon for you.
-
-### Play with Minikube:
+Play with Minikube:
 
 ** NOTE: The below steps require at least minikube version v1.30.1 and yq (https://github.com/mikefarah/yq/) version v4.34.1. **
 
@@ -164,13 +163,15 @@ The default ctfd config values are here: [aws/k8s/ctfd-values.yaml](aws/k8s/ctfd
 Download & Save the file and tell helm to use your config file over the default by running:
 
 ```sh
-helm install -f values.yaml wrongsecrets-ctf-party ./wrongsecrets-ctf-party/helm/wrongsecrets-ctf-party/
+helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
+
+helm install -f values.yaml my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-party
 ```
 
 ### Deinstallation
 
 ```sh
-helm delete wrongsecrets-ctf-party
+helm delete my-wrongsecrets-ctf-party
 ```
 
 And if you are running AWS (including CTFd):
@@ -223,7 +224,6 @@ kubectl -n kube-system get pod -l component=kube-apiserver -o=jsonpath="{.items[
 ```
 
 Still having trouble to connect to that host at that port? run `./scripts/patch-nsp-for-kubectl.sh` to make sure the NSPs are updated.
-
 
 ## Talk with Us!
 

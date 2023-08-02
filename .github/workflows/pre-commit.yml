@@ -10,6 +10,7 @@ env:
   TF_DOCS_VERSION: v0.16.0
   TFLINT_VERSION: v0.44.1
   TF_VERSION: "1.3.4"
+  HELM_DOCS_VERSION: "1.7.0"
 permissions:
   contents: read
 jobs:
@@ -42,6 +43,12 @@ jobs:
           tar -zxvf terraform_docs.tar.gz terraform-docs
           chmod +x terraform-docs
           mv terraform-docs /usr/local/bin/
+      - name: Setup helm-docs
+        run: |
+          cd /tmp
+          wget https://github.com/norwoodj/helm-docs/releases/download/v${{env.HELM_DOCS_VERSION}}/helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          tar -xvf helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/sbin
       - name: Pre-commit checks
         uses: pre-commit/action@v3.0.0
       - name: pre-commit-ci-lite

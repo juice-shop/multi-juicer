@@ -3,7 +3,7 @@ name: wrongsecrets-ctf-party
 description: Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 icon: https://github.com/OWASP/wrongsecrets/blob/master/icon.png?raw=true
 
-home: https://github.com/
+home: https://owasp.org/www-project-wrongsecrets/
 sources:
   - https://github.com/OWASP/wrongsecrets-ctf-party
 
