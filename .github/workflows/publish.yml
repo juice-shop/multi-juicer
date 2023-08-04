@@ -1,6 +1,9 @@
 on:
+  workflow_dispatch:
   release:
     types: [published]
+
+
 name: "Publish Docker Images"
 jobs:
   helmRelease:
