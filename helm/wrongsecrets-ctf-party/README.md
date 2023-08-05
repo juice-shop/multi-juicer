@@ -54,10 +54,6 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| balancer.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created wrongsecrets instances (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
-| balancer.basicAuth | object | `{"username":"admin"}` | Credentials used in wrongsecrets-balancer-secret to authenticate with the wrongsecrets-api |
-| balancer.basicAuth.username | string | `"admin"` | Username for the basic auth credentials |
-| balancer.containerPort | int | `3000` | Port to expose on the balancer pods which the container listens on |
 | balancer.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | balancer.containerSecurityContext.capabilities.add[0] | string | `"CAP_NET_ADMIN"` |  |
 | balancer.containerSecurityContext.capabilities.add[1] | string | `"CAP_NET_BIND_SERVICE"` |  |
