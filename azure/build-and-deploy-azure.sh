@@ -62,15 +62,14 @@ az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
 echo "Deploying the k8s autoscaler for eks through kubectl"
 
 # This will create a new service principal with "Contributor" role scoped to your subscription.
-az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$AZURE_SUBSCRIPTION_ID" --output json
+az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$AZURE_SUBSCRIPTION_ID" --output json > mycredentials.json
 
 
 curl -o cluster-autoscaler-autodiscover.yaml https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/azure/examples/cluster-autoscaler-aks.yaml
 
+export CLIENT_ID_BASE64="$(echo mycredentials.json | jq -r .appId | base64)"
 
-export CLIENT_ID_BASE64="$(az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$AZURE_SUBSCRIPTION_ID" --output json | jq -r .appId | base64)"
-
-export CLIENT_SECRET_BASE64="$(az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$AZURE_SUBSCRIPTION_ID" --output json | jq -r .password | base64)"
+export CLIENT_SECRET_BASE64="$( echo mycredentials.json | jq -r .password | base64)"
 
 export RESOURCE_GROUP_BASE64="$(echo $RESOURCE_GROUP | base64)"
 
@@ -148,10 +147,9 @@ fi
 
 
 # Preparing calico via Helm
-
 echo "preparing calico via Helm"
 helm repo add projectcalico https://docs.projectcalico.org/charts
-helm upgrade --install calico projectcalico/tigera-operator --version v3.21.4
+helm upgrade --install calico projectcalico/tigera-operator
 
 
 echo "Generate secret manager challenge secret 2"
@@ -172,7 +170,7 @@ envsubst <./k8s/secret-challenge-vault-deployment.yml.tpl >./k8s/secret-challeng
 kubectl apply -f./k8s/pod-id.yml
 
 while [[ $(kubectl --namespace=default get pods -l "app.kubernetes.io/component=mic" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True True" ]]; do echo "waiting for component=mic" && sleep 2; done
-while [[ $(kubectl --namespace=default get pods -l "app.kubernetes.io/component=nmi" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for component=nmi" && sleep 2; done
+while [[ $(kubectl --namespace=default get pods -l "app.kubernetes.io/component=nmi" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True True True" ]]; do echo "waiting for component=nmi" && sleep 2; done
 
 
 echo "Installing metrics api-server"
@@ -218,7 +216,7 @@ export HELM_EXPERIMENTAL_OCI=1
 kubectl create namespace ctfd
 
 # Double base64 encoding to prevent weird character errors in ctfd
-helm upgrade --install ctfd -n ctfd oci://ghcr.io/bman46/ctfd/ctfd \
+helm upgrade --install ctfd -n ctfd oci://ghcr.io/bman46/ctfd/ctfd --version 0.6.3 \
   --set="redis.auth.password=$(openssl rand -base64 24 | base64)" \
   --set="mariadb.auth.rootPassword=$(openssl rand -base64 24 | base64)" \
   --set="mariadb.auth.password=$(openssl rand -base64 24 | base64)" \
