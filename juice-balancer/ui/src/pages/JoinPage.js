@@ -11,7 +11,7 @@ import { TeamDisplayCard } from '../cards/TeamDisplayCard';
 const messages = defineMessages({
   teamnameValidationConstraints: {
     id: 'teamname_validation_constraints',
-    defaultMessage: "Teamnames must consist of lowercase letter, number or '-'",
+    defaultMessage: "Teamnames must have at least 3 characters and consist of lowercase letter, number or '-'",
   },
 });
 
@@ -107,7 +107,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             name="teamname"
             value={teamname}
             title={formatMessage(messages.teamnameValidationConstraints)}
-            pattern="^[a-z0-9]([-a-z0-9])+[a-z0-9]$"
+            pattern="^[a-z0-9]([\-a-z0-9])+[a-z0-9]$"
             maxLength="16"
             onChange={({ target }) => setTeamname(target.value)}
           />
