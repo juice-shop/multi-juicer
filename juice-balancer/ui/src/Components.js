@@ -27,6 +27,10 @@ export const Input = styled.input`
   font-size: 14px;
   display: block;
   width: 100%;
+
+  &:invalid {
+    color: red;
+  }
 `;
 export const Label = styled.label`
   font-weight: 300;
