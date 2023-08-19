@@ -1,0 +1,33 @@
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentity
+metadata:
+  name: wrongsecrets-pod-id
+spec:
+  type: 0
+  resourceID: /subscriptions/8c39fb32-7a4c-43f4-ac57-c54ee236859c/resourceGroups/owasp-wrongsecrets/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wrongsecrets-identity
+  clientID: 102db5a3-a13a-493a-9a29-a481e97e5db0
+---
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: wrongsecrets-podid-binding
+spec:
+  azureIdentity: wrongsecrets-pod-id
+  selector: wrongsecrets-pod-id
+---
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentity
+metadata:
+  name: separate-workload-pod-id
+spec:
+  type: 0
+  resourceID: /subscriptions/8c39fb32-7a4c-43f4-ac57-c54ee236859c/resourceGroups/owasp-wrongsecrets/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wrongsecrets-extra-identity
+  clientID: 11d0906e-7c6b-4708-a45a-1ea657af0487
+---
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: wrongsecrets-extra-podid-binding
+spec:
+  azureIdentity: separate-workload-pod-id
+  selector: separate-workload-pod-id

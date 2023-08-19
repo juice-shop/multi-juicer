@@ -2,12 +2,12 @@ terraform {
   # For shared state:
   # Set the resource group in the backend configuration below, then uncomment and apply!
   # Note that you probably already create a resource group. Don't forget to set that correctly in this file.
-  backend "azurerm" {
-    resource_group_name  = "owasp-wrongsecrets"
-    storage_account_name = "wrongsecretso763k93847"
-    container_name       = "tfstate"
-    key                  = "terraform.tfstate"
-  }
+  # backend "azurerm" {
+  #   resource_group_name  = "owasp-wrongsecrets"
+  #   storage_account_name = "<storage account name>"
+  #   container_name       = "tfstate"
+  #   key                  = "terraform.tfstate"
+  # }
 }
 
 data "http" "ip" {

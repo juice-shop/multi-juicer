@@ -57,56 +57,6 @@ export AZ_KEY_VAULT_NAME="$(terraform output -raw vault_name)"
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
 
 
-# Installing the cluster autoscaler
-
-echo "Deploying the k8s autoscaler for eks through kubectl"
-
-# This will create a new service principal with "Contributor" role scoped to your subscription.
-az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$AZURE_SUBSCRIPTION_ID" --output json > mycredentials.json
-
-
-curl -o cluster-autoscaler-autodiscover.yaml https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/azure/examples/cluster-autoscaler-aks.yaml
-
-export CLIENT_ID_BASE64="$(echo mycredentials.json | jq -r .appId | base64)"
-
-export CLIENT_SECRET_BASE64="$( echo mycredentials.json | jq -r .password | base64)"
-
-export RESOURCE_GROUP_BASE64="$(echo $RESOURCE_GROUP | base64)"
-
-export SUBSCRIPTION_ID_BASE64="$(echo $AZURE_SUBSCRIPTION_ID | base64)"
-
-export TENANT_ID_BASE64="$(echo $AZURE_TENANT_ID | base64)"
-
-export CLUSTERNAME="$(echo $CLUSTER_NAME | base64)"
-
-export NODE_RESOURCE_GROUP="$(echo $IDENTITY_RESOURCE_GROUP | base64)"
-
-# Replace the values in the cluster-autoscaler-autodiscover.yaml file
-sed -i -e "s/<base64-encoded-client-id>/$CLIENT_ID_BASE64/g" cluster-autoscaler-autodiscover.yaml
-
-sed -i -e "s/<base64-encoded-client-secret>/$CLIENT_SECRET_BASE64/g" cluster-autoscaler-autodiscover.yaml
-
-sed -i -e "s/<base64-encoded-resource-group>/$RESOURCE_GROUP_BASE64/g" cluster-autoscaler-autodiscover.yaml
-
-sed -i -e "s/<base64-encoded-subscription-id>/$SUBSCRIPTION_ID_BASE64/g" cluster-autoscaler-autodiscover.yaml
-
-sed -i -e "s/<base64-encoded-tenant-id>/$TENANT_ID_BASE64/g" cluster-autoscaler-autodiscover.yaml
-
-sed -i -e "s/<base64-encoded-clustername>/$CLUSTERNAME/g" cluster-autoscaler-autodiscover.yaml
-
-sed -i -e "s/<base64-encoded-node-resource-group>/$NODE_RESOURCE_GROUP/g" cluster-autoscaler-autodiscover.yaml
-
-# Then deploy cluster-autoscaler by running
-kubectl apply -f cluster-autoscaler-aks.yaml
-
-
-# In the cluster-autoscaler spec, find the image: field and replace {{ ca_version }} with a specific cluster autoscaler release.
-kubectl set image deployment cluster-autoscaler \
-  -n kube-system \
-  cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.25.0
-
-
-
 # Install the secrets store CSI driver
 helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 helm list --namespace kube-system | grep 'csi-secrets-store' &>/dev/null
@@ -183,7 +133,7 @@ wait
 
 if [[ -z $APP_PASSWORD ]]; then
   echo "No app password passed, creating a new one"
-  APP_PASSWORD="$(uuidgen)"
+  APP_PASSWORD="$( uuidgen | sed 's/[-]//g')"
 else
   echo "App password already set"
 fi
@@ -202,13 +152,13 @@ fi
 
 echo "App password is ${APP_PASSWORD}"
 helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
-  --set="balancer.env.K8S_ENV=aws" \
-  --set="balancer.env.IRSA_ROLE=${IRSA_ROLE_ARN}" \
+  --set="balancer.env.K8S_ENV=azure" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
-  --set="balancer.env.REACT_APP_S3_BUCKET_URL=s3://${STATE_BUCKET}" \
   --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
   --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}"
 
+  # TODO: Support azure storage account instead
+  # --set="balancer.env.REACT_APP_S3_BUCKET_URL=s3://${STATE_BUCKET}" \
 # Install CTFd
 echo "Installing CTFd"
 
@@ -217,6 +167,7 @@ kubectl create namespace ctfd
 
 # Double base64 encoding to prevent weird character errors in ctfd
 helm upgrade --install ctfd -n ctfd oci://ghcr.io/bman46/ctfd/ctfd --version 0.6.3 \
+  --values ./k8s/ctfd-values.yaml \
   --set="redis.auth.password=$(openssl rand -base64 24 | base64)" \
   --set="mariadb.auth.rootPassword=$(openssl rand -base64 24 | base64)" \
   --set="mariadb.auth.password=$(openssl rand -base64 24 | base64)" \
