@@ -39,6 +39,7 @@ data:
         "affinity": {{ .Values.juiceShop.affinity | toJson }},
         "tolerations": {{ .Values.juiceShop.tolerations | toJson }},
         "runtimeClassName": {{ .Values.juiceShop.runtimeClassName | toJson }},
-        "additionalAnnotations": {{ .Values.juiceShop.additionalAnnotations | toJson }}
+        "annotations": {{ .Values.juiceShop.pod.annotations | toJson }},
+        "labels": {{ .Values.juiceShop.pod.labels | toJson }}
       }
     }

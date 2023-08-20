@@ -63,8 +63,11 @@ balancer:
   tolerations: []
   # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
   skipOwnerReference: false
-  # -- Optional Additional annotations for the balancer pods.
-  additionalAnnotations: {}
+  pod:
+    # -- Optional Additional annotations for the balancer pods.
+    annotations: {}
+    # -- Optional Additional labels for the balancer pods.
+    labels: {}
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
     enabled: true
@@ -74,9 +77,9 @@ balancer:
     serviceMonitor:
       # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
       enabled: false
-      # -- Allows to add additional labels. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
-      # -- If you use the Kube-Prometheus-Stack Helm-Chart, the default label looked for is `release=<Kube-Prometheus-Release-Name>
-      additionalLabels: {}
+      # -- Optional Allows to add additional labels to the service monitor. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
+      # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
+      labels: {}
     basicAuth:
       username: prometheus-scraper
       # -- Should be changed when metrics are enabled.
@@ -146,8 +149,11 @@ juiceShop:
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
-  # -- Optional Additional annotations for the Juice Shop pods.
-  additionalAnnotations: {}
+  pod:
+    # -- Optional Additional annotations for the Juice Shop pods.
+    annotations: {}
+    # -- Optional Additional labels for the Juice Shop pods.
+    labels: {}
   # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
   runtimeClassName: null
 

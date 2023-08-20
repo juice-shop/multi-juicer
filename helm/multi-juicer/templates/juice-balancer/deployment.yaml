@@ -14,11 +14,14 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/juice-balancer/config-map.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/juice-balancer/secret.yaml") . | sha256sum }}
-        {{- with .Values.balancer.additionalAnnotations }}
+        {{- with .Values.balancer.pod.annotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
         {{- include "multi-juicer.juice-balancer.labels" . | nindent 8 }}
+        {{- with .Values.balancer.pod.labels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: juice-balancer
       {{- with .Values.balancer.securityContext }}

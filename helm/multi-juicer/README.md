@@ -27,6 +27,9 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | balancer.metrics.dashboards.enabled | bool | `false` | if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards |
 | balancer.metrics.enabled | bool | `true` | enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password |
 | balancer.metrics.serviceMonitor.enabled | bool | `false` | If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances |
+| balancer.metrics.serviceMonitor.labels | object | `{}` | If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name> |
+| balancer.pod.annotations | object | `{}` | Optional Additional annotations for the balancer pods. |
+| balancer.pod.labels | object | `{}` | Optional Additional labels for the balancer pods. |
 | balancer.replicas | int | `1` | Number of replicas of the juice-balancer deployment |
 | balancer.repository | string | `"ghcr.io/juice-shop/multi-juicer/juice-balancer"` |  |
 | balancer.resources.limits.cpu | string | `"400m"` |  |
@@ -47,6 +50,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts[0].host | string | `"multi-juicer.local"` |  |
 | ingress.hosts[0].paths[0] | string | `"/"` |  |
+| ingress.ingressClassName | string | `"nginx"` |  |
 | ingress.tls | list | `[]` |  |
 | juiceShop.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | juiceShop.config | string | See values.yaml for full details | Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file |
@@ -56,6 +60,8 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | juiceShop.image | string | `"bkimminich/juice-shop"` | Juice Shop Image to use |
 | juiceShop.maxInstances | int | `10` | Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap |
 | juiceShop.nodeEnv | string | `"multi-juicer"` | Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`. |
+| juiceShop.pod.annotations | object | `{}` | Optional Additional annotations for the Juice Shop pods. |
+| juiceShop.pod.labels | object | `{}` | Optional Additional labels for the Juice Shop pods. |
 | juiceShop.resources | object | `{"requests":{"cpu":"150m","memory":"300Mi"}}` | Optional resources definitions to set for each JuiceShop instance |
 | juiceShop.runtimeClassName | string | `nil` | Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/) |
 | juiceShop.securityContext | object | `{}` | Optional securityContext definitions to set for each JuiceShop instance |

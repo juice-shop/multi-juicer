@@ -38,6 +38,7 @@
     },
     "tolerations": [],
     "affinity": {},
-    "additionalAnnotations": {}
+    "annotations": {},
+    "labels": {}
   }
 }

@@ -50,6 +50,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
       template: {
         metadata: {
           labels: {
+            ...get('juiceShop.labels'),
             team,
             'app.kubernetes.io/version': get('juiceShop.tag'),
             'app.kubernetes.io/name': 'juice-shop',
@@ -58,7 +59,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
             'app.kubernetes.io/instance': `juice-shop-${get('deploymentContext')}`,
             'app.kubernetes.io/part-of': 'multi-juicer',
           },
-          annotations: get('juiceShop.additionalAnnotations'),
+          annotations: get('juiceShop.annotations'),
         },
         spec: {
           automountServiceAccountToken: false,
