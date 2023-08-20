@@ -11,7 +11,7 @@ import { TeamDisplayCard } from '../cards/TeamDisplayCard';
 const messages = defineMessages({
   teamnameValidationConstraints: {
     id: 'teamname_validation_constraints',
-    defaultMessage: "Teamnames must have at least 3 characters and consist of lowercase letter, number or '-'",
+    defaultMessage: "Teamnames must have at least 3 characters and consist of lowercase letters, numbers or '-'",
   },
 });
 

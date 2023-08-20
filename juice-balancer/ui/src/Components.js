@@ -29,7 +29,9 @@ export const Input = styled.input`
   width: 100%;
 
   &:invalid {
-    color: red;
+    outline-color: red;
+    outline-width: 2px;
+    outline-style: solid;
   }
 `;
 export const Label = styled.label`
