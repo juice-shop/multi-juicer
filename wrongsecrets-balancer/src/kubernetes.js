@@ -18,6 +18,8 @@ const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE;
 const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1;
 const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2;
+const keyvaultSecretName1 = process.env.KEYVAULT_SECRET_ID_1;
+const keyvaultSecretName2 = process.env.KEYVAULT_SECRET_ID_2;
 const challenge33Value = process.env.CHALLENGE33_VALUE;
 const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG;
 const wrongSecretsDekstopTag = process.env.WRONGSECRETS_DESKTOP_TAG;
@@ -573,6 +575,275 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
 module.exports.createAWSDeploymentForTeam = createAWSDeploymentForTeam;
 
 //END AWS
+
+//BEGIN AZURE
+const createAzureSecretsProviderForTeam = async (team) => {
+  const secretProviderClass = {
+    apiVersion: 'secrets-store.csi.x-k8s.io/v1',
+    kind: 'SecretProviderClass',
+    metadata: {
+      name: 'wrongsecrets-azure-keyvault',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      provider: 'azure',
+      secretObjects: [
+        {
+          secretName: 'challenge9',
+          type: 'keyVaultSecret',
+          data: [
+            {
+              objectName: `${keyvaultSecretName1}`,
+              key: 'value',
+            },
+          ],
+        },
+        {
+          secretName: 'challenge10',
+          type: 'keyVaultSecret',
+          data: [
+            {
+              objectName: `${keyvaultSecretName2}`,
+              key: 'value',
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  return k8sCustomAPI
+    .createNamespacedCustomObject(
+      'secrets-store.csi.x-k8s.io',
+      'v1',
+      `t-${team}`,
+      'secretproviderclasses',
+      secretProviderClass
+    )
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+};
+module.exports.createAzureSecretsProviderForTeam = createAzureSecretsProviderForTeam;
+
+
+const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
+  const deploymentWrongSecretsConfig = {
+    metadata: {
+      namespace: `t-${team}`,
+      name: `t-${team}-wrongsecrets`,
+      labels: {
+        app: 'wrongsecrets',
+        team: `${team}`,
+        'deployment-context': get('deploymentContext'),
+      },
+      annotations: {
+        'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
+        'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
+        'wrongsecrets-ctf-party/passcode': passcodeHash,
+        'wrongsecrets-ctf-party/challengesSolved': '0',
+        'wrongsecrets-ctf-party/challenges': '[]',
+      },
+    },
+    spec: {
+      selector: {
+        matchLabels: {
+          app: 'wrongsecrets',
+          team: `${team}`,
+          'deployment-context': get('deploymentContext'),
+        },
+      },
+      template: {
+        metadata: {
+          labels: {
+            app: 'wrongsecrets',
+            team: `${team}`,
+            'deployment-context': get('deploymentContext'),
+          },
+        },
+        spec: {
+          automountServiceAccountToken: false,
+          securityContext: {
+            runAsUser: 2000,
+            runAsGroup: 2000,
+            fsGroup: 2000,
+          },
+          volumes: [
+            {
+              name: 'secrets-store-inline',
+              csi: {
+                driver: 'secrets-store.csi.k8s.io',
+                readOnly: true,
+                volumeAttributes: {
+                  secretProviderClass: 'wrongsecrets-azure-keyvault',
+                },
+              },
+            },
+            {
+              name: 'ephemeral',
+              emptyDir: {},
+            },
+          ],
+          containers: [
+            {
+              name: 'wrongsecrets',
+              image: `jeroenwillemsen/wrongsecrets:${wrongSecretsContainterTag}`,
+              imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
+              // resources: get('wrongsecrets.resources'),
+              securityContext: {
+                allowPrivilegeEscalation: false,
+                readOnlyRootFilesystem: true,
+                runAsNonRoot: true,
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
+              },
+              env: [
+                {
+                  name: 'hints_enabled',
+                  value: 'false',
+                },
+                {
+                  name: 'ctf_enabled',
+                  value: 'true',
+                },
+                {
+                  name: 'ctf_key',
+                  value: 'notarealkeyyouknowbutyoumightgetflags',
+                },
+                {
+                  name: 'K8S_ENV',
+                  value: 'azure',
+                },
+                {
+                  name: 'APP_VERSION',
+                  value: `${wrongSecretsContainterTag}-ctf`,
+                },
+                {
+                  name: 'CTF_SERVER_ADDRESS',
+                  value: `${heroku_wrongsecret_ctf_url}`,
+                },
+                {
+                  name: 'FILENAME_CHALLENGE9',
+                  value: `${KEYVAULT_SECRET_ID_1}`,
+                },
+                {
+                  name: 'FILENAME_CHALLENGE10',
+                  value: `${KEYVAULT_SECRET_ID_2}`,
+                },
+                {
+                  name: 'challenge_acht_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostThankyouAlllGoodDoYouLikeRandomLogging?',
+                },
+                {
+                  name: 'challenge_thirty_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostWhenYouRealizeLSIsOK?',
+                },
+                {
+                  name: 'SPECIAL_K8S_SECRET',
+                  valueFrom: {
+                    configMapKeyRef: {
+                      name: 'secrets-file',
+                      key: 'funny.entry',
+                    },
+                  },
+                },
+                {
+                  name: 'SPECIAL_SPECIAL_K8S_SECRET',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'funnystuff',
+                      key: 'funnier',
+                    },
+                  },
+                },
+                {
+                  name: 'CHALLENGE33',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'challenge33',
+                      key: 'answer',
+                    },
+                  },
+                },
+                ...get('wrongsecrets.env', []),
+              ],
+              envFrom: get('wrongsecrets.envFrom'),
+              ports: [
+                {
+                  containerPort: 8080,
+                },
+              ],
+              readinessProbe: {
+                httpGet: {
+                  path: '/actuator/health/readiness',
+                  port: 8080,
+                },
+                initialDelaySeconds: 120,
+                timeoutSeconds: 30,
+                periodSeconds: 10,
+                failureThreshold: 10,
+              },
+              livenessProbe: {
+                httpGet: {
+                  path: '/actuator/health/liveness',
+                  port: 8080,
+                },
+                initialDelaySeconds: 90,
+                timeoutSeconds: 30,
+                periodSeconds: 30,
+              },
+              resources: {
+                requests: {
+                  memory: '512Mi',
+                  cpu: '200m',
+                  'ephemeral-storage': '1Gi',
+                },
+                limits: {
+                  memory: '512Mi',
+                  cpu: '500m',
+                  'ephemeral-storage': '2Gi',
+                },
+              },
+              volumeMounts: [
+                // {
+                //   name: 'wrongsecrets-config',
+                //   mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
+                //   subPath: 'wrongsecrets-ctf-party.yaml',
+                // },
+                {
+                  mountPath: '/tmp',
+                  name: 'ephemeral',
+                },
+                {
+                  name: 'secrets-store-inline',
+                  mountPath: '/mnt/secrets-store',
+                  readOnly: true,
+                },
+                // ...get('wrongsecrets.volumeMounts', []),
+              ],
+            },
+          ],
+          tolerations: get('wrongsecrets.tolerations'),
+          affinity: get('wrongsecrets.affinity'),
+          runtimeClassName: get('wrongsecrets.runtimeClassName')
+            ? get('wrongsecrets.runtimeClassName')
+            : undefined,
+        },
+      },
+    },
+  };
+  return k8sAppsApi
+    .createNamespacedDeployment('t-' + team, deploymentWrongSecretsConfig)
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+};
+
+module.exports.createAzureDeploymentForTeam = createAzureDeploymentForTeam;
+
+//END AZURE
+
+
 
 const getKubernetesEndpointToWhitelist = async () => {
   const {

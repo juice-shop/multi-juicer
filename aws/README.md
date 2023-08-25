@@ -86,6 +86,17 @@ Want to setup your own? You can! Watch out for people finding your key though, s
 
 Want to make the CTFD instance look pretty? Include the fragment located at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
 
+### Configuring the application
+
+In the front page of the application you can edit the description to reference the right urls and the desplayed image. Use the following:
+
+```sh
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+  --set="balancer.env.REACT_APP_MOVING_GIF_LOGO=<>" \
+  --set="balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL=<>" \
+  --set="balancer.env.REACT_APP_CTFD_URL='<>'" \
+```
+
 ### Clean it up
 
 When you're done:

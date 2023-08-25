@@ -92,12 +92,14 @@ balancer:
     REACT_APP_HEROKU_WRONGSECRETS_URL: "https://wrongsecrets-ctf.herokuapp.com" #required for 3 domain setup
     REACT_APP_CTFD_URL: "https://ctfd.io" #requierd for 2 and 3 domain setup
     REACT_APP_S3_BUCKET_URL: "s3://funstuff" #the s3 bucket you use for teh aws challenges, don't forget to make it accessible!
-    K8S_ENV: "k8s" #or 'aws'
+    K8S_ENV: "k8s" #or 'aws', 'azure'
     REACT_APP_ACCESS_PASSWORD: "" #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
     REACT_APP_CREATE_TEAM_HMAC_KEY: "hardcodedkey"
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
     SECRETS_MANAGER_SECRET_ID_1: "wrongsecret" #only change if you need non-default AWS SM entries
     SECRETS_MANAGER_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default AWS SM entries
+    KEYVAULT_SECRET_ID_1: "wrongsecret"
+    KEYVAULT_SECRET_ID_2: "wrongsecret-2"
     CHALLENGE33_VALUE: "VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password

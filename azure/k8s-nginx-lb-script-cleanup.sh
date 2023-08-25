@@ -30,4 +30,4 @@ echo "Delete the namespace"
 
 kubectl delete namespace ingress-nginx
 
-echo "You can now delete the resource group $RESOURCE_GROUP and the cluster $CLUSTER_NAME"
+echo "You can now delete the resource group $RESOURCE_GROUP and the cluster $CLUSTER_NAME using terraform destroy"

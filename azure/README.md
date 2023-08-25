@@ -98,6 +98,17 @@ Want to make the CTFD instance look pretty? Include the fragment located at [./k
 
 If you want to share with others go to the [When you want to share your environment with others (experimental)](#when-you-want-to-share-your-environment-with-others-experimental) section.
 
+### Configuring the application
+
+In the front page of the application you can edit the description to reference the right urls and the desplayed image. Use the following:
+
+```sh
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+  --set="balancer.env.REACT_APP_MOVING_GIF_LOGO=<>" \
+  --set="balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL=<>" \
+  --set="balancer.env.REACT_APP_CTFD_URL='<>'" \
+```
+
 ### Clean it up
 
 When you're done:
@@ -180,7 +191,6 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The AKS cluster name | `string` | `"wrongsecrets-exercise-cluster"` | no |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The AKS cluster version to use | `string` | `"1.25"` | no |
-| <a name="input_region"></a> [region](#input\_region) | The Azure region to use | `string` | `"East US"` | no |
 
 ## Outputs
 

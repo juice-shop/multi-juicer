@@ -32,6 +32,10 @@ esac
 
 echo "This is a script to bootstrap the configuration. You need to have installed: helm, kubectl, vault, grep, cat, sed, envsubst, and azure cli, and is only tested on mac, Debian and Ubuntu"
 
+# The storage account to store the terraform state file
+export AZ_STORAGE_ACCOUNT="$(terraform -chdir=./shared-state output -raw storage_account_name)"
+
+
 # Most of the variables below are used in envsubst later.
 export AZURE_SUBSCRIPTION_ID="$(az account show --query id --output tsv)"
 export AZURE_TENANT_ID="$(az account show --query tenantId --output tsv)"
@@ -135,7 +139,7 @@ if [[ -z $APP_PASSWORD ]]; then
   echo "No app password passed, creating a new one"
   APP_PASSWORD="$( uuidgen | sed 's/[-]//g')"
 else
-  echo "App password already set"
+  echo "App password already set to ${APP_PASSWORD}"
 fi
 
 if [[ -z $CREATE_TEAM_HMAC ]]; then
@@ -153,12 +157,11 @@ fi
 echo "App password is ${APP_PASSWORD}"
 helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.K8S_ENV=azure" \
+  --set="balancer.env.REACT_APP_S3_BUCKET_URL='Azure Storage Account: ${AZ_STORAGE_ACCOUNT}'" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
   --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
   --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}"
 
-  # TODO: Support azure storage account instead
-  # --set="balancer.env.REACT_APP_S3_BUCKET_URL=s3://${STATE_BUCKET}" \
 # Install CTFd
 echo "Installing CTFd"
 
