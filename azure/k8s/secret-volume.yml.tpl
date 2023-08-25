@@ -1,7 +1,7 @@
 apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
 metadata:
-  name: azure-wrongsecrets-vault
+  name: wrongsecrets-azure-keyvault
 spec:
   provider: azure
   parameters:

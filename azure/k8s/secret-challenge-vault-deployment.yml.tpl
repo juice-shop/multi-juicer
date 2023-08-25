@@ -39,7 +39,7 @@ spec:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: "azure-wrongsecrets-vault"
+              secretProviderClass: "wrongsecrets-azure-keyvault"
       containers:
         - image: jeroenwillemsen/wrongsecrets:1.6.7-k8s-vault
           imagePullPolicy: IfNotPresent

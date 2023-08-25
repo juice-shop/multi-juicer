@@ -724,11 +724,11 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 {
                   name: 'FILENAME_CHALLENGE9',
-                  value: `${KEYVAULT_SECRET_ID_1}`,
+                  value: `${keyvaultSecretName1}`,
                 },
                 {
                   name: 'FILENAME_CHALLENGE10',
-                  value: `${KEYVAULT_SECRET_ID_2}`,
+                  value: `${keyvaultSecretName2}`,
                 },
                 {
                   name: 'challenge_acht_ctf_to_provide_to_host_value',

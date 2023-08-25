@@ -542,7 +542,7 @@ async function createAzureTeam(req, res) {
   }
 
   try {
-    logger.info(`Creating service account for virtual desktop in AWS '${team}'`);
+    logger.info(`Creating service account for virtual desktop in Azure '${team}'`);
     await createServiceAccountForWebTop(team);
     logger.info(`Created service account for virtual desktopfor team '${team}'`);
   } catch (error) {
@@ -553,7 +553,7 @@ async function createAzureTeam(req, res) {
   }
 
   try {
-    logger.info(`Creating role for virtual desktop in AWS '${team}'`);
+    logger.info(`Creating role for virtual desktop in Azure '${team}'`);
     await createRoleForWebTop(team);
     logger.info(`Created role for virtual desktopfor team '${team}'`);
   } catch (error) {
@@ -564,7 +564,7 @@ async function createAzureTeam(req, res) {
   }
 
   try {
-    logger.info(`Creating roleBinding for virtual desktop in AWS '${team}'`);
+    logger.info(`Creating roleBinding for virtual desktop in Azure '${team}'`);
     await createRoleBindingForWebtop(team);
     logger.info(`Created roleBinding for virtual desktopfor team '${team}'`);
   } catch (error) {
