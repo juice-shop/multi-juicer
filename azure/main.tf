@@ -24,21 +24,21 @@ data "azurerm_client_config" "current" {}
 
 # If you're using an existing resource group, modify this part.
 # Note that you'll need to find/replace references to "azurerm_resource_group.default" to "data.azurerm_resource_group.default"
-data "azurerm_resource_group" "default" {
-  name = "owasp-wrongsecrets"
-}
+# data "azurerm_resource_group" "default" {
+#   name = "owasp-wrongsecrets"
+# }
 
 # If you're using an existing resource group, comment this.
-# resource "azurerm_resource_group" "default" {
-#   name     = "owasp-wrongsecrets"
-#   location = var.region
-# }
+resource "azurerm_resource_group" "default" {
+  name     = "owasp-wrongsecrets"
+  location = var.region
+}
 
 
 resource "azurerm_kubernetes_cluster" "cluster" {
   name                = var.cluster_name
-  location            = data.azurerm_resource_group.default.location
-  resource_group_name = data.azurerm_resource_group.default.name
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.default.name
   dns_prefix          = "wrongsecrets"
 
   kubernetes_version = var.cluster_version

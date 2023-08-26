@@ -18,6 +18,10 @@ const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE;
 const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1;
 const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2;
+const azureTenantId = process.env.AZ_KEY_VAULT_TENANT_ID;
+const keyvaultName = process.env.AZ_KEY_VAULT_NAME;
+const azureVaultURI = process.env.AZ_VAULT_URI;
+const azurePodClientId = process.env.AZ_POD_CLIENT_ID;
 const keyvaultSecretName1 = process.env.KEYVAULT_SECRET_ID_1;
 const keyvaultSecretName2 = process.env.KEYVAULT_SECRET_ID_2;
 const challenge33Value = process.env.CHALLENGE33_VALUE;
@@ -578,37 +582,33 @@ module.exports.createAWSDeploymentForTeam = createAWSDeploymentForTeam;
 
 //BEGIN AZURE
 const createAzureSecretsProviderForTeam = async (team) => {
+    // Define the YAML-formatted objects field as a string
+    const objectsYaml = `
+    array:
+    - |
+      objectName: "${keyvaultSecretName1}"
+      objectType: "secret"
+    - |
+      objectName: "${keyvaultSecretName2}"
+      objectType: "secret"
+    `;
+
+
   const secretProviderClass = {
     apiVersion: 'secrets-store.csi.x-k8s.io/v1',
     kind: 'SecretProviderClass',
     metadata: {
-      name: 'wrongsecrets-azure-keyvault',
+      name: 'azure-wrongsecrets-vault',
       namespace: `t-${team}`,
     },
     spec: {
       provider: 'azure',
-      secretObjects: [
-        {
-          secretName: 'challenge9',
-          type: 'keyVaultSecret',
-          data: [
-            {
-              objectName: `${keyvaultSecretName1}`,
-              key: 'value',
-            },
-          ],
+      parameters: {
+          usePodIdentity: 'true',
+          tenantId: `${azureTenantId}`,
+          keyvaultName: `${keyvaultName}`,
+          objects: objectsYaml,
         },
-        {
-          secretName: 'challenge10',
-          type: 'keyVaultSecret',
-          data: [
-            {
-              objectName: `${keyvaultSecretName2}`,
-              key: 'value',
-            },
-          ],
-        },
-      ],
     },
   };
 
@@ -634,6 +634,7 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
       name: `t-${team}-wrongsecrets`,
       labels: {
         app: 'wrongsecrets',
+        aadpodidbinding: 'wrongsecrets-pod-id',
         team: `${team}`,
         'deployment-context': get('deploymentContext'),
       },
@@ -649,6 +650,7 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
       selector: {
         matchLabels: {
           app: 'wrongsecrets',
+          aadpodidbinding: 'wrongsecrets-pod-id',
           team: `${team}`,
           'deployment-context': get('deploymentContext'),
         },
@@ -657,6 +659,7 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
         metadata: {
           labels: {
             app: 'wrongsecrets',
+            aadpodidbinding: 'wrongsecrets-pod-id',
             team: `${team}`,
             'deployment-context': get('deploymentContext'),
           },
@@ -675,7 +678,7 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
                 driver: 'secrets-store.csi.k8s.io',
                 readOnly: true,
                 volumeAttributes: {
-                  secretProviderClass: 'wrongsecrets-azure-keyvault',
+                  secretProviderClass: 'azure-wrongsecrets-vault',
                 },
               },
             },
@@ -755,6 +758,34 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
                       key: 'funnier',
                     },
                   },
+                },
+                {
+                  name: 'SPRING_CLOUD_AZURE_KEYVAULT_SECRET_PROPERTYSOURCEENABLED',
+                  value: 'true',
+                },
+                {
+                  name: 'SPRING_CLOUD_AZURE_KEYVAULT_SECRET_PROPERTYSOURCES_0_NAME',
+                  value: 'wrongsecrets-3',
+                },
+                {
+                  name: 'SPRING_CLOUD_AZURE_KEYVAULT_SECRET_PROPERTYSOURCES_0_ENDPOINT',
+                  value: `${azureVaultURI}`,
+                },
+                {
+                  name: 'SPRING_CLOUD_AZURE_KEYVAULT_SECRET_PROPERTYSOURCES_0_CREDENTIAL_CLIENTID',
+                  value: `${azurePodClientId}`,
+                },
+                {
+                  name: 'SPRING_CLOUD_AZURE_KEYVAULT_SECRET_PROPERTYSOURCES_0_CREDENTIAL_MANAGEDIDENTITYENABLED',
+                  value: `true`,
+                },
+                {
+                  name: 'SPRING_CLOUD_VAULT_URI',
+                  value: 'http://vault.vault.svc.cluster.local:8200'
+                },
+                {
+                  name: 'JWT_PATH',
+                  value: "/var/run/secrets/kubernetes.io/serviceaccount/token"
                 },
                 {
                   name: 'CHALLENGE33',

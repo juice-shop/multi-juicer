@@ -45,11 +45,11 @@ terraform apply
 
 The storage account name should be in the output. Please use that to configure the Terraform backend in `main.tf` by uncommenting the part on the `backend "azurerm"` inside the `terraform` block. Assign the `storage_account_name` to the one from the output.
 
-**Note**: You'll need to follow the description [below](#wrongsecrets-ctf-party) in step 1 for the "existing resource group" i.e., use the `data.azurerm_resource_group.default` resource.
+**Note**: You'll need to follow the description [below](#wrongsecrets-ctf-party) in step 1 for the "existing resource group" i.e., use the `azurerm_resource_group.default` resource.
 
 ### WrongSecrets-ctf-party
 
-1. Set either a new resource group or use an existing resource group in `main.tf` (it defaults to the existing `OWASP-Projects` resource group). Note that you'll need to find/replace references to "data.azurerm_resource_group.default" to "arurerm_resource_group.default" if you want to create a new one.
+1. Set either a new resource group or use an existing resource group in `main.tf` (it defaults to the existing `OWASP-Projects` resource group). Note that you'll need to find/replace references to "azurerm_resource_group.default" to "arurerm_resource_group.default" if you want to create a new one.
 2. check whether you have the right project by doing `az account show` (after `az login`). Want to set the project as your default? Use `az account set --subscription <.id here>`.
 3. If not yet enabled, register the required services for the subscription, run:
     - `az provider register --namespace Microsoft.ContainerService`
@@ -58,7 +58,19 @@ The storage account name should be in the output. Please use that to configure t
 4. Run `terraform init` (if required, use `tfenv` to select TF 0.14.0 or higher )
 5. Run `terraform plan` to see what will be created (optional).
 6. Run `terraform apply`. Note: the apply will take 5 to 20 minutes depending on the speed of the Azure backplane.
-7. Run `./build-and-deploy-azure.sh`. Your kubeconfig file will automatically be updated.
+7. Go to the values of the helm chart and replace the wrongsecrets.config with this:
+
+    ```yaml
+    K8S_ENV: "azure"
+    ```
+
+    and replace the value of wrongsecrets.env having the name 'K8S_ENV' with this:
+
+    ```yaml
+    value: "azure"
+    ```
+
+8. Run `./build-and-deploy-azure.sh`. Your kubeconfig file will automatically be updated.
 
 Your AKS cluster should be visible in your resource group. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
@@ -173,6 +185,7 @@ No modules.
 | [azurerm_key_vault_secret.wrongsecret_2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_key_vault_secret.wrongsecret_3](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_kubernetes_cluster.cluster](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster) | resource |
+| [azurerm_resource_group.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_role_assignment.aks_extra_identity_operator](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_identity_operator](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_vm_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -182,7 +195,6 @@ No modules.
 | [random_password.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
-| [azurerm_resource_group.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 | [http_http.ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 
 ## Inputs
@@ -191,6 +203,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The AKS cluster name | `string` | `"wrongsecrets-exercise-cluster"` | no |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | The AKS cluster version to use | `string` | `"1.25"` | no |
+| <a name="input_region"></a> [region](#input\_region) | The Azure region to use | `string` | `"East US"` | no |
 
 ## Outputs
 

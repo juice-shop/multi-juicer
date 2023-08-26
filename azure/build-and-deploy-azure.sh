@@ -60,16 +60,6 @@ export AZ_KEY_VAULT_NAME="$(terraform output -raw vault_name)"
 # Set the kubeconfig
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
 
-
-# Install the secrets store CSI driver
-helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
-helm list --namespace kube-system | grep 'csi-secrets-store' &>/dev/null
-if [ $? == 0 ]; then
-  echo "CSI driver is already installed"
-else
-  helm upgrade --install -n kube-system csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver --set enableSecretRotation=true --set rotationPollInterval=60s
-fi
-
 # Patch the default namespace to use the secrets store CSI driver
 echo "Patching default namespace"
 kubectl apply -f k8s/workspace-psa.yml
@@ -80,7 +70,7 @@ helm repo add csi-secrets-store-provider-azure https://azure.github.io/secrets-s
 
 helm list --namespace kube-system | grep 'csi-secrets-store' &>/dev/null
 if [ $? == 0 ]; then
-  echo "CSI driver is already installed"
+  echo "CSI driver provider is already installed"
 else
   echo "Installing CSI driver"
   helm install csi csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --namespace kube-system
@@ -154,13 +144,19 @@ else
   echo "Cookie parser secret already set"
 fi
 
-echo "App password is ${APP_PASSWORD}"
+echo "App password is ${APP_PASSWORD}" > password.txt
+
+echo "You can find the app password in password.txt"
+
 helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.K8S_ENV=azure" \
-  --set="balancer.env.REACT_APP_S3_BUCKET_URL='Azure Storage Account: ${AZ_STORAGE_ACCOUNT}'" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
   --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
-  --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}"
+  --set="balancer.env.AZ_KEY_VAULT_NAME=${AZ_KEY_VAULT_NAME}" \
+  --set="balancer.env.AZ_KEY_VAULT_TENANT_ID=${AZ_KEY_VAULT_TENANT_ID}" \
+  --set="balancer.env.AZ_VAULT_URI=${AZ_VAULT_URI}" \
+  --set="balancer.env.AZ_POD_CLIENT_ID=${AZ_POD_CLIENT_ID}" \
+  --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}" \
 
 # Install CTFd
 echo "Installing CTFd"
