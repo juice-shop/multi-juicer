@@ -872,7 +872,6 @@ module.exports.createAzureDeploymentForTeam = createAzureDeploymentForTeam;
 
 //END AZURE
 
-
 const getKubernetesEndpointToWhitelist = async () => {
   const {
     response: {
