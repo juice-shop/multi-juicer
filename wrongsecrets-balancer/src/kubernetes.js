@@ -582,8 +582,8 @@ module.exports.createAWSDeploymentForTeam = createAWSDeploymentForTeam;
 
 //BEGIN AZURE
 const createAzureSecretsProviderForTeam = async (team) => {
-    // Define the YAML-formatted objects field as a string
-    const objectsYaml = `
+  // Define the YAML-formatted objects field as a string
+  const objectsYaml = `
     array:
     - |
       objectName: "${keyvaultSecretName1}"
@@ -592,7 +592,6 @@ const createAzureSecretsProviderForTeam = async (team) => {
       objectName: "${keyvaultSecretName2}"
       objectType: "secret"
     `;
-
 
   const secretProviderClass = {
     apiVersion: 'secrets-store.csi.x-k8s.io/v1',
@@ -604,11 +603,11 @@ const createAzureSecretsProviderForTeam = async (team) => {
     spec: {
       provider: 'azure',
       parameters: {
-          usePodIdentity: 'true',
-          tenantId: `${azureTenantId}`,
-          keyvaultName: `${keyvaultName}`,
-          objects: objectsYaml,
-        },
+        usePodIdentity: 'true',
+        tenantId: `${azureTenantId}`,
+        keyvaultName: `${keyvaultName}`,
+        objects: objectsYaml,
+      },
     },
   };
 
@@ -625,7 +624,6 @@ const createAzureSecretsProviderForTeam = async (team) => {
     });
 };
 module.exports.createAzureSecretsProviderForTeam = createAzureSecretsProviderForTeam;
-
 
 const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentWrongSecretsConfig = {
@@ -781,11 +779,11 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 {
                   name: 'SPRING_CLOUD_VAULT_URI',
-                  value: 'http://vault.vault.svc.cluster.local:8200'
+                  value: 'http://vault.vault.svc.cluster.local:8200',
                 },
                 {
                   name: 'JWT_PATH',
-                  value: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+                  value: '/var/run/secrets/kubernetes.io/serviceaccount/token',
                 },
                 {
                   name: 'CHALLENGE33',
@@ -873,7 +871,6 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
 module.exports.createAzureDeploymentForTeam = createAzureDeploymentForTeam;
 
 //END AZURE
-
 
 
 const getKubernetesEndpointToWhitelist = async () => {
