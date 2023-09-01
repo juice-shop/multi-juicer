@@ -28,6 +28,8 @@ const {
   createAWSDeploymentForTeam,
   createAWSSecretsProviderForTeam,
   patchServiceAccountForTeamForAWS,
+  createAzureSecretsProviderForTeam,
+  createAzureDeploymentForTeam,
   createServiceAccountForWebTop,
   createRoleForWebTop,
   createRoleBindingForWebtop,
@@ -247,6 +249,11 @@ async function createTeam(req, res) {
       'We will create an AWS deployment see the helm chart/deployment for setting this to k8s'
     );
     return createAWSTeam(req, res);
+  } else if (k8sEnv === 'azure') {
+    logger.info(
+      'We will create an Azure deployment see the helm chart/deployment for setting this to k8s'
+    );
+    return createAzureTeam(req, res);
   }
   logger.info(
     'We will create a K8s deployment see the helm chart/deployment for setting this to aws'
@@ -437,6 +444,126 @@ async function createAWSTeam(req, res) {
 
   try {
     logger.info(`Creating roleBinding for virtual desktop in AWS '${team}'`);
+    await createRoleBindingForWebtop(team);
+    logger.info(`Created roleBinding for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating roleBinding for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating virtualdesktop Deployment for team '${team}'`);
+    await createDesktopDeploymentForTeam({ team, passcodeHash: hash });
+    await createDesktopServiceForTeam(team);
+
+    logger.info(`Created virtualdesktop Deployment for team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating Virtualdesktop deployment or service for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating network security policies for team '${team}'`);
+    await createNSPsforTeam(team);
+
+    logger.info(`Created network security policies for team  '${team}'`);
+  } catch (error) {
+    logger.error(`Error while network security policies for team ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
+
+    res
+      .cookie(get('cookieParser.cookieName'), `t-${team}`, {
+        ...cookieSettings,
+      })
+      .status(200)
+      .json({
+        message: 'Created Instance',
+        passcode,
+      });
+  } catch (error) {
+    logger.error(`Error while creating deployment or service for team ${team}: ${error.message}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+}
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+async function createAzureTeam(req, res) {
+  const { team } = req.params;
+  const { passcode, hash } = await generatePasscode();
+  try {
+    logger.info(`Creating Namespace for team '${team}'`);
+    await createNameSpaceForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating namespace for ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    logger.info(`Creating Configmap for team '${team}'`);
+    await createConfigmapForTeam(team);
+
+    logger.info(`Creating Secretsfile for team '${team}'`);
+    await createSecretsfileForTeam(team);
+    await createChallenge33SecretForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating secretsfile or configmap for ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+  try {
+    logger.info(
+      `Creating Secrets provider for team ${team}, please make sure the csi driver helm is installed and running`
+    );
+    await createAzureSecretsProviderForTeam(team);
+  } catch (error) {
+    logger.error(`Error while creating Secretsprovider for team ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating WrongSecrets Deployment for team '${team}'`);
+    await createAzureDeploymentForTeam({ team, passcodeHash: hash });
+    await createServiceForTeam(team);
+  } catch (error) {
+    logger.error(
+      `Error while creating wrongsecrets deployment or service for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating service account for virtual desktop in Azure '${team}'`);
+    await createServiceAccountForWebTop(team);
+    logger.info(`Created service account for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating service account for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating role for virtual desktop in Azure '${team}'`);
+    await createRoleForWebTop(team);
+    logger.info(`Created role for virtual desktopfor team '${team}'`);
+  } catch (error) {
+    logger.error(
+      `Error while creating role for virtual desktop for team ${team}: ${error.message}`
+    );
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating roleBinding for virtual desktop in Azure '${team}'`);
     await createRoleBindingForWebtop(team);
     logger.info(`Created roleBinding for virtual desktopfor team '${team}'`);
   } catch (error) {

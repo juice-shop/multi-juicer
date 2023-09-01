@@ -92,12 +92,18 @@ balancer:
     REACT_APP_HEROKU_WRONGSECRETS_URL: "https://wrongsecrets-ctf.herokuapp.com" #required for 3 domain setup
     REACT_APP_CTFD_URL: "https://ctfd.io" #requierd for 2 and 3 domain setup
     REACT_APP_S3_BUCKET_URL: "s3://funstuff" #the s3 bucket you use for teh aws challenges, don't forget to make it accessible!
-    K8S_ENV: "k8s" #or 'aws'
+    K8S_ENV: "k8s" #or 'aws', 'azure'
     REACT_APP_ACCESS_PASSWORD: "" #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
     REACT_APP_CREATE_TEAM_HMAC_KEY: "hardcodedkey"
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
     SECRETS_MANAGER_SECRET_ID_1: "wrongsecret" #only change if you need non-default AWS SM entries
     SECRETS_MANAGER_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default AWS SM entries
+    KEYVAULT_SECRET_ID_1: "wrongsecret" #only change if you need non-default Azure KV entries
+    KEYVAULT_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default Azure KV entries
+    AZ_KEY_VAULT_NAME: "" #Change this to your Azure Key Vault name
+    AZ_KEY_VAULT_TENANT_ID: "" #Change this to your Azure Key Vault tenant ID
+    AZ_VAULT_URI: "" #Change this to your Azure Key Vault URI
+    AZ_POD_CLIENT_ID: "" #Change this to your Azure pod client ID
     CHALLENGE33_VALUE: "VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="
   metrics:
     # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
@@ -159,7 +165,7 @@ wrongsecrets:
   # -- Specify a custom Wrongsecrets config.yaml. See the Wrongsecrets Docs for any needed ENVs: https://github.com/OWASP/wrongsecrets
   # @default -- See values.yaml for full details
   config: |
-    K8S_ENV: aws
+    K8S_ENV: azure
   # "aws" is for using the cluster with eks and "k8s" is for using the cluster with miniKube which will enable specific challenges
   # -- Specify a custom NODE_ENV for Wrongsecrets. If value is changed to something other than 'wrongsecrets-ctf-party' it's not possible to set a custom config via `wrongsecrets-balancer-config`.
   nodeEnv: "wrongsecrets-ctf-party"
@@ -184,7 +190,7 @@ wrongsecrets:
   # -- Optional environment variables to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env:
     - name: K8S_ENV
-      value: k8s
+      value: azure
     - name: SPECIAL_K8S_SECRET
       valueFrom:
         configMapKeyRef:

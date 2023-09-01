@@ -48,7 +48,7 @@ The terraform code is loosely based on [this EKS managed Node Group TF example](
 6. Do `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the AWS backplane.
 7. When creation is done, do `aws eks update-kubeconfig --region eu-west-1 --name wrongsecrets-exercise-cluster --kubeconfig ~/.kube/wrongsecrets`
 8. Do `export KUBECONFIG=~/.kube/wrongsecrets`
-9. Run `./build-an-deploy-aws.sh` to install all the required materials (helm for calico, secrets management, autoscaling, etc.)
+9. Run `./build-and-deploy-aws.sh` to install all the required materials (helm for calico, secrets management, autoscaling, etc.)
 
 Your EKS cluster should be visible in [eu-west-1](https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
@@ -85,6 +85,17 @@ After that you will still need to override the flags with their actual values if
 Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
 
 Want to make the CTFD instance look pretty? Include the fragment located at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
+
+### Configuring the application
+
+In the front page of the application you can edit the description to reference the right urls and the desplayed image. Use the following:
+
+```sh
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+  --set="balancer.env.REACT_APP_MOVING_GIF_LOGO=<>" \
+  --set="balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL=<>" \
+  --set="balancer.env.REACT_APP_CTFD_URL='<>'" \
+```
 
 ### Clean it up
 
