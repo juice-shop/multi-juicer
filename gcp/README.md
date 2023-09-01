@@ -26,10 +26,12 @@ If you want to host a multi-user setup, you will probably want to share the stat
 
 First, create an storage bucket:
 
-1. Navigate to the 'shared-state' directory `cd shared-state`
+1. Check whether you have the right project by doing `gcloud config list`. Otherwise configure it by doing `gcloud init`.
 2. Change the `project_id` in the `terraform.tfvars` file to your project id
-3. Run `terraform init`
-4. Run `terraform apply`.
+3. Run `gcloud auth application-default login` to be able to use your account credentials for terraform.
+4. Navigate to the 'shared-state' directory `cd shared-state`
+5. Run `terraform init`
+6. Run `terraform apply`.
 
 The bucket name should be in the output. Please use that to configure the Terraform backend in `main.tf`.
 

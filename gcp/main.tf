@@ -2,10 +2,10 @@ terraform {
   # For shared state:
   # Set the resource group in the backend configuration below, then uncomment and apply!
   # Note that you probably already create a resource group. Don't forget to set that correctly in this file.
-  #  backend "gcs" {
-  #    bucket  = ""
-  #    prefix  = "terraform/state"
-  #  }
+  backend "gcs" {
+    bucket = "tfstate-wrongsecrets-856fe4c9"
+    prefix = "terraform/state"
+  }
 }
 
 provider "google" {
@@ -55,6 +55,31 @@ resource "google_container_cluster" "gke" {
       cidr_block   = "${data.http.ip.response_body}/32"
       display_name = "user origin"
     }
+  }
+
+  cluster_autoscaling {
+    enabled = true
+    resource_limits {
+      resource_type = "cpu"
+      minimum       = 1
+      maximum       = 10
+
+    }
+
+    resource_limits {
+      resource_type = "memory"
+      minimum       = 1
+      maximum       = 64
+
+    }
+
+  }
+
+  addons_config {
+    gce_persistent_disk_csi_driver_config {
+      enabled = true
+    }
+
   }
 
   timeouts {

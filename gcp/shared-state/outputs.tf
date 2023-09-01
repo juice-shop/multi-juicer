@@ -1,4 +1,4 @@
 output "bucket" {
-  value       = google_storage_bucket.state-bucket.name
+  value       = google_storage_bucket.state_bucket.name
   description = "Terraform backend storage bucket"
 }
