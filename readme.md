@@ -113,7 +113,7 @@ For minikube, run:
 
 minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
 eval $(minikube docker-env)
-./build-an-deploy-container.sh
+./build-and-deploy-container.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
@@ -134,7 +134,7 @@ kubectl top pods
 
 minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
 eval $(minikube docker-env)
-./build-an-deploy.sh
+./build-and-deploy.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 ```
@@ -158,7 +158,7 @@ See [production notes](./guides/production-notes/production-notes.md) for a chec
 You got some options on how to setup the stack, with some option to customize the WrongSecrets and Virtual desktop instances to your own liking.
 You can find the default config values under: [helm/wrongsecrets-ctf-party/values.yaml](helm/wrongsecrets-ctf-party/values.yaml)
 
-The default ctfd config values are here: [aws/k8s/ctfd-values.yaml](aws/k8s/ctfd-values.yaml). Note that these values are not used, and instead only se in the file [aws/build-an-deploy-aws.sh](aws/build-an-deploy-aws.sh).
+The default ctfd config values are here: [aws/k8s/ctfd-values.yaml](aws/k8s/ctfd-values.yaml). Note that these values are not used, and instead only se in the file [aws/build-and-deploy-aws.sh](aws/build-and-deploy-aws.sh).
 
 Download & Save the file and tell helm to use your config file over the default by running:
 

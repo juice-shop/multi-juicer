@@ -29,7 +29,7 @@ jobs:
       - name: test script
         run: |
           eval $(minikube docker-env)
-          ./build-an-deploy.sh
+          ./build-and-deploy.sh
           while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != *"True"* ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
           kubectl logs deployments/wrongsecrets-balancer -f >> pod.log &
           echo "port forwarding"

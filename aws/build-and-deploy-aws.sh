@@ -10,7 +10,7 @@ echo "NOTE: WE ARE WORKING HERE WITH A 5 LEGGED LOAD BALANCER on AWS which costs
 echo "NOTE 2: You can replace balancer.cookie.cookieParserSecret with a value you fancy."
 echo "Note 3: Ensure you turn TLS on :)."
 
-echo "Usage: ./build-an-deploy-aws.sh "
+echo "Usage: ./build-and-deploy-aws.sh "
 
 source ./../scripts/check-available-commands.sh
 checkCommandsAvailable helm aws kubectl eksctl sed
