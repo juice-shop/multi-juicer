@@ -34,3 +34,7 @@ updates:
     directory: "/aws"
     schedule:
       interval: "monthly"
+  - package-ecosystem: "terraform"
+    directory: "/azure"
+    schedule:
+      interval: "monthly"
