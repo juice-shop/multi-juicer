@@ -35,7 +35,7 @@
     "jest": "^29.6.4",
     "jest-date-mock": "^1.0.8",
     "minimatch": "^9.0.3",
-    "prettier": "^2.8.8",
+    "prettier": "^3.0.3",
     "supertest": "^6.3.3"
   },
   "overrides": {
