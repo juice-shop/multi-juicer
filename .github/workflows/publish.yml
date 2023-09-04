@@ -9,7 +9,7 @@ jobs:
     name: "Package Helm Chart"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
@@ -38,7 +38,7 @@ jobs:
           helm-docs -t helm/wrongsecrets-ctf-party/README.md.gotmpl -t helm/wrongsecrets-ctf-party/_template.gotmpl -o README.md
           cp helm/wrongsecrets-ctf-party/README.md /tmp/README.md
       - name: Update gh-pages branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
           fetch-depth: 0
@@ -56,7 +56,7 @@ jobs:
             git push
           fi
       - name: Get back to original branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
         with:
@@ -73,7 +73,7 @@ jobs:
           - wrongsecrets-balancer
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Docker Meta
         id: docker_meta
