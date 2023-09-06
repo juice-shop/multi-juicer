@@ -57,6 +57,7 @@ balancer:
       memory: 256Mi
       cpu: 400m
   securityContext: {}
+  podSecurityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -119,6 +120,7 @@ juiceShop:
   #    memory: 200Mi
   # -- Optional securityContext definitions to set for each JuiceShop instance
   securityContext: {}
+  podSecurityContext: {}
   # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env: []
   # env:
@@ -191,6 +193,7 @@ juiceShopCleanup:
     limits:
       memory: 256Mi
   securityContext: {}
+  podsecurityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the JuiceShopCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the JuiceShopCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
