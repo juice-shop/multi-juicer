@@ -29,6 +29,10 @@ spec:
             - image: '{{ .Values.juiceShopCleanup.repository }}:{{ .Values.juiceShopCleanup.tag | default (printf "v%s" .Chart.Version) }}'
               imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
               name: 'cleanup-job'
+              {{- with .Values.juiceShopCleanup.podsecurityContext }}
+              securityContext:
+                {{- toYaml . | nindent 12 }}
+              {{- end }}
               env:
                 - name: NAMESPACE
                   value: {{ .Release.Namespace | quote }}
