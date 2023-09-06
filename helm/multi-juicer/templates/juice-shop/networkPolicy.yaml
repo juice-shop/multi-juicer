@@ -1,0 +1,27 @@
+{{- if .Values.juiceshop.networkPolicy }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: networkPolicy-juice-shop
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: 'juice-shop'
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "multi-juicer.juice-balancer.labels" . | nindent 14 }}
+      ports:
+        - port: http
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "multi-juicer.juice-balancer.labels" . | nindent 14 }}
+      ports:
+        - port: http
+{{- end }}
