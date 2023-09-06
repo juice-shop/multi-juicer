@@ -9,12 +9,28 @@ To ensure MultiJuicer runs as smoothly during your CTF's / trainings / workshops
 5. When running a CTF with JuiceShop challenge flags, make sure to change `juiceShop.ctfKey` from the default. Otherwise users will be able to generate their own flags relatively easily. Additionally, include the `juiceShop.nodeEnv` value and specify it as "ctf". This way, it will generate flags for the CTF event. The default behavior is to not generate them.
 6. When using prometheus metrics, e.g. when you have followed the [Monitoring SetUp Guide](https://github.com/juice-shop/multi-juicer/blob/main/guides/monitoring-setup/monitoring.md) you'll want to change `balancer.metrics.basicAuth.password` to a non default values. Otherwise users can use the default value to access the technical metrics of the JuiceBalancer pods.
 
+## Security Consideration
+
+Add SecurityContext, PodSecurityContext and NetworkPolicy to further isolate and secure your training plattform.
+
 ## TLDR
 
 Here's a example helm values file:
 
 ```yaml
 balancer:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    runAsNonRoot: true
+  podsecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+      - ALL
+  networkPolicy: true
   replicas: 3
   cookie:
     cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
@@ -27,4 +43,16 @@ juiceShop:
   maxInstances: 42
   nodeEnv: "ctf"
   ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+    runAsNonRoot: true
+  podsecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+      - ALL
+  networkPolicy: true
 ```
