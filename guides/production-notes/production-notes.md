@@ -20,9 +20,6 @@ Here's a example helm values file:
 ```yaml
 balancer:
   securityContext:
-    runAsUser: 1000
-    runAsGroup: 3000
-    fsGroup: 2000
     runAsNonRoot: true
   podsecurityContext:
     allowPrivilegeEscalation: false
@@ -44,9 +41,6 @@ juiceShop:
   nodeEnv: "ctf"
   ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
   securityContext:
-    runAsUser: 1000
-    runAsGroup: 3000
-    fsGroup: 2000
     runAsNonRoot: true
   podsecurityContext:
     allowPrivilegeEscalation: false
@@ -65,5 +59,4 @@ progressWatchdog:
     capabilities:
       drop:
       - ALL
-  networkPolicy: true
 ```
