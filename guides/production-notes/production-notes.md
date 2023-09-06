@@ -55,4 +55,15 @@ juiceShop:
       drop:
       - ALL
   networkPolicy: true
+
+progressWatchdog:
+  securityContext:
+    runAsNonRoot: true
+  podsecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+      - ALL
+  networkPolicy: true
 ```
