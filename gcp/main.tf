@@ -3,7 +3,7 @@ terraform {
   # Set the resource group in the backend configuration below, then uncomment and apply!
   # Note that you probably already create a resource group. Don't forget to set that correctly in this file.
   backend "gcs" {
-    bucket = "tfstate-wrongsecrets-856fe4c9"
+    bucket = ""
     prefix = "terraform/state"
   }
 }
@@ -77,6 +77,10 @@ resource "google_container_cluster" "gke" {
 
   addons_config {
     gce_persistent_disk_csi_driver_config {
+      enabled = true
+    }
+
+    config_connector_config {
       enabled = true
     }
 

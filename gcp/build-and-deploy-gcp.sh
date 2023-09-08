@@ -111,6 +111,9 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
   --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
   --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}" \
+  --set="balancer.env.GCP_PROJECT_ID=${GCP_PROJECT}" \
+  --set="balancer.repository=osamamagdy/wrongsecrets-balancer" \
+  --set="balancer.tag=v1.1.2"
 
 # Install CTFd
 echo "Installing CTFd"

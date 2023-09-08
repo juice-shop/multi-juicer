@@ -69,23 +69,26 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.cookie.cookieParserSecret | string | `nil` | Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again. |
 | balancer.cookie.name | string | `"balancer"` | Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true` |
 | balancer.cookie.secure | bool | `false` | Sets the secure attribute on cookie so that it only be send over https |
+| balancer.env.AWS_SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
+| balancer.env.AWS_SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
+| balancer.env.AZ_KEYVAULT_SECRET_ID_1 | string | `"wrongsecret"` |  |
+| balancer.env.AZ_KEYVAULT_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.env.AZ_KEY_VAULT_NAME | string | `""` |  |
 | balancer.env.AZ_KEY_VAULT_TENANT_ID | string | `""` |  |
 | balancer.env.AZ_POD_CLIENT_ID | string | `""` |  |
 | balancer.env.AZ_VAULT_URI | string | `""` |  |
 | balancer.env.CHALLENGE33_VALUE | string | `"VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="` |  |
+| balancer.env.GCP_PROJECT_ID | string | `""` |  |
+| balancer.env.GCP_SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
+| balancer.env.GCP_SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.env.IRSA_ROLE | string | `"arn:aws:iam::233483431651:role/wrongsecrets-secret-manager"` |  |
-| balancer.env.K8S_ENV | string | `"k8s"` |  |
-| balancer.env.KEYVAULT_SECRET_ID_1 | string | `"wrongsecret"` |  |
-| balancer.env.KEYVAULT_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
+| balancer.env.K8S_ENV | string | `"gcp"` |  |
 | balancer.env.REACT_APP_ACCESS_PASSWORD | string | `""` |  |
 | balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY | string | `"hardcodedkey"` |  |
 | balancer.env.REACT_APP_CTFD_URL | string | `"https://ctfd.io"` |  |
 | balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL | string | `"https://wrongsecrets-ctf.herokuapp.com"` |  |
 | balancer.env.REACT_APP_MOVING_GIF_LOGO | string | `"https://i.gifer.com/9kGQ.gif"` |  |
 | balancer.env.REACT_APP_S3_BUCKET_URL | string | `"s3://funstuff"` |  |
-| balancer.env.SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
-| balancer.env.SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.livenessProbe | object | `{"httpGet":{"path":"/balancer/","port":"http"}}` | livenessProbe: Checks if the balancer pod is still alive |
 | balancer.metrics.basicAuth.password | string | `"ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"` | Should be changed when metrics are enabled. |
 | balancer.metrics.basicAuth.username | string | `"prometheus-scraper"` |  |
@@ -159,7 +162,7 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | wrongsecrets.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created Wrongsecrets instances (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | wrongsecrets.config | string | See values.yaml for full details | Specify a custom Wrongsecrets config.yaml. See the Wrongsecrets Docs for any needed ENVs: https://github.com/OWASP/wrongsecrets |
 | wrongsecrets.ctfKey | string | `"zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"` | Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/OWASP/wrongsecrets#ctf |
-| wrongsecrets.env | list | `[{"name":"K8S_ENV","value":"k8s"},{"name":"SPECIAL_K8S_SECRET","valueFrom":{"configMapKeyRef":{"key":"funny.entry","name":"secrets-file"}}},{"name":"SPECIAL_SPECIAL_K8S_SECRET","valueFrom":{"secretKeyRef":{"key":"funnier","name":"funnystuff"}}}]` | Optional environment variables to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) |
+| wrongsecrets.env | list | `[{"name":"K8S_ENV","value":"gcp"},{"name":"SPECIAL_K8S_SECRET","valueFrom":{"configMapKeyRef":{"key":"funny.entry","name":"secrets-file"}}},{"name":"SPECIAL_SPECIAL_K8S_SECRET","valueFrom":{"secretKeyRef":{"key":"funnier","name":"funnystuff"}}}]` | Optional environment variables to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) |
 | wrongsecrets.envFrom | list | `[]` | Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) |
 | wrongsecrets.image | string | `"jeroenwillemsen/wrongsecrets"` | Wrongsecrets Image to use |
 | wrongsecrets.maxInstances | int | `500` | Specifies how many Wrongsecrets instances should start at max. Set to -1 to remove the max Wrongsecrets instance cap |
