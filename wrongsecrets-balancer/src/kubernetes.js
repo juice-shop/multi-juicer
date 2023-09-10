@@ -10,6 +10,24 @@ const {
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
+// Imports the Storage Google Cloud client library
+const { Storage } = require('@google-cloud/storage');
+
+// For more information on ways to initialize Storage, please see
+// https://googleapis.dev/nodejs/storage/latest/Storage.html
+
+// Creates a client using Application Default Credentials
+const storage = new Storage();
+
+async function getAllBucketFiles() {
+  const [buckets] = await storage.getBuckets();
+
+  console.log('Buckets:');
+  buckets.forEach((bucket) => {
+    console.log(bucket.name);
+  });
+}
+
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
@@ -922,6 +940,8 @@ const patchServiceAccountForTeamForGCP = async (team) => {
   };
   const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
 
+  getAllBucketFiles().catch(console.error);
+
   return k8sCoreApi
     .patchNamespacedServiceAccount(
       'default',
@@ -937,7 +957,7 @@ const patchServiceAccountForTeamForGCP = async (team) => {
     .catch((error) => {
       throw new Error(JSON.stringify(error));
     });
-}
+};
 module.exports.patchServiceAccountForTeamForGCP = patchServiceAccountForTeamForGCP;
 
 const createGCPDeploymentForTeam = async ({ team, passcodeHash }) => {

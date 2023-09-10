@@ -20,21 +20,11 @@ resource "google_iam_workload_identity_pool" "pool" {
   display_name              = "WrongSecrets"
 }
 
-resource "google_service_account_iam_member" "wrongsecret_pod_sa" {
-  service_account_id = google_service_account.wrongsecrets_workload.id
-  role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/vault]"
-  depends_on = [
-    google_iam_workload_identity_pool.pool,
-    google_container_cluster.gke
-  ]
-}
-
-# Bonus IAM member for GCP Secret Manager challenge 3. Can be used in a pod.
+# IAM member for the balancer pod. Can be used in a pod.
 resource "google_service_account_iam_member" "wrongsecret_wrong_pod_sa" {
   service_account_id = google_service_account.wrongsecrets_workload.id
-  role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/default]"
+  role               = "roles/owner"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/wrongsecrets-balancer]"
   depends_on = [
     google_iam_workload_identity_pool.pool,
     google_container_cluster.gke

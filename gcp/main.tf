@@ -81,7 +81,7 @@ resource "google_container_cluster" "gke" {
     }
 
     config_connector_config {
-      enabled = true
+      enabled = false
     }
 
   }

@@ -135,7 +135,6 @@ No modules.
 | [google_secret_manager_secret_version.secret_version_basic](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
 | [google_service_account.wrongsecrets_cluster](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account.wrongsecrets_workload](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
-| [google_service_account_iam_member.wrongsecret_pod_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_service_account_iam_member.wrongsecret_wrong_pod_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [random_integer.int](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) | resource |
 | [random_password.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |

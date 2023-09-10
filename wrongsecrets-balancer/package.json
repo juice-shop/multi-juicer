@@ -11,6 +11,8 @@
   "author": "Project OWASP WrongSecrets",
   "license": "Apache-2.0",
   "dependencies": {
+    "@google-cloud/iam": "^1.0.1",
+    "@google-cloud/storage": "^7.1.0",
     "@kubernetes/client-node": "^0.18.1",
     "basic-auth-connect": "^1.0.0",
     "bcryptjs": "^2.4.3",
