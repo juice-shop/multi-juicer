@@ -95,7 +95,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.component }}
           file: ./${{ matrix.component }}/Dockerfile
