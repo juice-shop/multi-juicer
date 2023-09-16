@@ -3,7 +3,7 @@ terraform {
   # Set the resource group in the backend configuration below, then uncomment and apply!
   # Note that you probably already create a resource group. Don't forget to set that correctly in this file.
   backend "gcs" {
-    bucket = "tfstate-wrongsecrets-4d4c5bc1"
+    bucket = ""
     prefix = "terraform/state"
   }
 }
@@ -61,15 +61,15 @@ resource "google_container_cluster" "gke" {
     enabled = true
     resource_limits {
       resource_type = "cpu"
-      minimum       = 1
-      maximum       = 10
+      minimum       = 2  # 1 node * 2 vCPU (e2-standard-2)
+      maximum       = 20 # 10 nodes * 2 vCPU (e2-standard-2)
 
     }
 
     resource_limits {
       resource_type = "memory"
-      minimum       = 1
-      maximum       = 64
+      minimum       = 8  # 1 node * 8 GB (e2-standard-2)
+      maximum       = 80 # 10 nodes * 8 GB (e2-standard-2)
 
     }
 
