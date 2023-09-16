@@ -92,7 +92,7 @@ balancer:
     REACT_APP_HEROKU_WRONGSECRETS_URL: "https://wrongsecrets-ctf.herokuapp.com" #required for 3 domain setup
     REACT_APP_CTFD_URL: "https://ctfd.io" #requierd for 2 and 3 domain setup
     REACT_APP_S3_BUCKET_URL: "s3://funstuff" #the s3 bucket you use for teh aws challenges, don't forget to make it accessible!
-    K8S_ENV: "gcp" #or 'aws', 'azure', or 'gcp'
+    K8S_ENV: "k8s" #or 'aws', 'azure', or 'gcp'
     REACT_APP_ACCESS_PASSWORD: "" #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
     REACT_APP_CREATE_TEAM_HMAC_KEY: "hardcodedkey"
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!

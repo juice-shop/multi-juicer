@@ -29,4 +29,4 @@ kubectl delete namespace ingress-nginx
 echo "Fecthing network endpoint groups. If this yields results, clean them up:"
 gcloud compute network-endpoint-groups list
 
-echo "After tha, you can delete using terraform destroy"
+echo "Finished Cleaning ingress, you can now delete everything else using terraform destroy"

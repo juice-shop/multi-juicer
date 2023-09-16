@@ -54,13 +54,13 @@ The bucket name should be in the output. Please use that to configure the Terraf
 10. Go to the values of the helm chart and replace the wrongsecrets.config with this:
 
     ```yaml
-    K8S_ENV: "azure"
+    K8S_ENV: "gcp"
     ```
 
     and replace the value of wrongsecrets.env having the name 'K8S_ENV' with this:
 
     ```yaml
-    value: "azure"
+    value: "gcp"
     ```
 
 11. Run `./build-and-deploy-gcp.sh`
@@ -135,7 +135,7 @@ We added additional scripts for adding a Load Balancer and ingress so that you c
 Do the following:
 
 1. Follow the installation section first.
-2. Run `./k8s-nginx-lb-script.sh` and the script will return the url at which you can reach the application. (Be aware this opens the url's to the internet in general, if you'd like to limit the access please do this using the security groups in Azure)
+2. Run `./k8s-nginx-lb-script.sh` and the script will return the url at which you can reach the application. (Be aware this opens the url's to the internet in general, if you'd like to limit the access please do this using the security groups in gcp)
 3. When you are done, before you do cleanup, first run `./k8s-nginx-lb-script-cleanup.sh`.
 
 Note that you might have to do some manual cleanups after that.
