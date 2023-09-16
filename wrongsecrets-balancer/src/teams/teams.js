@@ -31,6 +31,8 @@ const {
   createAzureSecretsProviderForTeam,
   createAzureDeploymentForTeam,
   createGCPSecretsProviderForTeam,
+  createIAMServiceAccountForTeam,
+  bindIAMServiceAccountToWorkloadForTeam,
   patchServiceAccountForTeamForGCP,
   createGCPDeploymentForTeam,
   createServiceAccountForWebTop,
@@ -654,6 +656,24 @@ async function createGCPTeam(req, res) {
     await createGCPSecretsProviderForTeam(team);
   } catch (error) {
     logger.error(`Error while creating Secretsprovider for team ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Creating IAM service account for team '${team}'`);
+    await createIAMServiceAccountForTeam(team);
+    logger.info(`Created IAM service account for team '${team}'`);
+  } catch (error) {
+    logger.error(`Error while creating IAM service account for team ${team}: ${error}`);
+    res.status(500).send({ message: 'Failed to Create Instance' });
+  }
+
+  try {
+    logger.info(`Binding IAM service account to workload for team '${team}'`);
+    await bindIAMServiceAccountToWorkloadForTeam(team);
+    logger.info(`Bound IAM service account to workload for team '${team}'`);
+  } catch (error) {
+    logger.error(`Error while binding IAM service account to workload for team ${team}: ${error}`);
     res.status(500).send({ message: 'Failed to Create Instance' });
   }
 

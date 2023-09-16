@@ -10,22 +10,44 @@ const {
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
-// Imports the Storage Google Cloud client library
-const { Storage } = require('@google-cloud/storage');
+// This will be needed only in case of k8s_env=gcp
+const { auth: authGCPClient } = require('google-auth-library');
 
-// For more information on ways to initialize Storage, please see
-// https://googleapis.dev/nodejs/storage/latest/Storage.html
+const { google } = require('googleapis');
 
-// Creates a client using Application Default Credentials
-const storage = new Storage();
+const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 
-async function getAllBucketFiles() {
-  const [buckets] = await storage.getBuckets();
+// Instantiates a client
+const secretsClient = new SecretManagerServiceClient();
 
-  console.log('Buckets:');
-  buckets.forEach((bucket) => {
-    console.log(bucket.name);
+// Helper function to authenticate with GCP workload identity
+async function authenticateGCP() {
+  const authClient = await authGCPClient.getClient({
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
   });
+  return authClient;
+}
+
+// Helper function to assign the GCP service account access to secret manager
+async function secretmanagerGCPAccess(secretName, member) {
+  // Get the current IAM policy.
+  const [policy] = await secretsClient.getIamPolicy({
+    resource: secretName,
+  });
+
+  // Add the user with accessor permissions to the bindings list.
+  policy.bindings.push({
+    role: 'roles/secretmanager.secretAccessor',
+    members: [member],
+  });
+
+  // Save the updated IAM policy.
+  await secretsClient.setIamPolicy({
+    resource: secretName,
+    policy: policy,
+  });
+
+  console.log(`Updated IAM policy for ${secretName}`);
 }
 
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
@@ -930,17 +952,79 @@ const createGCPSecretsProviderForTeam = async (team) => {
 };
 module.exports.createGCPSecretsProviderForTeam = createGCPSecretsProviderForTeam;
 
+const createIAMServiceAccountForTeam = async (team) => {
+  try {
+    const authClient = await authenticateGCP();
+    const serviceAccountName = `team-${team}`; // Replace with the desired service account name
+    const projectId = `${gcpProject}`; // Replace with your GCP project ID
+    const iam = google.iam('v1');
+
+    // Create the service account
+    const createServiceAccountResponse = await iam.projects.serviceAccounts.create({
+      name: `projects/${projectId}`,
+      requestBody: {
+        accountId: serviceAccountName,
+        serviceAccount: {
+          displayName: 'Service Account Display Name',
+        },
+      },
+      auth: authClient,
+    });
+
+    console.log(`Service account created: ${createServiceAccountResponse.data.name}`);
+
+    // Grant the Secret Manager Secret Accessor role to the service account
+    const member = `serviceAccount:${createServiceAccountResponse.data.email}`;
+
+    await secretmanagerGCPAccess(`projects/${gcpProject}/secrets/wrongsecret-1`, member);
+
+    await secretmanagerGCPAccess(`projects/${gcpProject}/secrets/wrongsecret-2`, member);
+
+    await secretmanagerGCPAccess(`projects/${gcpProject}/secrets/wrongsecret-3`, member);
+
+    console.log('Secret Manager Secret Accessor role granted.');
+  } catch (error) {
+    console.error('Error creating service account:', error);
+  }
+};
+module.exports.createIAMServiceAccountForTeam = createIAMServiceAccountForTeam;
+
+const bindIAMServiceAccountToWorkloadForTeam = async (team) => {
+  const authClient = await authenticateGCP();
+  const projectId = `${gcpProject}`; // Replace with your GCP project ID
+  const serviceAccountEmail = `team-${team}@${gcpProject}.iam.gserviceaccount.com`; // Replace with your service account's email
+  const resource = `projects/${projectId}/serviceAccounts/${serviceAccountEmail}`;
+
+  // Define the role binding you want to add
+  const roleBinding = {
+    role: 'roles/iam.workloadIdentityUser', // The role you want to grant
+    members: [`serviceAccount:owasp-wrongsecrets.svc.id.goog[t-${team}/default]`], // The user or group you want to grant the role to
+  };
+
+  // Add the role binding
+  const res = await authClient.request({
+    url: `https://iam.googleapis.com/v1/${resource}:setIamPolicy`,
+    method: 'POST',
+    data: {
+      policy: {
+        bindings: [roleBinding],
+      },
+    },
+  });
+
+  console.log(`Role binding added: ${JSON.stringify(res.data, null, 2)}`);
+};
+module.exports.bindIAMServiceAccountToWorkloadForTeam = bindIAMServiceAccountToWorkloadForTeam;
+
 const patchServiceAccountForTeamForGCP = async (team) => {
   const patch = {
     metadata: {
       annotations: {
-        'iam.gke.io/gcp-service-account': `wrongsecrets-workload-sa@${gcpProject}.iam.gserviceaccount.com`,
+        'iam.gke.io/gcp-service-account': `team-${team}@${gcpProject}.iam.gserviceaccount.com`,
       },
     },
   };
   const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
-
-  getAllBucketFiles().catch(console.error);
 
   return k8sCoreApi
     .patchNamespacedServiceAccount(

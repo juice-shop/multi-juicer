@@ -20,10 +20,18 @@ resource "google_iam_workload_identity_pool" "pool" {
   display_name              = "WrongSecrets"
 }
 
-# IAM member for the balancer pod. Can be used in a pod.
+# Give the balancer pod owner permissions over the project
+resource "google_project_iam_member" "wrongsecrets_workload_sa_roles" {
+
+  project = var.project_id
+  role    = "roles/owner"
+  member  = "serviceAccount:${google_service_account.wrongsecrets_workload.email}"
+}
+
+# Give the service account access to the workload identity of the IAM service account
 resource "google_service_account_iam_member" "wrongsecret_wrong_pod_sa" {
   service_account_id = google_service_account.wrongsecrets_workload.id
-  role               = "roles/owner"
+  role               = "roles/iam.workloadIdentityUser"
   member             = "serviceAccount:${var.project_id}.svc.id.goog[default/wrongsecrets-balancer]"
   depends_on = [
     google_iam_workload_identity_pool.pool,

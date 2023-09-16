@@ -7,18 +7,17 @@ Please make sure that the account in which you run this exercise has either Clou
 
 Have the following tools installed:
 
--   gcloud CLI - [Installation](https://cloud.google.com/sdk/docs/install)
--   Tfenv (Optional) - [Installation](https://github.com/tfutils/tfenv)
--   Terraform CLI - [Installation](https://learn.hashicorp.com/tutorials/terraform/install-cli)
--   Wget - [Installation](https://www.jcchouinard.com/wget/)
--   Helm [Installation](https://helm.sh/docs/intro/install/)
--   Kubectl [Installation](https://kubernetes.io/docs/tasks/tools/)
--   jq [Installation](https://stedolan.github.io/jq/download/)
+- gcloud CLI - [Installation](https://cloud.google.com/sdk/docs/install)
+- Tfenv (Optional) - [Installation](https://github.com/tfutils/tfenv)
+- Terraform CLI - [Installation](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+- Wget - [Installation](https://www.jcchouinard.com/wget/)
+- Helm [Installation](https://helm.sh/docs/intro/install/)
+- Kubectl [Installation](https://kubernetes.io/docs/tasks/tools/)
+- jq [Installation](https://stedolan.github.io/jq/download/)
 
 Make sure you have an active account at GCP for which you have configured the credentials on the system where you will execute the steps below.
 
 Please note that this setup relies on bash scripts that have been tested in MacOS and Linux. We have no intention of supporting vanilla Windows at the moment.
-
 
 ### Multi-user setup: shared state
 
@@ -51,13 +50,20 @@ The bucket name should be in the output. Please use that to configure the Terraf
 6. Run `terraform plan`
 7. Run `terraform apply`. Note: the apply will take 10 to 20 minutes depending on the speed of the GCP backplane.
 8. Run `export USE_GKE_GCLOUD_AUTH_PLUGIN=True`
-9. When creation is done, run `gcloud container clusters get-credentials wrongsecrets-exercise-cluster --region YOUR_REGION`. Note if it errors on a missing plugin to support `kubectl`, then run `gcloud components install gke-gcloud-auth-plugin` and `gcloud container clusters get-credentials wrongsecrets-exercise-cluster` .
-10. Run `./k8s-vault-gcp-start.sh`
+9. When creation is done, run `gcloud container clusters get-credentials wrongsecrets-exercise-cluster --region YOUR_REGION`. Note if it errors on a missing plugin to support `kubectl`, then run `gcloud components install gke-gcloud-auth-plugin` and `gcloud container clusters get-credentials wrongsecrets-exercise-cluster`.
+10. Go to the values of the helm chart and replace the wrongsecrets.config with this:
 
-### GKE ingres for shared deployment
+    ```yaml
+    K8S_ENV: "azure"
+    ```
 
-By default the deployment uses a nodePort tunneled to localhost. For a larger audience deployment the wrongsecrets app can deployed with a GKE ingress, run `k8s-vault-gcp-ingress-start.sh`
-Please note that the GKE ingress can take a few minues to deploy and is publicly available. A connection URL will be returned once the ingress is available. Note that, after the connection URL is returned, a first lookup might still take a minute, after which it is much faster.
+    and replace the value of wrongsecrets.env having the name 'K8S_ENV' with this:
+
+    ```yaml
+    value: "azure"
+    ```
+
+11. Run `./build-and-deploy-gcp.sh`
 
 Your GKE cluster should be visible in [EU-West4](https://console.cloud.google.com/kubernetes?referrer=search&project=wrongsecrets) by default. Want a different region? You can modify `terraform.tfvars` or input it directly using the `region` variable in plan/apply.
 
@@ -65,28 +71,74 @@ Are you done playing? Please run `terraform destroy` twice to clean up.
 
 ### Test it
 
-Run `./k8s-vault-gcp-start.sh` and connect to [http://localhost:8080](http://localhost:8080) when it's ready to accept connections (you'll read the line `Forwarding from 127.0.0.1:8080 -> 8080` in your console). Now challenge 9 and 10 should be available as well.
+When you have completed the installation steps, you can do `kubectl port-forward service/wrongsecrets-balancer 3000:3000` and then go to [http://localhost:3000](http://localhost:3000).
 
-### Resume it
+Want to know how well your cluster is holding up? Check with
 
-When you stopped the `k8s-vault-gcp-start.sh` script and want to resume the port forward run: `k8s-vault-gcp-resume.sh`. This is because if you run the start script again it will replace the secret in the vault and not update the secret-challenge application with the new secret.
+```sh
+    kubectl top nodes
+    kubectl top pods
+```
+
+### Configuring CTFd
+
+You can use the [Juiceshop CTF CLI](https://github.com/juice-shop/juice-shop-ctf) to generate CTFd configuration files.
+
+Follow the following steps:
+
+```shell
+    npm install -g juice-shop-ctf-cli@9.1.2
+    juice-shop-ctf #choose ctfd and https://wrongsecrets-ctf.herokuapp.com as domain. No trailing slash! The key is 'test', by default feel free to enable hints. We do not support snippets or links/urls to code or hints.
+```
+
+Now visit the CTFd instance and setup your CTF. To test things locally before setting up a load balancer/ingress, you can use `kubectl port-forward -n ctfd $(kubectl get pods --namespace ctfd -l "app.kubernetes.io/name=ctfd,app.kubernetes.io/instance=ctfd" -o jsonpath="{.items[0].metadata.name}") 8000:8000` and go to `localhost:8000` to visit CTFd.
+
+_!!NOTE:_ **The following can be dangerous if you use CTFd `>= 3.5.0` with wrongsecrets `< 1.5.11`. Check the `challenges.json` and make sure it's 1-indexed - a 0-indexed file will break CTFd!** _/NOTE!!_
+
+Then use the administrative backup function to import the zipfile you created with the juice-shop-ctf command.
+After that you will still need to override the flags with their actual values if you do use the 2-domain configuration. For a guide on how to do this see the 2-domain setup steps in the general [README](../readme.md)
+Want to setup your own? You can! Watch out for people finding your key though, so secure it properly: make sure the running container with the actual ctf-key is not exposed to the audience, similar to our heroku container.
+
+Want to make the CTFD instance look pretty? Include the fragment located at [./k8s/ctfd_resources/index_fragment.html](/k8s/ctfd_resources/index_fragment.html) in your index.html via the admin panel.
+
+If you want to share with others go to the [When you want to share your environment with others (experimental)](#when-you-want-to-share-your-environment-with-others-experimental) section.
+
+### Configuring the application
+
+In the front page of the application you can edit the description to reference the right urls and the desplayed image. Use the following:
+
+```sh
+helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+  --set="balancer.env.REACT_APP_MOVING_GIF_LOGO=<>" \
+  --set="balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL=<>" \
+  --set="balancer.env.REACT_APP_CTFD_URL='<>'" \
+```
 
 ### Clean it up
 
 When you're done:
 
 1. Kill the port forward.
-2. Run `terraform destroy` to clean up the infrastructure.
-3. Run `unset KUBECONFIG` to unset the KUBECONFIG env var.
-4. Run `rm ~/.kube/wrongsecrets` to remove the kubeconfig file.
-5. Run `rm terraform.tfstate*` to remove local state files.
+2. Run `terraform destroy` to clean up the infrastructure. Note that you may need to repeat the destroy to fully clean up.
+3. If you've used the shared state, `cd` to the `shared-state` folder and run `terraform destroy` there too.
+4. Run `rm terraform.tf*` to remove local state files.
 
 ### A few things to consider
 
 1. Does your worker node now have access as well?
-2. Can you easily obtain the GCP IAM role of the Node?
-3. Can you get the secrets in the SSM Parameter Store and Secret Manager easily? Which paths do you see?
-4. You should see at the configuration details of the cluster that `databaseEncryption` is `DECRYPTED` (`gcloud container clusters describe wrongsecrets-exercise-cluster --region europe-west4`). What does that mean?
+2. Can you easily obtain the AKS managed identity of the Node?
+3. Can you get the secrets in the Key vault? Which paths do you see?
+
+### When you want to share your environment with others (experimental)
+
+We added additional scripts for adding a Load Balancer and ingress so that you can use your cloud setup with multiple people.
+Do the following:
+
+1. Follow the installation section first.
+2. Run `./k8s-nginx-lb-script.sh` and the script will return the url at which you can reach the application. (Be aware this opens the url's to the internet in general, if you'd like to limit the access please do this using the security groups in Azure)
+3. When you are done, before you do cleanup, first run `./k8s-nginx-lb-script-cleanup.sh`.
+
+Note that you might have to do some manual cleanups after that.
 
 ## Terraform documentation
 
@@ -126,6 +178,7 @@ No modules.
 | [google_compute_subnetwork.node_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_container_cluster.gke](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster) | resource |
 | [google_project_iam_member.wrongsecrets_cluster_sa_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.wrongsecrets_workload_sa_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_secret_manager_secret.wrongsecret_1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret.wrongsecret_2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret.wrongsecret_3](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |

@@ -68,10 +68,6 @@ echo "Apply secretsmanager storage volume"
 kubectl apply -f./k8s/secret-volume.yml
 
 
-kubectl annotate serviceaccount \
-  --namespace default wrongsecrets-balancer \
-  "iam.gke.io/gcp-service-account=wrongsecrets-workload-sa@${GCP_PROJECT}.iam.gserviceaccount.com"
-
 envsubst <./k8s/secret-challenge-vault-deployment.yml.tpl >./k8s/secret-challenge-vault-deployment.yml
 
 echo "Installing metrics api-server"
@@ -113,7 +109,10 @@ helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}" \
   --set="balancer.env.GCP_PROJECT_ID=${GCP_PROJECT}" \
   --set="balancer.repository=osamamagdy/wrongsecrets-balancer" \
-  --set="balancer.tag=v1.1.7"
+
+kubectl annotate serviceaccount \
+  --namespace default wrongsecrets-balancer \
+  "iam.gke.io/gcp-service-account=wrongsecrets-workload-sa@${GCP_PROJECT}.iam.gserviceaccount.com"
 
 # Install CTFd
 echo "Installing CTFd"

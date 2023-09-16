@@ -12,6 +12,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@google-cloud/iam": "^1.0.1",
+    "@google-cloud/secret-manager": "^5.0.1",
     "@google-cloud/storage": "^7.1.0",
     "@kubernetes/client-node": "^0.18.1",
     "basic-auth-connect": "^1.0.0",
@@ -21,6 +22,8 @@
     "crypto-random-string": "^3.3.1",
     "express": "^4.18.2",
     "express-joi-validation": "^5.0.1",
+    "google-auth-library": "^9.0.0",
+    "googleapis": "^126.0.1",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "^2.0.6",
     "joi": "^17.9.2",
