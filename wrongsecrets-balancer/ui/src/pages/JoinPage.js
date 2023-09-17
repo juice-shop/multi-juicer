@@ -96,9 +96,12 @@ export const JoinPage = injectIntl(({ intl }) => {
   const initialDynamics = {
     // type all the fields you need
     react_gif_logo: 'https://i.gifer.com/9kGQ.gif',
+    k8s_env: process.env['K8S_ENV'],
     heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
     ctfd_url: process.env['REACT_APP_CTFD_URL'],
     s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
+    azure_blob_url: process.env['REACT_APP_AZ_BLOB_URL'],
+    gcp_bucket_url: process.env['REACT_APP_GCP_BUCKET_URL'],
     hmac_key: process.env['REACT_APP_CREATE_TEAM_HMAC_KEY'],
     enable_password: false,
   };
@@ -156,14 +159,37 @@ export const JoinPage = injectIntl(({ intl }) => {
               {dynamics.ctfd_url}
             </a>
           </li>
+          {dynamics.k8s_env === 'aws' ? (
           <li>
-            Optionally: the storage bucket with Terraform state for the cloud challenges:{' '}
+            Optionally: the aws storage bucket with Terraform state for the cloud challenges:{' '}
             <a href={dynamics.s3_bucket_url}>
               {dynamics.s3_bucket_url}
             </a>
             . For this you will need credentials that will be provided to you as part of the CTF
             instructions.
           </li>
+          ) : null }
+          {dynamics.k8s_env === 'azure' ? (
+            <li>
+              Optionally: the azure storage bucket with Terraform state for the cloud challenges:{' '}
+              <a href={dynamics.azure_blob_url}>
+                {dynamics.azure_blob_url}
+              </a>
+              . For this you will need credentials that will be provided to you as part of the CTF
+              instructions.
+            </li>
+          ) : null }
+          {dynamics.k8s_env === 'gcp' ? (
+          <li>
+            Optionally: the gcp storage bucket with Terraform state for the cloud challenges:{' '}
+            <a href={dynamics.gcp_bucket_url}>
+              {dynamics.gcp_bucket_url}
+            </a>
+            . For this you will need credentials that will be provided to you as part of the CTF
+            instructions.
+          </li>
+          ) : null }
+
         </ul>
         <FormattedMessage
           id="welcome_text_2"

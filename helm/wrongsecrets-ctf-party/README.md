@@ -84,8 +84,10 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.env.IRSA_ROLE | string | `"arn:aws:iam::233483431651:role/wrongsecrets-secret-manager"` |  |
 | balancer.env.K8S_ENV | string | `"k8s"` |  |
 | balancer.env.REACT_APP_ACCESS_PASSWORD | string | `""` |  |
+| balancer.env.REACT_APP_AZ_BLOB_URL | string | `"az://funstuff"` |  |
 | balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY | string | `"hardcodedkey"` |  |
 | balancer.env.REACT_APP_CTFD_URL | string | `"https://ctfd.io"` |  |
+| balancer.env.REACT_APP_GCP_BUCKET_URL | string | `"gs://funstuff"` |  |
 | balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL | string | `"https://wrongsecrets-ctf.herokuapp.com"` |  |
 | balancer.env.REACT_APP_MOVING_GIF_LOGO | string | `"https://i.gifer.com/9kGQ.gif"` |  |
 | balancer.env.REACT_APP_S3_BUCKET_URL | string | `"s3://funstuff"` |  |

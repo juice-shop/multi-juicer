@@ -3,9 +3,11 @@ terraform {
   required_providers {
     azurerm = {
       version = "~> 3.0"
+      source  = "hashicorp/azurerm"
     }
     random = {
       version = "~> 3.0"
+      source  = "hashicorp/random"
     }
   }
 }
@@ -16,7 +18,7 @@ provider "azurerm" {
 }
 
 # If you're using an existing resource group, modify this part. That'll definitely be the case if you're using shared state!
-# Note that you'll need to find/replace references to "arurerm_resource_group.default" to "data.azurerm_resource_group.default"
+# Note that you'll need to find/replace references to "azurerm_resource_group.default" to "data.azurerm_resource_group.default"
 #data "azurerm_resource_group" "default" {
 #  name = "owasp-wrongsecrets"
 #}
