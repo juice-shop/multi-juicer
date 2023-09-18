@@ -1,27 +1,40 @@
-{{- if .Values.juiceshop.networkPolicy }}
+{{- if .Values.juiceShop.networkPolicy }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: networkPolicy-juice-shop
+  name: networkpolicy-juice-shop
 spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: 'juice-shop'
   policyTypes:
-    - Ingress
-    - Egress
+  - Ingress
+  - Egress
   ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              {{- include "multi-juicer.juice-balancer.labels" . | nindent 14 }}
-      ports:
-        - port: http
+  - from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: 'juice-balancer'
+    ports:
+    - port: http
   egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              {{- include "multi-juicer.juice-balancer.labels" . | nindent 14 }}
-      ports:
-        - port: http
+  - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: 'juice-balancer'
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: 'progress-watchdog'
+    ports:
+    - port: http
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+    to:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
 {{- end }}
