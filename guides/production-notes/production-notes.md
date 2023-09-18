@@ -11,7 +11,7 @@ To ensure MultiJuicer runs as smoothly during your CTF's / trainings / workshops
 
 ## Security Consideration
 
-Add SecurityContext, PodSecurityContext and NetworkPolicy to further isolate and secure your training plattform.
+Add SecurityContext and PodSecurityContext further isolate and secure your training plattform.
 
 ## TLDR
 
@@ -27,7 +27,6 @@ balancer:
     capabilities:
       drop:
       - ALL
-  networkPolicy: true
   replicas: 3
   cookie:
     cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
@@ -44,11 +43,9 @@ juiceShop:
     runAsNonRoot: true
   podsecurityContext:
     allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
     capabilities:
       drop:
       - ALL
-  networkPolicy: true
 
 progressWatchdog:
   securityContext:
