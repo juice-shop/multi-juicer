@@ -20,3 +20,4 @@ db.zip
 *.auto.tfvars
 node_modules
 .npm
+gcp/k8s/secret-volume.yml

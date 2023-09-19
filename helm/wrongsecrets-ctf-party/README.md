@@ -69,23 +69,28 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.cookie.cookieParserSecret | string | `nil` | Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again. |
 | balancer.cookie.name | string | `"balancer"` | Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true` |
 | balancer.cookie.secure | bool | `false` | Sets the secure attribute on cookie so that it only be send over https |
+| balancer.env.AWS_SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
+| balancer.env.AWS_SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
+| balancer.env.AZ_KEYVAULT_SECRET_ID_1 | string | `"wrongsecret"` |  |
+| balancer.env.AZ_KEYVAULT_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.env.AZ_KEY_VAULT_NAME | string | `""` |  |
 | balancer.env.AZ_KEY_VAULT_TENANT_ID | string | `""` |  |
 | balancer.env.AZ_POD_CLIENT_ID | string | `""` |  |
 | balancer.env.AZ_VAULT_URI | string | `""` |  |
 | balancer.env.CHALLENGE33_VALUE | string | `"VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="` |  |
+| balancer.env.GCP_PROJECT_ID | string | `""` |  |
+| balancer.env.GCP_SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
+| balancer.env.GCP_SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.env.IRSA_ROLE | string | `"arn:aws:iam::233483431651:role/wrongsecrets-secret-manager"` |  |
 | balancer.env.K8S_ENV | string | `"k8s"` |  |
-| balancer.env.KEYVAULT_SECRET_ID_1 | string | `"wrongsecret"` |  |
-| balancer.env.KEYVAULT_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.env.REACT_APP_ACCESS_PASSWORD | string | `""` |  |
+| balancer.env.REACT_APP_AZ_BLOB_URL | string | `"az://funstuff"` |  |
 | balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY | string | `"hardcodedkey"` |  |
 | balancer.env.REACT_APP_CTFD_URL | string | `"https://ctfd.io"` |  |
+| balancer.env.REACT_APP_GCP_BUCKET_URL | string | `"gs://funstuff"` |  |
 | balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL | string | `"https://wrongsecrets-ctf.herokuapp.com"` |  |
 | balancer.env.REACT_APP_MOVING_GIF_LOGO | string | `"https://i.gifer.com/9kGQ.gif"` |  |
 | balancer.env.REACT_APP_S3_BUCKET_URL | string | `"s3://funstuff"` |  |
-| balancer.env.SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
-| balancer.env.SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.livenessProbe | object | `{"httpGet":{"path":"/balancer/","port":"http"}}` | livenessProbe: Checks if the balancer pod is still alive |
 | balancer.metrics.basicAuth.password | string | `"ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"` | Should be changed when metrics are enabled. |
 | balancer.metrics.basicAuth.username | string | `"prometheus-scraper"` |  |

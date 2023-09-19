@@ -63,9 +63,12 @@ app.get('/balancer/dynamics', (req, res) => {
   }
   res.json({
     react_gif_logo: process.env['REACT_APP_MOVING_GIF_LOGO'],
+    k8s_env: process.env['K8S_ENV'],
     heroku_wrongsecret_ctf_url: process.env['REACT_APP_HEROKU_WRONGSECRETS_URL'],
     ctfd_url: process.env['REACT_APP_CTFD_URL'],
     s3_bucket_url: process.env['REACT_APP_S3_BUCKET_URL'],
+    azure_blob_url: process.env['REACT_APP_AZ_BLOB_URL'],
+    gcp_bucket_url: process.env['REACT_APP_GCP_BUCKET_URL'],
     hmac_key: process.env['REACT_APP_CREATE_TEAM_HMAC_KEY'] || 'hardcodedkey',
     enable_password: usePassword,
   });

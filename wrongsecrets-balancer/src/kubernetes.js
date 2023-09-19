@@ -10,20 +10,63 @@ const {
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
+// This will be needed only in case of k8s_env=gcp
+const { auth: authGCPClient } = require('google-auth-library');
+
+const { google } = require('googleapis');
+
+const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+
+// Instantiates a client
+const secretsClient = new SecretManagerServiceClient();
+
+// Helper function to authenticate with GCP workload identity
+async function authenticateGCP() {
+  const authClient = await authGCPClient.getClient({
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+  });
+  return authClient;
+}
+
+// Helper function to assign the GCP service account access to secret manager
+async function secretmanagerGCPAccess(secretName, member) {
+  // Get the current IAM policy.
+  const [policy] = await secretsClient.getIamPolicy({
+    resource: secretName,
+  });
+
+  // Add the user with accessor permissions to the bindings list.
+  policy.bindings.push({
+    role: 'roles/secretmanager.secretAccessor',
+    members: [member],
+  });
+
+  // Save the updated IAM policy.
+  await secretsClient.setIamPolicy({
+    resource: secretName,
+    policy: policy,
+  });
+
+  console.log(`Updated IAM policy for ${secretName}`);
+}
+
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 const k8sCustomAPI = kc.makeApiClient(CustomObjectsApi);
 const k8sRBACAPI = kc.makeApiClient(RbacAuthorizationV1Api);
 const k8sNetworkingApi = kc.makeApiClient(NetworkingV1Api);
 const awsAccountEnv = process.env.IRSA_ROLE;
-const secretsmanagerSecretName1 = process.env.SECRETS_MANAGER_SECRET_ID_1;
-const secretsmanagerSecretName2 = process.env.SECRETS_MANAGER_SECRET_ID_2;
+const awsSecretsmanagerSecretName1 = process.env.AWS_SECRETS_MANAGER_SECRET_ID_1;
+const awsSecretsmanagerSecretName2 = process.env.AWS_SECRETS_MANAGER_SECRET_ID_2;
 const azureTenantId = process.env.AZ_KEY_VAULT_TENANT_ID;
 const keyvaultName = process.env.AZ_KEY_VAULT_NAME;
 const azureVaultURI = process.env.AZ_VAULT_URI;
 const azurePodClientId = process.env.AZ_POD_CLIENT_ID;
-const keyvaultSecretName1 = process.env.KEYVAULT_SECRET_ID_1;
-const keyvaultSecretName2 = process.env.KEYVAULT_SECRET_ID_2;
+const keyvaultSecretName1 = process.env.AZ_KEYVAULT_SECRET_ID_1;
+const keyvaultSecretName2 = process.env.AZ_KEYVAULT_SECRET_ID_2;
+const gcpSecretsmanagerSecretName1 = process.env.GCP_SECRETS_MANAGER_SECRET_ID_1;
+const gcpSecretsmanagerSecretName2 = process.env.GCP_SECRETS_MANAGER_SECRET_ID_2;
+const gcpProject = process.env.GCP_PROJECT_ID;
 const challenge33Value = process.env.CHALLENGE33_VALUE;
 const wrongSecretsContainterTag = process.env.WRONGSECRETS_TAG;
 const wrongSecretsDekstopTag = process.env.WRONGSECRETS_DESKTOP_TAG;
@@ -318,7 +361,7 @@ const createAWSSecretsProviderForTeam = async (team) => {
     spec: {
       provider: 'aws',
       parameters: {
-        objects: `- objectName: "${secretsmanagerSecretName1}"\n  objectType: "secretsmanager"\n- objectName: "${secretsmanagerSecretName2}"\n  objectType: "secretsmanager"\n`,
+        objects: `- objectName: "${awsSecretsmanagerSecretName1}"\n  objectType: "secretsmanager"\n- objectName: "${awsSecretsmanagerSecretName2}"\n  objectType: "secretsmanager"\n`,
       },
     },
   };
@@ -461,11 +504,11 @@ const createAWSDeploymentForTeam = async ({ team, passcodeHash }) => {
                 },
                 {
                   name: 'FILENAME_CHALLENGE9',
-                  value: `${secretsmanagerSecretName1}`,
+                  value: `${awsSecretsmanagerSecretName1}`,
                 },
                 {
                   name: 'FILENAME_CHALLENGE10',
-                  value: `${secretsmanagerSecretName2}`,
+                  value: `${awsSecretsmanagerSecretName2}`,
                 },
                 {
                   name: 'challenge_acht_ctf_to_provide_to_host_value',
@@ -871,6 +914,359 @@ const createAzureDeploymentForTeam = async ({ team, passcodeHash }) => {
 module.exports.createAzureDeploymentForTeam = createAzureDeploymentForTeam;
 
 //END AZURE
+
+//BEGIN GCP
+const createGCPSecretsProviderForTeam = async (team) => {
+  // Define the YAML-formatted secrets field as a string
+  const secretsYaml = `
+    - resourceName: "projects/${gcpProject}/secrets/wrongsecret-1/versions/latest"
+      fileName: "${gcpSecretsmanagerSecretName1}"
+    - resourceName: "projects/${gcpProject}/secrets/wrongsecret-2/versions/latest"
+      fileName: "${gcpSecretsmanagerSecretName2}"
+    `;
+  const secretProviderClass = {
+    apiVersion: 'secrets-store.csi.x-k8s.io/v1',
+    kind: 'SecretProviderClass',
+    metadata: {
+      name: 'wrongsecrets-gcp-secretsmanager',
+      namespace: `t-${team}`,
+    },
+    spec: {
+      provider: 'gcp',
+      parameters: {
+        secrets: secretsYaml,
+      },
+    },
+  };
+  return k8sCustomAPI
+    .createNamespacedCustomObject(
+      'secrets-store.csi.x-k8s.io',
+      'v1',
+      `t-${team}`,
+      'secretproviderclasses',
+      secretProviderClass
+    )
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+};
+module.exports.createGCPSecretsProviderForTeam = createGCPSecretsProviderForTeam;
+
+const createIAMServiceAccountForTeam = async (team) => {
+  try {
+    const authClient = await authenticateGCP();
+    const serviceAccountName = `team-${team}`; // Replace with the desired service account name
+    const projectId = `${gcpProject}`; // Replace with your GCP project ID
+    const iam = google.iam('v1');
+
+    // Create the service account
+    const createServiceAccountResponse = await iam.projects.serviceAccounts.create({
+      name: `projects/${projectId}`,
+      requestBody: {
+        accountId: serviceAccountName,
+        serviceAccount: {
+          displayName: 'Service Account Display Name',
+        },
+      },
+      auth: authClient,
+    });
+
+    console.log(`Service account created: ${createServiceAccountResponse.data.name}`);
+
+    // Grant the Secret Manager Secret Accessor role to the service account
+    const member = `serviceAccount:${createServiceAccountResponse.data.email}`;
+
+    await secretmanagerGCPAccess(`projects/${gcpProject}/secrets/wrongsecret-1`, member);
+
+    await secretmanagerGCPAccess(`projects/${gcpProject}/secrets/wrongsecret-2`, member);
+
+    await secretmanagerGCPAccess(`projects/${gcpProject}/secrets/wrongsecret-3`, member);
+
+    console.log('Secret Manager Secret Accessor role granted.');
+  } catch (error) {
+    console.error('Error creating service account:', error);
+  }
+};
+module.exports.createIAMServiceAccountForTeam = createIAMServiceAccountForTeam;
+
+const bindIAMServiceAccountToWorkloadForTeam = async (team) => {
+  const authClient = await authenticateGCP();
+  const projectId = `${gcpProject}`; // Replace with your GCP project ID
+  const serviceAccountEmail = `team-${team}@${gcpProject}.iam.gserviceaccount.com`; // Replace with your service account's email
+  const resource = `projects/${projectId}/serviceAccounts/${serviceAccountEmail}`;
+
+  // Define the role binding you want to add
+  const roleBinding = {
+    role: 'roles/iam.workloadIdentityUser', // The role you want to grant
+    members: [`serviceAccount:owasp-wrongsecrets.svc.id.goog[t-${team}/default]`], // The user or group you want to grant the role to
+  };
+
+  // Add the role binding
+  const res = await authClient.request({
+    url: `https://iam.googleapis.com/v1/${resource}:setIamPolicy`,
+    method: 'POST',
+    data: {
+      policy: {
+        bindings: [roleBinding],
+      },
+    },
+  });
+
+  console.log(`Role binding added: ${JSON.stringify(res.data, null, 2)}`);
+};
+module.exports.bindIAMServiceAccountToWorkloadForTeam = bindIAMServiceAccountToWorkloadForTeam;
+
+const patchServiceAccountForTeamForGCP = async (team) => {
+  const patch = {
+    metadata: {
+      annotations: {
+        'iam.gke.io/gcp-service-account': `team-${team}@${gcpProject}.iam.gserviceaccount.com`,
+      },
+    },
+  };
+  const options = { headers: { 'Content-type': PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH } };
+
+  return k8sCoreApi
+    .patchNamespacedServiceAccount(
+      'default',
+      `t-${team}`,
+      patch,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      options
+    )
+    .catch((error) => {
+      throw new Error(JSON.stringify(error));
+    });
+};
+module.exports.patchServiceAccountForTeamForGCP = patchServiceAccountForTeamForGCP;
+
+const createGCPDeploymentForTeam = async ({ team, passcodeHash }) => {
+  const deploymentWrongSecretsConfig = {
+    metadata: {
+      namespace: `t-${team}`,
+      name: `t-${team}-wrongsecrets`,
+      labels: {
+        app: 'wrongsecrets',
+        team: `${team}`,
+        'deployment-context': get('deploymentContext'),
+      },
+      annotations: {
+        'wrongsecrets-ctf-party/lastRequest': `${new Date().getTime()}`,
+        'wrongsecrets-ctf-party/lastRequestReadable': new Date().toString(),
+        'wrongsecrets-ctf-party/passcode': passcodeHash,
+        'wrongsecrets-ctf-party/challengesSolved': '0',
+        'wrongsecrets-ctf-party/challenges': '[]',
+      },
+    },
+    spec: {
+      selector: {
+        matchLabels: {
+          app: 'wrongsecrets',
+          team: `${team}`,
+          'deployment-context': get('deploymentContext'),
+        },
+      },
+      template: {
+        metadata: {
+          labels: {
+            app: 'wrongsecrets',
+            team: `${team}`,
+            'deployment-context': get('deploymentContext'),
+          },
+        },
+        spec: {
+          automountServiceAccountToken: false,
+          serviceAccountName: 'default',
+          securityContext: {
+            runAsUser: 2000,
+            runAsGroup: 2000,
+            fsGroup: 2000,
+          },
+          volumes: [
+            {
+              name: 'secrets-store-inline',
+              csi: {
+                driver: 'secrets-store.csi.k8s.io',
+                readOnly: true,
+                volumeAttributes: {
+                  secretProviderClass: 'wrongsecrets-gcp-secretsmanager',
+                },
+              },
+            },
+            {
+              name: 'ephemeral',
+              emptyDir: {},
+            },
+          ],
+          containers: [
+            {
+              name: 'wrongsecrets',
+              image: `jeroenwillemsen/wrongsecrets:${wrongSecretsContainterTag}`,
+              imagePullPolicy: get('wrongsecrets.imagePullPolicy'),
+              // resources: get('wrongsecrets.resources'),
+              securityContext: {
+                allowPrivilegeEscalation: false,
+                readOnlyRootFilesystem: true,
+                runAsNonRoot: true,
+                capabilities: { drop: ['ALL'] },
+                seccompProfile: { type: 'RuntimeDefault' },
+              },
+              env: [
+                {
+                  name: 'hints_enabled',
+                  value: 'false',
+                },
+                {
+                  name: 'ctf_enabled',
+                  value: 'true',
+                },
+                {
+                  name: 'ctf_key',
+                  value: 'notarealkeyyouknowbutyoumightgetflags',
+                },
+                {
+                  name: 'K8S_ENV',
+                  value: 'gcp',
+                },
+                {
+                  name: 'APP_VERSION',
+                  value: `${wrongSecretsContainterTag}-ctf`,
+                },
+                {
+                  name: 'CTF_SERVER_ADDRESS',
+                  value: `${heroku_wrongsecret_ctf_url}`,
+                },
+                {
+                  name: 'FILENAME_CHALLENGE9',
+                  value: `${gcpSecretsmanagerSecretName1}`,
+                },
+                {
+                  name: 'FILENAME_CHALLENGE10',
+                  value: `${gcpSecretsmanagerSecretName2}`,
+                },
+                {
+                  name: 'challenge_acht_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostThankyouAlllGoodDoYouLikeRandomLogging?',
+                },
+                {
+                  name: 'challenge_thirty_ctf_to_provide_to_host_value',
+                  value: 'provideThisKeyToHostWhenYouRealizeLSIsOK?',
+                },
+                {
+                  name: 'SPECIAL_K8S_SECRET',
+                  valueFrom: {
+                    configMapKeyRef: {
+                      name: 'secrets-file',
+                      key: 'funny.entry',
+                    },
+                  },
+                },
+                {
+                  name: 'SPECIAL_SPECIAL_K8S_SECRET',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'funnystuff',
+                      key: 'funnier',
+                    },
+                  },
+                },
+                {
+                  name: 'SPRING_CLOUD_VAULT_URI',
+                  value: 'http://vault.vault.svc.cluster.local:8200',
+                },
+                {
+                  name: 'JWT_PATH',
+                  value: '/var/run/secrets/kubernetes.io/serviceaccount/token',
+                },
+                {
+                  name: 'CHALLENGE33',
+                  valueFrom: {
+                    secretKeyRef: {
+                      name: 'challenge33',
+                      key: 'answer',
+                    },
+                  },
+                },
+                ...get('wrongsecrets.env', []),
+              ],
+              envFrom: get('wrongsecrets.envFrom'),
+              ports: [
+                {
+                  containerPort: 8080,
+                },
+              ],
+              readinessProbe: {
+                httpGet: {
+                  path: '/actuator/health/readiness',
+                  port: 8080,
+                },
+                initialDelaySeconds: 120,
+                timeoutSeconds: 30,
+                periodSeconds: 10,
+                failureThreshold: 10,
+              },
+              livenessProbe: {
+                httpGet: {
+                  path: '/actuator/health/liveness',
+                  port: 8080,
+                },
+                initialDelaySeconds: 90,
+                timeoutSeconds: 30,
+                periodSeconds: 30,
+              },
+              resources: {
+                requests: {
+                  memory: '512Mi',
+                  cpu: '200m',
+                  'ephemeral-storage': '1Gi',
+                },
+                limits: {
+                  memory: '512Mi',
+                  cpu: '500m',
+                  'ephemeral-storage': '2Gi',
+                },
+              },
+              volumeMounts: [
+                // {
+                //   name: 'wrongsecrets-config',
+                //   mountPath: '/wrongsecrets/config/wrongsecrets-ctf-party.yaml',
+                //   subPath: 'wrongsecrets-ctf-party.yaml',
+                // },
+                {
+                  mountPath: '/tmp',
+                  name: 'ephemeral',
+                },
+                {
+                  name: 'secrets-store-inline',
+                  mountPath: '/mnt/secrets-store',
+                  readOnly: true,
+                },
+                // ...get('wrongsecrets.volumeMounts', []),
+              ],
+            },
+          ],
+          tolerations: get('wrongsecrets.tolerations'),
+          affinity: get('wrongsecrets.affinity'),
+          runtimeClassName: get('wrongsecrets.runtimeClassName')
+            ? get('wrongsecrets.runtimeClassName')
+            : undefined,
+        },
+      },
+    },
+  };
+  return k8sAppsApi
+    .createNamespacedDeployment('t-' + team, deploymentWrongSecretsConfig)
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+};
+module.exports.createGCPDeploymentForTeam = createGCPDeploymentForTeam;
+
+//END GCP
 
 const getKubernetesEndpointToWhitelist = async () => {
   const {

@@ -57,6 +57,8 @@ export AZ_VAULT_URI="$(terraform output -raw vault_uri)"
 export AZ_KEY_VAULT_TENANT_ID="$(terraform output -raw tenant_id)"
 export AZ_KEY_VAULT_NAME="$(terraform output -raw vault_name)"
 
+export AZ_STORAGE_ACCOUNT="$(terraform output -chdir=./shared-state -raw storage_account_name)"
+
 # Set the kubeconfig
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
 
@@ -150,6 +152,7 @@ echo "You can find the app password in password.txt"
 
 helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.K8S_ENV=azure" \
+  --set="balancer.env.REACT_APP_AZ_BLOB_URL=https://${AZ_STORAGE_ACCOUNT}.blob.core.windows.net/tfstate" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
   --set="balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY=${CREATE_TEAM_HMAC}" \
   --set="balancer.env.AZ_KEY_VAULT_NAME=${AZ_KEY_VAULT_NAME}" \

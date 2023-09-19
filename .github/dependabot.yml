@@ -38,3 +38,7 @@ updates:
     directory: "/azure"
     schedule:
       interval: "monthly"
+  - package-ecosystem: "terraform"
+    directory: "/gcp"
+    schedule:
+      interval: "monthly"
