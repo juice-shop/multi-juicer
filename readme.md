@@ -64,7 +64,7 @@ A 100 contestant game can be played on the AWS, GCP, and Azure setup, which will
 
 ## Status - Experimental release
 
-This is an experimental release. It showed to work at 2 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we support using Minikube, AWS EKS, GCP GKE, and Azure AKS (_**Please follow the readme in the folder for each cloud provider if you want to use it, as the guides section is not updated yet**_).
+This is an experimental release. It showed to work at 6 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we support using Minikube, AWS EKS, GCP GKE, and Azure AKS (_**Please follow the readme in the folder for each cloud provider if you want to use it, as the guides section is not updated yet**_).
 
 ## How to use it
 
