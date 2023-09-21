@@ -60,11 +60,11 @@ We recently played a small CTF with 40 relatively active players using version 1
 
 #### Large Numbers
 
-A 100 contestant game can be played on the AWS setup, which will require around 150 (100-250) CPUs, 200 (150-350) GB Ram, and 400 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in AWS. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
+A 100 contestant game can be played on the AWS, GCP, and Azure setup, which will require around 150 (100-250) CPUs, 200 (150-350) GB Ram, and 400 GB of storage available in the cluster. Note that we have configured everything based on autoscaling in all cloud providers. This means that you can often start with a cluster about 20% of the size of the "limit" numbers and then see how things evolve. You will hardly hit those limits, unless all players are very actively fuzzing the WrongSecrets app, while runnign heavy appss on their Webtops. Instead, you will see that you are using just 25% of what is provided in numbers here. So, by using our terraform (including an autoscaling managed nodegroup), you can reduce the cost of your CTF by a lot!
 
 ## Status - Experimental release
 
-This is an experimental release. It showed to work at 2 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we only support using Minikube and AWS EKS (_**Please follow the readme in the AWS folder if you want to use EKS, as the guides section is not updated yet**_).
+This is an experimental release. It showed to work at 2 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we support using Minikube, AWS EKS, GCP GKE, and Azure AKS (_**Please follow the readme in the folder for each cloud provider if you want to use it, as the guides section is not updated yet**_).
 
 ## How to use it
 
@@ -87,14 +87,14 @@ You need 2 things:
 
 To use the 2 domain setup with CTFD:
 
-1. Set up the CTFD and WrongSecrets instances using your preferred method and docs e.g. AWS and the docs [here](aws/README.md).
-2. Set up a team with spoilers available (On AWS this can be done by changing the deployment of a team you have created and setting ctf-mode=false).
-3. Use these spoilers to manually copy the answers from WrongSecrets to CTFD.]
-4. Delete the team used to get these spoilers (On AWS you can delete the entire namespace of the team)
+1. Set up the CTFD and WrongSecrets instances using your preferred method and docs e.g. AWS [here](aws/README.md), GCP [here](gcp/README.md), or Azure [here](azure/README.md).
+2. Set up a team with spoilers available (On Cloud providers AWS, GCP, or Azure this can be done by changing the deployment of a team you have created and setting ctf-mode=false).
+3. Use these spoilers to manually copy the answers from WrongSecrets to CTFD.
+4. Delete the team used to get these spoilers ( You can delete the entire namespace of the team)
 
 ### General Helm usage
 
-This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the AWS Challenges, do:
+This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the Cloud Challenges, do:
 
 ```shell
 helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
@@ -105,7 +105,7 @@ helm upgrade --install my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-p
 
 Play with Minikube:
 
-** NOTE: The below steps require at least minikube version v1.30.1 and yq (https://github.com/mikefarah/yq/) version v4.34.1. **
+** NOTE: The below steps require at least minikube version v1.30.1 and yq (<https://github.com/mikefarah/yq/>) version v4.34.1. **
 
 For minikube, run:
 
@@ -141,11 +141,27 @@ kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 or use `build-and-deploy-minikube.sh` to do all of the above in one script.
 
-### Play with AWS EKS:
+### Play with AWS EKS
 
-** NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your AWS bill. **
+**NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your AWS bill.**
 
 For AWS EKS follow the instructions in the `/aws` folder. This setup also includes a helm installation of CTFd.
+
+Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
+
+### Play with GCP GKE
+
+**NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your GCP bill.**
+
+For GCP GKE follow the instructions in the `/gcp` folder. This setup also includes a helm installation of CTFd.
+
+Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
+
+### Play with Azure AKS
+
+**NOTE: SEE SECTIONS ABOVE ABOUT WHAT YOU NEED AND THE COST OF THINGS: This project is not responsible, and will not pay for any part of your Azure bill.**
+
+For Azure AKS follow the instructions in the `/azure` folder. This setup also includes a helm installation of CTFd.
 
 Then open a browser and go to [localhost:3000](http:localhost:3000) and have fun :D .
 
@@ -174,7 +190,7 @@ helm install -f values.yaml my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-
 helm delete my-wrongsecrets-ctf-party
 ```
 
-And if you are running AWS (including CTFd):
+And if you are running AWS, GCP, or Azure (including CTFd):
 
 ```sh
 helm delete ctfd -n ctfd
@@ -225,6 +241,6 @@ kubectl -n kube-system get pod -l component=kube-apiserver -o=jsonpath="{.items[
 
 Still having trouble to connect to that host at that port? run `./scripts/patch-nsp-for-kubectl.sh` to make sure the NSPs are updated.
 
-## Talk with Us!
+## Talk with Us
 
 You can reach us in the `#project-wrongsecrets` channel of the OWASP Slack Workspace. We'd love to hear any feedback or usage reports you got. If you are not already in the OWASP Slack Workspace, you can join via [this link](https://owasp.slack.com/join/shared_invite/enQtNjExMTc3MTg0MzU4LWQ2Nzg3NGJiZGQ2MjRmNzkzN2Q4YzU1MWYyZTdjYjA2ZTA5M2RkNzE2ZjdkNzI5ZThhOWY5MjljYWZmYmY4ZjM)
