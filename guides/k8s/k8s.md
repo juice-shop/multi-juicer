@@ -19,7 +19,7 @@ This example expects you to have the following cli tools setup.
 kubectl cluster-info
 ```
 
-## Step 2. Installing MultiJuicer via helm
+## Step 2. Installing WrongSecrets CTF Party via helm
 
 ```bash
 # You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
