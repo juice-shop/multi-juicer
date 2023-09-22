@@ -16,13 +16,12 @@ This example expects you to have the following cli tools setup.
 # This will take a couple of minutes
 eksctl create cluster \
 --name multi-juicer \
---version 1.21 \
+--version 1.23 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
 --nodes 2 \
 --nodes-min 1 \
---nodes-max 4 \
---node-ami auto
+--nodes-max 4
 
 # After completion verify that your kubectl context has been updated:
 # Should print something like: Administrator@multi-juicer.eu-central-1.eksctl.io
