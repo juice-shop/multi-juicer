@@ -34,4 +34,12 @@ version: 1.6.10
 # incremented each time you make changes to the application.
 appVersion: 1.6.10
 
-dependencies: []
+dependencies:
+  - name: prometheus
+    version: "23.2.0"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheus.included
+  - name: grafana
+    version: "6.58.7"
+    repository:  https://grafana.github.io/helm-charts
+    condition: grafana.included

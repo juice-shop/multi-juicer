@@ -320,3 +320,32 @@ wrongsecretsCleanup:
         - ALL
     seccompProfile:
       type: RuntimeDefault
+grafana:
+  adminUser: admin
+  adminPassword: admin
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: default
+          orgId: 1
+          folder: ""
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+  dashboards: 
+    default:
+      k8s-compute-resources-pod:
+        # Ref: https://grafana.com/grafana/dashboards/12120
+        gnetId: 12120
+        datasource: Prometheus
+      k8s-storage-volumes-cluster-dashboard:
+        # Ref: https://grafana.com/grafana/dashboards/11454
+        gnetId: 11454
+        datasource: Prometheus
+      k8s-monitoring-by-namespace-and-instance:
+        # Ref: https://grafana.com/grafana/dashboards/15826
+        gnetId: 15826
+        datasource: Prometheus
