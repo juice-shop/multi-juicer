@@ -1,0 +1,113 @@
+suite: Full Snapshot
+
+tests:
+  - it: default values render correctly
+    templates:
+      # templates are specified here as it fails otherwise when empty templates are rendered (e.g. service-monitors which are skipped in this config)
+      - templates/juice-shop/config-map.yaml
+
+      - templates/cleanup/cron-job.yaml
+      - templates/cleanup/role.yaml
+      - templates/cleanup/role-binding.yaml
+      - templates/cleanup/service-account.yaml
+
+      - templates/progress-watchdog/deployment.yaml
+      - templates/progress-watchdog/role.yaml
+      - templates/progress-watchdog/role-binding.yaml
+      - templates/progress-watchdog/service-account.yaml
+      - templates/progress-watchdog/service.yaml
+
+      - templates/juice-balancer/config-map.yaml
+      - templates/juice-balancer/deployment.yaml
+      - templates/juice-balancer/role-binding.yaml
+      - templates/juice-balancer/role.yaml
+      - templates/juice-balancer/secret.yaml
+      - templates/juice-balancer/service-account.yaml
+      - templates/juice-balancer/service.yaml
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    set: {}
+    asserts:
+      - matchSnapshot: {}
+  - it: production notes work correctly
+    templates:
+      # templates are specified here as it fails otherwise when empty templates are rendered (e.g. service-monitors which are skipped in this config)
+      - templates/juice-shop/config-map.yaml
+
+      - templates/cleanup/cron-job.yaml
+      - templates/cleanup/role.yaml
+      - templates/cleanup/role-binding.yaml
+      - templates/cleanup/service-account.yaml
+
+      - templates/progress-watchdog/deployment.yaml
+      - templates/progress-watchdog/role.yaml
+      - templates/progress-watchdog/role-binding.yaml
+      - templates/progress-watchdog/service-account.yaml
+      - templates/progress-watchdog/service.yaml
+
+      - templates/juice-balancer/config-map.yaml
+      - templates/juice-balancer/deployment.yaml
+      - templates/juice-balancer/role-binding.yaml
+      - templates/juice-balancer/role.yaml
+      - templates/juice-balancer/secret.yaml
+      - templates/juice-balancer/service-account.yaml
+      - templates/juice-balancer/service.yaml
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    set:
+      balancer:
+        adminPassword: "ABCDEFGH"
+        replicas: 3
+        cookie:
+          cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+          secure: true
+        metrics:
+          basicAuth:
+            password: "ROTATE_THIS_YOU_LAZY_ASS"
+
+      juiceShop:
+        maxInstances: 42
+        nodeEnv: "ctf"
+        ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
+    asserts:
+      - matchSnapshot: {}
+  - it: full values render out correctly
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    set:
+      ingress:
+        enabled: true
+        ingressClassName: cool-ingress
+        annotations:
+          kubernetes.io/tls-acme: "true"
+        hosts:
+          - host: multi-juicer.local
+            paths:
+              - "/"
+        tls:
+          - secretName: tls-secret
+            hosts:
+              - multi-juicer.local
+      balancer:
+        adminPassword: "ABCDEFGH"
+        replicas: 3
+        cookie:
+          cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+          secure: true
+        metrics:
+          basicAuth:
+            password: "ROTATE_THIS_YOU_LAZY_ASS"
+          serviceMonitor:
+            enabled: true
+          dashboards:
+            enabled: true
+
+      juiceShop:
+        maxInstances: 42
+        nodeEnv: "ctf"
+        ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
+    asserts:
+      - matchSnapshot: {}

@@ -1,0 +1,3699 @@
+default values render correctly:
+  1: |
+    apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: cleanup-job
+    spec:
+      failedJobsHistoryLimit: 1
+      jobTemplate:
+        spec:
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/component: garbage-collector
+                app.kubernetes.io/instance: cleaner-RELEASE-NAME
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: cleaner
+                app.kubernetes.io/part-of: multi-juicer
+                app.kubernetes.io/version: 42.0.0
+            spec:
+              containers:
+                - env:
+                    - name: NAMESPACE
+                      value: NAMESPACE
+                    - name: MAX_INACTIVE_DURATION
+                      value: 1d
+                  image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
+                  imagePullPolicy: IfNotPresent
+                  name: cleanup-job
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop:
+                        - ALL
+                    readOnlyRootFilesystem: true
+              restartPolicy: Never
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: juice-cleaner
+      schedule: 0 * * * *
+      successfulJobsHistoryLimit: 1
+  2: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: juice-cleaner
+    subjects:
+      - kind: ServiceAccount
+        name: juice-cleaner
+  3: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - delete
+          - list
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - delete
+  4: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+  5: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "port": 3000,
+          "namespace": "NAMESPACE",
+          "deploymentContext": "RELEASE-NAME",
+          "maxJuiceShopInstances": 10,
+          "skipOwnerReference": false,
+          "cookieParser": {
+            "cookieName": "balancer",
+            "secure": false
+          },
+          "admin": {
+            "username": "admin"
+          },
+          "metrics": {
+            "enabled": true
+          },
+          "juiceShop": {
+            "image": "bkimminich/juice-shop",
+            "tag": "v15.2.0",
+            "imagePullPolicy": "IfNotPresent",
+            "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
+            "nodeEnv": "multi-juicer",
+            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
+            "podSecurityContext": {"runAsNonRoot":true},
+            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "env": [],
+            "envFrom": [],
+            "volumes": [],
+            "volumeMounts": [],
+            "affinity": {},
+            "tolerations": [],
+            "runtimeClassName": null,
+            "annotations": {},
+            "labels": {}
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer-config
+  6: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+          app.kubernetes.io/name: juice-balancer
+          app.kubernetes.io/part-of: multi-juicer
+      template:
+        metadata:
+          annotations:
+            checksum/config: cde3e0c24bac6408a29187ee901a91483bb351f782e8f9ca2b4537bce5ceac8d
+            checksum/secret: 30f91ecdb8632e628c7e80176c847e0b2297187ebc580f71f4338b02483d4ac3
+          labels:
+            app.kubernetes.io/component: load-balancer
+            app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: juice-balancer
+            app.kubernetes.io/part-of: multi-juicer
+            app.kubernetes.io/version: 42.0.0
+        spec:
+          containers:
+            - env:
+                - name: COOKIEPARSER_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookieParserSecret
+                      name: juice-balancer-secret
+                - name: ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: adminPassword
+                      name: juice-balancer-secret
+                - name: METRICS_BASICAUTH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      key: metricsBasicAuthUsername
+                      name: juice-balancer-secret
+                - name: METRICS_BASICAUTH_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: metricsBasicAuthPassword
+                      name: juice-balancer-secret
+              image: ghcr.io/juice-shop/multi-juicer/juice-balancer:v42.0.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /balancer/
+                  port: http
+              name: multi-juicer
+              ports:
+                - containerPort: 3000
+                  name: http
+              readinessProbe:
+                httpGet:
+                  path: /balancer/
+                  port: http
+              resources:
+                limits:
+                  cpu: 400m
+                  memory: 256Mi
+                requests:
+                  cpu: 400m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /home/app/config/
+                  name: config-volume
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: juice-balancer
+          volumes:
+            - configMap:
+                name: juice-balancer-config
+              name: config-volume
+  7: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: juice-balancer
+    subjects:
+      - kind: ServiceAccount
+        name: juice-balancer
+  8: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - create
+          - list
+          - delete
+          - patch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - delete
+  9: |
+    apiVersion: v1
+    data:
+      adminPassword: WllVMExLR04=
+      cookieParserSecret: dXJCc2dmNEJPUmE5dDU5RjliUzk3NUdm
+      metricsBasicAuthPassword: RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k=
+      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer-secret
+    type: Opaque
+  10: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+  11: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      ports:
+        - name: web
+          port: 3000
+      selector:
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  12: |
+    apiVersion: v1
+    data:
+      multi-juicer.yaml: |-
+        application:
+          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+          showVersionNumber: false
+          showGitHubLinks: false
+        challenges:
+          showHints: true
+        hackingInstructor:
+          isEnabled: true
+        ctf:
+          showFlagsInNotifications: false
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: vulnerable-app
+        app.kubernetes.io/instance: juice-shop-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-shop
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-shop-config
+  13: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+          app.kubernetes.io/name: progress-watchdog
+          app.kubernetes.io/part-of: multi-juicer
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: progress-tracker
+            app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: progress-watchdog
+            app.kubernetes.io/part-of: multi-juicer
+            app.kubernetes.io/version: 42.0.0
+        spec:
+          containers:
+            - env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+              image: ghcr.io/juice-shop/multi-juicer/progress-watchdog:v42.0.0
+              imagePullPolicy: IfNotPresent
+              name: progress-watchdog
+              ports:
+                - containerPort: 8080
+                  name: http
+              resources:
+                limits:
+                  cpu: 20m
+                  memory: 48Mi
+                requests:
+                  cpu: 20m
+                  memory: 48Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: progress-watchdog
+  14: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: progress-watchdog
+    subjects:
+      - kind: ServiceAccount
+        name: progress-watchdog
+  15: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - list
+          - patch
+  16: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+  17: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+full values render out correctly:
+  1: |
+    raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward service/juice-balancer 3000:3000\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:3000\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
+  2: |
+    apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: cleanup-job
+    spec:
+      failedJobsHistoryLimit: 1
+      jobTemplate:
+        spec:
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/component: garbage-collector
+                app.kubernetes.io/instance: cleaner-RELEASE-NAME
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: cleaner
+                app.kubernetes.io/part-of: multi-juicer
+                app.kubernetes.io/version: 42.0.0
+            spec:
+              containers:
+                - env:
+                    - name: NAMESPACE
+                      value: NAMESPACE
+                    - name: MAX_INACTIVE_DURATION
+                      value: 1d
+                  image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
+                  imagePullPolicy: IfNotPresent
+                  name: cleanup-job
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop:
+                        - ALL
+                    readOnlyRootFilesystem: true
+              restartPolicy: Never
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: juice-cleaner
+      schedule: 0 * * * *
+      successfulJobsHistoryLimit: 1
+  3: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: juice-cleaner
+    subjects:
+      - kind: ServiceAccount
+        name: juice-cleaner
+  4: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - delete
+          - list
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - delete
+  5: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+  6: |
+    apiVersion: v1
+    data:
+      instances.json: |-
+        {
+          "annotations": {
+            "list": [
+              {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+              }
+            ]
+          },
+          "editable": true,
+          "gnetId": null,
+          "graphTooltip": 0,
+          "iteration": 1613221395031,
+          "links": [],
+          "panels": [
+            {
+              "collapsed": false,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+              },
+              "id": 25,
+              "panels": [],
+              "title": "Challenge Progress",
+              "type": "row"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorPostfix": false,
+              "colorPrefix": false,
+              "colorValue": true,
+              "colors": [
+                "#C8F2C2",
+                "#56A64B",
+                "#37872D"
+              ],
+              "datasource": "Prometheus",
+              "decimals": 0,
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "percent",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 0,
+                "y": 1
+              },
+              "id": 2,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "maxPerRow": 6,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "pluginVersion": "6.5.2",
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "repeat": "difficulties",
+              "repeatDirection": "h",
+              "scopedVars": {
+                "difficulties": {
+                  "selected": true,
+                  "text": "1",
+                  "value": "1"
+                }
+              },
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": true,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": true,
+                "ymax": 100,
+                "ymin": 0
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "20,60",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved $difficulties Star Challenges",
+              "type": "singlestat",
+              "valueFontSize": "120%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorPostfix": false,
+              "colorPrefix": false,
+              "colorValue": true,
+              "colors": [
+                "#C8F2C2",
+                "#56A64B",
+                "#37872D"
+              ],
+              "datasource": "Prometheus",
+              "decimals": 0,
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "percent",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 4,
+                "y": 1
+              },
+              "id": 86,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "maxPerRow": 6,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "pluginVersion": "6.5.2",
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "repeatDirection": "h",
+              "repeatIteration": 1613221395031,
+              "repeatPanelId": 2,
+              "scopedVars": {
+                "difficulties": {
+                  "selected": true,
+                  "text": "2",
+                  "value": "2"
+                }
+              },
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": true,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": true,
+                "ymax": 100,
+                "ymin": 0
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "20,60",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved $difficulties Star Challenges",
+              "type": "singlestat",
+              "valueFontSize": "120%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorPostfix": false,
+              "colorPrefix": false,
+              "colorValue": true,
+              "colors": [
+                "#C8F2C2",
+                "#56A64B",
+                "#37872D"
+              ],
+              "datasource": "Prometheus",
+              "decimals": 0,
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "percent",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 8,
+                "y": 1
+              },
+              "id": 87,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "maxPerRow": 6,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "pluginVersion": "6.5.2",
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "repeatDirection": "h",
+              "repeatIteration": 1613221395031,
+              "repeatPanelId": 2,
+              "scopedVars": {
+                "difficulties": {
+                  "selected": true,
+                  "text": "3",
+                  "value": "3"
+                }
+              },
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": true,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": true,
+                "ymax": 100,
+                "ymin": 0
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "20,60",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved $difficulties Star Challenges",
+              "type": "singlestat",
+              "valueFontSize": "120%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorPostfix": false,
+              "colorPrefix": false,
+              "colorValue": true,
+              "colors": [
+                "#C8F2C2",
+                "#56A64B",
+                "#37872D"
+              ],
+              "datasource": "Prometheus",
+              "decimals": 0,
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "percent",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 12,
+                "y": 1
+              },
+              "id": 88,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "maxPerRow": 6,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "pluginVersion": "6.5.2",
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "repeatDirection": "h",
+              "repeatIteration": 1613221395031,
+              "repeatPanelId": 2,
+              "scopedVars": {
+                "difficulties": {
+                  "selected": true,
+                  "text": "4",
+                  "value": "4"
+                }
+              },
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": true,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": true,
+                "ymax": 100,
+                "ymin": 0
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "20,60",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved $difficulties Star Challenges",
+              "type": "singlestat",
+              "valueFontSize": "120%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorPostfix": false,
+              "colorPrefix": false,
+              "colorValue": true,
+              "colors": [
+                "#C8F2C2",
+                "#56A64B",
+                "#37872D"
+              ],
+              "datasource": "Prometheus",
+              "decimals": 0,
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "percent",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 16,
+                "y": 1
+              },
+              "id": 89,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "maxPerRow": 6,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "pluginVersion": "6.5.2",
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "repeatDirection": "h",
+              "repeatIteration": 1613221395031,
+              "repeatPanelId": 2,
+              "scopedVars": {
+                "difficulties": {
+                  "selected": true,
+                  "text": "5",
+                  "value": "5"
+                }
+              },
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": true,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": true,
+                "ymax": 100,
+                "ymin": 0
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "20,60",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved $difficulties Star Challenges",
+              "type": "singlestat",
+              "valueFontSize": "120%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorPostfix": false,
+              "colorPrefix": false,
+              "colorValue": true,
+              "colors": [
+                "#C8F2C2",
+                "#56A64B",
+                "#37872D"
+              ],
+              "datasource": "Prometheus",
+              "decimals": 0,
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "percent",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 20,
+                "y": 1
+              },
+              "id": 90,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "maxPerRow": 6,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "pluginVersion": "6.5.2",
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "repeatDirection": "h",
+              "repeatIteration": 1613221395031,
+              "repeatPanelId": 2,
+              "scopedVars": {
+                "difficulties": {
+                  "selected": true,
+                  "text": "6",
+                  "value": "6"
+                }
+              },
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": true,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": true,
+                "ymax": 100,
+                "ymin": 0
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "20,60",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved $difficulties Star Challenges",
+              "type": "singlestat",
+              "valueFontSize": "120%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "mappings": [],
+                  "max": 100,
+                  "min": 1,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 19,
+                "x": 0,
+                "y": 5
+              },
+              "id": 78,
+              "maxPerRow": 4,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "vertical",
+                "reduceOptions": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "7.3.5",
+              "repeat": null,
+              "repeatDirection": "h",
+              "targets": [
+                {
+                  "expr": "sum by (category)(juiceshop_challenges_solved{team=\"$team\"}) / sum by (category)(juiceshop_challenges_total{team=\"$team\"}) * 100 != 0",
+                  "interval": "",
+                  "legendFormat": "{{category}} ",
+                  "refId": "A"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Solved Challenges by Category",
+              "type": "stat"
+            },
+            {
+              "datasource": null,
+              "description": "The cheat score show a estimate of how likely it is that a team is cheating. This estimate is based on the time taken between challenges solved. Take this only as a approximation and never as direct prove that a team is in fact cheating.",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "decimals": 0,
+                  "mappings": [],
+                  "max": 1,
+                  "min": 0,
+                  "noValue": "0",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "super-light-yellow",
+                        "value": 0.5
+                      },
+                      {
+                        "color": "semi-dark-orange",
+                        "value": 0.65
+                      },
+                      {
+                        "color": "dark-red",
+                        "value": 0.8
+                      }
+                    ]
+                  },
+                  "unit": "percentunit"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 5,
+                "x": 19,
+                "y": 5
+              },
+              "id": 85,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "last"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "7.3.5",
+              "targets": [
+                {
+                  "expr": "juiceshop_cheat_score{team=\"$team\"}",
+                  "interval": "",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Cheat Score",
+              "type": "stat"
+            },
+            {
+              "collapsed": true,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 9
+              },
+              "id": 32,
+              "panels": [
+                {
+                  "aliasColors": {},
+                  "bars": false,
+                  "dashLength": 10,
+                  "dashes": false,
+                  "datasource": null,
+                  "fill": 1,
+                  "fillGradient": 0,
+                  "gridPos": {
+                    "h": 5,
+                    "w": 24,
+                    "x": 0,
+                    "y": 10
+                  },
+                  "hiddenSeries": false,
+                  "id": 11,
+                  "legend": {
+                    "avg": false,
+                    "current": true,
+                    "max": false,
+                    "min": false,
+                    "show": true,
+                    "total": false,
+                    "values": true
+                  },
+                  "lines": true,
+                  "linewidth": 1,
+                  "nullPointMode": "null",
+                  "options": {
+                    "dataLinks": []
+                  },
+                  "percentage": false,
+                  "pointradius": 2,
+                  "points": false,
+                  "renderer": "flot",
+                  "seriesOverrides": [],
+                  "spaceLength": 10,
+                  "stack": false,
+                  "steppedLine": false,
+                  "targets": [
+                    {
+                      "expr": "juiceshop_user_social_interactions{team=\"$team\"}",
+                      "interval": "1m",
+                      "legendFormat": "{{type}}",
+                      "refId": "A"
+                    }
+                  ],
+                  "thresholds": [],
+                  "timeFrom": null,
+                  "timeRegions": [],
+                  "timeShift": null,
+                  "title": "Social Interactions",
+                  "tooltip": {
+                    "shared": true,
+                    "sort": 0,
+                    "value_type": "individual"
+                  },
+                  "type": "graph",
+                  "xaxis": {
+                    "buckets": null,
+                    "mode": "time",
+                    "name": null,
+                    "show": true,
+                    "values": []
+                  },
+                  "yaxes": [
+                    {
+                      "decimals": 0,
+                      "format": "short",
+                      "label": "Orders per Minute",
+                      "logBase": 1,
+                      "max": null,
+                      "min": "0",
+                      "show": true
+                    },
+                    {
+                      "format": "short",
+                      "label": "",
+                      "logBase": 1,
+                      "max": null,
+                      "min": null,
+                      "show": true
+                    }
+                  ],
+                  "yaxis": {
+                    "align": false,
+                    "alignLevel": null
+                  }
+                },
+                {
+                  "aliasColors": {},
+                  "bars": true,
+                  "dashLength": 10,
+                  "dashes": false,
+                  "datasource": null,
+                  "fill": 1,
+                  "fillGradient": 0,
+                  "gridPos": {
+                    "h": 6,
+                    "w": 16,
+                    "x": 0,
+                    "y": 15
+                  },
+                  "hiddenSeries": false,
+                  "id": 64,
+                  "legend": {
+                    "avg": false,
+                    "current": false,
+                    "max": false,
+                    "min": false,
+                    "show": true,
+                    "total": false,
+                    "values": false
+                  },
+                  "lines": false,
+                  "linewidth": 1,
+                  "nullPointMode": "null",
+                  "options": {
+                    "dataLinks": []
+                  },
+                  "percentage": false,
+                  "pointradius": 2,
+                  "points": false,
+                  "renderer": "flot",
+                  "seriesOverrides": [],
+                  "spaceLength": 10,
+                  "stack": false,
+                  "steppedLine": false,
+                  "targets": [
+                    {
+                      "expr": "increase(juiceshop_users_registered{team=\"$team\"}[1m])",
+                      "legendFormat": "{{type}}",
+                      "refId": "A"
+                    }
+                  ],
+                  "thresholds": [],
+                  "timeFrom": null,
+                  "timeRegions": [],
+                  "timeShift": null,
+                  "title": "User Signups",
+                  "tooltip": {
+                    "shared": true,
+                    "sort": 0,
+                    "value_type": "individual"
+                  },
+                  "type": "graph",
+                  "xaxis": {
+                    "buckets": null,
+                    "mode": "time",
+                    "name": null,
+                    "show": true,
+                    "values": []
+                  },
+                  "yaxes": [
+                    {
+                      "decimals": 0,
+                      "format": "short",
+                      "label": "",
+                      "logBase": 1,
+                      "max": null,
+                      "min": "0",
+                      "show": true
+                    },
+                    {
+                      "format": "short",
+                      "label": null,
+                      "logBase": 1,
+                      "max": null,
+                      "min": null,
+                      "show": true
+                    }
+                  ],
+                  "yaxis": {
+                    "align": false,
+                    "alignLevel": null
+                  }
+                },
+                {
+                  "cacheTimeout": null,
+                  "colorBackground": false,
+                  "colorValue": false,
+                  "colors": [
+                    "#299c46",
+                    "rgba(237, 129, 40, 0.89)",
+                    "#d44a3a"
+                  ],
+                  "datasource": null,
+                  "decimals": 0,
+                  "format": "none",
+                  "gauge": {
+                    "maxValue": 100,
+                    "minValue": 0,
+                    "show": false,
+                    "thresholdLabels": false,
+                    "thresholdMarkers": true
+                  },
+                  "gridPos": {
+                    "h": 3,
+                    "w": 8,
+                    "x": 16,
+                    "y": 15
+                  },
+                  "id": 13,
+                  "interval": null,
+                  "links": [],
+                  "mappingType": 1,
+                  "mappingTypes": [
+                    {
+                      "name": "value to text",
+                      "value": 1
+                    },
+                    {
+                      "name": "range to text",
+                      "value": 2
+                    }
+                  ],
+                  "maxDataPoints": 100,
+                  "nullPointMode": "connected",
+                  "nullText": null,
+                  "pluginVersion": "6.5.2",
+                  "postfix": " Standard Users",
+                  "postfixFontSize": "50%",
+                  "prefix": "",
+                  "prefixFontSize": "50%",
+                  "rangeMaps": [
+                    {
+                      "from": "null",
+                      "text": "N/A",
+                      "to": "null"
+                    }
+                  ],
+                  "sparkline": {
+                    "fillColor": "rgba(31, 118, 189, 0.18)",
+                    "full": false,
+                    "lineColor": "rgb(31, 120, 193)",
+                    "show": true,
+                    "ymax": null,
+                    "ymin": null
+                  },
+                  "tableColumn": "",
+                  "targets": [
+                    {
+                      "expr": "juiceshop_users_registered{type=\"standard\", team=\"$team\"}",
+                      "refId": "A"
+                    }
+                  ],
+                  "thresholds": "",
+                  "timeFrom": null,
+                  "timeShift": null,
+                  "title": "",
+                  "type": "singlestat",
+                  "valueFontSize": "80%",
+                  "valueMaps": [
+                    {
+                      "op": "=",
+                      "text": "N/A",
+                      "value": "null"
+                    }
+                  ],
+                  "valueName": "current"
+                },
+                {
+                  "cacheTimeout": null,
+                  "colorBackground": false,
+                  "colorValue": false,
+                  "colors": [
+                    "#299c46",
+                    "rgba(237, 129, 40, 0.89)",
+                    "#d44a3a"
+                  ],
+                  "datasource": null,
+                  "decimals": 0,
+                  "format": "none",
+                  "gauge": {
+                    "maxValue": 100,
+                    "minValue": 0,
+                    "show": false,
+                    "thresholdLabels": false,
+                    "thresholdMarkers": true
+                  },
+                  "gridPos": {
+                    "h": 3,
+                    "w": 8,
+                    "x": 16,
+                    "y": 18
+                  },
+                  "id": 14,
+                  "interval": null,
+                  "links": [],
+                  "mappingType": 1,
+                  "mappingTypes": [
+                    {
+                      "name": "value to text",
+                      "value": 1
+                    },
+                    {
+                      "name": "range to text",
+                      "value": 2
+                    }
+                  ],
+                  "maxDataPoints": 100,
+                  "nullPointMode": "connected",
+                  "nullText": null,
+                  "pluginVersion": "6.5.2",
+                  "postfix": " Deluxe Users",
+                  "postfixFontSize": "50%",
+                  "prefix": "",
+                  "prefixFontSize": "50%",
+                  "rangeMaps": [
+                    {
+                      "from": "null",
+                      "text": "N/A",
+                      "to": "null"
+                    }
+                  ],
+                  "sparkline": {
+                    "fillColor": "rgba(31, 118, 189, 0.18)",
+                    "full": false,
+                    "lineColor": "rgb(31, 120, 193)",
+                    "show": true,
+                    "ymax": null,
+                    "ymin": null
+                  },
+                  "tableColumn": "",
+                  "targets": [
+                    {
+                      "expr": "juiceshop_users_registered{type=\"deluxe\", team=\"$team\"}",
+                      "refId": "A"
+                    }
+                  ],
+                  "thresholds": "",
+                  "timeFrom": null,
+                  "timeShift": null,
+                  "title": "",
+                  "type": "singlestat",
+                  "valueFontSize": "80%",
+                  "valueMaps": [
+                    {
+                      "op": "=",
+                      "text": "N/A",
+                      "value": "null"
+                    }
+                  ],
+                  "valueName": "current"
+                }
+              ],
+              "title": "Business Metrics",
+              "type": "row"
+            },
+            {
+              "collapsed": false,
+              "datasource": null,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 10
+              },
+              "id": 39,
+              "panels": [],
+              "title": "Technical",
+              "type": "row"
+            },
+            {
+              "aliasColors": {},
+              "bars": true,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": null,
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "links": []
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 6,
+                "w": 24,
+                "x": 0,
+                "y": 11
+              },
+              "hiddenSeries": false,
+              "id": 71,
+              "legend": {
+                "avg": false,
+                "current": false,
+                "max": false,
+                "min": false,
+                "show": true,
+                "total": false,
+                "values": false
+              },
+              "lines": false,
+              "linewidth": 1,
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "percentage": false,
+              "pluginVersion": "7.3.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [
+                {
+                  "alias": "2XX",
+                  "color": "#37872D"
+                },
+                {
+                  "alias": "3XX",
+                  "color": "#96D98D"
+                },
+                {
+                  "alias": "4XX",
+                  "color": "#FF780A"
+                },
+                {
+                  "alias": "5XX",
+                  "color": "#C4162A"
+                }
+              ],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "expr": "increase(http_requests_count{app=\"juiceshop\", team=\"$team\"}[1m])",
+                  "interval": "1m",
+                  "legendFormat": "{{status_code}}",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "HTTP Requests",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "label": "Requests per Minute",
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": "Prometheus",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "links": []
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 10,
+                "x": 0,
+                "y": 17
+              },
+              "hiddenSeries": false,
+              "id": 46,
+              "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+              },
+              "lines": true,
+              "linewidth": 1,
+              "links": [],
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "paceLength": 10,
+              "percentage": false,
+              "pluginVersion": "7.3.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "expr": "irate(process_cpu_user_seconds_total{team=~\"$team\"}[2m]) * 100",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "User CPU",
+                  "refId": "A"
+                },
+                {
+                  "expr": "irate(process_cpu_system_seconds_total{team=~\"$team\"}[2m]) * 100",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Sys CPU",
+                  "refId": "B"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "Process CPU Usage",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "percent",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": "Prometheus",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "links": []
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 9,
+                "x": 10,
+                "y": 17
+              },
+              "hiddenSeries": false,
+              "id": 48,
+              "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+              },
+              "lines": true,
+              "linewidth": 1,
+              "links": [],
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "paceLength": 10,
+              "percentage": false,
+              "pluginVersion": "7.3.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "expr": "nodejs_eventloop_lag_seconds{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "{{team}}",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "Event Loop Lag",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "s",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorValue": false,
+              "colors": [
+                "#299c46",
+                "rgba(237, 129, 40, 0.89)",
+                "#d44a3a"
+              ],
+              "datasource": "Prometheus",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "none",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 5,
+                "x": 19,
+                "y": 17
+              },
+              "id": 52,
+              "interval": null,
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": false,
+                "lineColor": "#F2495C",
+                "show": true
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum(changes(process_start_time_seconds{team=~\"$team\"}[1m]))",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "{{instance}}",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Process Restart Times",
+              "type": "singlestat",
+              "valueFontSize": "80%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "current"
+            },
+            {
+              "cacheTimeout": null,
+              "colorBackground": false,
+              "colorValue": false,
+              "colors": [
+                "#299c46",
+                "rgba(237, 129, 40, 0.89)",
+                "#d44a3a"
+              ],
+              "datasource": "Prometheus",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "format": "none",
+              "gauge": {
+                "maxValue": 100,
+                "minValue": 0,
+                "show": false,
+                "thresholdLabels": false,
+                "thresholdMarkers": true
+              },
+              "gridPos": {
+                "h": 3,
+                "w": 5,
+                "x": 19,
+                "y": 21
+              },
+              "id": 50,
+              "interval": "",
+              "links": [],
+              "mappingType": 1,
+              "mappingTypes": [
+                {
+                  "name": "value to text",
+                  "value": 1
+                },
+                {
+                  "name": "range to text",
+                  "value": 2
+                }
+              ],
+              "maxDataPoints": 100,
+              "nullPointMode": "connected",
+              "nullText": null,
+              "postfix": "",
+              "postfixFontSize": "50%",
+              "prefix": "",
+              "prefixFontSize": "50%",
+              "rangeMaps": [
+                {
+                  "from": "null",
+                  "text": "N/A",
+                  "to": "null"
+                }
+              ],
+              "sparkline": {
+                "fillColor": "rgba(31, 118, 189, 0.18)",
+                "full": false,
+                "lineColor": "rgb(31, 120, 193)",
+                "show": false
+              },
+              "tableColumn": "",
+              "targets": [
+                {
+                  "expr": "sum(nodejs_version_info{team=~\"$team\"}) by (version)",
+                  "format": "time_series",
+                  "instant": false,
+                  "interval": "",
+                  "intervalFactor": 1,
+                  "legendFormat": "{{version}}",
+                  "refId": "A"
+                }
+              ],
+              "thresholds": "",
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Node.js Version",
+              "type": "singlestat",
+              "valueFontSize": "80%",
+              "valueMaps": [
+                {
+                  "op": "=",
+                  "text": "N/A",
+                  "value": "null"
+                }
+              ],
+              "valueName": "name"
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": "Prometheus",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "links": []
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 16,
+                "x": 0,
+                "y": 24
+              },
+              "hiddenSeries": false,
+              "id": 54,
+              "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "rightSide": true,
+                "show": true,
+                "total": false,
+                "values": true
+              },
+              "lines": true,
+              "linewidth": 1,
+              "links": [],
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "paceLength": 10,
+              "percentage": false,
+              "pluginVersion": "7.3.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "expr": "process_resident_memory_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Process Memory",
+                  "refId": "A"
+                },
+                {
+                  "expr": "nodejs_heap_size_total_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Heap Total",
+                  "refId": "B"
+                },
+                {
+                  "expr": "nodejs_heap_size_used_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Heap Used",
+                  "refId": "C"
+                },
+                {
+                  "expr": "nodejs_external_memory_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "External Memory",
+                  "refId": "D"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "Process Memory Usage",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "bytes",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "aliasColors": {},
+              "bars": false,
+              "dashLength": 10,
+              "dashes": false,
+              "datasource": "Prometheus",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {},
+                  "links": []
+                },
+                "overrides": []
+              },
+              "fill": 1,
+              "fillGradient": 0,
+              "gridPos": {
+                "h": 7,
+                "w": 8,
+                "x": 16,
+                "y": 24
+              },
+              "hiddenSeries": false,
+              "id": 56,
+              "legend": {
+                "alignAsTable": true,
+                "avg": true,
+                "current": true,
+                "max": true,
+                "min": true,
+                "show": true,
+                "total": false,
+                "values": true
+              },
+              "lines": true,
+              "linewidth": 1,
+              "links": [],
+              "nullPointMode": "null",
+              "options": {
+                "alertThreshold": true
+              },
+              "paceLength": 10,
+              "percentage": false,
+              "pluginVersion": "7.3.5",
+              "pointradius": 2,
+              "points": false,
+              "renderer": "flot",
+              "seriesOverrides": [],
+              "spaceLength": 10,
+              "stack": false,
+              "steppedLine": false,
+              "targets": [
+                {
+                  "expr": "nodejs_active_handles_total{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Active Handler",
+                  "refId": "A"
+                },
+                {
+                  "expr": "nodejs_active_requests_total{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Active Request",
+                  "refId": "B"
+                }
+              ],
+              "thresholds": [],
+              "timeFrom": null,
+              "timeRegions": [],
+              "timeShift": null,
+              "title": "Active Handlers/Requests Total",
+              "tooltip": {
+                "shared": true,
+                "sort": 0,
+                "value_type": "individual"
+              },
+              "type": "graph",
+              "xaxis": {
+                "buckets": null,
+                "mode": "time",
+                "name": null,
+                "show": true,
+                "values": []
+              },
+              "yaxes": [
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                },
+                {
+                  "format": "short",
+                  "label": null,
+                  "logBase": 1,
+                  "max": null,
+                  "min": null,
+                  "show": true
+                }
+              ],
+              "yaxis": {
+                "align": false,
+                "alignLevel": null
+              }
+            },
+            {
+              "datasource": "Loki",
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {}
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 31
+              },
+              "id": 23,
+              "options": {
+                "showLabels": false,
+                "showTime": true,
+                "sortOrder": "Ascending",
+                "wrapLogMessage": true
+              },
+              "targets": [
+                {
+                  "expr": "{app=\"juice-shop\", team=\"$team\"}",
+                  "refId": "A"
+                }
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Logs",
+              "type": "logs"
+            }
+          ],
+          "refresh": "10s",
+          "schemaVersion": 26,
+          "style": "dark",
+          "tags": [],
+          "templating": {
+            "list": [
+              {
+                "allValue": null,
+                "current": {
+                  "text": "1 + 2 + 3 + 4 + 5 + 6",
+                  "value": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                  ]
+                },
+                "error": null,
+                "hide": 2,
+                "includeAll": true,
+                "label": "Difficulty Levels supported by JuiceShop",
+                "multi": true,
+                "name": "difficulties",
+                "options": [
+                  {
+                    "selected": false,
+                    "text": "All",
+                    "value": "$__all"
+                  },
+                  {
+                    "selected": true,
+                    "text": "1",
+                    "value": "1"
+                  },
+                  {
+                    "selected": true,
+                    "text": "2",
+                    "value": "2"
+                  },
+                  {
+                    "selected": true,
+                    "text": "3",
+                    "value": "3"
+                  },
+                  {
+                    "selected": true,
+                    "text": "4",
+                    "value": "4"
+                  },
+                  {
+                    "selected": true,
+                    "text": "5",
+                    "value": "5"
+                  },
+                  {
+                    "selected": true,
+                    "text": "6",
+                    "value": "6"
+                  }
+                ],
+                "query": "1,2,3,4,5,6",
+                "skipUrlSync": false,
+                "type": "custom"
+              },
+              {
+                "allValue": null,
+                "current": {
+                  "selected": false,
+                  "text": "team44",
+                  "value": "team44"
+                },
+                "datasource": "Prometheus",
+                "definition": "label_values(juiceshop_challenges_total, team)",
+                "error": null,
+                "hide": 0,
+                "includeAll": false,
+                "label": "Team",
+                "multi": false,
+                "name": "team",
+                "options": [],
+                "query": "label_values(juiceshop_challenges_total, team)",
+                "refresh": 2,
+                "regex": "",
+                "skipUrlSync": false,
+                "sort": 0,
+                "tagValuesQuery": "",
+                "tags": [],
+                "tagsQuery": "",
+                "type": "query",
+                "useTags": false
+              }
+            ]
+          },
+          "time": {
+            "from": "now-6h",
+            "to": "now"
+          },
+          "timepicker": {
+            "refresh_intervals": [
+              "5s",
+              "10s",
+              "30s",
+              "1m",
+              "5m",
+              "15m",
+              "30m",
+              "1h",
+              "2h",
+              "1d"
+            ]
+          },
+          "timezone": "",
+          "title": "MultiJuicer - Instance Dashboard",
+          "uid": "Sj-cIdwZk",
+          "version": 3
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        grafana_dashboard: "1"
+      name: multijuicer-instance
+  7: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "port": 3000,
+          "namespace": "NAMESPACE",
+          "deploymentContext": "RELEASE-NAME",
+          "maxJuiceShopInstances": 42,
+          "skipOwnerReference": false,
+          "cookieParser": {
+            "cookieName": "__Secure-balancer",
+            "secure": true
+          },
+          "admin": {
+            "username": "admin"
+          },
+          "metrics": {
+            "enabled": true
+          },
+          "juiceShop": {
+            "image": "bkimminich/juice-shop",
+            "tag": "v15.2.0",
+            "imagePullPolicy": "IfNotPresent",
+            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
+            "nodeEnv": "ctf",
+            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
+            "podSecurityContext": {"runAsNonRoot":true},
+            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "env": [],
+            "envFrom": [],
+            "volumes": [],
+            "volumeMounts": [],
+            "affinity": {},
+            "tolerations": [],
+            "runtimeClassName": null,
+            "annotations": {},
+            "labels": {}
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer-config
+  8: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+          app.kubernetes.io/name: juice-balancer
+          app.kubernetes.io/part-of: multi-juicer
+      template:
+        metadata:
+          annotations:
+            checksum/config: 2f8b4a5c752111a08412a536536d366567350e2673eaf60e51c21a09daa4e425
+            checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
+          labels:
+            app.kubernetes.io/component: load-balancer
+            app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: juice-balancer
+            app.kubernetes.io/part-of: multi-juicer
+            app.kubernetes.io/version: 42.0.0
+        spec:
+          containers:
+            - env:
+                - name: COOKIEPARSER_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookieParserSecret
+                      name: juice-balancer-secret
+                - name: ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: adminPassword
+                      name: juice-balancer-secret
+                - name: METRICS_BASICAUTH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      key: metricsBasicAuthUsername
+                      name: juice-balancer-secret
+                - name: METRICS_BASICAUTH_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: metricsBasicAuthPassword
+                      name: juice-balancer-secret
+              image: ghcr.io/juice-shop/multi-juicer/juice-balancer:v42.0.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /balancer/
+                  port: http
+              name: multi-juicer
+              ports:
+                - containerPort: 3000
+                  name: http
+              readinessProbe:
+                httpGet:
+                  path: /balancer/
+                  port: http
+              resources:
+                limits:
+                  cpu: 400m
+                  memory: 256Mi
+                requests:
+                  cpu: 400m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /home/app/config/
+                  name: config-volume
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: juice-balancer
+          volumes:
+            - configMap:
+                name: juice-balancer-config
+              name: config-volume
+  9: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/tls-acme: "true"
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: RELEASE-NAME-multi-juicer
+    spec:
+      ingressClassName: cool-ingress
+      rules:
+        - host: multi-juicer.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: juice-balancer
+                    port:
+                      number: 3000
+                path: /
+                pathType: ImplementationSpecific
+      tls:
+        - hosts:
+            - multi-juicer.local
+          secretName: tls-secret
+  10: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: juice-balancer
+    subjects:
+      - kind: ServiceAccount
+        name: juice-balancer
+  11: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - create
+          - list
+          - delete
+          - patch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - delete
+  12: |
+    apiVersion: v1
+    data:
+      adminPassword: QUJDREVGR0g=
+      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
+      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer-secret
+    type: Opaque
+  13: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+  14: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      ports:
+        - name: web
+          port: 3000
+      selector:
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  15: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      endpoints:
+        - basicAuth:
+            password:
+              key: metricsBasicAuthPassword
+              name: juice-balancer-secret
+            username:
+              key: metricsBasicAuthUsername
+              name: juice-balancer-secret
+          path: /balancer/metrics
+          port: web
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+          app.kubernetes.io/name: juice-balancer
+          app.kubernetes.io/part-of: multi-juicer
+  16: |
+    apiVersion: v1
+    data:
+      multi-juicer.yaml: |-
+        application:
+          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+          showVersionNumber: false
+          showGitHubLinks: false
+        challenges:
+          showHints: true
+        hackingInstructor:
+          isEnabled: true
+        ctf:
+          showFlagsInNotifications: false
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: vulnerable-app
+        app.kubernetes.io/instance: juice-shop-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-shop
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-shop-config
+  17: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        app.kubernetes.io/component: vulnerable-app
+        app.kubernetes.io/instance: juice-shop-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-shop
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-shops
+    spec:
+      endpoints:
+        - targetPort: 3000
+      selector:
+        matchLabels:
+          app.kubernetes.io/managed-by: RELEASE-NAME
+          app.kubernetes.io/name: juice-shop
+      targetLabels:
+        - team
+  18: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+          app.kubernetes.io/name: progress-watchdog
+          app.kubernetes.io/part-of: multi-juicer
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: progress-tracker
+            app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: progress-watchdog
+            app.kubernetes.io/part-of: multi-juicer
+            app.kubernetes.io/version: 42.0.0
+        spec:
+          containers:
+            - env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+              image: ghcr.io/juice-shop/multi-juicer/progress-watchdog:v42.0.0
+              imagePullPolicy: IfNotPresent
+              name: progress-watchdog
+              ports:
+                - containerPort: 8080
+                  name: http
+              resources:
+                limits:
+                  cpu: 20m
+                  memory: 48Mi
+                requests:
+                  cpu: 20m
+                  memory: 48Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: progress-watchdog
+  19: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: progress-watchdog
+    subjects:
+      - kind: ServiceAccount
+        name: progress-watchdog
+  20: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - list
+          - patch
+  21: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+  22: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+production notes work correctly:
+  1: |
+    apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: cleanup-job
+    spec:
+      failedJobsHistoryLimit: 1
+      jobTemplate:
+        spec:
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/component: garbage-collector
+                app.kubernetes.io/instance: cleaner-RELEASE-NAME
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: cleaner
+                app.kubernetes.io/part-of: multi-juicer
+                app.kubernetes.io/version: 42.0.0
+            spec:
+              containers:
+                - env:
+                    - name: NAMESPACE
+                      value: NAMESPACE
+                    - name: MAX_INACTIVE_DURATION
+                      value: 1d
+                  image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
+                  imagePullPolicy: IfNotPresent
+                  name: cleanup-job
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop:
+                        - ALL
+                    readOnlyRootFilesystem: true
+              restartPolicy: Never
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: juice-cleaner
+      schedule: 0 * * * *
+      successfulJobsHistoryLimit: 1
+  2: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: juice-cleaner
+    subjects:
+      - kind: ServiceAccount
+        name: juice-cleaner
+  3: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - delete
+          - list
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - delete
+  4: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cleaner
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-cleaner
+  5: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "port": 3000,
+          "namespace": "NAMESPACE",
+          "deploymentContext": "RELEASE-NAME",
+          "maxJuiceShopInstances": 42,
+          "skipOwnerReference": false,
+          "cookieParser": {
+            "cookieName": "__Secure-balancer",
+            "secure": true
+          },
+          "admin": {
+            "username": "admin"
+          },
+          "metrics": {
+            "enabled": true
+          },
+          "juiceShop": {
+            "image": "bkimminich/juice-shop",
+            "tag": "v15.2.0",
+            "imagePullPolicy": "IfNotPresent",
+            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
+            "nodeEnv": "ctf",
+            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
+            "podSecurityContext": {"runAsNonRoot":true},
+            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "env": [],
+            "envFrom": [],
+            "volumes": [],
+            "volumeMounts": [],
+            "affinity": {},
+            "tolerations": [],
+            "runtimeClassName": null,
+            "annotations": {},
+            "labels": {}
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer-config
+  6: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+          app.kubernetes.io/name: juice-balancer
+          app.kubernetes.io/part-of: multi-juicer
+      template:
+        metadata:
+          annotations:
+            checksum/config: 2f8b4a5c752111a08412a536536d366567350e2673eaf60e51c21a09daa4e425
+            checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
+          labels:
+            app.kubernetes.io/component: load-balancer
+            app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: juice-balancer
+            app.kubernetes.io/part-of: multi-juicer
+            app.kubernetes.io/version: 42.0.0
+        spec:
+          containers:
+            - env:
+                - name: COOKIEPARSER_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookieParserSecret
+                      name: juice-balancer-secret
+                - name: ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: adminPassword
+                      name: juice-balancer-secret
+                - name: METRICS_BASICAUTH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      key: metricsBasicAuthUsername
+                      name: juice-balancer-secret
+                - name: METRICS_BASICAUTH_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: metricsBasicAuthPassword
+                      name: juice-balancer-secret
+              image: ghcr.io/juice-shop/multi-juicer/juice-balancer:v42.0.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /balancer/
+                  port: http
+              name: multi-juicer
+              ports:
+                - containerPort: 3000
+                  name: http
+              readinessProbe:
+                httpGet:
+                  path: /balancer/
+                  port: http
+              resources:
+                limits:
+                  cpu: 400m
+                  memory: 256Mi
+                requests:
+                  cpu: 400m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /home/app/config/
+                  name: config-volume
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: juice-balancer
+          volumes:
+            - configMap:
+                name: juice-balancer-config
+              name: config-volume
+  7: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: juice-balancer
+    subjects:
+      - kind: ServiceAccount
+        name: juice-balancer
+  8: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - create
+          - list
+          - delete
+          - patch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - delete
+  9: |
+    apiVersion: v1
+    data:
+      adminPassword: QUJDREVGR0g=
+      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
+      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer-secret
+    type: Opaque
+  10: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+  11: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-balancer
+    spec:
+      ports:
+        - name: web
+          port: 3000
+      selector:
+        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  12: |
+    apiVersion: v1
+    data:
+      multi-juicer.yaml: |-
+        application:
+          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+          showVersionNumber: false
+          showGitHubLinks: false
+        challenges:
+          showHints: true
+        hackingInstructor:
+          isEnabled: true
+        ctf:
+          showFlagsInNotifications: false
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: vulnerable-app
+        app.kubernetes.io/instance: juice-shop-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: juice-shop
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: juice-shop-config
+  13: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+          app.kubernetes.io/name: progress-watchdog
+          app.kubernetes.io/part-of: multi-juicer
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: progress-tracker
+            app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: progress-watchdog
+            app.kubernetes.io/part-of: multi-juicer
+            app.kubernetes.io/version: 42.0.0
+        spec:
+          containers:
+            - env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+              image: ghcr.io/juice-shop/multi-juicer/progress-watchdog:v42.0.0
+              imagePullPolicy: IfNotPresent
+              name: progress-watchdog
+              ports:
+                - containerPort: 8080
+                  name: http
+              resources:
+                limits:
+                  cpu: 20m
+                  memory: 48Mi
+                requests:
+                  cpu: 20m
+                  memory: 48Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: progress-watchdog
+  14: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: progress-watchdog
+    subjects:
+      - kind: ServiceAccount
+        name: progress-watchdog
+  15: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - list
+          - patch
+  16: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+  17: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: progress-tracker
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: progress-watchdog
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app.kubernetes.io/instance: progress-watchdog-RELEASE-NAME
+        app.kubernetes.io/name: progress-watchdog
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
