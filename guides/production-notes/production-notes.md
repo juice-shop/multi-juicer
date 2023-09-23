@@ -21,12 +21,12 @@ Here's a example helm values file:
 balancer:
   securityContext:
     runAsNonRoot: true
-  podsecurityContext:
+  podSecurityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     capabilities:
       drop:
-      - ALL
+        - ALL
   replicas: 3
   cookie:
     cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
@@ -41,19 +41,19 @@ juiceShop:
   ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
   securityContext:
     runAsNonRoot: true
-  podsecurityContext:
+  podSecurityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - ALL
+        - ALL
 
 progressWatchdog:
   securityContext:
     runAsNonRoot: true
-  podsecurityContext:
+  podSecurityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     capabilities:
       drop:
-      - ALL
+        - ALL
 ```

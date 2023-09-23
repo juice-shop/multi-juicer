@@ -22,7 +22,7 @@ spec:
         - name: progress-watchdog
           image: '{{ .Values.progressWatchdog.repository }}:{{ .Values.progressWatchdog.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
-          {{- with .Values.progressWatchdog.podsecurityContext }}
+          {{- with .Values.progressWatchdog.podSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}

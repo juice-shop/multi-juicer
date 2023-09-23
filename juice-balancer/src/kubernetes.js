@@ -70,7 +70,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
               image: `${get('juiceShop.image')}:${get('juiceShop.tag')}`,
               imagePullPolicy: get('juiceShop.imagePullPolicy'),
               resources: get('juiceShop.resources'),
-              securityContext: get('juiceShop.podsecurityContext'),
+              securityContext: get('juiceShop.podSecurityContext'),
               env: [
                 {
                   name: 'NODE_ENV',
