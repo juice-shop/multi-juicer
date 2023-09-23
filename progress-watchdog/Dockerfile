@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.19 as builder
+FROM --platform=$BUILDPLATFORM golang:1.21 as builder
 WORKDIR /src
 COPY go.mod go.sum ./
 # cache deps before building and copying source so that we don't need to re-download as much

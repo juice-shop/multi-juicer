@@ -7,8 +7,6 @@ import promiseRetry from 'promise-retry';
 import { BodyCard, CenteredCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
 
-const LinkButton = Button.withComponent('a');
-
 const CenteredText = styled.span`
   text-align: center;
   display: block;
@@ -83,9 +81,9 @@ export const InstanceStatusCard = ({ teamname }) => {
               />
             </span>
           </CenteredText>
-          <LinkButton data-test-id="start-hacking-button" href="/">
+          <Button as="a" data-test-id="start-hacking-button" href="/">
             <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
-          </LinkButton>
+          </Button>
         </BodyCard>
       );
     case waitingForLong:

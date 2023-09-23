@@ -6,8 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import { BodyCard, CenteredCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
 
-const LinkButton = Button.withComponent('a');
-
 const CenteredText = styled.span`
   text-align: center;
   display: block;
@@ -43,12 +41,12 @@ export const InstanceRestartingCard = ({ teamname }) => {
             />
           </span>
         </CenteredText>
-        <LinkButton data-test-id="start-hacking-button" href="/">
+        <Button as="a" data-test-id="start-hacking-button" href="/">
           <FormattedMessage
             id="instance_status_back_to_hacking"
             defaultMessage="Get back to Hacking"
           />
-        </LinkButton>
+        </Button>
       </BodyCard>
     );
   } else {

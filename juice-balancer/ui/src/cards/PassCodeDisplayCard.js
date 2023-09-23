@@ -13,7 +13,7 @@ const CharDisplay = styled.span`
 
   border-radius: 4px;
   margin-right: 8px;
-  margin-left: ${(props) => (props.addOffset ? '8px' : '0')};
+  margin-left: ${(props) => (props.$addOffset ? '8px' : '0')};
   display: inline-block;
 `;
 
@@ -73,14 +73,14 @@ export const PasscodeDisplayCard = ({ passcode = '', reset = false }) => {
           <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
             <FakePasscodeDisplay>
               {'●●●●●●●●'.split('').map((char, index) => (
-                <CharDisplay addOffset={index === 4} key={index} aria-hidden="true">
+                <CharDisplay $addOffset={index === 4} key={index} aria-hidden="true">
                   {char}
                 </CharDisplay>
               ))}
             </FakePasscodeDisplay>
             <PasscodeDisplay data-test-id="passcode-display">
               {passcode.split('').map((char, index) => (
-                <CharDisplay addOffset={index === 4} key={index}>
+                <CharDisplay $addOffset={index === 4} key={index}>
                   {char}
                 </CharDisplay>
               ))}

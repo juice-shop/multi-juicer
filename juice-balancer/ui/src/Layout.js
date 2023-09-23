@@ -25,7 +25,7 @@ Logo.defaultProps = {
 };
 
 const HeaderCard = styled(Card)`
-  width: ${props => props.wide ? "70vw" : "50vw"};
+  width: ${props => props.$wide ? "70vw" : "50vw"};
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -119,7 +119,7 @@ export function Layout({ children, footer, siteHeader = null, wide = false }) {
       <GlobalStyles />
       <Wrapper>
         <Header>
-          <HeaderCard wide={wide}>
+          <HeaderCard $wide={wide}>
             <Logo alt="MultiJuicer Logo" />
             {siteHeader ? (
               <SiteHeader>
