@@ -1,0 +1,52 @@
+# https://taskfile.dev
+version: "3"
+
+tasks:
+  dev:
+    aliases: [d]
+    desc: |
+      Builds and Deploys MultiJuicer to the default kubernetes context.
+      Then forwards the balancer service to localhost:3000
+    cmds:
+      - ./build-an-deploy.sh
+      - kubectl rollout status deployment juice-balancer
+      - kubectl port-forward svc/juice-balancer 3000:3000
+
+  build:
+    aliases: [b]
+    cmds:
+      - task: juice-balancer:ui:build
+
+  test:
+    aliases: [t]
+    cmds:
+      - task: helm:test
+      - task: juice-balancer:api:test
+
+  juice-balancer:ui:build:
+    preconditions:
+      - sh: test -d node_modules/
+        msg: "juice-balancer ui dependencies are not installed. run 'npm ci' in juice-balancer/ui/ to install them."
+    cmds:
+      - npm run build
+    dir: juice-balancer/ui/
+
+  juice-balancer:api:test:
+    preconditions:
+      - sh: test -f ui/build/index.html
+        msg: "juice balancer ui needs to be compiled for the api tests to work properly. run 'task build' to compile it."
+      - sh: test -d node_modules/
+        msg: "juice-balancer api dependencies are not installed. run 'npm ci' in juice-balancer/ to install them."
+    cmds:
+      - npm run test
+    dir: juice-balancer/
+
+  helm:test:
+    preconditions:
+      - sh: helm version
+        msg: "helm is not installed: https://helm.sh/"
+      - sh: helm unittest --help
+        msg: "helm unittest plugin is not installed: https://github.com/helm-unittest/helm-unittest/"
+    cmds:
+      - helm unittest .
+    dir: helm/multi-juicer/
