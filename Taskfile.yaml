@@ -10,7 +10,7 @@ tasks:
     cmds:
       - ./build-an-deploy.sh
       - kubectl rollout status deployment juice-balancer
-      - kubectl port-forward svc/juice-balancer 3000:3000
+      - kubectl port-forward svc/juice-balancer 4000:3000
 
   build:
     aliases: [b]
