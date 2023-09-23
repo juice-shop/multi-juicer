@@ -57,9 +57,15 @@ balancer:
       memory: 256Mi
       cpu: 400m
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsNonRoot: true
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext: {}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -121,9 +127,14 @@ juiceShop:
   #    cpu: 100m
   #    memory: 200Mi
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsNonRoot: true
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext: {}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
   # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env: []
   # env:
@@ -174,9 +185,16 @@ progressWatchdog:
       memory: 48Mi
       cpu: 20m
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsNonRoot: true
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext: {}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
   # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -199,9 +217,15 @@ juiceShopCleanup:
     limits:
       memory: 256Mi
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsNonRoot: true
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext: {}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
   # -- Optional Configure kubernetes scheduling affinity for the JuiceShopCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the JuiceShopCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)

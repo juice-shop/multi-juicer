@@ -19,14 +19,6 @@ Here's a example helm values file:
 
 ```yaml
 balancer:
-  securityContext:
-    runAsNonRoot: true
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
   replicas: 3
   cookie:
     cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
@@ -39,21 +31,4 @@ juiceShop:
   maxInstances: 42
   nodeEnv: "ctf"
   ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
-  securityContext:
-    runAsNonRoot: true
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-
-progressWatchdog:
-  securityContext:
-    runAsNonRoot: true
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
 ```
