@@ -27,7 +27,12 @@ tests:
     chart:
       version: 42.0.0
       appVersion: 42.0.0
-    set: {}
+    set:
+      # randomized values are still specified here as the snapshot tests would fail otherwise
+      balancer:
+        adminPassword: "ABCDEFGH"
+        cookie:
+          cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
     asserts:
       - matchSnapshot: {}
   - it: production notes work correctly

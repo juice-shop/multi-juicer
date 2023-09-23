@@ -180,7 +180,7 @@ default values render correctly:
         metadata:
           annotations:
             checksum/config: cde3e0c24bac6408a29187ee901a91483bb351f782e8f9ca2b4537bce5ceac8d
-            checksum/secret: 30f91ecdb8632e628c7e80176c847e0b2297187ebc580f71f4338b02483d4ac3
+            checksum/secret: 251cfd8e9e6e2060f9bce6d7ab720ed1658fee709ffddb5c877b0a366f3ff49c
           labels:
             app.kubernetes.io/component: load-balancer
             app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
@@ -311,8 +311,8 @@ default values render correctly:
   9: |
     apiVersion: v1
     data:
-      adminPassword: WllVMExLR04=
-      cookieParserSecret: dXJCc2dmNEJPUmE5dDU5RjliUzk3NUdm
+      adminPassword: QUJDREVGR0g=
+      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
       metricsBasicAuthPassword: RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k=
       metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
     kind: Secret
