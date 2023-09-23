@@ -56,8 +56,10 @@ balancer:
     limits:
       memory: 256Mi
       cpu: 400m
-  securityContext: {}
+  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
   podSecurityContext: {}
+  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+  containerSecurityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -118,9 +120,10 @@ juiceShop:
   #  limits:
   #    cpu: 100m
   #    memory: 200Mi
-  # -- Optional securityContext definitions to set for each JuiceShop instance
-  securityContext: {}
+  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
   podSecurityContext: {}
+  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+  containerSecurityContext: {}
   # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env: []
   # env:
@@ -170,7 +173,10 @@ progressWatchdog:
     limits:
       memory: 48Mi
       cpu: 20m
-  securityContext: {}
+  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
+  podSecurityContext: {}
+  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+  containerSecurityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
@@ -192,8 +198,10 @@ juiceShopCleanup:
       memory: 256Mi
     limits:
       memory: 256Mi
-  securityContext: {}
+  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
   podSecurityContext: {}
+  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+  containerSecurityContext: {}
   # -- Optional Configure kubernetes scheduling affinity for the JuiceShopCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
   # -- Optional Configure kubernetes toleration for the JuiceShopCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)

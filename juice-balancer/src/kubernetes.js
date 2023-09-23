@@ -63,14 +63,14 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
         },
         spec: {
           automountServiceAccountToken: false,
-          securityContext: get('juiceShop.securityContext'),
+          securityContext: get('juiceShop.podSecurityContext'),
           containers: [
             {
               name: 'juice-shop',
               image: `${get('juiceShop.image')}:${get('juiceShop.tag')}`,
               imagePullPolicy: get('juiceShop.imagePullPolicy'),
               resources: get('juiceShop.resources'),
-              securityContext: get('juiceShop.podSecurityContext'),
+              securityContext: get('juiceShop.containerSecurityContext'),
               env: [
                 {
                   name: 'NODE_ENV',

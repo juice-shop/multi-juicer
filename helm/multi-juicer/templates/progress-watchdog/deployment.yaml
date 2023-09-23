@@ -14,7 +14,7 @@ spec:
         {{- include "multi-juicer.progress-watchdog.labels" . | nindent 8 }}
     spec:
       serviceAccountName: progress-watchdog
-      {{- with .Values.progressWatchdog.securityContext }}
+      {{- with .Values.progressWatchdog.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -22,7 +22,7 @@ spec:
         - name: progress-watchdog
           image: '{{ .Values.progressWatchdog.repository }}:{{ .Values.progressWatchdog.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
-          {{- with .Values.progressWatchdog.podSecurityContext }}
+          {{- with .Values.progressWatchdog.containerSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}

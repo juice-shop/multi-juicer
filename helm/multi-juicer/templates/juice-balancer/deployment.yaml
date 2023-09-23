@@ -24,7 +24,7 @@ spec:
         {{- end }}
     spec:
       serviceAccountName: juice-balancer
-      {{- with .Values.balancer.securityContext }}
+      {{- with .Values.balancer.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -32,7 +32,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
-          {{- with .Values.balancer.podSecurityContext }}
+          {{- with .Values.balancer.containerSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
