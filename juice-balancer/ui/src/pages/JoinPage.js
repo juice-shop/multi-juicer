@@ -7,17 +7,36 @@ import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
 import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
 import { TeamDisplayCard } from '../cards/TeamDisplayCard';
+import styled from 'styled-components';
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
     id: 'teamname_validation_constraints',
-    defaultMessage: "Teamnames must have at least 3 characters and consist of lowercase letters, numbers or '-'",
+    defaultMessage:
+      "Teamnames must have at least 3 characters and consist of lowercase letters, numbers or '-'",
   },
 });
 
+const ErrorBox = styled.div`
+  border: 1px solid red;
+  border-radius: 4px;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: rgba(255, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+
+  p {
+    margin: 0;
+  }
+`;
+
 export const JoinPage = injectIntl(({ intl }) => {
   const [teamname, setTeamname] = useState('');
-  const [failed, setFailed] = useState(false);
+  const [failureMessage, setFailureMessage] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,15 +60,23 @@ export const JoinPage = injectIntl(({ intl }) => {
         passcode,
       });
 
-      navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode }});
+      setFailureMessage(null);
+      navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode } });
     } catch (error) {
       if (
         error.response.status === 401 &&
         error.response.data.message === 'Team requires authentication to join'
       ) {
         navigate(`/teams/${teamname}/joining/`);
+      } else if (
+        error.response.status === 500 &&
+        error.response.data.message === 'Reached Maximum Instance Count'
+      ) {
+        setFailureMessage(
+          'Max instances reached, contact admin or join another team to participate.'
+        );
       } else {
-        setFailed(true);
+        setFailureMessage('Unexpected error. Please contact an admin.');
       }
     }
   }
@@ -85,15 +112,16 @@ export const JoinPage = injectIntl(({ intl }) => {
           }}
         />
 
-        {failed ? (
-          <p>
+        {failureMessage !== null ? (
+          <ErrorBox>
             <strong>
               <FormattedMessage
                 id="join_failed_text"
-                defaultMessage="Failed to create / join the team"
+                defaultMessage="Failed To Create / Join the Team"
               />
             </strong>
-          </p>
+            <p>{failureMessage}</p>
+          </ErrorBox>
         ) : null}
 
         <Form onSubmit={onSubmit}>
