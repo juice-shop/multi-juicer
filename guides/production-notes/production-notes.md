@@ -11,7 +11,7 @@ To ensure MultiJuicer runs as smoothly during your CTF's / trainings / workshops
 
 ## Security Consideration
 
-Add SecurityContext and PodSecurityContext further isolate and secure your training plattform.
+Add SecurityContext and PodSecurityContext further isolate and secure your training platform.
 
 ## TLDR
 
