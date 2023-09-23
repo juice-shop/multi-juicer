@@ -19,6 +19,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | balancer.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| balancer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
 | balancer.cookie.cookieParserSecret | string | `nil` | Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again. |
 | balancer.cookie.name | string | `"balancer"` | Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true` |
 | balancer.cookie.secure | bool | `false` | Sets the secure attribute on cookie so that it only be send over https |
@@ -30,13 +31,13 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | balancer.metrics.serviceMonitor.labels | object | `{}` | If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name> |
 | balancer.pod.annotations | object | `{}` | Optional Additional annotations for the balancer pods. |
 | balancer.pod.labels | object | `{}` | Optional Additional labels for the balancer pods. |
+| balancer.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | balancer.replicas | int | `1` | Number of replicas of the juice-balancer deployment |
 | balancer.repository | string | `"ghcr.io/juice-shop/multi-juicer/juice-balancer"` |  |
 | balancer.resources.limits.cpu | string | `"400m"` |  |
 | balancer.resources.limits.memory | string | `"256Mi"` |  |
 | balancer.resources.requests.cpu | string | `"400m"` |  |
 | balancer.resources.requests.memory | string | `"256Mi"` |  |
-| balancer.securityContext | object | `{}` |  |
 | balancer.service.clusterIP | string | `nil` | internal cluster service IP |
 | balancer.service.externalIPs | string | `nil` | IP address to assign to load balancer (if supported) |
 | balancer.service.loadBalancerIP | string | `nil` | IP address to assign to load balancer (if supported) |
@@ -54,6 +55,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | ingress.tls | list | `[]` |  |
 | juiceShop.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | juiceShop.config | string | See values.yaml for full details | Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/part1/customization.html#yaml-configuration-file |
+| juiceShop.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
 | juiceShop.ctfKey | string | `"zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"` | Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/part1/ctf.html#overriding-the-ctfkey |
 | juiceShop.env | list | `[]` | Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) |
 | juiceShop.envFrom | list | `[]` | Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) |
@@ -62,33 +64,35 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | juiceShop.nodeEnv | string | `"multi-juicer"` | Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`. |
 | juiceShop.pod.annotations | object | `{}` | Optional Additional annotations for the Juice Shop pods. |
 | juiceShop.pod.labels | object | `{}` | Optional Additional labels for the Juice Shop pods. |
+| juiceShop.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | juiceShop.resources | object | `{"requests":{"cpu":"150m","memory":"300Mi"}}` | Optional resources definitions to set for each JuiceShop instance |
 | juiceShop.runtimeClassName | string | `nil` | Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/) |
-| juiceShop.securityContext | object | `{}` | Optional securityContext definitions to set for each JuiceShop instance |
-| juiceShop.tag | string | `"v15.0.0"` |  |
+| juiceShop.tag | string | `"v15.2.0"` |  |
 | juiceShop.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | juiceShop.volumeMounts | list | `[]` | Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | juiceShop.volumes | list | `[]` | Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | juiceShopCleanup.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the JuiceShopCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| juiceShopCleanup.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
 | juiceShopCleanup.cron | string | `"0 * * * *"` | Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour |
 | juiceShopCleanup.enabled | bool | `true` |  |
 | juiceShopCleanup.failedJobsHistoryLimit | int | `1` |  |
 | juiceShopCleanup.gracePeriod | string | `"1d"` | Specifies when Juice Shop instances will be deleted when unused for that period. |
+| juiceShopCleanup.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | juiceShopCleanup.repository | string | `"ghcr.io/juice-shop/multi-juicer/cleaner"` |  |
 | juiceShopCleanup.resources.limits.memory | string | `"256Mi"` |  |
 | juiceShopCleanup.resources.requests.memory | string | `"256Mi"` |  |
-| juiceShopCleanup.securityContext | object | `{}` |  |
 | juiceShopCleanup.successfulJobsHistoryLimit | int | `1` |  |
 | juiceShopCleanup.tag | string | `nil` |  |
 | juiceShopCleanup.tolerations | list | `[]` | Optional Configure kubernetes toleration for the JuiceShopCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | nodeSelector | object | `{}` |  |
 | progressWatchdog.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| progressWatchdog.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
+| progressWatchdog.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | progressWatchdog.repository | string | `"ghcr.io/juice-shop/multi-juicer/progress-watchdog"` |  |
 | progressWatchdog.resources.limits.cpu | string | `"20m"` |  |
 | progressWatchdog.resources.limits.memory | string | `"48Mi"` |  |
 | progressWatchdog.resources.requests.cpu | string | `"20m"` |  |
 | progressWatchdog.resources.requests.memory | string | `"48Mi"` |  |
-| progressWatchdog.securityContext | object | `{}` |  |
 | progressWatchdog.tag | string | `nil` |  |
 | progressWatchdog.tolerations | list | `[]` | Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | service.port | int | `3000` |  |
