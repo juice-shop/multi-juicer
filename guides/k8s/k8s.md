@@ -65,11 +65,11 @@ kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPasswo
 kubectl get pods
 
 # We got a example loadbalancer yaml for this example in the repository
-wget https://raw.githubusercontent.com/OWASP/wrongsecrets-ctf-party/main/guides/k8s/k8s-juice-service.yaml
+wget https://raw.githubusercontent.com/OWASP/wrongsecrets-ctf-party/main/guides/k8s/wrongsecrets-ctf-party-loadbalancer.yaml
 
 # Create the loadbalancer
 # This might take a couple of minutes
-kubectl apply -f k8s-juice-service.yaml
+kubectl apply -f wrongsecrets-ctf-party-loadbalancer.yaml
 
 # If it takes longer than a few minutes take a detailed look at the loadbalancer
 kubectl describe svc wrongsecrets-ctf-party-loadbalancer
@@ -81,5 +81,5 @@ kubectl describe svc wrongsecrets-ctf-party-loadbalancer
 helm uninstall wrongsecrets-ctf-party
 
 # Delete the loadbalancer
-kubectl delete -f k8s-juice-service.yaml
+kubectl delete -f wrongsecrets-ctf-party-loadbalancer.yaml
 ```
