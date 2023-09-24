@@ -14,6 +14,7 @@ WrongSecrets CTF Party gives you the ability to run separate WrongSecrets instan
 - runs on a single domain, comes with a LoadBalancer sending the traffic to the participants WrongSecrets instance
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
+- comes with a monitoring chart to monitor the instances and the cluster using Prometheus & Grafana
 
 It follows the same architecture as MultiJuicer below:
 ![MultiJuicer, High Level Architecture Diagram](https://raw.githubusercontent.com/iteratec/multi-juicer/main/high-level-architecture.svg)
@@ -119,36 +120,26 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created wrongsecrets instances (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | balancer.volumeMounts[0] | object | `{"mountPath":"/home/app/config/","name":"config-volume"}` | If true, creates a volumeMount for the created pods. This is required for the podSecurityPolicy to work |
 | balancer.volumes[0] | object | `{"configMap":{"name":"wrongsecrets-balancer-config"},"name":"config-volume"}` | If true, creates a volume for the created pods. This is required for the podSecurityPolicy to work |
-| grafana.adminPassword | string | `"admin"` |  |
-| grafana.adminUser | string | `"admin"` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].disableDeletion | bool | `false` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].editable | bool | `true` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].folder | string | `""` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].name | string | `"default"` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].options.path | string | `"/var/lib/grafana/dashboards/default"` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].orgId | int | `1` |  |
-| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].type | string | `"file"` |  |
-| grafana.dashboards.default.k8s-compute-resources-pod.datasource | string | `"Prometheus"` |  |
-| grafana.dashboards.default.k8s-compute-resources-pod.gnetId | int | `12120` |  |
-| grafana.dashboards.default.k8s-monitoring-by-namespace-and-instance.datasource | string | `"Prometheus"` |  |
-| grafana.dashboards.default.k8s-monitoring-by-namespace-and-instance.gnetId | int | `15826` |  |
-| grafana.dashboards.default.k8s-storage-volumes-cluster-dashboard.datasource | string | `"Prometheus"` |  |
-| grafana.dashboards.default.k8s-storage-volumes-cluster-dashboard.gnetId | int | `11454` |  |
 | imagePullPolicy | string | `"IfNotPresent"` |  |
 | ingress.annotations | object | `{}` | Annotations to be added to the ingress object. |
 | ingress.enabled | bool | `false` | If true, Wrongsecrets will create an Ingress object for the balancer service. Useful if you want to expose the balancer service externally for example with a loadbalancer in order to view any webpages that are hosted on the balancer service. |
 | ingress.hosts | list | `[{"host":"wrongsecrets-ctf-party.local","paths":["/"]}]` | Hostnames to your Wrongsecrets balancer installation. |
 | ingress.tls | list | `[]` | TLS configuration for Wrongsecrets balancer |
-| kube-prometheus-stack.enabled | bool | `true` |  |
-| kube-prometheus-stack.ingress.annotations[0]."kubernetes.io/ingress.class" | string | `"nginx"` |  |
-| kube-prometheus-stack.ingress.enabled | bool | `true` |  |
-| kube-prometheus-stack.ingress.hosts | list | `[]` |  |
-| kube-prometheus-stack.ingress.ingressClassName | string | `"nginx"` |  |
-| kube-prometheus-stack.ingress.labels | object | `{}` |  |
-| kube-prometheus-stack.ingress.pathType | string | `"Prefix"` |  |
-| kube-prometheus-stack.ingress.paths[0] | string | `"/grafana"` |  |
-| kube-prometheus-stack.ingress.tls | list | `[]` |  |
+| kube-prometheus-stack.enabled | bool | `true` | If true, installs the kube-prometheus-stack chart which includes Prometheus, Alertmanager, Grafana, and other monitoring components |
+| kube-prometheus-stack.grafana.adminPassword | string | `"prom-operator"` | Password for the default "admin" user |
+| kube-prometheus-stack.grafana.defaultDashboardsEnabled | bool | `true` | Deploy default dashboards |
+| kube-prometheus-stack.grafana.defaultDashboardsTimezone | string | `"utc"` | Other options are: browser or a specific timezone, i.e. Europe/Luxembourg |
+| kube-prometheus-stack.grafana.enabled | bool | `true` |  |
+| kube-prometheus-stack.grafana.forceDeployDashboards | bool | `false` | ForceDeployDashboard Create dashboard configmap even if grafana deployment has been disabled |
+| kube-prometheus-stack.grafana.forceDeployDatasources | bool | `false` | ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled |
+| kube-prometheus-stack.grafana.ingress.annotations | object | `{}` |  |
+| kube-prometheus-stack.grafana.ingress.enabled | bool | `false` |  |
+| kube-prometheus-stack.grafana.ingress.hosts | list | `[]` |  hosts:   - grafana.domain.com |
+| kube-prometheus-stack.grafana.ingress.labels | object | `{}` |  |
+| kube-prometheus-stack.grafana.ingress.path | string | `"/"` | Path for grafana ingress |
+| kube-prometheus-stack.grafana.ingress.tls | list | `[]` |  |
+| kube-prometheus-stack.grafana.namespaceOverride | string | `""` |  |
+| kube-prometheus-stack.grafana.rbac.pspEnabled | bool | `false` | If true, Grafana PSPs will be created |
 | nodeSelector | object | `{}` |  |
 | service.port | int | `3000` |  |
 | service.portName | string | `"web"` |  |

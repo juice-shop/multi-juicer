@@ -150,7 +150,7 @@ echo "App password is ${APP_PASSWORD}" > password.txt
 
 echo "You can find the app password in password.txt"
 
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+helm upgrade --install wrongsecrets ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.K8S_ENV=azure" \
   --set="balancer.env.REACT_APP_AZ_BLOB_URL=https://${AZ_STORAGE_ACCOUNT}.blob.core.windows.net/tfstate" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \

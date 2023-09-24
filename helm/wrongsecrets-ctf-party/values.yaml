@@ -303,72 +303,67 @@ wrongsecretsCleanup:
         - ALL
     seccompProfile:
       type: RuntimeDefault
-grafana:
-  adminUser: admin
-  adminPassword: admin
-  dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-        - name: default
-          orgId: 1
-          folder: ""
-          type: file
-          disableDeletion: false
-          editable: true
-          options:
-            path: /var/lib/grafana/dashboards/default
-  dashboards:
-    default:
-      k8s-compute-resources-pod:
-        # Ref: https://grafana.com/grafana/dashboards/12120
-        gnetId: 12120
-        datasource: Prometheus
-      k8s-storage-volumes-cluster-dashboard:
-        # Ref: https://grafana.com/grafana/dashboards/11454
-        gnetId: 11454
-        datasource: Prometheus
-      k8s-monitoring-by-namespace-and-instance:
-        # Ref: https://grafana.com/grafana/dashboards/15826
-        gnetId: 15826
-        datasource: Prometheus
 kube-prometheus-stack:
+  # -- If true, installs the kube-prometheus-stack chart which includes Prometheus, Alertmanager, Grafana, and other monitoring components
   enabled: true
-  ingress:
+  grafana:
     enabled: true
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
-    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    ingressClassName: nginx
+    namespaceOverride: ""
 
-    annotations:
-      - kubernetes.io/ingress.class: nginx
+    # -- ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
+    forceDeployDatasources: false
 
-    labels: {}
+    # -- ForceDeployDashboard Create dashboard configmap even if grafana deployment has been disabled
+    forceDeployDashboards: false
 
-    ## Override ingress to a different defined port on the service
-    # servicePort: 8081
-    ## Override ingress to a different service then the default, this is useful if you need to
-    ## point to a specific instance of the alertmanager (eg kube-prometheus-stack-alertmanager-0)
-    # serviceName: kube-prometheus-stack-alertmanager-0
+    # -- Deploy default dashboards
+    defaultDashboardsEnabled: true
 
-    ## Hosts must be provided if Ingress is enabled.
-    ##
-    hosts: []
-      # - alertmanager.domain.com
+    # -- Timezone for the default dashboards
+    # -- Other options are: browser or a specific timezone, i.e. Europe/Luxembourg
+    defaultDashboardsTimezone: utc
 
-    ## Paths to use for ingress rules - one path should match the alertmanagerSpec.routePrefix
-    ##
-    paths:
-      - /grafana
+    # -- Password for the default "admin" user
+    adminPassword: prom-operator
 
-    ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
-    ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
-    pathType: Prefix
+    rbac:
+      # -- If true, Grafana PSPs will be created
+      pspEnabled: false
 
-    ## TLS configuration for Alertmanager Ingress
-    ## Secret must be manually created in the namespace
-    ##
-    tls: []
-    # - secretName: alertmanager-general-tls
-    #   hosts:
-    #   - alertmanager.example.com
+    ingress:
+      # -- If true, Grafana Ingress will be created
+      # --
+      enabled: false
+
+      # -- IngressClassName for Grafana Ingress.
+      # -- Should be provided if Ingress is enable.
+      # --
+      # ingressClassName: nginx
+
+      # -- Annotations for Grafana Ingress
+      # --
+      annotations: {}
+        # kubernetes.io/ingress.class: nginx
+        # kubernetes.io/tls-acme: "true"
+
+      # -- Labels to be added to the Ingress
+      # --
+      labels: {}
+
+      # -- Hostnames.
+      # -- Must be provided if Ingress is enable.
+      # --
+      # hosts:
+      #   - grafana.domain.com
+      hosts: []
+
+      # -- Path for grafana ingress
+      path: /
+
+      # -- TLS configuration for grafana Ingress
+      # -- Secret must be manually created in the namespace
+      # --
+      tls: []
+      # - secretName: grafana-general-tls
+      #   hosts:
+      #   - grafana.example.com

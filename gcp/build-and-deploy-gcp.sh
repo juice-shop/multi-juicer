@@ -102,7 +102,7 @@ echo "App password is ${APP_PASSWORD}" > password.txt
 
 echo "You can find the app password in password.txt"
 
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+helm upgrade --install wrongsecrets ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.K8S_ENV=gcp" \
   --set="balancer.env.REACT_APP_GCP_BUCKET_URL=https://console.cloud.google.com/storage/browser/${GCP_BUCKET_NAME}" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \
