@@ -97,7 +97,7 @@ To use the 2 domain setup with CTFD:
 This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the Cloud Challenges, do:
 
 ```shell
-helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
+helm repo add wrongsecrets https://owasp.org/wrongsecrets-ctf-party
 
 helm upgrade --install my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-party
 
@@ -179,7 +179,7 @@ The default ctfd config values are here: [aws/k8s/ctfd-values.yaml](aws/k8s/ctfd
 Download & Save the file and tell helm to use your config file over the default by running:
 
 ```sh
-helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
+helm repo add wrongsecrets https://owasp.org/wrongsecrets-ctf-party
 
 helm install -f values.yaml my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-party
 ```
