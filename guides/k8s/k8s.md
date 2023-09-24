@@ -23,7 +23,7 @@ kubectl cluster-info
 
 ```bash
 # You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
-helm repo add wrongsecrets-ctf-party: [https://iteratec.github.io/multi-juicer/](https://wrongsecrets.github.io/wrongsecrets-ctf-party/)
+helm repo add wrongsecrets-ctf-party: [https://owasp.org/wrongsecrets-ctf-party](https://owasp.org/wrongsecrets-ctf-party)
 
 helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
