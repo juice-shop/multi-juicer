@@ -13,13 +13,6 @@
     "secret": "askdbakhdajhvdsjavjdsgv",
     "secure": false
   },
-  "metrics": {
-    "enabled": false,
-    "basicAuth": {
-      "username": "prometheus-scraper",
-      "password": "ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"
-    }
-  },
   "wrongsecrets": {
     "image": "jeroenwillemsen/wrongsecrets",
     "tag": "1.5.9-no-vault",

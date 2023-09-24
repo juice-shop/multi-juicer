@@ -58,18 +58,6 @@ spec:
                 secretKeyRef:
                   name: wrongsecrets-balancer-secret
                   key: adminPassword
-            {{- if .Values.balancer.metrics.enabled }}
-            - name: METRICS_BASICAUTH_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: wrongsecrets-balancer-secret
-                  key: metricsBasicAuthUsername
-            - name: METRICS_BASICAUTH_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: wrongsecrets-balancer-secret
-                  key: metricsBasicAuthPassword
-            {{- end }}
           {{- if .Values.balancer.containerSecurityContext.enabled }}
           securityContext:
             {{- omit .Values.balancer.containerSecurityContext "enabled" | toYaml | nindent 12 }}

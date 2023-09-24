@@ -2,50 +2,10 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-const promClient = require('prom-client');
-const basicAuth = require('basic-auth-connect');
-const onFinished = require('on-finished');
-
 const { get, extractTeamName } = require('./config');
 const { logger } = require('./logger');
 
 const app = express();
-
-if (get('metrics.enabled')) {
-  promClient.collectDefaultMetrics();
-
-  promClient.register.setDefaultLabels({ app: 'wrongsecrets-ctf-party' });
-
-  const httpRequestsMetric = new promClient.Counter({
-    name: 'http_requests_count',
-    help: 'Total HTTP request count grouped by status code.',
-    labelNames: ['status_code'],
-  });
-
-  app.use((req, res, next) => {
-    onFinished(res, () => {
-      const statusCode = `${Math.floor(res.statusCode / 100)}XX`;
-      httpRequestsMetric.labels(statusCode).inc();
-    });
-    next();
-  });
-
-  app.disable('x-powered-by');
-
-  app.get(
-    '/balancer/metrics',
-    basicAuth(get('metrics.basicAuth.username'), get('metrics.basicAuth.password')),
-    async (req, res) => {
-      try {
-        res.set('Content-Type', promClient.register.contentType);
-        res.end(await promClient.register.metrics());
-      } catch (err) {
-        console.error('Failed to write metrics', err);
-        res.status(500).end();
-      }
-    }
-  );
-}
 
 const teamRoutes = require('./teams/teams');
 const adminRoutes = require('./admin/admin');

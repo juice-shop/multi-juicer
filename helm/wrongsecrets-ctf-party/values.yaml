@@ -94,7 +94,7 @@ balancer:
     REACT_APP_S3_BUCKET_URL: "s3://funstuff" #the s3 bucket you use for the aws challenges, don't forget to make it accessible!
     REACT_APP_GCP_BUCKET_URL: "gs://funstuff" #the gcp bucket you use for the gcp challenges, don't forget to make it accessible!
     REACT_APP_AZ_BLOB_URL: "az://funstuff" #the azure blob storage you use for the azure challenges, don't forget to make it accessible!
-    K8S_ENV: "k8s" #or 'aws', 'azure', or 'gcp'
+    K8S_ENV: "gcp" #or 'aws', 'azure', or 'gcp'
     REACT_APP_ACCESS_PASSWORD: "" #DEFAULT NO PASSWORD, PLAYING THIS IN PUBLIC? PUT A FANCY STRING HERE, BUT BE GENTLE: USERS NEED TO BE ABLE TO COPY THAT STUFF...
     REACT_APP_CREATE_TEAM_HMAC_KEY: "hardcodedkey"
     IRSA_ROLE: arn:aws:iam::233483431651:role/wrongsecrets-secret-manager #change this in your own AWS role!
@@ -110,23 +110,6 @@ balancer:
     GCP_SECRETS_MANAGER_SECRET_ID_2: "wrongsecret-2" #only change if you need non-default GCP SM entries
     GCP_PROJECT_ID: "" #Change this to your GCP project ID
     CHALLENGE33_VALUE: "VkJVR2gzd3UvM0kxbmFIajFVZjk3WTBMcThCNS85MnExandwMy9hWVN3SFNKSThXcWRabllMajc4aEVTbGZQUEtmMVpLUGFwNHoyK3IrRzlOUndkRlUvWUJNVFkzY05ndU1tNUM2bDJwVEs5SmhQRm5VemVySXdNcm5odTlHanJxU0ZuL0J0T3ZMblFhL21TZ1hETkpZVU9VOGdDSEZzOUpFZVF2OWhwV3B5eGxCMk5xdTBNSHJQTk9EWTNab2hoa2pXWGF4YmpDWmk5U3BtSHlkVTA2WjdMcVd5RjM5RzZWOENGNkxCUGtkVW4zYUpBVisrRjBROUljU009Cg=="
-  metrics:
-    # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
-    enabled: true
-    dashboards:
-      # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards
-      enabled: false
-    serviceMonitor:
-      # -- If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Wrongsecrets instances
-      enabled: false
-      # -- Target port for the ServiceMonitor to scrape
-      targetPort: 3000
-      # -- Path to scrape for metrics
-      path: "/balancer/metrics"
-    basicAuth:
-      username: prometheus-scraper
-      # -- Should be changed when metrics are enabled.
-      password: ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy
   podSecurityContext:
     # -- If true, sets the securityContext on the created pods. This is required for the podSecurityPolicy to work
     enabled: true
@@ -170,7 +153,7 @@ wrongsecrets:
   # -- Specify a custom Wrongsecrets config.yaml. See the Wrongsecrets Docs for any needed ENVs: https://github.com/OWASP/wrongsecrets
   # @default -- See values.yaml for full details
   config: |
-    K8S_ENV: k8s
+    K8S_ENV: gcp
   # "aws" is for using the cluster with eks and "k8s" is for using the cluster with miniKube which will enable specific challenges
   # -- Specify a custom NODE_ENV for Wrongsecrets. If value is changed to something other than 'wrongsecrets-ctf-party' it's not possible to set a custom config via `wrongsecrets-balancer-config`.
   nodeEnv: "wrongsecrets-ctf-party"
@@ -195,7 +178,7 @@ wrongsecrets:
   # -- Optional environment variables to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
   env:
     - name: K8S_ENV
-      value: k8s
+      value: gcp
     - name: SPECIAL_K8S_SECRET
       valueFrom:
         configMapKeyRef:
@@ -335,7 +318,7 @@ grafana:
           editable: true
           options:
             path: /var/lib/grafana/dashboards/default
-  dashboards: 
+  dashboards:
     default:
       k8s-compute-resources-pod:
         # Ref: https://grafana.com/grafana/dashboards/12120
@@ -349,3 +332,43 @@ grafana:
         # Ref: https://grafana.com/grafana/dashboards/15826
         gnetId: 15826
         datasource: Prometheus
+kube-prometheus-stack:
+  enabled: true
+  ingress:
+    enabled: true
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    ingressClassName: nginx
+
+    annotations:
+      - kubernetes.io/ingress.class: nginx
+
+    labels: {}
+
+    ## Override ingress to a different defined port on the service
+    # servicePort: 8081
+    ## Override ingress to a different service then the default, this is useful if you need to
+    ## point to a specific instance of the alertmanager (eg kube-prometheus-stack-alertmanager-0)
+    # serviceName: kube-prometheus-stack-alertmanager-0
+
+    ## Hosts must be provided if Ingress is enabled.
+    ##
+    hosts: []
+      # - alertmanager.domain.com
+
+    ## Paths to use for ingress rules - one path should match the alertmanagerSpec.routePrefix
+    ##
+    paths:
+      - /grafana
+
+    ## For Kubernetes >= 1.18 you should specify the pathType (determines how Ingress paths should be matched)
+    ## See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#better-path-matching-with-path-types
+    pathType: Prefix
+
+    ## TLS configuration for Alertmanager Ingress
+    ## Secret must be manually created in the namespace
+    ##
+    tls: []
+    # - secretName: alertmanager-general-tls
+    #   hosts:
+    #   - alertmanager.example.com

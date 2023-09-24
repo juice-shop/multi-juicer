@@ -50,10 +50,22 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 
 * <https://github.com/OWASP/wrongsecrets-ctf-party>
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://grafana.github.io/helm-charts | loki | 2.16.0 |
+| https://grafana.github.io/helm-charts | promtail | 3.6.0 |
+| https://prometheus-community.github.io/helm-charts | kube-prometheus-stack | 43.1.4 |
+
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| balancer.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created wrongsecrets instances (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| balancer.basicAuth | object | `{"username":"admin"}` | Credentials used in wrongsecrets-balancer-secret to authenticate with the wrongsecrets-api |
+| balancer.basicAuth.username | string | `"admin"` | Username for the basic auth credentials |
+| balancer.containerPort | int | `3000` | Port to expose on the balancer pods which the container listens on |
 | balancer.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | balancer.containerSecurityContext.capabilities.add[0] | string | `"CAP_NET_ADMIN"` |  |
 | balancer.containerSecurityContext.capabilities.add[1] | string | `"CAP_NET_BIND_SERVICE"` |  |
@@ -78,7 +90,7 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.env.GCP_SECRETS_MANAGER_SECRET_ID_1 | string | `"wrongsecret"` |  |
 | balancer.env.GCP_SECRETS_MANAGER_SECRET_ID_2 | string | `"wrongsecret-2"` |  |
 | balancer.env.IRSA_ROLE | string | `"arn:aws:iam::233483431651:role/wrongsecrets-secret-manager"` |  |
-| balancer.env.K8S_ENV | string | `"k8s"` |  |
+| balancer.env.K8S_ENV | string | `"gcp"` |  |
 | balancer.env.REACT_APP_ACCESS_PASSWORD | string | `""` |  |
 | balancer.env.REACT_APP_AZ_BLOB_URL | string | `"az://funstuff"` |  |
 | balancer.env.REACT_APP_CREATE_TEAM_HMAC_KEY | string | `"hardcodedkey"` |  |
@@ -88,13 +100,6 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.env.REACT_APP_MOVING_GIF_LOGO | string | `"https://i.gifer.com/9kGQ.gif"` |  |
 | balancer.env.REACT_APP_S3_BUCKET_URL | string | `"s3://funstuff"` |  |
 | balancer.livenessProbe | object | `{"httpGet":{"path":"/balancer/","port":"http"}}` | livenessProbe: Checks if the balancer pod is still alive |
-| balancer.metrics.basicAuth.password | string | `"ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"` | Should be changed when metrics are enabled. |
-| balancer.metrics.basicAuth.username | string | `"prometheus-scraper"` |  |
-| balancer.metrics.dashboards.enabled | bool | `false` | if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards |
-| balancer.metrics.enabled | bool | `true` | enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password |
-| balancer.metrics.serviceMonitor.enabled | bool | `false` | If true, creates a Prometheus Operator ServiceMonitor (also requires metrics.enabled to be true). This will also deploy a servicemonitor which monitors metrics from the Wrongsecrets instances |
-| balancer.metrics.serviceMonitor.path | string | `"/balancer/metrics"` | Path to scrape for metrics |
-| balancer.metrics.serviceMonitor.targetPort | int | `3000` | Target port for the ServiceMonitor to scrape |
 | balancer.podSecurityContext.enabled | bool | `true` | If true, sets the securityContext on the created pods. This is required for the podSecurityPolicy to work |
 | balancer.podSecurityContext.fsGroup | int | `2000` |  |
 | balancer.podSecurityContext.runAsGroup | int | `3000` |  |
@@ -114,11 +119,36 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | balancer.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created wrongsecrets instances (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | balancer.volumeMounts[0] | object | `{"mountPath":"/home/app/config/","name":"config-volume"}` | If true, creates a volumeMount for the created pods. This is required for the podSecurityPolicy to work |
 | balancer.volumes[0] | object | `{"configMap":{"name":"wrongsecrets-balancer-config"},"name":"config-volume"}` | If true, creates a volume for the created pods. This is required for the podSecurityPolicy to work |
+| grafana.adminPassword | string | `"admin"` |  |
+| grafana.adminUser | string | `"admin"` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".apiVersion | int | `1` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].disableDeletion | bool | `false` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].editable | bool | `true` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].folder | string | `""` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].name | string | `"default"` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].options.path | string | `"/var/lib/grafana/dashboards/default"` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].orgId | int | `1` |  |
+| grafana.dashboardProviders."dashboardproviders.yaml".providers[0].type | string | `"file"` |  |
+| grafana.dashboards.default.k8s-compute-resources-pod.datasource | string | `"Prometheus"` |  |
+| grafana.dashboards.default.k8s-compute-resources-pod.gnetId | int | `12120` |  |
+| grafana.dashboards.default.k8s-monitoring-by-namespace-and-instance.datasource | string | `"Prometheus"` |  |
+| grafana.dashboards.default.k8s-monitoring-by-namespace-and-instance.gnetId | int | `15826` |  |
+| grafana.dashboards.default.k8s-storage-volumes-cluster-dashboard.datasource | string | `"Prometheus"` |  |
+| grafana.dashboards.default.k8s-storage-volumes-cluster-dashboard.gnetId | int | `11454` |  |
 | imagePullPolicy | string | `"IfNotPresent"` |  |
 | ingress.annotations | object | `{}` | Annotations to be added to the ingress object. |
 | ingress.enabled | bool | `false` | If true, Wrongsecrets will create an Ingress object for the balancer service. Useful if you want to expose the balancer service externally for example with a loadbalancer in order to view any webpages that are hosted on the balancer service. |
 | ingress.hosts | list | `[{"host":"wrongsecrets-ctf-party.local","paths":["/"]}]` | Hostnames to your Wrongsecrets balancer installation. |
 | ingress.tls | list | `[]` | TLS configuration for Wrongsecrets balancer |
+| kube-prometheus-stack.enabled | bool | `true` |  |
+| kube-prometheus-stack.ingress.annotations[0]."kubernetes.io/ingress.class" | string | `"nginx"` |  |
+| kube-prometheus-stack.ingress.enabled | bool | `true` |  |
+| kube-prometheus-stack.ingress.hosts | list | `[]` |  |
+| kube-prometheus-stack.ingress.ingressClassName | string | `"nginx"` |  |
+| kube-prometheus-stack.ingress.labels | object | `{}` |  |
+| kube-prometheus-stack.ingress.pathType | string | `"Prefix"` |  |
+| kube-prometheus-stack.ingress.paths[0] | string | `"/grafana"` |  |
+| kube-prometheus-stack.ingress.tls | list | `[]` |  |
 | nodeSelector | object | `{}` |  |
 | service.port | int | `3000` |  |
 | service.portName | string | `"web"` |  |
@@ -160,7 +190,7 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | wrongsecrets.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created Wrongsecrets instances (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | wrongsecrets.config | string | See values.yaml for full details | Specify a custom Wrongsecrets config.yaml. See the Wrongsecrets Docs for any needed ENVs: https://github.com/OWASP/wrongsecrets |
 | wrongsecrets.ctfKey | string | `"zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"` | Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/OWASP/wrongsecrets#ctf |
-| wrongsecrets.env | list | `[{"name":"K8S_ENV","value":"k8s"},{"name":"SPECIAL_K8S_SECRET","valueFrom":{"configMapKeyRef":{"key":"funny.entry","name":"secrets-file"}}},{"name":"SPECIAL_SPECIAL_K8S_SECRET","valueFrom":{"secretKeyRef":{"key":"funnier","name":"funnystuff"}}}]` | Optional environment variables to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) |
+| wrongsecrets.env | list | `[{"name":"K8S_ENV","value":"gcp"},{"name":"SPECIAL_K8S_SECRET","valueFrom":{"configMapKeyRef":{"key":"funny.entry","name":"secrets-file"}}},{"name":"SPECIAL_SPECIAL_K8S_SECRET","valueFrom":{"secretKeyRef":{"key":"funnier","name":"funnystuff"}}}]` | Optional environment variables to set for each Wrongsecrets instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) |
 | wrongsecrets.envFrom | list | `[]` | Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) |
 | wrongsecrets.image | string | `"jeroenwillemsen/wrongsecrets"` | Wrongsecrets Image to use |
 | wrongsecrets.maxInstances | int | `500` | Specifies how many Wrongsecrets instances should start at max. Set to -1 to remove the max Wrongsecrets instance cap |
@@ -195,4 +225,4 @@ Run Multi User "Capture the Flags" or Security Trainings with OWASP Wrongsecrets
 | wrongsecretsCleanup.tolerations | list | `[]` | Optional Configure kubernetes toleration for the wrongsecretsCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.2](https://github.com/norwoodj/helm-docs/releases/v1.11.2)
+Autogenerated from chart metadata using [helm-docs v1.7.0](https://github.com/norwoodj/helm-docs/releases/v1.7.0)

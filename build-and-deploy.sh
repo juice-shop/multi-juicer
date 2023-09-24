@@ -26,4 +26,4 @@ docker build -t local/wrongsecrets-balancer:$version ./wrongsecrets-balancer &
 docker build -t local/cleaner:$version ./cleaner &
 wait
 
-helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Never" --set="balancer.repository=local/wrongsecrets-balancer" --set="balancer.tag=$version" --set="wrongsecretsCleanup.repository=local/cleaner" --set="wrongsecretsCleanup.tag=$version"
+helm upgrade --install wrongsecrets ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=Never" --set="balancer.repository=local/wrongsecrets-balancer" --set="balancer.tag=$version" --set="wrongsecretsCleanup.repository=local/cleaner" --set="wrongsecretsCleanup.tag=$version"

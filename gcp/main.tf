@@ -3,7 +3,7 @@ terraform {
   # Set the resource group in the backend configuration below, then uncomment and apply!
   # Note that you probably already create a resource group. Don't forget to set that correctly in this file.
   backend "gcs" {
-    bucket = ""
+    bucket = "tfstate-wrongsecrets-97ed8310"
     prefix = "terraform/state"
   }
 }
