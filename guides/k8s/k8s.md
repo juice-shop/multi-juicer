@@ -19,11 +19,11 @@ This example expects you to have the following cli tools setup.
 kubectl cluster-info
 ```
 
-## Step 2. Installing MultiJuicer via helm
+## Step 2. Installing WrongSecrets CTF Party via Helm
 
 ```bash
 # You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
-helm repo add wrongsecrets-ctf-party https://iteratec.github.io/multi-juicer/
+helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
 
 helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
@@ -41,14 +41,14 @@ This step is optional, but helpful to catch errors quicker.
 
 ```bash
 # lets test out if the app is working correctly before proceeding
-# for that we can port forward the JuiceBalancer service to your local machine
+# for that we can port forward the wrongsecrets-balancer service to your local machine
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 # Open up your browser for localhost:3000
-# You should be able to see the MultiJuicer Balancer UI
+# You should be able to see the wrongsecrets-balancer Balancer UI
 
 # Try to create a team and see if everything works correctly
-# You should be able to access a JuiceShop instances after a few seconds after creating a team,
+# You should be able to access a WrongSecrets instances after a few seconds after creating a team,
 # and after clicking the "Start Hacking" Button
 
 # You can also try out if the admin UI works correctly
@@ -58,18 +58,18 @@ kubectl port-forward service/wrongsecrets-balancer 3000:3000
 kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
-## Step 4. Make a service to expose multi-juicer outside of the cluster
+## Step 4. Make a service to expose WrongSecrets CTF Party outside of the cluster
 
 ```bash
 # make sure the balancer is running without errors.
 kubectl get pods
 
 # We got a example loadbalancer yaml for this example in the repository
-wget https://raw.githubusercontent.com/iteratec/multi-juicer/main/guides/k8s/k8s-juice-service.yaml
+wget https://raw.githubusercontent.com/OWASP/wrongsecrets-ctf-party/main/guides/k8s/wrongsecrets-ctf-party-loadbalancer.yaml
 
 # Create the loadbalancer
 # This might take a couple of minutes
-kubectl apply -f k8s-juice-service.yaml
+kubectl apply -f wrongsecrets-ctf-party-loadbalancer.yaml
 
 # If it takes longer than a few minutes take a detailed look at the loadbalancer
 kubectl describe svc wrongsecrets-ctf-party-loadbalancer
@@ -81,5 +81,5 @@ kubectl describe svc wrongsecrets-ctf-party-loadbalancer
 helm uninstall wrongsecrets-ctf-party
 
 # Delete the loadbalancer
-kubectl delete -f k8s-juice-service.yaml
+kubectl delete -f wrongsecrets-ctf-party-loadbalancer.yaml
 ```
