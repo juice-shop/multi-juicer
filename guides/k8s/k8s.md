@@ -19,11 +19,11 @@ This example expects you to have the following cli tools setup.
 kubectl cluster-info
 ```
 
-## Step 2. Installing WrongSecrets CTF Party via Helm
+## Step 2. Installing WrongSecrets CTF Party via helm
 
 ```bash
 # You'll need to add the wrongsecrets-ctf-party helm repo to your helm repos
-helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
+helm repo add wrongsecrets-ctf-party: [https://owasp.org/wrongsecrets-ctf-party](https://owasp.org/wrongsecrets-ctf-party)
 
 helm install wrongsecrets-ctf-party wrongsecrets-ctf-party/wrongsecrets-ctf-party
 
@@ -41,14 +41,14 @@ This step is optional, but helpful to catch errors quicker.
 
 ```bash
 # lets test out if the app is working correctly before proceeding
-# for that we can port forward the wrongsecrets-balancer service to your local machine
+# for that we can port forward the Wrongsecrets-balancer service to your local machine
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
 
 # Open up your browser for localhost:3000
-# You should be able to see the wrongsecrets-balancer Balancer UI
+# You should be able to see the WrongSecrets Balancer UI
 
 # Try to create a team and see if everything works correctly
-# You should be able to access a WrongSecrets instances after a few seconds after creating a team,
+# You should be able to access a WrongSecrets and webtop instances after a few seconds after creating a team,
 # and after clicking the "Start Hacking" Button
 
 # You can also try out if the admin UI works correctly
@@ -58,7 +58,7 @@ kubectl port-forward service/wrongsecrets-balancer 3000:3000
 kubectl get secrets wrongsecrets-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
-## Step 4. Make a service to expose WrongSecrets CTF Party outside of the cluster
+## Step 4. Make a service to expose WrongSecrets Balancer outside of the cluster
 
 ```bash
 # make sure the balancer is running without errors.

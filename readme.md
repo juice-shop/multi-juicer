@@ -64,7 +64,7 @@ A 100 contestant game can be played on the AWS, GCP, and Azure setup, which will
 
 ## Status - Experimental release
 
-This is an experimental release. It showed to work at 2 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we support using Minikube, AWS EKS, GCP GKE, and Azure AKS (_**Please follow the readme in the folder for each cloud provider if you want to use it, as the guides section is not updated yet**_).
+This is an experimental release. It showed to work at 6 CTFs already, we just did not complete the documentation and the cleaning up of the Helm chart yet. However: it is working in its basis, and can support a good crowd. Currently, we support using Minikube, AWS EKS, GCP GKE, and Azure AKS (_**Please follow the readme in the folder for each cloud provider if you want to use it, as the guides section is not updated yet**_).
 
 ## How to use it
 
@@ -97,7 +97,7 @@ To use the 2 domain setup with CTFD:
 This setup works best if you have Calico installed as your CNI, if you want to use the helm directly, without the Cloud Challenges, do:
 
 ```shell
-helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
+helm repo add wrongsecrets https://owasp.org/wrongsecrets-ctf-party
 
 helm upgrade --install my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-party
 
@@ -179,7 +179,7 @@ The default ctfd config values are here: [aws/k8s/ctfd-values.yaml](aws/k8s/ctfd
 Download & Save the file and tell helm to use your config file over the default by running:
 
 ```sh
-helm repo add wrongsecrets https://wrongsecrets.github.io/wrongsecrets-ctf-party
+helm repo add wrongsecrets https://owasp.org/wrongsecrets-ctf-party
 
 helm install -f values.yaml my-wrongsecrets-ctf-party wrongsecrets/wrongsecrets-ctf-party
 ```
