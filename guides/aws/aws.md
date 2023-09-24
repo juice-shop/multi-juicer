@@ -2,6 +2,8 @@
 
 **WARNING:** The resources created in this guide will cost about \$70.00/month. The actual price might depend on its usage, but make sure to delete the resources as described in Step 5 Deinstallation when you do not need them anymore.
 
+**NOTE:** If you find anything in this guide which is out of date (e.g. needs a version number increased) or doesn't work anymore, please help us by telling us in this ticket [#15](https://github.com/juice-shop/multi-juicer/issues/15) or by opening a pull request with a fix 🙌
+
 ## Prerequisites
 
 This example expects you to have the following cli tools setup.
@@ -16,7 +18,6 @@ This example expects you to have the following cli tools setup.
 # This will take a couple of minutes
 eksctl create cluster \
 --name multi-juicer \
---version 1.23 \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
 --nodes 2 \
