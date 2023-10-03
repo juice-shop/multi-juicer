@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "cookie-signature": "^1.2.1",
-    "eslint": "^8.49.0",
+    "eslint": "^8.50.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.7.0",
     "jest-date-mock": "^1.0.8",
