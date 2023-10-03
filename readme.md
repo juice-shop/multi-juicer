@@ -111,7 +111,7 @@ For minikube, run:
 
 ```shell
 
-minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
+minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.28.1
 eval $(minikube docker-env)
 ./build-and-deploy-container.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
@@ -132,7 +132,7 @@ kubectl top pods
 
 ```shell
 
-minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
+minikube start  --cpus=6 --memory=10000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.28.1
 eval $(minikube docker-env)
 ./build-and-deploy.sh
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
