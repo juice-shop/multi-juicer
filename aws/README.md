@@ -146,7 +146,7 @@ The documentation below is auto-generated to give insight on what's created via 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.17.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.19.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.4.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
 
