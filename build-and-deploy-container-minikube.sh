@@ -4,7 +4,7 @@ source ./scripts/check-available-commands.sh
 checkCommandsAvailable helm docker kubectl yq minikube
 
 minikube delete
-minikube start  --cpus=6 --memory=8000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.25.6
+minikube start  --cpus=6 --memory=8000MB --network-plugin=cni --cni=calico --driver=docker --kubernetes-version=1.28.1
 eval $(minikube docker-env)
 ./build-and-deploy-container.sh
 
