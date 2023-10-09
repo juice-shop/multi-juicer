@@ -41,7 +41,7 @@
   },
   "virtualdesktop": {
     "image": "jeroenwillemsen/wrongsecrets-desktop-k8s",
-    "tag": "1.5.9",
+    "tag": "1.7.0C",
     "imagePullPolicy": "IfNotPresent",
     "nodeEnv": "wrongsecrets-ctf-party",
     "resources:": {
