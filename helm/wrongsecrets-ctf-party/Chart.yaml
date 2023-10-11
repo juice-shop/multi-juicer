@@ -28,11 +28,11 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 1.6.10
+version: 1.7.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 1.6.10
+appVersion: 1.7.0
 
 dependencies:
   - name: kube-prometheus-stack
