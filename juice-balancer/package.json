@@ -23,14 +23,14 @@
     "http-proxy": "^1.18.1",
     "lodash": "^4.17.21",
     "on-finished": "^2.4.1",
-    "prom-client": "^14.2.0",
-    "winston": "^3.10.0"
+    "prom-client": "^15.0.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
-    "@types/hapi__joi": "^17.1.11",
+    "@types/hapi__joi": "^17.1.12",
     "cookie-signature": "^1.2.1",
-    "eslint": "^8.50.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint": "^8.51.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "jest": "^29.7.0",
     "jest-date-mock": "^1.0.8",
     "prettier": "^3.0.3",
