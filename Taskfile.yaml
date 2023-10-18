@@ -50,3 +50,13 @@ tasks:
     cmds:
       - helm unittest .
     dir: helm/multi-juicer/
+
+  helm:test:update-snapshots:
+    preconditions:
+      - sh: helm version
+        msg: "helm is not installed: https://helm.sh/"
+      - sh: helm unittest --help
+        msg: "helm unittest plugin is not installed: https://github.com/helm-unittest/helm-unittest/"
+    cmds:
+      - helm unittest . --update-snapshot
+    dir: helm/multi-juicer/
