@@ -13,3 +13,7 @@ sleep 15
 echo "let's go!"
 
 kubectl port-forward service/wrongsecrets-balancer 3000:3000
+
+kubectl port-forward service/prometheus-server 9090:80
+
+kubectl port-forward service/grafana 80:80

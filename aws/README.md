@@ -91,11 +91,15 @@ Want to make the CTFD instance look pretty? Include the fragment located at [./k
 In the front page of the application you can edit the description to reference the right urls and the desplayed image. Use the following:
 
 ```sh
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+helm upgrade --install wrongsecrets ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.REACT_APP_MOVING_GIF_LOGO=<>" \
   --set="balancer.env.REACT_APP_HEROKU_WRONGSECRETS_URL=<>" \
   --set="balancer.env.REACT_APP_CTFD_URL='<>'" \
 ```
+
+### Monitoring the cluster
+
+For a guide on how to use the monitoring setup, see the [monitoring guide](../guides/monitoring-setup/monitoring.md).
 
 ### Clean it up
 

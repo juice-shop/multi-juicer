@@ -12,4 +12,14 @@ sleep 5
 
 echo "let's go!"
 
-kubectl port-forward service/wrongsecrets-balancer 3000:3000
+wait 10
+
+kubectl port-forward service/wrongsecrets-balancer 3000:3000 &
+
+echo "Balancer is running on http://localhost:3000"
+
+wait 10
+
+kubectl port-forward svc/wrongsecrets-grafana 8080:80 &
+
+echo "Grafana is running on http://localhost:8080"

@@ -137,7 +137,7 @@ else
 fi
 
 echo "App password is ${APP_PASSWORD}"
-helm upgrade --install mj ../helm/wrongsecrets-ctf-party \
+helm upgrade --install wrongsecrets ../helm/wrongsecrets-ctf-party \
   --set="balancer.env.K8S_ENV=aws" \
   --set="balancer.env.IRSA_ROLE=${IRSA_ROLE_ARN}" \
   --set="balancer.env.REACT_APP_ACCESS_PASSWORD=${APP_PASSWORD}" \

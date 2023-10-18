@@ -31,4 +31,4 @@ docker pull $WRONGSECRETS_BALANCER_IMAGE:$WRONGSECRETS_BALANCER_TAG &
 docker pull $WRONGSECRETS_CLEANER_IMAGE:$WRONGSECRETS_CLEANER_TAG
 wait
 
-helm upgrade --install mj ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=IfNotPresent"
+helm upgrade --install wrongsecrets ./helm/wrongsecrets-ctf-party --set="imagePullPolicy=IfNotPresent"

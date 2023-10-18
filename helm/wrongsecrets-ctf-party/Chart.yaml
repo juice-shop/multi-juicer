@@ -34,4 +34,15 @@ version: 1.7.0
 # incremented each time you make changes to the application.
 appVersion: 1.7.0
 
-dependencies: []
+dependencies:
+  - name: kube-prometheus-stack
+    version: 43.1.4
+    repository: https://prometheus-community.github.io/helm-charts
+
+  - name: loki
+    version: 2.16.0
+    repository: https://grafana.github.io/helm-charts
+
+  - name: promtail
+    version: 3.6.0
+    repository: https://grafana.github.io/helm-charts

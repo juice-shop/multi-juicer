@@ -30,6 +30,11 @@ echo "Ingress for Ctfd is not supported by default as it needs to have a sub-dom
 echo "Go to the file at k8s/ctfd-ingress.yaml and change the host to your own domain name"
 # kubectl apply -f k8s/ctfd-ingress.yaml
 
+echo "Ingress for Grafana is not supported by default as it needs to have a sub-domain with root path. Do kubectl port-forward svc/wrongsecrets-grafana 8080:80 to access it locally"
+
+echo "Go to the file at k8s/grafana-ingress.yaml and change the host to your own domain name"
+# kubectl apply -f k8s/grafana-ingress.yaml
+
 IP_ADDRESS="$(kubectl get service ingress-nginx-controller --namespace=ingress-nginx --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 
 echo "IP_ADDRESS for the entrypoint is $IP_ADDRESS"

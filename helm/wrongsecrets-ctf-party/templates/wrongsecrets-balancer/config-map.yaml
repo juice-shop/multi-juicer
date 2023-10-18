@@ -19,11 +19,6 @@ data:
       "admin": {
         "username": {{ .Values.balancer.basicAuth.username | quote }}
       },
-  {{- if .Values.balancer.metrics.enabled }}
-      "metrics": {
-        "enabled": true
-      },
-  {{- end }}
       "wrongsecrets": {
         "image": {{ .Values.wrongsecrets.image | quote }},
         "tag": {{ .Values.wrongsecrets.tag | quote }},
