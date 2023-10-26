@@ -109,6 +109,14 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                 initialDelaySeconds: 30,
                 periodSeconds: 15,
               },
+              startupProbe: {
+                httpGet: {
+                  path: '/rest/admin/application-version',
+                  port: 3000,
+                },
+                failureThreshold: 30,
+                periodSeconds: 10,
+              },
               volumeMounts: [
                 {
                   name: 'juice-shop-config',
