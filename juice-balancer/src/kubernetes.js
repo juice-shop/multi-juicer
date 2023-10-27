@@ -114,8 +114,8 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/rest/admin/application-version',
                   port: 3000,
                 },
-                failureThreshold: 30,
-                periodSeconds: 10,
+                failureThreshold: 150,
+                periodSeconds: 2,
               },
               volumeMounts: [
                 {
