@@ -40,7 +40,7 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 1.7.0cloud
+  tag: 1.7.2cloud
   # -- Number of replicas of the wrongsecrets-balancer deployment. Changing this in a commit? PLEASE UPDATE THE GITHUB WORKLFOWS THEN!(NUMBER OF "TRUE")
   replicas: 2
   # -- Port to expose on the balancer pods which the container listens on
@@ -147,7 +147,7 @@ wrongsecrets:
   maxInstances: 500
   # -- Wrongsecrets Image to use
   image: jeroenwillemsen/wrongsecrets
-  tag: 1.7.0-no-vault
+  tag: 1.7.2-no-vault
   # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://github.com/OWASP/wrongsecrets#ctf
   ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
   # -- Specify a custom Wrongsecrets config.yaml. See the Wrongsecrets Docs for any needed ENVs: https://github.com/OWASP/wrongsecrets
@@ -209,7 +209,7 @@ virtualdesktop:
   maxInstances: 500
   # -- Wrongsecrets Image to use
   image: jeroenwillemsen/wrongsecrets-desktop-k8s
-  tag: 1.7.0C
+  tag: 1.7.2
   repository: commjoenie/wrongSecrets
   resources:
     request:
