@@ -58,7 +58,7 @@ jobs:
       - name: Get back to original branch
         uses: actions/checkout@v4
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
+        uses: helm/chart-releaser-action@v1.6.0
         with:
           charts_dir: helm
         env:
