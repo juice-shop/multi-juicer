@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@commitlint/config-conventional": "^18.1.0"
+    "@commitlint/config-conventional": "^18.4.3"
   },
   "dependencies": {
     "eslint": "^8.52.0"
