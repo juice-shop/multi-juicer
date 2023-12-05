@@ -3,6 +3,6 @@
     "@commitlint/config-conventional": "^18.4.3"
   },
   "dependencies": {
-    "eslint": "^8.52.0"
+    "eslint": "^8.55.0"
   }
 }
