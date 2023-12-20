@@ -28,6 +28,8 @@ tests:
       version: 42.0.0
       appVersion: 42.0.0
     set:
+      juiceShop:
+        tag: v42.42.42
       # randomized values are still specified here as the snapshot tests would fail otherwise
       balancer:
         adminPassword: "ABCDEFGH"
@@ -73,6 +75,7 @@ tests:
             password: "ROTATE_THIS_YOU_LAZY_ASS"
 
       juiceShop:
+        tag: v42.42.42
         maxInstances: 42
         nodeEnv: "ctf"
         ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
@@ -111,6 +114,7 @@ tests:
             enabled: true
 
       juiceShop:
+        tag: v42.42.42
         maxInstances: 42
         nodeEnv: "ctf"
         ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"

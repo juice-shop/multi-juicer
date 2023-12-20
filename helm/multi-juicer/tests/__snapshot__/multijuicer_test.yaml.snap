@@ -129,7 +129,7 @@ default values render correctly:
           },
           "juiceShop": {
             "image": "bkimminich/juice-shop",
-            "tag": "v15.3.0",
+            "tag": "v42.42.42",
             "imagePullPolicy": "IfNotPresent",
             "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
             "nodeEnv": "multi-juicer",
@@ -179,7 +179,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: cf48275312cac7c9cacf895b9002eca3e01e3fcfb6b0936d2fc85716da847c2a
+            checksum/config: 4e04b32a6763d0f6788ac2eb7c5728626d7333691d95c412f393001adc1447ea
             checksum/secret: 251cfd8e9e6e2060f9bce6d7ab720ed1658fee709ffddb5c877b0a366f3ff49c
           labels:
             app.kubernetes.io/component: load-balancer
@@ -2710,7 +2710,7 @@ full values render out correctly:
           },
           "juiceShop": {
             "image": "bkimminich/juice-shop",
-            "tag": "v15.3.0",
+            "tag": "v42.42.42",
             "imagePullPolicy": "IfNotPresent",
             "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
             "nodeEnv": "ctf",
@@ -2760,7 +2760,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 947dc2e05e7d0515da848adf5e029ee2d423e134c673de366cfd6dd444b07980
+            checksum/config: 6d6bc92a94f12493138aa82fe204065d1f1ff6933357494240ac68429af2b01d
             checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
           labels:
             app.kubernetes.io/component: load-balancer
@@ -3309,7 +3309,7 @@ production notes work correctly:
           },
           "juiceShop": {
             "image": "bkimminich/juice-shop",
-            "tag": "v15.3.0",
+            "tag": "v42.42.42",
             "imagePullPolicy": "IfNotPresent",
             "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
             "nodeEnv": "ctf",
@@ -3359,7 +3359,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 947dc2e05e7d0515da848adf5e029ee2d423e134c673de366cfd6dd444b07980
+            checksum/config: 6d6bc92a94f12493138aa82fe204065d1f1ff6933357494240ac68429af2b01d
             checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
           labels:
             app.kubernetes.io/component: load-balancer
