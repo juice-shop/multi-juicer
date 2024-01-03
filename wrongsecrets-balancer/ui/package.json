@@ -13,7 +13,7 @@
     "react-intl": "^6.4.7",
     "react-router-dom": "^6.21.1",
     "reactjs-popup": "^2.0.6",
-    "styled-components": "^6.1.1"
+    "styled-components": "^6.1.6"
   },
   "devDependencies": {
     "react-scripts": "^5.0.1",
