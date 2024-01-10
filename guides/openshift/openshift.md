@@ -24,10 +24,7 @@ oc new-project multi-juicer
 ## Step 2. Installing MultiJuicer via helm
 
 ```bash
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
-
-helm install multi-juicer multi-juicer/multi-juicer ./multi-juicer/helm/multi-juicer/
+helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer
 ```
 
 ## Step 3. Verify the app is running correctly
