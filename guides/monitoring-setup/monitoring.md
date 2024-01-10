@@ -25,8 +25,5 @@ echo "Installing loki/promtail"
 helm --namespace monitoring upgrade --install promtail grafana/promtail --version 3.0.4 --set "config.lokiAddress=http://loki:3100/loki/api/v1/push" --set="serviceMonitor.enabled=true"
 
 echo "Installing MultiJuicer"
-helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
-
-# for helm >= 3
-helm install multi-juicer multi-juicer/multi-juicer --set="balancer.metrics.enabled=true" --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
+helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer --set="balancer.metrics.enabled=true" --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
 ```

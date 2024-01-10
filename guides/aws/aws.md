@@ -32,10 +32,7 @@ kubectl config current-context
 ## Step 2. Installing MultiJuicer via helm
 
 ```sh
-# You'll need to add the multi-juicer helm repo to your helm repos
-helm repo add multi-juicer https://juice-shop.github.io/multi-juicer/
-
-helm install multi-juicer multi-juicer/multi-juicer
+helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer
 
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
