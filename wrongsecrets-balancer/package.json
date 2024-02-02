@@ -41,7 +41,7 @@
     "jest-date-mock": "^1.0.8",
     "minimatch": "^9.0.3",
     "prettier": "^3.2.4",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.4"
   },
   "overrides": {
     "@kubernetes/client-node": {
