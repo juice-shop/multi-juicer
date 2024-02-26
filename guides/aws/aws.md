@@ -9,7 +9,7 @@
 This example expects you to have the following cli tools setup.
 
 1. [awscli](https://aws.amazon.com/cli/)
-2. [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html)
+2. [eksctl](https://eksctl.io/installation/)
 3. [helm](https://helm.sh)
 4. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos)
 
