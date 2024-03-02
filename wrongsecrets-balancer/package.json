@@ -13,7 +13,7 @@
   "dependencies": {
     "@google-cloud/iam": "^1.1.0",
     "@google-cloud/secret-manager": "^5.1.0",
-    "@google-cloud/storage": "^7.1.0",
+    "@google-cloud/storage": "^7.7.0",
     "@kubernetes/client-node": "^0.20.0",
     "basic-auth-connect": "^1.0.0",
     "bcryptjs": "^2.4.3",
