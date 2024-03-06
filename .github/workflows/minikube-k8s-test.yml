@@ -14,8 +14,8 @@ permissions:
   contents: read
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test-minikube:
-    name: Test with minikube
+  test-minikube-build:
+    name: Test with minikube (build)
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,6 +30,31 @@ jobs:
         run: |
           eval $(minikube docker-env)
           ./build-and-deploy.sh
+          while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != *"True"* ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
+          kubectl logs deployments/wrongsecrets-balancer -f >> pod.log &
+          echo "port forwarding"
+          kubectl port-forward service/wrongsecrets-balancer 3000:3000 &
+          echo "Awaiting the first forward to be ready"
+          sleep 10
+          curl http://localhost:3000/balancer/
+          echo "logs from pod to make sure:"
+          cat pod.log
+  test-minikube-containers:
+    name: Test with minikube (containers)
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start minikube
+        uses: medyagh/setup-minikube@master
+        with:
+          minikube-version: 1.31.2
+          driver: docker
+          kubernetes-version: v1.28.1
+      - name: test script
+        run: |
+          eval $(minikube docker-env)
+          ./build-and-deploy-container.sh
           while [[ $(kubectl get pods -l app=wrongsecrets-balancer -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != *"True"* ]]; do echo "waiting for wrongsecrets-balancer" && sleep 2; done
           kubectl logs deployments/wrongsecrets-balancer -f >> pod.log &
           echo "port forwarding"
