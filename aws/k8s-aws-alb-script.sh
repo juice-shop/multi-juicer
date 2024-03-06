@@ -23,7 +23,7 @@ fi
 ACCOUNT_ID=$(aws sts get-caller-identity | jq '.Account' -r)
 echo "ACCOUNT_ID=${ACCOUNT_ID}"
 
-LBC_VERSION="v2.4.1"
+LBC_VERSION="v2.7.1"
 echo "LBC_VERSION=$LBC_VERSION"
 
 echo "setting up kubectl"

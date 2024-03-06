@@ -85,6 +85,8 @@ module "eks" {
 
   enable_irsa = true
 
+  enable_cluster_creator_admin_permissions = true
+
   create_cloudwatch_log_group            = true
   cluster_enabled_log_types              = ["api", "audit", "authenticator"]
   cloudwatch_log_group_retention_in_days = 14 #it's a ctf , we don't need non-necessary costs!
