@@ -119,7 +119,7 @@ wait
 
 if [[ -z $APP_PASSWORD ]]; then
   echo "No app password passed, creating a new one"
-  APP_PASSWORD="$(uuidgen)"
+  APP_PASSWORD="$(openssl rand -base64 12 | tr -d '\n' )"
 else
   echo "App password already set"
 fi
