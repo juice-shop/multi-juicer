@@ -40,7 +40,7 @@ balancer:
     # -- Set this to a fixed random alpa-numeric string (recommended length 24 chars). If not set this get randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requirering users to login again.
     cookieParserSecret: null
   repository: jeroenwillemsen/wrongsecrets-balancer
-  tag: 1.8.3cloud
+  tag: 1.8.4cloud
   # -- Number of replicas of the wrongsecrets-balancer deployment. Changing this in a commit? PLEASE UPDATE THE GITHUB WORKLFOWS THEN!(NUMBER OF "TRUE")
   replicas: 2
   # -- Port to expose on the balancer pods which the container listens on
