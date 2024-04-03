@@ -115,3 +115,5 @@ kubectl delete -f https://raw.githubusercontent.com/juice-shop/multi-juicer/main
 # Delete the kubernetes cluster
 eksctl delete cluster multi-juicer
 ```
+
+In order to nuke the hole account, e.g. resources like the created _security groups_ or _VPCs_, consider to run the destructive [aws-nuke](https://github.com/rebuy-de/aws-nuke).
