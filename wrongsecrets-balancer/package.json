@@ -30,7 +30,7 @@
     "lodash": "^4.17.21",
     "minimatch": "^9.0.3",
     "on-finished": "^2.4.1",
-    "prom-client": "^15.1.0",
+    "prom-client": "^15.1.1",
     "winston": "^3.13.0"
   },
   "devDependencies": {
