@@ -11,19 +11,23 @@ updates:
       interval: "daily"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/wrongsecrets-balancer/" # Location of package manifests
+    open-pull-requests-limit: 15
     schedule:
       interval: "monthly"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/wrongsecrets-balancer/ui" # Location of package manifests
+    open-pull-requests-limit: 16
     schedule:
       interval: "monthly"
     # check our npm for dev
   - package-ecosystem: "npm"
     directory: "/"
+    open-pull-requests-limit: 15
     schedule:
       interval: "monthly"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/cleaner" # Location of package manifests
+    open-pull-requests-limit: 15
     schedule:
       interval: "monthly"
   - package-ecosystem: "docker"
