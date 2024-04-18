@@ -1,6 +1,6 @@
 module github.com/juice-shop/multi-juicer/progress-watchdog
 
-go 1.21
+go 1.22
 
 require (
 	github.com/gin-gonic/gin v1.9.1

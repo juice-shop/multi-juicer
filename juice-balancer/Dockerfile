@@ -1,10 +1,10 @@
-FROM node:20-alpine as build
+FROM node:21-alpine as build
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-FROM --platform=$BUILDPLATFORM node:20-alpine as ui
+FROM --platform=$BUILDPLATFORM node:21-alpine as ui
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
@@ -12,7 +12,7 @@ RUN npm ci
 COPY ui/ ./
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:21-alpine
 ARG NODE_ENV
 RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
 WORKDIR /home/app/
