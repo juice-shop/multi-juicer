@@ -8,7 +8,7 @@ tasks:
       Builds and Deploys MultiJuicer to the default kubernetes context.
       Then forwards the balancer service to localhost:3000
     cmds:
-      - ./build-an-deploy.sh
+      - ./build-and-deploy.sh
       - kubectl rollout status deployment juice-balancer
       - kubectl port-forward svc/juice-balancer 4000:3000
 
