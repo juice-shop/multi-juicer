@@ -160,12 +160,12 @@ export default function AdminPage() {
   const columns = [
     {
       name: formatMessage(messages.teamname),
-      selector: 'team',
+      selector: row => row.team,
       sortable: true,
     },
     {
       name: formatMessage(messages.ready),
-      selector: 'ready',
+      selector: row => row.ready,
       sortable: true,
       right: true,
       // ready is just a emoji, so the colum can shrink
@@ -174,7 +174,7 @@ export default function AdminPage() {
     },
     {
       name: formatMessage(messages.created),
-      selector: 'createdAt',
+      selector: row => row.createdAt,
       sortable: true,
       format: ({ createdAt }) => {
         const { value, unit } = selectUnit(createdAt);
@@ -187,7 +187,7 @@ export default function AdminPage() {
     },
     {
       name: formatMessage(messages.lastUsed),
-      selector: 'lastConnect',
+      selector: row => row.lastConnect,
       sortable: true,
       format: ({ lastConnect }) => {
         const { value, unit } = selectUnit(lastConnect);
@@ -200,7 +200,7 @@ export default function AdminPage() {
     },
     {
       name: formatMessage(messages.actions),
-      selector: 'actions',
+      selector: row => row.actions,
       right: true,
       cell: ({ team }) => {
         return (
