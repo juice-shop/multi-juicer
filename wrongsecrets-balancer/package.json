@@ -26,7 +26,7 @@
     "googleapis": "^135.1.0",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "^3.0.0",
-    "joi": "^17.12.3",
+    "joi": "^17.13.0",
     "lodash": "^4.17.21",
     "minimatch": "^9.0.4",
     "on-finished": "^2.4.1",
