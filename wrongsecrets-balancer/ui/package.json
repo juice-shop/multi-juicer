@@ -9,7 +9,7 @@
     "promise-retry": "^2.0.1",
     "react": "^18.2.0",
     "react-data-table-component": "^7.6.2",
-    "react-dom": "^18.2.0",
+    "react-dom": "^18.3.1",
     "react-intl": "^6.6.5",
     "react-router-dom": "^6.22.3",
     "reactjs-popup": "^2.0.6",
