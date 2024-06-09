@@ -53,7 +53,7 @@ function App() {
                   <Layout
                     footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
                     siteHeader="Admin"
-                    wide={true}
+                    wide="true"
                   >
                     <AdminPage />
                   </Layout>
