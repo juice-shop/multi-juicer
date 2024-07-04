@@ -40,7 +40,15 @@ If the juice-balancer pod is still pending status after a couple of minutes, the
 ```bash
 # This show details about the juice-balancer pod. Warnings can be found under Events, and the cluster 
 # does not have the necessary resources if theres is a warning about insufficient CPU or memory.
+# In this case you would need to increase resources
 kubectl describe pods juice-balancer
+
+# To see the different size options for compute resources run the following command:
+doctl kubernetes options sizes
+
+# To run an instace with 2 vcpu and 4gb memory, add the --size flag to the cluster create command as follows.
+# note that this will increase the cost of the k8s cluster. Make sure you understand the costs of every option size.
+doctl kubernetes cluster create juicy-k8s --size s-2vcpu-4gb
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -70,7 +78,14 @@ kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | 
 
 DigitalOcean lets you create a DigitalOcean Loadbalancer to expose your kubernetes deployment without having to setup the whole kubernetes ingress stuff. This makes it especially easy if you also manage your domains in DigitalOcean as DigitalOcean will also be able to provide you with the tls certificates.
 
+To use with a domain and TLS certificate, you first need to purchase a domain from a domain registrar (GoDaddy, NameCheap, etc.)
+and allow DigitalOcean to manage the domain by pointing it's NS records to the DigitalOcean nameservers
+Note that this may take between 30 minutes to several hours for the change to propogate cross the internet. See
+[Point to DigitalOcean Name Servers From Common Domain Registrars](https://docs.digitalocean.com/products/networking/dns/getting-started/dns-registrars/)
+
 ```bash
+# Create the certificate in digital ocean (after purchasing a domain and letting DigitalOcean handle it)
+doctl compute certificate create --type lets_encrypt --name your_certificate_name --dns-names yourdomain.com
 
 # Get you digitalocean cert id
 doctl compute certificate list
