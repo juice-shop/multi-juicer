@@ -35,13 +35,14 @@ kubectl get pods
 # Wait until both pods are ready
 ```
 
-If the juice-balancer pod is still pending status after a couple of minutes, the cluster may not have the necessary resources to provision the pod.
+If the juice-balancer pods is still pending status after a couple of minutes, the cluster may not have the necessary resources to provision the pods.
 
 ```bash
-# This show details about the juice-balancer pod. Warnings can be found under Events, and the cluster 
+# This show details about the juice-balancer pods. Warnings can be found under Events, and the cluster
 # does not have the necessary resources if theres is a warning about insufficient CPU or memory.
 # In this case you would need to increase resources
-kubectl describe pods juice-balancer
+kubectl describe pods juice-balancer-<postfix>
+# e.g. kubectl describe pods juice-balancer-7d57fff697-4r8lv
 
 # To see the different size options for compute resources run the following command:
 doctl kubernetes options sizes
