@@ -519,7 +519,7 @@ default values render correctly:
       type: ClusterIP
 full values render out correctly:
   1: |
-    raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward service/juice-balancer 3000:3000\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:3000\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
+    raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward --namespace=\"NAMESPACE\" service/juice-balancer 3000:3000\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:3000\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets juice-balancer-secret --namespace=\"NAMESPACE\" -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
   2: |
     apiVersion: batch/v1
     kind: CronJob
