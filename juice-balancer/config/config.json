@@ -6,25 +6,25 @@
   "skipOwnerReference": false,
   "admin": {
     "username": "admin",
-    "password": "12345678"
+    "password": ""
   },
   "cookieParser": {
     "cookieName": "balancer",
-    "secret": "askdbakhdajhvdsjavjdsgv",
+    "secret": "",
     "secure": false
   },
   "metrics": {
     "enabled": false,
     "basicAuth": {
       "username": "prometheus-scraper",
-      "password": "ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy"
+      "password": ""
     }
   },
   "juiceShop": {
     "image": "bkimminich/juice-shop",
     "tag": "snapshot",
     "imagePullPolicy": "IfNotPresent",
-    "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
+    "ctfKey": "",
     "nodeEnv": "multi-juicer",
     "resources:": {
       "requests": {
