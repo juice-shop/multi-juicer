@@ -238,7 +238,7 @@ func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, errors.New("Failed to fetch Challenge Status")
+		return nil, errors.New("failed to fetch Challenge Status")
 	}
 	defer res.Body.Close()
 
@@ -250,13 +250,13 @@ func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
 
 		err = json.NewDecoder(res.Body).Decode(&challengeResponse)
 		if err != nil {
-			return nil, errors.New("Failed to parse JSON from Juice Shop Challenge Status response")
+			return nil, errors.New("failed to parse JSON from Juice Shop Challenge Status response")
 		}
 
 		challengeStatus := make(ChallengeStatuses, 0)
 
 		for _, challenge := range challengeResponse.Data {
-			if challenge.Solved == true {
+			if challenge.Solved {
 				log.Debugf("Challenge %s: Solved: %t", challenge.Key, challenge.Solved)
 				challengeStatus = append(challengeStatus, ChallengeStatus{
 					Key:      challenge.Key,
@@ -269,7 +269,7 @@ func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
 
 		return challengeStatus, nil
 	default:
-		return nil, fmt.Errorf("Unexpected response status code '%d' from Juice Shop", res.StatusCode)
+		return nil, fmt.Errorf("unexpected response status code '%d' from Juice Shop", res.StatusCode)
 	}
 }
 
