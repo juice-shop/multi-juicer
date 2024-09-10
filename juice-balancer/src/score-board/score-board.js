@@ -113,6 +113,7 @@ const keyDifficultyMapping = Object.freeze({
   bullyChatbotChallenge: 1,
   lfrChallenge: 5,
   closeNotificationsChallenge: 1,
+  csafChallenge: 3,
 });
 
 /**
