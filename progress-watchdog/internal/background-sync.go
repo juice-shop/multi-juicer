@@ -244,10 +244,6 @@ func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
 
 	switch res.StatusCode {
 	case 200:
-		if err != nil {
-			return nil, errors.New("Failed to response body stream from Juice Shop")
-		}
-
 		defer res.Body.Close()
 
 		challengeResponse := ChallengeResponse{}
