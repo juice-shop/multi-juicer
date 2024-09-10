@@ -34,7 +34,7 @@ func CompareChallengeStates(currentSolvedChallenges, lastSolvedChallenges []Chal
 	for _, challengeSolvedInLastContinueCode := range lastSolvedChallenges {
 		contained := contains(currentSolvedChallenges, challengeSolvedInLastContinueCode)
 
-		if contained == false {
+		if !contained {
 			return ApplyCode
 		}
 	}
