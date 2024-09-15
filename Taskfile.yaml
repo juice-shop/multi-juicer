@@ -22,6 +22,8 @@ tasks:
     cmds:
       - task: helm:test
       - task: juice-balancer:api:test
+      - task: cleaner:test
+      - task: progress-watchdog:test
 
   juice-balancer:ui:build:
     preconditions:
@@ -40,6 +42,22 @@ tasks:
     cmds:
       - npm run test
     dir: juice-balancer/
+
+  progress-watchdog:test:
+    preconditions:
+      - sh: which go
+        msg: "go needs to be installed for running the progress-watchdog tests."
+    cmds:
+      - go test ./...
+    dir: progress-watchdog/
+
+  cleaner:test:
+    preconditions:
+      - sh: test -d node_modules/
+        msg: "cleaner dependencies are not installed. run 'npm ci' in cleaner/ to install them."
+    cmds:
+      - npm run test
+    dir: cleaner/
 
   helm:test:
     preconditions:
