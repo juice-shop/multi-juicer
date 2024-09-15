@@ -5,8 +5,6 @@ Instructing everybody how to start Juice Shop on their own machine works ok, but
 
 MultiJuicer gives you the ability to run separate Juice Shop instances for every participant on a central kubernetes cluster, to run events without the need for local Juice Shop instances.
 
-> Note: MultiJuicer is now an official part of the Juice Shop OWASP Project. For this change the this repo was recently moved from the [iteratec](https://github.com/iteratec/) organisation into the official [juice-shop](https://github.com/juice-shop/) GitHub organisation. If you notice or encounter any problems introduced by this change, check the [v6.0.0](https://github.com/juice-shop/multi-juicer/releases/tag/v6.0.0) changelog for possible upgrade steps, if the problems can't be solved by it please reach out via a GitHub discussion or via [slack](#talk-with-us).
-
 **What it does:**
 
 - dynamically create new Juice Shop instances when needed
