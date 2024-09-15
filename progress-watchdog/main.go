@@ -106,6 +106,15 @@ func main() {
 			log.Error(err)
 		}
 
+		// check if the challenge is already solved
+		for _, status := range challengeStatus {
+			if status.Key == webhook.Solution.Challenge {
+				log.Infof("Challenge '%s' already solved by Team '%s', ignoring webhook", webhook.Solution.Challenge, team)
+				c.String(http.StatusOK, "ok")
+				return
+			}
+		}
+
 		challengeStatus = append(challengeStatus, internal.ChallengeStatus{Key: webhook.Solution.Challenge, SolvedAt: webhook.Solution.IssuedOn})
 		sort.Stable(challengeStatus)
 
