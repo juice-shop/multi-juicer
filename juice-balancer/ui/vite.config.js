@@ -6,6 +6,7 @@ export default defineConfig(() => {
     base: '/balancer/',
     build: {
       outDir: 'build',
+      sourcemap: true, // we are an open source project, we have nothing to hide :D
     },
     plugins: [react()],
     server: {
