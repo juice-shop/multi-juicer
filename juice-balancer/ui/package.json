@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "license": "Apache-2.0",
+  "type": "module",
   "dependencies": {
     "@formatjs/intl-utils": "^3.8.4",
     "axios": "^1.7.7",
@@ -15,22 +16,18 @@
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "react-scripts": "^5.0.1",
-    "source-map-explorer": "^2.5.3"
+    "@vitejs/plugin-react": "^4.3.1",
+    "source-map-explorer": "^2.5.3",
+    "vite": "^5.4.8"
   },
   "scripts": {
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://localhost:4000",
-  "homepage": "/balancer/",
   "browserslist": {
     "production": [
       ">0.2%",
