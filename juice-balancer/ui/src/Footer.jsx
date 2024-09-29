@@ -19,7 +19,7 @@ const LanguageSwitchButton = styled.button`
 const LanguageSelectionButton = styled(LanguageSwitchButton)`
   margin-bottom: 8px;
   font-size: 14px;
-  font-weight: ${(props) => (props.showAsActive ? '600' : 'initial')};
+  font-weight: ${(props) => (props.$showAsActive ? '600' : 'initial')};
 `;
 
 const LangPopupWrapper = styled.div`
@@ -63,7 +63,7 @@ export const Footer = ({ switchLanguage, selectedLocale }) => {
           return (
             <LanguageSelectionButton
               key={`translation-${translation.key}`}
-              showAsActive={selectedLocale === translation.key}
+              $showAsActive={selectedLocale === translation.key}
               onClick={() =>
                 switchLanguage({
                   key: translation.key,
