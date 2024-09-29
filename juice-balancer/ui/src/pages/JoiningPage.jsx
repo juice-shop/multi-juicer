@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,17 +7,26 @@ import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 export const JoiningPage = () => {
   const [passcode, setPasscode] = useState('');
   const [failed, setFailed] = useState(false);
-  const navigate = useNavigate()
-  const { team } = useParams()
-
+  const navigate = useNavigate();
+  const { team } = useParams();
 
   async function sendJoinRequest() {
     try {
-      const res = await axios.post(`/balancer/teams/${team}/join`, {
-        passcode,
+      const response = await fetch(`/balancer/teams/${team}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ passcode }),
       });
 
-      if (res.data.message === 'Signed in as admin') {
+      if (!response.ok) {
+        throw new Error('Failed to join the team');
+      }
+
+      const data = await response.json();
+
+      if (data.message === 'Signed in as admin') {
         navigate(`/admin`);
         return;
       }

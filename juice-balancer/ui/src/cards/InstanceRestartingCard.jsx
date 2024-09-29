@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
@@ -13,11 +12,17 @@ const CenteredText = styled.span`
 
 export const InstanceRestartingCard = ({ teamname }) => {
   const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    axios
-      .get(`/balancer/teams/${teamname}/wait-till-ready`, {
-        // Wait at most 3 minutes before timing out
-        timeout: 3 * 60 * 1000,
+    fetch(`/balancer/teams/${teamname}/wait-till-ready`, {
+      method: 'GET',
+      timeout: 3 * 60 * 1000,
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response;
       })
       .then(() => {
         setReady(true);
