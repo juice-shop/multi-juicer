@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import promiseRetry from 'promise-retry';
@@ -32,16 +31,20 @@ export const InstanceStatusCard = ({ teamname }) => {
           setInstanceStatus(waitingForLong);
         }
 
-        return axios
-          .get(`/balancer/teams/${teamname}/wait-till-ready`, {
-            // Wait at most 3 minutes before timing out
-            timeout: 3 * 60 * 1000,
+        return fetch(`/balancer/teams/${teamname}/wait-till-ready`, {
+          method: 'GET',
+          timeout: 3 * 60 * 1000,
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response;
           })
           .catch(retry);
       },
       {
         retries: 5,
-        // Use a factor of one. We don't need a exponential backoff strategy.
         factor: 1,
       }
     )

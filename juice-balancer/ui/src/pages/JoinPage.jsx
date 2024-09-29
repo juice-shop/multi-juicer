@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
-
 import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
 import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
@@ -56,28 +54,39 @@ export const JoinPage = injectIntl(({ intl }) => {
 
   async function sendJoinRequest() {
     try {
-      const { data } = await axios.post(`/balancer/teams/${teamname}/join`, {
-        passcode,
+      const response = await fetch(`/balancer/teams/${teamname}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ passcode }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (
+          response.status === 401 &&
+          errorData.message === 'Team requires authentication to join'
+        ) {
+          navigate(`/teams/${teamname}/joining/`);
+        } else if (
+          response.status === 500 &&
+          errorData.message === 'Reached Maximum Instance Count'
+        ) {
+          setFailureMessage(
+            'Max instances reached, contact admin or join another team to participate.'
+          );
+        } else {
+          setFailureMessage('Unexpected error. Please contact an admin.');
+        }
+        return;
+      }
+
+      const data = await response.json();
       setFailureMessage(null);
       navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode } });
     } catch (error) {
-      if (
-        error.response.status === 401 &&
-        error.response.data.message === 'Team requires authentication to join'
-      ) {
-        navigate(`/teams/${teamname}/joining/`);
-      } else if (
-        error.response.status === 500 &&
-        error.response.data.message === 'Reached Maximum Instance Count'
-      ) {
-        setFailureMessage(
-          'Max instances reached, contact admin or join another team to participate.'
-        );
-      } else {
-        setFailureMessage('Unexpected error. Please contact an admin.');
-      }
+      setFailureMessage('Unexpected error. Please contact an admin.');
     }
   }
 
