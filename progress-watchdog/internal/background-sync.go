@@ -166,7 +166,7 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 		// Get Instances
 		log.Info("Looking for Instances")
 		opts := metav1.ListOptions{
-			LabelSelector: "app=juice-shop",
+			LabelSelector: "app.kubernetes.io/name=juice-shop",
 		}
 
 		namespace := os.Getenv("NAMESPACE")
