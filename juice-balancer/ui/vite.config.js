@@ -9,11 +9,5 @@ export default defineConfig(() => {
       sourcemap: true, // we are an open source project, we have nothing to hide :D
     },
     plugins: [react()],
-    server: {
-        proxy: {
-            // proxy every request but those that start with /balancer to port 3000
-            '^/balancer/.*': "http://localhost:4000",
-        },
-    }
   };
 });
