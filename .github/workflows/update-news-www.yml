@@ -4,6 +4,9 @@ on:
   release:
     types: [ published ]
 
+# the pipeline doesn't use the GITHUB_TOKEN for anything, so no permissions needed.
+permissions: {}
+
 jobs:
   UpdateNewsOnWebsite:
     runs-on: ubuntu-latest
