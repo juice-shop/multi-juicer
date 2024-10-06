@@ -72,6 +72,6 @@ jobs:
           helm version
       - name: Install Helm Unit Test Plugin
         run: |
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 0.4.4
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 0.6.2
       - name: Helm-Chart Unit Tests | Operator
         run: helm unittest .
