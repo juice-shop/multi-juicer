@@ -13,7 +13,7 @@ jobs:
         with:
           token: ${{ secrets.BOT_TOKEN }}
           repository: OWASP/www-project-juice-shop
-          branch: master
+          ref: master
       - name: Update tab_news.md
         run: |
           sed -i 's/<!-- next:multi-juicer -->/<!-- next:multi-juicer -->\n* ${{ github.event.release.published_at }}: multi-juicer [`${{ github.event.release.tag_name }}`](https:\/\/github.com\/juice-shop\/multi-juicer\/releases\/tag\/${{ github.event.release.tag_name }})/' tab_news.md
