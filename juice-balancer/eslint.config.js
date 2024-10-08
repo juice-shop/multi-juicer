@@ -1,15 +1,8 @@
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import prettier from 'eslint-plugin-prettier';
 import globals from 'globals';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.url,
-  recommendedConfig: js.configs.recommended,
-});
-
 export default [
-  js.configs.recommended,
   {
     files: ['**/*.js'],
     languageOptions: {
@@ -29,5 +22,5 @@ export default [
       'no-console': 'off',
     },
   },
-  ...compat.extends('eslint:recommended'),
+  js.configs.recommended,
 ];
