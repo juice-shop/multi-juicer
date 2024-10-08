@@ -64,7 +64,7 @@ async function checkIfInstanceIsUp(req, res, next) {
 
     logger.warn(`Tried to proxy for team ${teamname}, but no ready instance found.`);
     return res.redirect(`/balancer/?msg=instance-restarting&teamname=${teamname}`);
-  } catch (error) {
+  } catch {
     logger.warn(`Could not find instance for team: '${teamname}'`);
     res.redirect(`/balancer/?msg=instance-not-found&teamname=${teamname}`);
   }
