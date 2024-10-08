@@ -1,9 +1,9 @@
-const express = require('express');
+import { Router } from 'express';
 
-const router = express.Router();
+const router = Router();
 
-const { getJuiceShopInstances } = require('../kubernetes');
-const { logger } = require('../logger');
+import { getJuiceShopInstances } from '../kubernetes.js';
+import { logger } from '../logger.js';
 
 // Generated via: `curl https://demo.owasp-juice.shop/api/challenges | jq '.data | map({ key: .key, value: .difficulty }) | from_entries'`
 const keyDifficultyMapping = Object.freeze({
@@ -160,4 +160,4 @@ async function getTopTeams(req, res) {
 
 router.get('/top', getTopTeams);
 
-module.exports = router;
+export default router;

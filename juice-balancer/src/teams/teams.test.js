@@ -1,22 +1,28 @@
-jest.mock('../kubernetes');
-jest.mock('http-proxy');
+import request from 'supertest';
+import bcrypt from 'bcryptjs';
+import app from '../app.js';
+import { get } from '../config.js';
+import { jest } from '@jest/globals';
 
-const request = require('supertest');
-const bcrypt = require('bcryptjs');
-const app = require('../app');
-const { get } = require('../config');
-const {
-  getJuiceShopInstanceForTeamname,
-  getJuiceShopInstances,
-  createDeploymentForTeam,
-  createServiceForTeam,
-  changePasscodeHashForTeam,
-} = require('../kubernetes');
+const kubernetesMock = {
+  createDeploymentForTeam: jest.fn(),
+  createServiceForTeam: jest.fn(),
+  getJuiceShopInstanceForTeamname: jest.fn(() => ({
+    readyReplicas: 1,
+    availableReplicas: 1,
+  })),
+  getJuiceShopInstances: jest.fn(),
+  deletePodForTeam: jest.fn(),
+  updateLastRequestTimestampForTeam: jest.fn(),
+  changePasscodeHashForTeam: jest.fn(),
+};
+
+jest.unstable_mockModule('../kubernetes.js', () => kubernetesMock);
 
 afterEach(() => {
-  getJuiceShopInstanceForTeamname.mockReset();
-  getJuiceShopInstances.mockReset();
-  changePasscodeHashForTeam.mockReset();
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockReset();
+  kubernetesMock.getJuiceShopInstances.mockReset();
+  kubernetesMock.changePasscodeHashForTeam.mockReset();
 });
 
 describe('teamname validation', () => {
@@ -43,7 +49,7 @@ describe('passcode validation', () => {
     ['123456789', false],
     ['1234567', false],
   ])('passcode "%s" should pass validation: %p', async (passcode, shouldPassValidation) => {
-    getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+    kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(async () => {
       return {
         // lowered salt to keep hashing quick
         passcodeHash: bcrypt.hashSync('foo', 2),
@@ -58,7 +64,7 @@ describe('passcode validation', () => {
 });
 
 test('returns a 500 error code when kubernetes returns a unexpected error code while looking for existing deployments', async () => {
-  getJuiceShopInstanceForTeamname.mockImplementation(() => {
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(() => {
     throw new Error(`kubernetes cluster is on burning. Evacuate immediately!`);
   });
 
@@ -66,7 +72,7 @@ test('returns a 500 error code when kubernetes returns a unexpected error code w
 });
 
 test('requires authentication response when the deployment exists but no passcode was provided', async () => {
-  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {
       // lowered salt to keep hashing quick
       passcodeHash: bcrypt.hashSync('foo', 2),
@@ -77,7 +83,7 @@ test('requires authentication response when the deployment exists but no passcod
 });
 
 test('requires authentication when the passcode is incorrect', async () => {
-  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {
       // lowered salt to keep hashing quick
       passcodeHash: bcrypt.hashSync('12345678', 2),
@@ -88,7 +94,7 @@ test('requires authentication when the passcode is incorrect', async () => {
 });
 
 test('joins team when the passcode is correct and the instance exists', async () => {
-  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     return {
       passcodeHash: bcrypt.hashSync('12345678', 2),
     };
@@ -104,10 +110,10 @@ test('joins team when the passcode is correct and the instance exists', async ()
 });
 
 test('create team fails when max instances is reached', async () => {
-  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     throw new Error(`deployments.apps "t-team42-juiceshop" not found`);
   });
-  getJuiceShopInstances.mockImplementation(async () => {
+  kubernetesMock.getJuiceShopInstances.mockImplementation(async () => {
     return { body: { items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } };
   });
 
@@ -120,7 +126,7 @@ test('create team fails when max instances is reached', async () => {
 });
 
 test('create team creates a instance for team via k8s service', async () => {
-  getJuiceShopInstanceForTeamname.mockImplementation(async () => {
+  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(async () => {
     throw new Error(`deployments.apps "t-team42-juiceshop" not found`);
   });
 
@@ -158,7 +164,7 @@ test('reset passcode is forbidden for admin', async () => {
 test('reset passcode fails with not found if team does not exist', async () => {
   const team = 't-test-team';
 
-  changePasscodeHashForTeam.mockImplementation(() => {
+  kubernetesMock.changePasscodeHashForTeam.mockImplementation(() => {
     throw new Error(`deployments.apps "${team}-juiceshop" not found`);
   });
 
@@ -185,9 +191,9 @@ test('reset passcode resets passcode to new value if team exists', async () => {
       newPasscode = body.passcode;
     });
 
-  expect(changePasscodeHashForTeam).toHaveBeenCalled();
+  expect(kubernetesMock.changePasscodeHashForTeam).toHaveBeenCalled();
 
-  const callArgs = changePasscodeHashForTeam.mock.calls[0];
+  const callArgs = kubernetesMock.changePasscodeHashForTeam.mock.calls[0];
   expect(callArgs[0]).toBe(team);
   expect(bcrypt.compareSync(newPasscode, callArgs[1])).toBe(true);
 });

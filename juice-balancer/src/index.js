@@ -1,7 +1,6 @@
-const { get } = require('./config');
-const { logger } = require('./logger');
-
-const app = require('./app.js');
+import { get } from './config.js';
+import { logger } from './logger.js';
+import app from './app.js';
 
 const server = app.listen(get('port'), () =>
   logger.info(`JuiceBalancer listening on port ${get('port')}!`)

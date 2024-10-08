@@ -1,36 +1,33 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const cryptoRandomString = require('crypto-random-string');
+import { Router } from 'express';
+import bcrypt from 'bcryptjs';
+import cryptoRandomString from 'crypto-random-string';
+import joi from '@hapi/joi';
+import { createValidator } from 'express-joi-validation';
+import { Counter } from 'prom-client';
 
-const Joi = require('@hapi/joi');
-const expressJoiValidation = require('express-joi-validation');
-const promClient = require('prom-client');
+const validator = createValidator();
+const router = Router();
 
-const validator = expressJoiValidation.createValidator();
-
-const router = express.Router();
-
-const {
+import {
   createDeploymentForTeam,
   createServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
   changePasscodeHashForTeam,
-} = require('../kubernetes');
+} from '../kubernetes.js';
+import { logger } from '../logger.js';
+import { get } from '../config.js';
 
-const loginCounter = new promClient.Counter({
+const loginCounter = new Counter({
   name: 'multijuicer_logins',
   help: 'Number of logins (including registrations, see label "type").',
   labelNames: ['type', 'userType'],
 });
-const failedLoginCounter = new promClient.Counter({
+const failedLoginCounter = new Counter({
   name: 'multijuicer_failed_logins',
   help: 'Number of failed logins, bad password (including admin logins, see label "type").',
   labelNames: ['userType'],
 });
-
-const { logger } = require('../logger');
-const { get } = require('../config');
 
 const BCRYPT_ROUNDS = process.env['NODE_ENV'] === 'production' ? 12 : 2;
 
@@ -275,14 +272,15 @@ function logout(req, res) {
     .send();
 }
 
-const paramsSchema = Joi.object({
-  team: Joi.string()
+const paramsSchema = joi.object({
+  team: joi
+    .string()
     .required()
     .max(16)
     .regex(/^[a-z0-9]([-a-z0-9])+[a-z0-9]$/),
 });
-const bodySchema = Joi.object({
-  passcode: Joi.string().alphanum().uppercase().length(8),
+const bodySchema = joi.object({
+  passcode: joi.string().alphanum().uppercase().length(8),
 });
 
 router.post('/logout', logout);
@@ -301,4 +299,4 @@ router.post('/reset-passcode', resetPasscode);
 
 router.get('/:team/wait-till-ready', validator.params(paramsSchema), awaitReadiness);
 
-module.exports = router;
+export default router;

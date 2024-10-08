@@ -1,16 +1,15 @@
-const express = require('express');
+import { Router } from 'express';
 
-const router = express.Router();
+const router = Router();
 
-const {
+import {
   getJuiceShopInstances,
   deletePodForTeam,
   deleteDeploymentForTeam,
   deleteServiceForTeam,
-} = require('../kubernetes');
-
-const { get } = require('../config');
-const { logger } = require('../logger');
+} from '../kubernetes.js';
+import { get } from '../config.js';
+import { logger } from '../logger.js';
 
 /**
  * @param {import("express").Request} req
@@ -94,4 +93,5 @@ router.all('*', ensureAdminLogin);
 router.get('/all', listInstances);
 router.post('/teams/:team/restart', restartInstance);
 router.delete('/teams/:team/delete', deleteInstance);
-module.exports = router;
+
+export default router;

@@ -1,15 +1,15 @@
-const config = require('../config/config.json');
-const lodashGet = require('lodash/get');
-const memoize = require('lodash/memoize');
+import { get as lodashGet, memoize } from 'lodash-es';
+import { readFileSync } from 'node:fs';
 
-const fetchConfigValue = (name, defaultValue) => {
+const configFile = JSON.parse(readFileSync('./config/config.json'));
+
+function fetchConfigValue(name, defaultValue) {
   const envVarName = name
     .split('.')
     .map((string) => string.toUpperCase())
     .join('_');
 
-  return process.env[envVarName] || lodashGet(config, name, defaultValue);
-};
+  return process.env[envVarName] || lodashGet(configFile, name, defaultValue);
+}
 
-const get = memoize(fetchConfigValue);
-module.exports.get = get;
+export const get = memoize(fetchConfigValue);

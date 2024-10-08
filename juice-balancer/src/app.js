@@ -1,21 +1,26 @@
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const path = require('path');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import { join } from 'path';
 
-const promClient = require('prom-client');
-const basicAuth = require('basic-auth-connect');
-const onFinished = require('on-finished');
+import { collectDefaultMetrics, register, Counter } from 'prom-client';
+import basicAuth from 'basic-auth-connect';
+import onFinished from 'on-finished';
 
-const { get } = require('./config');
+import { get } from './config.js';
+
+import teamRoutes from './teams/teams.js';
+import adminRoutes from './admin/admin.js';
+import proxyRoutes from './proxy/proxy.js';
+import scoreBoard from './score-board/score-board.js';
 
 const app = express();
 
 if (get('metrics.enabled')) {
-  promClient.collectDefaultMetrics();
+  collectDefaultMetrics();
 
-  promClient.register.setDefaultLabels({ app: 'multijuicer' });
+  register.setDefaultLabels({ app: 'multijuicer' });
 
-  const httpRequestsMetric = new promClient.Counter({
+  const httpRequestsMetric = new Counter({
     name: 'http_requests_count',
     help: 'Total HTTP request count grouped by status code.',
     labelNames: ['status_code'],
@@ -34,8 +39,8 @@ if (get('metrics.enabled')) {
     basicAuth(get('metrics.basicAuth.username'), get('metrics.basicAuth.password')),
     async (req, res) => {
       try {
-        res.set('Content-Type', promClient.register.contentType);
-        res.end(await promClient.register.metrics());
+        res.set('Content-Type', register.contentType);
+        res.end(await register.metrics());
       } catch (err) {
         console.error('Failed to write metrics', err);
         res.status(500).end();
@@ -43,11 +48,6 @@ if (get('metrics.enabled')) {
     }
   );
 }
-
-const teamRoutes = require('./teams/teams');
-const adminRoutes = require('./admin/admin');
-const proxyRoutes = require('./proxy/proxy');
-const scoreBoard = require('./score-board/score-board');
 
 app.use(cookieParser(get('cookieParser.secret')));
 app.use('/balancer', express.json());
@@ -83,7 +83,7 @@ app.use(
 
 app.use('/balancer/teams', teamRoutes);
 app.get('/balancer/admin', (req, res) => {
-  const indexFile = path.join(
+  const indexFile = join(
     __dirname,
     process.env['NODE_ENV'] === 'test' ? '../ui/build/index.html' : '../public/index.html'
   );
@@ -94,4 +94,4 @@ app.use('/balancer/score-board', scoreBoard);
 
 app.use(proxyRoutes);
 
-module.exports = app;
+export default app;

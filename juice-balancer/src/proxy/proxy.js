@@ -1,16 +1,16 @@
-const express = require('express');
-const httpProxy = require('http-proxy');
+import { Router } from 'express';
+import httpProxy from 'http-proxy';
 
 const proxy = httpProxy.createProxyServer();
 
-const { get } = require('../config');
-const { logger } = require('../logger');
-const {
+import { get } from '../config.js';
+import { logger } from '../logger.js';
+import {
   getJuiceShopInstanceForTeamname,
   updateLastRequestTimestampForTeam,
-} = require('../kubernetes');
+} from '../kubernetes.js';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @param {import("express").Request} req
@@ -134,4 +134,4 @@ router.use(
   proxyTrafficToJuiceShop
 );
 
-module.exports = router;
+export default router;

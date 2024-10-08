@@ -1,14 +1,13 @@
-const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
+import { KubeConfig, AppsV1Api, CoreV1Api } from '@kubernetes/client-node';
+import { get as lodashGet, once } from 'lodash-es';
+
+import { get } from './config.js';
+
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
 const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
-
-const { get } = require('./config');
-
-const lodashGet = require('lodash/get');
-const once = require('lodash/once');
 
 // Gets the Deployment uid for the JuiceBalancer
 // This is required to set the JuiceBalancer as owner of the created JuiceShop Instances
@@ -17,7 +16,7 @@ const getJuiceBalancerDeploymentUid = once(async () => {
   return lodashGet(deployment, ['body', 'metadata', 'uid'], null);
 });
 
-const createDeploymentForTeam = async ({ team, passcodeHash }) => {
+export const createDeploymentForTeam = async ({ team, passcodeHash }) => {
   const deploymentConfig = {
     metadata: {
       name: `t-${team}-juiceshop`,
@@ -153,9 +152,7 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
     });
 };
 
-module.exports.createDeploymentForTeam = createDeploymentForTeam;
-
-const createServiceForTeam = async (teamname) =>
+export const createServiceForTeam = async (teamname) =>
   k8sCoreApi
     .createNamespacedService(get('namespace'), {
       metadata: {
@@ -187,9 +184,8 @@ const createServiceForTeam = async (teamname) =>
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
-module.exports.createServiceForTeam = createServiceForTeam;
 
-async function getOwnerReference() {
+export async function getOwnerReference() {
   if (get('skipOwnerReference') === true) {
     return {};
   }
@@ -207,7 +203,7 @@ async function getOwnerReference() {
   };
 }
 
-const getJuiceShopInstances = () =>
+export const getJuiceShopInstances = () =>
   k8sAppsApi
     .listNamespacedDeployment(
       get('namespace'),
@@ -223,27 +219,24 @@ const getJuiceShopInstances = () =>
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
-module.exports.getJuiceShopInstances = getJuiceShopInstances;
 
-const deleteDeploymentForTeam = async (team) => {
+export const deleteDeploymentForTeam = async (team) => {
   await k8sAppsApi
     .deleteNamespacedDeployment(`t-${team}-juiceshop`, get('namespace'))
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
 };
-module.exports.deleteDeploymentForTeam = deleteDeploymentForTeam;
 
-const deleteServiceForTeam = async (team) => {
+export const deleteServiceForTeam = async (team) => {
   await k8sCoreApi
     .deleteNamespacedService(`t-${team}-juiceshop`, get('namespace'))
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
 };
-module.exports.deleteServiceForTeam = deleteServiceForTeam;
 
-const deletePodForTeam = async (team) => {
+export const deletePodForTeam = async (team) => {
   const res = await k8sCoreApi.listNamespacedPod(
     get('namespace'),
     true,
@@ -267,9 +260,8 @@ const deletePodForTeam = async (team) => {
 
   await k8sCoreApi.deleteNamespacedPod(podname, get('namespace'));
 };
-module.exports.deletePodForTeam = deletePodForTeam;
 
-const getJuiceShopInstanceForTeamname = (teamname) =>
+export const getJuiceShopInstanceForTeamname = (teamname) =>
   k8sAppsApi
     .readNamespacedDeployment(`t-${teamname}-juiceshop`, get('namespace'))
     .then((res) => {
@@ -282,9 +274,8 @@ const getJuiceShopInstanceForTeamname = (teamname) =>
     .catch((error) => {
       throw new Error(error.response.body.message);
     });
-module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;
 
-const updateLastRequestTimestampForTeam = (teamname) => {
+export const updateLastRequestTimestampForTeam = (teamname) => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };
   return k8sAppsApi.patchNamespacedDeployment(
     `t-${teamname}-juiceshop`,
@@ -305,9 +296,8 @@ const updateLastRequestTimestampForTeam = (teamname) => {
     { headers }
   );
 };
-module.exports.updateLastRequestTimestampForTeam = updateLastRequestTimestampForTeam;
 
-const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
+export const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };
   const deploymentPatch = {
     metadata: {
@@ -329,4 +319,3 @@ const changePasscodeHashForTeam = async (teamname, passcodeHash) => {
     { headers }
   );
 };
-module.exports.changePasscodeHashForTeam = changePasscodeHashForTeam;
