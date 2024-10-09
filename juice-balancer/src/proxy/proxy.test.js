@@ -1,34 +1,34 @@
 import { advanceBy, advanceTo, clear } from 'jest-date-mock';
 import request from 'supertest';
-import app from '../app.js';
+import { createApp } from '../app.js';
 import { jest } from '@jest/globals';
-
-const kubernetesMock = {
-  createDeploymentForTeam: jest.fn(),
-  createServiceForTeam: jest.fn(),
-  getJuiceShopInstanceForTeamname: jest.fn(() => ({
-    readyReplicas: 1,
-    availableReplicas: 1,
-  })),
-  getJuiceShopInstances: jest.fn(),
-  deletePodForTeam: jest.fn(),
-  updateLastRequestTimestampForTeam: jest.fn(),
-  changePasscodeHashForTeam: jest.fn(),
-};
-
-jest.unstable_mockModule('http-proxy', () => ({
-  web: jest.fn((req, res) => res.send('proxied')),
-}));
-jest.unstable_mockModule('../kubernetes.js', () => kubernetesMock);
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error
 });
 
+let app;
+let kubernetesApi;
 beforeEach(() => {
   clear();
-  kubernetesMock.getJuiceShopInstanceForTeamname.mockClear();
-  kubernetesMock.updateLastRequestTimestampForTeam.mockClear();
+  kubernetesApi = {
+    createDeploymentForTeam: jest.fn(),
+    createServiceForTeam: jest.fn(),
+    getJuiceShopInstanceForTeamname: jest.fn(() => ({
+      readyReplicas: 1,
+      availableReplicas: 1,
+    })),
+    getJuiceShopInstances: jest.fn(),
+    deletePodForTeam: jest.fn(),
+    updateLastRequestTimestampForTeam: jest.fn(),
+    changePasscodeHashForTeam: jest.fn(),
+  };
+  app = createApp({
+    kubernetesApi,
+    proxy: {
+      web: jest.fn((req, res) => res.send('proxied')),
+    },
+  });
 });
 
 test('/balancer/ should return the balancer ui', async () => {
@@ -68,7 +68,7 @@ test('should set the last-connect timestamp when a new team gets proxied the fir
     .expect(200)
     .expect('proxied');
 
-  expect(kubernetesMock.updateLastRequestTimestampForTeam).toHaveBeenCalledWith(
+  expect(kubernetesApi.updateLastRequestTimestampForTeam).toHaveBeenCalledWith(
     'team-last-connect-test'
   );
 });
@@ -83,11 +83,11 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(kubernetesMock.updateLastRequestTimestampForTeam).toHaveBeenCalledWith(
+  expect(kubernetesApi.updateLastRequestTimestampForTeam).toHaveBeenCalledWith(
     'team-update-last-connect-test'
   );
 
-  kubernetesMock.updateLastRequestTimestampForTeam.mockClear();
+  kubernetesApi.updateLastRequestTimestampForTeam.mockClear();
 
   await request(app)
     .get('/rest/admin/application-version')
@@ -96,7 +96,7 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(kubernetesMock.updateLastRequestTimestampForTeam).not.toHaveBeenCalled();
+  expect(kubernetesApi.updateLastRequestTimestampForTeam).not.toHaveBeenCalled();
 
   // Wait for >10s
   advanceBy(10 * 1000 + 1);
@@ -108,12 +108,12 @@ test('should update the last-connect timestamp on requests at most every 10sec',
     .expect(200)
     .expect('proxied');
 
-  expect(kubernetesMock.updateLastRequestTimestampForTeam).toHaveBeenCalledWith(
+  expect(kubernetesApi.updateLastRequestTimestampForTeam).toHaveBeenCalledWith(
     'team-update-last-connect-test'
   );
 });
 
-test('should only call kubernetesMock.getJuiceShopInstanceForTeamname on requests at most every 10sec', async () => {
+test('should only call kubernetesApi.getJuiceShopInstanceForTeamname on requests at most every 10sec', async () => {
   advanceTo(new Date(1000000000000));
 
   await request(app)
@@ -122,9 +122,9 @@ test('should only call kubernetesMock.getJuiceShopInstanceForTeamname on request
     .send()
     .expect(200);
 
-  expect(kubernetesMock.getJuiceShopInstanceForTeamname).toHaveBeenCalled();
+  expect(kubernetesApi.getJuiceShopInstanceForTeamname).toHaveBeenCalled();
 
-  kubernetesMock.getJuiceShopInstanceForTeamname.mockClear();
+  kubernetesApi.getJuiceShopInstanceForTeamname.mockClear();
 
   await request(app)
     .get('/rest/admin/application-version')
@@ -133,7 +133,7 @@ test('should only call kubernetesMock.getJuiceShopInstanceForTeamname on request
     .expect(200)
     .expect('proxied');
 
-  expect(kubernetesMock.getJuiceShopInstanceForTeamname).not.toHaveBeenCalled();
+  expect(kubernetesApi.getJuiceShopInstanceForTeamname).not.toHaveBeenCalled();
 
   // Wait for >10s
   advanceBy(10 * 1000 + 1);
@@ -145,11 +145,11 @@ test('should only call kubernetesMock.getJuiceShopInstanceForTeamname on request
     .expect(200)
     .expect('proxied');
 
-  expect(kubernetesMock.getJuiceShopInstanceForTeamname).toHaveBeenCalled();
+  expect(kubernetesApi.getJuiceShopInstanceForTeamname).toHaveBeenCalled();
 });
 
 test('should redirect to /balancer/ when the instance is currently restarting', async () => {
-  kubernetesMock.getJuiceShopInstanceForTeamname.mockReturnValue({ readyReplicas: 0 });
+  kubernetesApi.getJuiceShopInstanceForTeamname.mockReturnValue({ readyReplicas: 0 });
 
   await request(app)
     .get('/rest/admin/application-version')
@@ -164,7 +164,7 @@ test('should redirect to /balancer/ when the instance is currently restarting', 
 });
 
 test('should redirect to /balancer/ when the instance is not existing', async () => {
-  kubernetesMock.getJuiceShopInstanceForTeamname.mockImplementation(() => {
+  kubernetesApi.getJuiceShopInstanceForTeamname.mockImplementation(() => {
     throw new Error();
   });
 

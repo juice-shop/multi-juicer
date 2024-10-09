@@ -1,7 +1,5 @@
 import { Router } from 'express';
 
-const router = Router();
-
 import { getJuiceShopInstances } from '../kubernetes.js';
 import { logger } from '../logger.js';
 
@@ -116,48 +114,52 @@ const keyDifficultyMapping = Object.freeze({
   csafChallenge: 3,
 });
 
-/**
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- */
-async function getTopTeams(req, res) {
-  const instances = await getJuiceShopInstances();
+export function createScoreBoardRouteHandler() {
+  const router = Router();
 
-  logger.debug(`Listing top teams`);
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   */
+  async function getTopTeams(req, res) {
+    const instances = await getJuiceShopInstances();
 
-  const teams = instances.body.items.map((team) => {
-    const challengeProgress = JSON.parse(
-      team.metadata.annotations['multi-juicer.owasp-juice.shop/challenges'] ?? '[]'
-    ).map((progress) => {
-      const difficulty = keyDifficultyMapping[progress.key];
+    logger.debug(`Listing top teams`);
 
-      if (difficulty === undefined) {
-        logger.warn(
-          `Difficulty for challenge "${progress.key}" is unknown. MultiJuicer version might be incompatible with the Juice Shop version used.`
-        );
+    const teams = instances.body.items.map((team) => {
+      const challengeProgress = JSON.parse(
+        team.metadata.annotations['multi-juicer.owasp-juice.shop/challenges'] ?? '[]'
+      ).map((progress) => {
+        const difficulty = keyDifficultyMapping[progress.key];
+
+        if (difficulty === undefined) {
+          logger.warn(
+            `Difficulty for challenge "${progress.key}" is unknown. MultiJuicer version might be incompatible with the Juice Shop version used.`
+          );
+        }
+
+        return {
+          ...progress,
+          difficulty,
+        };
+      });
+
+      let score = 0;
+      for (const { difficulty } of challengeProgress) {
+        score += difficulty * 10;
       }
 
-      return {
-        ...progress,
-        difficulty,
-      };
+      return { name: team.metadata.labels.team, score, challenges: challengeProgress };
     });
 
-    let score = 0;
-    for (const { difficulty } of challengeProgress) {
-      score += difficulty * 10;
-    }
+    teams.sort((a, b) => b.score - a.score);
+    // Get the 25 teams with the highest score
+    const topTeams = teams.slice(0, Math.min(teams.length, 24));
 
-    return { name: team.metadata.labels.team, score, challenges: challengeProgress };
-  });
+    res.status(200).send({ totalTeams: instances.length, teams: topTeams });
+  }
 
-  teams.sort((a, b) => b.score - a.score);
-  // Get the 25 teams with the highest score
-  const topTeams = teams.slice(0, Math.min(teams.length, 24));
+  router.get('/top', getTopTeams);
 
-  res.status(200).send({ totalTeams: instances.length, teams: topTeams });
+  return router;
 }
-
-router.get('/top', getTopTeams);
-
-export default router;

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint src/**",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "keywords": [],
   "author": "iteratec GmbH and multi-juicer contributors",
