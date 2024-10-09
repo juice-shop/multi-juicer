@@ -11,7 +11,7 @@ const server = createApp({ kubernetesApi, proxy }).listen(get('port'), () =>
 );
 
 process.on('SIGTERM', () => {
-  logger.warn('Recieved "SIGTERM" Signal shutting down.');
+  logger.warn('Received "SIGTERM" Signal. Shutting down.');
   server.close();
   process.exit(0);
 });
