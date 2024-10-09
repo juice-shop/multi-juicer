@@ -1,6 +1,6 @@
 import winston from 'winston';
 
-const myFormat = winston.format.printf(({ level, message, timestamp }) => {
+const logFormat = winston.format.printf(({ level, message, timestamp }) => {
   return `time="${timestamp}" level="${level}" msg="${message}"`;
 });
 
@@ -17,6 +17,6 @@ const getLogLevelForEnvironment = (env) => {
 
 export const logger = winston.createLogger({
   level: getLogLevelForEnvironment(process.env['NODE_ENV']),
-  format: winston.format.combine(winston.format.timestamp(), myFormat),
+  format: winston.format.combine(winston.format.timestamp(), logFormat),
   transports: [new winston.transports.Console()],
 });
