@@ -19,7 +19,7 @@ export default [
       'prettier/prettier': 'error',
       'linebreak-style': ['error', 'unix'],
       semi: ['error', 'always'],
-      'no-console': 'off',
+      'no-console': 'error',
     },
   },
   js.configs.recommended,

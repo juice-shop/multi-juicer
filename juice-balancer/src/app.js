@@ -7,6 +7,7 @@ import basicAuth from 'basic-auth-connect';
 import onFinished from 'on-finished';
 
 import { get } from './config.js';
+import { logger } from './logger.js';
 
 import { createTeamsRouteHandler } from './teams/teams.js';
 import { createAdminRouteHandler } from './admin/admin.js';
@@ -43,7 +44,7 @@ export function createApp({ kubernetesApi, proxy }) {
           res.set('Content-Type', register.contentType);
           res.end(await register.metrics());
         } catch (err) {
-          console.error('Failed to write metrics', err);
+          logger.warn('Failed to write metrics', err);
           res.status(500).end();
         }
       }
