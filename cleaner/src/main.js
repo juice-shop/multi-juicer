@@ -23,7 +23,7 @@ if (MaxInactiveDurationInMs === null) {
   `);
 }
 
-async function main() {
+async function runCleanup() {
   const counts = {
     successful: {
       deployments: 0,
@@ -97,18 +97,17 @@ async function main() {
   return counts;
 }
 
-main()
-  .then((counts) => {
-    console.log('Finished Juice Shop Instance Cleanup');
-    console.log('');
-    console.log('Successful deletions:');
-    console.log(`  Deployments: ${counts.successful.deployments}`);
-    console.log(`  Services: ${counts.successful.services}`);
-    console.log('Failed deletions:');
-    console.log(`  Deployments: ${counts.failed.deployments}`);
-    console.log(`  Services: ${counts.failed.services}`);
-  })
-  .catch((err) => {
-    console.error('Failed deletion tasks');
-    console.error(err);
-  });
+try {
+  const counts = await runCleanup();
+  console.log('Finished Juice Shop Instance Cleanup');
+  console.log('');
+  console.log('Successful deletions:');
+  console.log(`  Deployments: ${counts.successful.deployments}`);
+  console.log(`  Services: ${counts.successful.services}`);
+  console.log('Failed deletions:');
+  console.log(`  Deployments: ${counts.failed.deployments}`);
+  console.log(`  Services: ${counts.failed.services}`);
+} catch (error) {
+  console.error('Failed deletion tasks');
+  console.error(err);
+}
