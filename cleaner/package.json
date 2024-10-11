@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "type": "module",
   "scripts": {
-    "test": "node --test src/",
+    "test": "node --test",
     "lint": "eslint src/**"
   },
   "author": "iteratec GmbH and multi-juicer contributors",
