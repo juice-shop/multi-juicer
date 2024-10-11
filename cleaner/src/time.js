@@ -1,6 +1,6 @@
 const durationRegex = /^(\d+)([s,m,h,d])$/;
 
-function parseTimeDurationString(durationString) {
+export function parseTimeDurationString(durationString) {
   const match = durationRegex.exec(durationString.toLowerCase());
 
   if (match === null) {
@@ -29,7 +29,7 @@ const Minute = 60 * Second;
 const Hour = 60 * Minute;
 const Day = Hour * 24;
 
-function msToHumanReadable(ms) {
+export function msToHumanReadable(ms) {
   const asDays = Math.floor(ms / Day);
   if (asDays >= 1) {
     return `${asDays}d`;
@@ -48,6 +48,3 @@ function msToHumanReadable(ms) {
   }
   return '<1s';
 }
-
-module.exports.parseTimeDurationString = parseTimeDurationString;
-module.exports.msToHumanReadable = msToHumanReadable;

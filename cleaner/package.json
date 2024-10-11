@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Kubernetes CronJob for cleaning up unused Juice Shop instances.",
   "main": "src/main.js",
+  "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "node --test src/",
     "lint": "eslint src/**"
   },
   "author": "iteratec GmbH and multi-juicer contributors",
@@ -15,7 +16,6 @@
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "jest": "^29.7.0",
     "prettier": "^3.3.3"
   }
 }

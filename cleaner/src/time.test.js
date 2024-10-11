@@ -1,12 +1,15 @@
-const { parseTimeDurationString, msToHumanReadable } = require('./time');
+import { test, suite } from 'node:test';
+import assert from 'node:assert';
+
+import { parseTimeDurationString, msToHumanReadable } from './time.js';
 
 const Second = 1000;
 const Minute = 60 * Second;
 const Hour = 60 * Minute;
 const Day = Hour * 24;
 
-describe('parseTimeDurationString', () => {
-  describe.each([
+suite('parseTimeDurationString', () => {
+  for (const [durationString, expected] of [
     ['2s', 2 * Second],
     ['2S', 2 * Second],
     ['33m', 33 * Minute],
@@ -18,15 +21,15 @@ describe('parseTimeDurationString', () => {
     ['2ms', null],
     ['foobar', null],
     ['d7', null],
-  ])('%s', (durationString, expected) => {
-    test(`should be ${expected}ms`, () => {
-      expect(parseTimeDurationString(durationString)).toBe(expected);
+  ]) {
+    test(durationString, () => {
+      assert.equal(parseTimeDurationString(durationString), expected);
     });
-  });
+  }
 });
 
-describe('msToHumanReadable', () => {
-  describe.each([
+suite('msToHumanReadable', () => {
+  for (const [durationInMs, expected] of [
     [999, '<1s'],
     [1000, '1s'],
     [60 * 1000, '1m'],
@@ -35,9 +38,9 @@ describe('msToHumanReadable', () => {
     [15 * 60 * 60 * 1000, '15h'],
     [24 * 60 * 60 * 1000, '1d'],
     [3 * 24 * 60 * 60 * 1000, '3d'],
-  ])('%dms', (durationString, expected) => {
-    test(`should be ${expected}`, () => {
-      expect(msToHumanReadable(durationString)).toBe(expected);
+  ]) {
+    test(`${durationInMs}ms`, () => {
+      assert.equal(msToHumanReadable(durationInMs), expected);
     });
-  });
+  }
 });

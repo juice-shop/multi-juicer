@@ -1,6 +1,6 @@
-const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
+import { KubeConfig, AppsV1Api, CoreV1Api } from '@kubernetes/client-node';
 
-const { parseTimeDurationString, msToHumanReadable } = require('./time');
+import { parseTimeDurationString, msToHumanReadable } from './time.js';
 
 const Namespace = process.env['NAMESPACE'];
 

@@ -19,7 +19,7 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Test
-        run: npm test -- --ci --color --verbose
+        run: npm test
 
   balancer:
     name: Balancer
