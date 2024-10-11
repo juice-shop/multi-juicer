@@ -1,7 +1,7 @@
+import { jest, beforeEach, test, expect } from '@jest/globals';
 import { advanceBy, advanceTo, clear } from 'jest-date-mock';
 import request from 'supertest';
 import { createApp } from '../app.js';
-import { jest } from '@jest/globals';
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error

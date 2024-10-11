@@ -1,8 +1,8 @@
+import { jest, beforeEach, describe, test, expect } from '@jest/globals';
 import request from 'supertest';
 import bcrypt from 'bcryptjs';
 import { get } from '../config.js';
 import { createApp } from '../app.js';
-import { jest } from '@jest/globals';
 
 afterAll(async () => {
   await new Promise((resolve) => setTimeout(() => resolve(), 500)); // avoid jest open handle error
