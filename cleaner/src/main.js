@@ -87,7 +87,7 @@ async function runCleanup() {
       }
     } else {
       console.log(
-        `Not deleting Instance: '${instanceName}'. Been last active ${msToHumanReadable(
+        `Not deleting instance: '${instanceName}'. It was last active ${msToHumanReadable(
           timeDifference
         )} ago.`
       );
