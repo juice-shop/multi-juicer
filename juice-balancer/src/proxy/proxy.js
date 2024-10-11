@@ -87,7 +87,6 @@ export function createProxyRouteHandler({ kubernetesApi, proxy }) {
     } catch (error) {
       logger.warn(`Failed to update lastRequest timestamp for team '${teamname}'"`);
       logger.warn(error.message);
-      logger.warn(JSON.stringify(error));
     }
     next();
   }
