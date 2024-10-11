@@ -84,6 +84,7 @@ async function runCleanup() {
       } catch (error) {
         counts.failed.services++;
         console.error(`Failed to delete service: '${instanceName}' from namespace '${Namespace}'`);
+        console.error(error);
       }
     } else {
       console.log(
@@ -109,5 +110,5 @@ try {
   console.log(`  Services: ${counts.failed.services}`);
 } catch (error) {
   console.error('Failed deletion tasks');
-  console.error(err);
+  console.error(error);
 }
