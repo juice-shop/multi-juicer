@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
@@ -58,8 +58,10 @@ const LogoutButton = () => {
 
 const PasscodeResetButton = ({ teamname }) => {
   const navigate = useNavigate();
+  const [isResetting, setIsResetting] = useState(false);
 
   async function resetPasscode() {
+    setIsResetting(true);
     try {
       const response = await fetch('/balancer/teams/reset-passcode', {
         method: 'POST',
@@ -68,11 +70,13 @@ const PasscodeResetButton = ({ teamname }) => {
       navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode, reset: true }});
     } catch (error) {
       console.error('Failed to reset passcode', error);
+    } finally {
+      setIsResetting(false)
     }
   }
 
   return (
-    <SecondaryButton onClick={resetPasscode}>
+    <SecondaryButton onClick={resetPasscode} disabled={isResetting}>
       <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
     </SecondaryButton>
   );

@@ -61,13 +61,22 @@ export const Button = styled.button`
   @media (max-width: 640px) {
     padding: 8px 12px;
   }
-`;
 
-export const SecondaryButton = styled(Button)`
+  &:disabled {
+    background-color: #cf3a234d;
+    cursor: wait;
+  }
+  `;
+  
+  export const SecondaryButton = styled(Button)`
   margin: 0 0 0 5px;
   width: auto;
   background-color: #d8d8d8;
   color: #232323;
+
+  &:disabled {
+    background-color: #d8d8d87d;
+  }
 `;
 
 export const Card = styled.div`

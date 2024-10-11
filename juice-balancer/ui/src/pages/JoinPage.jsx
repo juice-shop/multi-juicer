@@ -35,6 +35,7 @@ const ErrorBox = styled.div`
 export const JoinPage = injectIntl(({ intl }) => {
   const [teamname, setTeamname] = useState('');
   const [failureMessage, setFailureMessage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -73,10 +74,12 @@ export const JoinPage = injectIntl(({ intl }) => {
           response.status === 500 &&
           errorData.message === 'Reached Maximum Instance Count'
         ) {
+          setIsSubmitting(false);
           setFailureMessage(
             'Max instances reached, contact admin or join another team to participate.'
           );
         } else {
+          setIsSubmitting(false);
           setFailureMessage('Unexpected error. Please contact an admin.');
         }
         return;
@@ -91,9 +94,12 @@ export const JoinPage = injectIntl(({ intl }) => {
   }
 
   function onSubmit(event) {
+    setIsSubmitting(true)
     event.preventDefault();
     sendJoinRequest({ teamname });
   }
+
+  console.log('render', isSubmitting);
 
   return (
     <>
@@ -148,7 +154,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             maxLength="16"
             onChange={({ target }) => setTeamname(target.value)}
           />
-          <Button data-test-id="create-join-team-button" type="submit">
+          <Button data-test-id="create-join-team-button" type="submit" disabled={isSubmitting}>
             <FormattedMessage id="create_or_join_team_label" defaultMessage="Create / Join Team" />
           </Button>
         </Form>
