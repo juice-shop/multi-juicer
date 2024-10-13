@@ -12,5 +12,4 @@ RUN chmod +x progress-watchdog
 
 FROM gcr.io/distroless/static:nonroot
 COPY --from=builder --chown=nonroot:nonroot /src/progress-watchdog /progress-watchdog
-ENV GIN_MODE=release
 CMD ["/progress-watchdog"]

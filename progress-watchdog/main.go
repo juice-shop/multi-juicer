@@ -11,7 +11,6 @@ import (
 
 	"github.com/juice-shop/multi-juicer/progress-watchdog/internal"
 
-	"github.com/gin-gonic/gin"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -48,6 +47,7 @@ type JuiceShopWebhook struct {
 }
 
 var logger = log.New(os.Stdout, "", log.LstdFlags)
+var namespace = os.Getenv("NAMESPACE")
 
 func main() {
 	logger.Println("Starting ProgressWatchdog")
@@ -66,16 +66,17 @@ func main() {
 	const numberWorkers = 10
 	internal.StartBackgroundSync(clientset, numberWorkers)
 
-	router := gin.New()
-	router.POST("/team/:team/webhook", func(c *gin.Context) {
-		team := c.Param("team")
+	router := http.NewServeMux()
+	router.HandleFunc("POST /team/{team}/webhook", func(responseWriter http.ResponseWriter, req *http.Request) {
+		team := req.PathValue("team")
 		var webhook JuiceShopWebhook
-		if err := c.ShouldBindJSON(&webhook); err != nil {
-			c.String(http.StatusBadRequest, "not ok")
+
+		err := json.NewDecoder(req.Body).Decode(&webhook)
+		if err != nil {
+			http.Error(responseWriter, "invalid json", http.StatusBadRequest)
 			return
 		}
 
-		namespace := os.Getenv("NAMESPACE")
 		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.Background(), fmt.Sprintf("t-%s-juiceshop", team), metav1.GetOptions{})
 		if err != nil {
 			logger.Print(fmt.Errorf("failed to get deployment for team: '%s' received via in webhook: %w", team, err))
@@ -96,7 +97,8 @@ func main() {
 		for _, status := range challengeStatus {
 			if status.Key == webhook.Solution.Challenge {
 				logger.Printf("Challenge '%s' already solved by team '%s', ignoring webhook", webhook.Solution.Challenge, team)
-				c.String(http.StatusOK, "ok")
+				responseWriter.WriteHeader(http.StatusOK)
+				responseWriter.Write([]byte("ok"))
 				return
 			}
 		}
@@ -108,8 +110,14 @@ func main() {
 
 		logger.Printf("Received webhook for team '%s' for challenge '%s'", team, webhook.Solution.Challenge)
 
-		c.String(http.StatusOK, "ok")
+		responseWriter.WriteHeader(http.StatusOK)
+		responseWriter.Write([]byte("ok"))
 	})
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
 	logger.Println("Starting web server listening for Solution Webhooks on :8080")
-	router.Run()
+	server.ListenAndServe()
 }
