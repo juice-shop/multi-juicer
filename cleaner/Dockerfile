@@ -1,13 +1,14 @@
-FROM node:22-alpine AS build
-RUN mkdir -p /home/app
-WORKDIR /home/app
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+FROM --platform=$BUILDPLATFORM docker.io/golang:1.23 AS builder
+WORKDIR /src
+COPY go.mod go.sum ./
+# cache deps before building and copying source so that we don't need to re-download as much
+# and so that source changes don't invalidate our downloaded layer
+RUN go mod download
+COPY main.go main.go
+ARG TARGETOS TARGETARCH
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build
+RUN chmod +x cleaner
 
-FROM node:22-alpine
-RUN addgroup --system --gid 1001 app && adduser app --system --uid 1001 --ingroup app
-WORKDIR /home/app/
-COPY --from=build --chown=app:app /home/app/node_modules/ ./node_modules/
-COPY --chown=app:app ./src src/
-USER 1001
-CMD ["node", "/home/app/src/main.js"]
+FROM gcr.io/distroless/static:nonroot
+COPY --from=builder --chown=nonroot:nonroot /src/cleaner /cleaner
+CMD ["/cleaner"]

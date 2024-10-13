@@ -11,15 +11,13 @@ jobs:
         working-directory: cleaner
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: "22"
-      - name: Install Dependencies
-        run: npm ci
-      - name: Lint
-        run: npm run lint
-      - name: Test
-        run: npm test
+          go-version-file: "cleaner/go.mod"
+      - name: "Lint"
+        run: go vet
+      - name: "Test"
+        run: go test -cover
 
   balancer:
     name: Balancer
