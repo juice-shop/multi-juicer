@@ -11,6 +11,7 @@ version="$(uuidgen)"
 docker build --progress plain -t local/juice-balancer:$version ./juice-balancer &
 docker build --progress plain -t local/cleaner:$version ./cleaner &
 docker build --progress plain -t local/progress-watchdog:$version ./progress-watchdog &
+docker build --progress plain -t local/balancer:$version ./balancer &
 
 wait
 
@@ -18,6 +19,7 @@ if [ "$(kubectl config current-context)" = "kind-kind" ]; then
   kind load docker-image "local/progress-watchdog:$version" &
   kind load docker-image "local/cleaner:$version" &
   kind load docker-image "local/juice-balancer:$version" &
+  kind load docker-image "local/balancer:$version" &
 
   wait
 fi

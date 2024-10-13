@@ -9,8 +9,8 @@ tasks:
       Then forwards the balancer service to localhost:3000
     cmds:
       - ./build-and-deploy.sh
-      - kubectl rollout status deployment juice-balancer
-      - kubectl port-forward svc/juice-balancer 4000:3000
+      - kubectl rollout status deployment balancer
+      - kubectl port-forward deployment/balancer 8080:8080
 
   build:
     aliases: [b]

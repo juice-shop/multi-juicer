@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balancer
+  labels:
+    foo: bar
+spec:
+  replicas: {{ .Values.balancer.replicas }}
+  selector:
+    matchLabels:
+      foo: bar
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/juice-balancer/config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/juice-balancer/secret.yaml") . | sha256sum }}
+        {{- with .Values.balancer.pod.annotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        foo: bar
+    spec:
+      serviceAccountName: juice-balancer
+      {{- with .Values.balancer.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: 'local/balancer:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
+          imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+          {{- with .Values.balancer.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: config-volume
+              mountPath: /home/app/config/
+          resources:
+            {{- toYaml .Values.balancer.resources | nindent 12 }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: juice-balancer-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
