@@ -30,7 +30,7 @@ default values render correctly:
                     - name: NAMESPACE
                       value: NAMESPACE
                     - name: MAX_INACTIVE_DURATION
-                      value: 1d
+                      value: 24h
                   image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
                   imagePullPolicy: IfNotPresent
                   name: cleanup-job
@@ -551,7 +551,7 @@ full values render out correctly:
                     - name: NAMESPACE
                       value: NAMESPACE
                     - name: MAX_INACTIVE_DURATION
-                      value: 1d
+                      value: 24h
                   image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
                   imagePullPolicy: IfNotPresent
                   name: cleanup-job
@@ -3210,7 +3210,7 @@ production notes work correctly:
                     - name: NAMESPACE
                       value: NAMESPACE
                     - name: MAX_INACTIVE_DURATION
-                      value: 1d
+                      value: 24h
                   image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
                   imagePullPolicy: IfNotPresent
                   name: cleanup-job

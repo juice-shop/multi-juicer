@@ -206,7 +206,7 @@ juiceShopCleanup:
   tag: null
   enabled: true
   # -- Specifies when Juice Shop instances will be deleted when unused for that period.
-  gracePeriod: 5m
+  gracePeriod: 24h
   # -- Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour
   cron: "0 * * * *"
   successfulJobsHistoryLimit: 1
