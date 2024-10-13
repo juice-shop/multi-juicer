@@ -17,7 +17,7 @@ import (
 )
 
 type ProgressUpdateJobs struct {
-	Teamname              string
+	Team                  string
 	LastChallengeProgress []ChallengeStatus
 }
 
@@ -148,7 +148,7 @@ var challengeIdLookup = map[string]int{
 }
 
 func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
-	log.Infof("Starting ProgressWatchdog with %d worker go routines", workerCount)
+	logger.Printf("Starting background-sync looking for JuiceShop challenge progress changes with %d workers", workerCount)
 
 	progressUpdateJobs := make(chan ProgressUpdateJobs)
 
@@ -162,35 +162,31 @@ func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
 
 // Constantly lists all JuiceShops in managed by MultiJuicer and queues progressUpdatesJobs for them
 func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clientset *kubernetes.Clientset) {
+	namespace := os.Getenv("NAMESPACE")
 	for {
 		// Get Instances
-		log.Info("Looking for Instances")
 		opts := metav1.ListOptions{
 			LabelSelector: "app.kubernetes.io/name=juice-shop",
 		}
-
-		namespace := os.Getenv("NAMESPACE")
 		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(context.TODO(), opts)
 		if err != nil {
 			panic(err.Error())
 		}
 
-		log.Debugf("Found %d JuiceShop instances running", len(juiceShops.Items))
+		logger.Printf("Background-sync started syncing %d instances", len(juiceShops.Items))
 
 		for _, instance := range juiceShops.Items {
-			teamname := instance.Labels["team"]
+			Team := instance.Labels["team"]
 
 			if instance.Status.ReadyReplicas != 1 {
 				continue
 			}
 
-			log.Debugf("Found instance for team %s", teamname)
-
 			var lastChallengeProgress []ChallengeStatus
 			json.Unmarshal([]byte(instance.Annotations["multi-juicer.owasp-juice.shop/challenges"]), &lastChallengeProgress)
 
 			progressUpdateJobs <- ProgressUpdateJobs{
-				Teamname:              instance.Labels["team"],
+				Team:                  Team,
 				LastChallengeProgress: lastChallengeProgress,
 			}
 		}
@@ -200,45 +196,35 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 
 func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clientset *kubernetes.Clientset) {
 	for job := range progressUpdateJobs {
-		log.Debugf("Running ProgressUpdateJob for team '%s'", job.Teamname)
 		lastChallengeProgress := job.LastChallengeProgress
-		log.Debug("Fetching current Challenge Progress from JuiceShop")
-		challengeProgress, err := getCurrentChallengeProgress(job.Teamname)
+		challengeProgress, err := getCurrentChallengeProgress(job.Team)
 
 		if err != nil {
-			log.Warningf("Failed to fetch current Challenge Progress for team '%s' from Juice Shop", job.Teamname)
-			log.Warning(err)
+			logger.Println(fmt.Errorf("failed to fetch current Challenge Progress for team '%s' from Juice Shop: %w", job.Team, err))
 			continue
 		}
 
-		log.Debug("Checking Difference between old and new Challenge Progresses")
-
 		switch CompareChallengeStates(challengeProgress, lastChallengeProgress) {
 		case ApplyCode:
-			log.Infof("Last ContinueCode for team '%s' contains unsolved challenges", job.Teamname)
-			applyChallengeProgress(job.Teamname, lastChallengeProgress)
+			logger.Printf("Last ContinueCode for team '%s' contains unsolved challenges", job.Team)
+			applyChallengeProgress(job.Team, lastChallengeProgress)
 
-			log.Debug("Re-fetching current Progress")
-			challengeProgress, err = getCurrentChallengeProgress(job.Teamname)
+			challengeProgress, err = getCurrentChallengeProgress(job.Team)
 
 			if err != nil {
-				log.Errorf("Failed to re-fetch challenge progress from Juice Shop for team '%s' to reapply it", job.Teamname)
-				log.Error(err)
+				logger.Println(fmt.Errorf("failed to re-fetch challenge progress from Juice Shop for team '%s' to reapply it: %w", job.Team, err))
 				continue
 			}
-
-			log.Debug("Persisting current Challenge Progress")
-			PersistProgress(clientset, job.Teamname, challengeProgress)
+			PersistProgress(clientset, job.Team, challengeProgress)
 		case UpdateCache:
-			PersistProgress(clientset, job.Teamname, challengeProgress)
+			PersistProgress(clientset, job.Team, challengeProgress)
 		case NoOp:
-			log.Debug("No need to apply Progress, Skipping")
 		}
 	}
 }
 
-func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/api/challenges", teamname)
+func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
+	url := fmt.Sprintf("http://t-%s-juiceshop:3000/api/challenges", team)
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
@@ -265,7 +251,6 @@ func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
 
 		for _, challenge := range challengeResponse.Data {
 			if challenge.Solved {
-				log.Debugf("Challenge %s: Solved: %t", challenge.Key, challenge.Solved)
 				challengeStatus = append(challengeStatus, ChallengeStatus{
 					Key:      challenge.Key,
 					SolvedAt: challenge.UpdatedAt,
@@ -281,26 +266,23 @@ func getCurrentChallengeProgress(teamname string) ([]ChallengeStatus, error) {
 	}
 }
 
-func applyChallengeProgress(teamname string, challengeProgress []ChallengeStatus) {
+func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
 	continueCode, err := GenerateContinueCode(challengeProgress)
 	if err != nil {
-		log.Warning("Failed to encode challenge progress into continue code")
-		log.Warning(err)
+		logger.Println(fmt.Errorf("failed to encode challenge progress into continue code: %w", err))
 		return
 	}
 
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code/apply/%s", teamname, continueCode)
+	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code/apply/%s", team, continueCode)
 
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		log.Warning("Failed to create http request to set the current ContinueCode")
-		log.Warning(err)
+		logger.Println(fmt.Errorf("failed to create http request to set the current ContinueCode: %w", err))
 		return
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Warning("Failed to set the current ContinueCode to juice shop")
-		log.Warning(err)
+		logger.Println(fmt.Errorf("failed to set the current ContinueCode to juice shop: %w", err))
 		return
 	}
 	defer res.Body.Close()

@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"sort"
 
 	"github.com/juice-shop/multi-juicer/progress-watchdog/internal"
-	"github.com/op/go-logging"
 
 	"github.com/gin-gonic/gin"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,21 +47,10 @@ type JuiceShopWebhook struct {
 	Issuer   JuiceShopWebhookIssuer   `json:"issuer"`
 }
 
-var log = logging.MustGetLogger("ProgressWatchdog")
-var format = logging.MustStringFormatter(
-	`%{time:2006/01/02 15:04:05} %{message}`,
-)
+var logger = log.New(os.Stdout, "", log.LstdFlags)
 
 func main() {
-	backend := logging.NewLogBackend(os.Stdout, "", 0)
-
-	backendLeveled := logging.AddModuleLevel(backend)
-	backendLeveled.SetLevel(logging.INFO, "")
-
-	logging.SetFormatter(format)
-	logging.SetBackend(backendLeveled)
-
-	log.Info("Starting ProgressWatchdog")
+	logger.Println("Starting ProgressWatchdog")
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -77,7 +66,6 @@ func main() {
 	const numberWorkers = 10
 	internal.StartBackgroundSync(clientset, numberWorkers)
 
-	log.Info("Starting WebServer listening for Solution Webhooks")
 	router := gin.New()
 	router.POST("/team/:team/webhook", func(c *gin.Context) {
 		team := c.Param("team")
@@ -90,8 +78,7 @@ func main() {
 		namespace := os.Getenv("NAMESPACE")
 		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.Background(), fmt.Sprintf("t-%s-juiceshop", team), metav1.GetOptions{})
 		if err != nil {
-			log.Errorf("Failed to get deployment for teamname: '%s' received via in webhook", team)
-			log.Error(err)
+			logger.Print(fmt.Errorf("failed to get deployment for team: '%s' received via in webhook: %w", team, err))
 		}
 
 		challengeStatusJson := "[]"
@@ -102,14 +89,13 @@ func main() {
 		challengeStatus := make(internal.ChallengeStatuses, 0)
 		err = json.Unmarshal([]byte(challengeStatusJson), &challengeStatus)
 		if err != nil {
-			log.Error("Failed to decode json from juice shop deployment annotation")
-			log.Error(err)
+			logger.Print(fmt.Errorf("failed to decode json from juice shop deployment annotation: %w", err))
 		}
 
 		// check if the challenge is already solved
 		for _, status := range challengeStatus {
 			if status.Key == webhook.Solution.Challenge {
-				log.Infof("Challenge '%s' already solved by Team '%s', ignoring webhook", webhook.Solution.Challenge, team)
+				logger.Printf("Challenge '%s' already solved by team '%s', ignoring webhook", webhook.Solution.Challenge, team)
 				c.String(http.StatusOK, "ok")
 				return
 			}
@@ -120,9 +106,10 @@ func main() {
 
 		internal.PersistProgress(clientset, team, challengeStatus)
 
-		log.Infof("Received Webhook for Team '%s' for Challenge '%s'", team, webhook.Solution.Challenge)
+		logger.Printf("Received webhook for team '%s' for challenge '%s'", team, webhook.Solution.Challenge)
 
 		c.String(http.StatusOK, "ok")
 	})
+	logger.Println("Starting web server listening for Solution Webhooks on :8080")
 	router.Run()
 }

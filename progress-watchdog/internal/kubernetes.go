@@ -7,13 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/op/go-logging"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 )
-
-var log = logging.MustGetLogger("Internal")
 
 type ChallengeStatus struct {
 	Key      string `json:"key"`
@@ -41,8 +38,8 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 	ChallengesSolved string `json:"multi-juicer.owasp-juice.shop/challengesSolved"`
 }
 
-func PersistProgress(clientset *kubernetes.Clientset, teamname string, solvedChallenges []ChallengeStatus) {
-	log.Infof("Updating saved ContinueCode of team '%s'", teamname)
+func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus) {
+	logger.Printf("Updating saved ContinueCode of team '%s'", team)
 
 	encodedSolvedChallenges, err := json.Marshal(solvedChallenges)
 	if err != nil {
@@ -64,9 +61,8 @@ func PersistProgress(clientset *kubernetes.Clientset, teamname string, solvedCha
 	}
 
 	namespace := os.Getenv("NAMESPACE")
-	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("t-%s-juiceshop", teamname), types.MergePatchType, jsonBytes, v1.PatchOptions{})
+	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("t-%s-juiceshop", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
 	if err != nil {
-		log.Errorf("Failed to patch new ContinueCode into deployment for team %s", teamname)
-		log.Error(err)
+		logger.Println(fmt.Errorf("failed to patch new ContinueCode into deployment for team %s: %w", team, err))
 	}
 }
