@@ -16,7 +16,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 
 ## Installation
 
-MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh)(helm >= 3.7 required)
+MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh)
 
 ```sh
 helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer
