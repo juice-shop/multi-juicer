@@ -14,6 +14,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: "cleaner/go.mod"
+          cache-dependency-path: "cleaner/go.sum"
       - name: "Lint"
         run: go vet
       - name: "Test"
@@ -54,6 +55,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: "progress-watchdog/go.mod"
+          cache-dependency-path: "progress-watchdog/go.sum"
       - name: "Lint"
         run: go vet
       - name: "Test"
