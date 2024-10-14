@@ -52,11 +52,8 @@ tasks:
     dir: progress-watchdog/
 
   cleaner:test:
-    preconditions:
-      - sh: test -d node_modules/
-        msg: "cleaner dependencies are not installed. run 'npm ci' in cleaner/ to install them."
     cmds:
-      - npm run test
+      - go test ./...
     dir: cleaner/
 
   helm:test:
