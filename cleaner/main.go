@@ -35,7 +35,25 @@ func main() {
 		panic(err.Error())
 	}
 
-	now := time.Now()
+	currentTime := time.Now()
+
+	cleanupSummary := runCleanup(clientset, currentTime, maxInactiveTime)
+
+	logger.Println("Finished cleaning up JuiceShop deployments.")
+	logger.Printf("Deleted %d deployment(s) and %d service(s) successfully", cleanupSummary.SuccessfulDeploymentDeletions, cleanupSummary.SuccessfulServiceDeletions)
+	if (cleanupSummary.FailedDeploymentDeletions + cleanupSummary.FailedServiceDeletions) > 0 {
+		logger.Printf("Failed to delete %d deployment(s) and %d service(s)", cleanupSummary.FailedDeploymentDeletions, cleanupSummary.FailedServiceDeletions)
+	}
+}
+
+type CleanupSummary struct {
+	SuccessfulDeploymentDeletions int
+	SuccessfulServiceDeletions    int
+	FailedDeploymentDeletions     int
+	FailedServiceDeletions        int
+}
+
+func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInactive time.Duration) CleanupSummary {
 	deployments, err := clientset.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 	})
@@ -48,14 +66,16 @@ func main() {
 		logger.Println("No JuiceShop deployments found. Nothing to do.")
 	}
 
-	successFullyDeletedDeployments := 0
-	failedDeletedDeployments := 0
-	successFullyDeletedServices := 0
-	failedDeletedServices := 0
+	summary := CleanupSummary{
+		SuccessfulDeploymentDeletions: 0,
+		SuccessfulServiceDeletions:    0,
+		FailedDeploymentDeletions:     0,
+		FailedServiceDeletions:        0,
+	}
 
 	for _, deployment := range deployments.Items {
-		lastConnectedTimestampString := deployment.Annotations["multi-juicer.owasp-juice.shop/lastRequest"]
-		if lastConnectedTimestampString == "" {
+		lastConnectedTimestampString, hasAnnotation := deployment.Annotations["multi-juicer.owasp-juice.shop/lastRequest"]
+		if !hasAnnotation || lastConnectedTimestampString == "" {
 			logger.Printf("Skipping deployment %s as it has no lastRequest annotation", deployment.Name)
 			continue
 		}
@@ -66,22 +86,22 @@ func main() {
 		}
 
 		name := deployment.Name
-		if now.Sub(time.UnixMilli(lastConnectedTimestamp)) > maxInactiveTime {
-			logger.Printf("Deleting instance '%s' as it has been inactive for longer than %s", name, maxInactiveTimeString)
+		if currentTime.Sub(time.UnixMilli(lastConnectedTimestamp)) > maxInactive {
+			logger.Printf("Deleting instance '%s' as it has been inactive for longer than %s", name, maxInactive.String())
 			err = clientset.AppsV1().Deployments(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {
 				logger.Printf("Failed to delete deployment %s: %v", name, err)
-				failedDeletedDeployments++
+				summary.FailedDeploymentDeletions++
 				continue
 			}
-			successFullyDeletedDeployments++
+			summary.SuccessfulDeploymentDeletions++
 			err = clientset.CoreV1().Services(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {
 				logger.Printf("Failed to delete service %s: %v", name, err)
-				failedDeletedServices++
+				summary.FailedServiceDeletions++
 				continue
 			}
-			successFullyDeletedServices++
+			summary.SuccessfulServiceDeletions++
 
 			logger.Printf("Successfully deleted instance %s", name)
 		} else {
@@ -89,9 +109,5 @@ func main() {
 		}
 	}
 
-	logger.Println("Finished cleaning up JuiceShop deployments.")
-	logger.Printf("Deleted %d deployment(s) and %d service(s) successfully", successFullyDeletedDeployments, successFullyDeletedServices)
-	if (failedDeletedDeployments + failedDeletedServices) > 0 {
-		logger.Printf("Failed to delete %d deployment(s) and %d service(s)", failedDeletedDeployments, failedDeletedServices)
-	}
+	return summary
 }
