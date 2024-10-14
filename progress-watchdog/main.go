@@ -114,6 +114,11 @@ func main() {
 		responseWriter.Write([]byte("ok"))
 	})
 
+	router.HandleFunc("GET /ready", func(responseWriter http.ResponseWriter, req *http.Request) {
+		responseWriter.WriteHeader(http.StatusOK)
+		responseWriter.Write([]byte("ok"))
+	})
+
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,

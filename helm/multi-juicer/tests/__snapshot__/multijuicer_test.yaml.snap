@@ -424,6 +424,11 @@ default values render correctly:
               ports:
                 - containerPort: 8080
                   name: http
+              readinessProbe:
+                httpGet:
+                  initialDelaySeconds: 5
+                  path: /ready
+                  port: http
               resources:
                 limits:
                   cpu: 20m
@@ -3085,6 +3090,11 @@ full values render out correctly:
               ports:
                 - containerPort: 8080
                   name: http
+              readinessProbe:
+                httpGet:
+                  initialDelaySeconds: 5
+                  path: /ready
+                  port: http
               resources:
                 limits:
                   cpu: 20m
@@ -3604,6 +3614,11 @@ production notes work correctly:
               ports:
                 - containerPort: 8080
                   name: http
+              readinessProbe:
+                httpGet:
+                  initialDelaySeconds: 5
+                  path: /ready
+                  port: http
               resources:
                 limits:
                   cpu: 20m
