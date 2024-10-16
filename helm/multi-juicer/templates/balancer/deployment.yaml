@@ -33,6 +33,12 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          env:
+          - name: COOKIEPARSER_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: cookieParserSecret
+                name: juice-balancer-secret
           ports:
             - name: http
               containerPort: 8080

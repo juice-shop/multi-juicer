@@ -5,6 +5,7 @@ COPY go.mod ./
 # and so that source changes don't invalidate our downloaded layer
 RUN go mod download
 COPY main.go main.go
+COPY pkg/ pkg/
 ARG TARGETOS TARGETARCH
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build
 RUN chmod +x balancer
