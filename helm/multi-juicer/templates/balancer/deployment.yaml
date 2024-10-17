@@ -34,6 +34,10 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
           - name: COOKIEPARSER_SECRET
             valueFrom:
               secretKeyRef:
