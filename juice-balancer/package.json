@@ -13,7 +13,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
-    "@kubernetes/client-node": "^0.22.0",
+    "@kubernetes/client-node": "^0.22.1",
     "basic-auth-connect": "^1.1.0",
     "bcryptjs": "^2.4.3",
     "cookie": "^1.0.0",
