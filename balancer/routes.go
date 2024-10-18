@@ -5,6 +5,7 @@ import (
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/routes/proxy"
+	staticfiles "github.com/juice-shop/multi-juicer/balancer/routes/staticFiles"
 	"github.com/juice-shop/multi-juicer/balancer/routes/teams"
 )
 
@@ -12,6 +13,7 @@ func addRoutes(
 	router *http.ServeMux,
 	bundle *bundle.Bundle,
 ) {
+	router.Handle("/", staticfiles.HandleStaticFiles(bundle))
 	router.Handle("POST /balancer/teams/{team}/join", teams.HandleTeamJoin(bundle))
 	router.Handle("GET /balancer/teams/{team}/wait-till-ready", teams.HandleWaitTillReady(bundle))
 

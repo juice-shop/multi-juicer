@@ -8,10 +8,11 @@ import (
 )
 
 type Bundle struct {
-	RuntimeEnvironment RuntimeEnvironment
-	ClientSet          kubernetes.Interface
-	Config             *Config
-	Log                *log.Logger
+	RuntimeEnvironment    RuntimeEnvironment
+	ClientSet             kubernetes.Interface
+	StaticAssetsDirectory string `json:"staticAssetsDirectory"`
+	Config                *Config
+	Log                   *log.Logger
 }
 
 type RuntimeEnvironment struct {

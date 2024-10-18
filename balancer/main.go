@@ -16,11 +16,6 @@ import (
 func main() {
 	router := http.NewServeMux()
 
-	// Serve static files from /public/ under the /balancer path
-	staticDir := "/public/"
-	fs := http.FileServer(http.Dir(staticDir))
-	router.Handle("/balancer/", http.StripPrefix("/balancer", fs))
-
 	addRoutes(router, createBundle())
 
 	log.Println("Starting proxy server on :8080")
@@ -54,7 +49,8 @@ func createBundle() *bundle.Bundle {
 	}
 
 	return &bundle.Bundle{
-		ClientSet: clientset,
+		ClientSet:             clientset,
+		StaticAssetsDirectory: "/public/",
 		RuntimeEnvironment: bundle.RuntimeEnvironment{
 			Namespace: namespace,
 		},
