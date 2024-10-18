@@ -153,7 +153,7 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 				"app.kubernetes.io/part-of":   "multi-juicer",
 			},
 			Annotations: map[string]string{
-				"multi-juicer.owasp-juice.shop/lastRequest":         fmt.Sprintf("%d", time.Now().Unix()),
+				"multi-juicer.owasp-juice.shop/lastRequest":         fmt.Sprintf("%d", time.Now().UnixMilli()),
 				"multi-juicer.owasp-juice.shop/lastRequestReadable": time.Now().String(),
 				"multi-juicer.owasp-juice.shop/passcode":            passcodeHash,
 				"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
