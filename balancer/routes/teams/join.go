@@ -29,11 +29,13 @@ func HandleTeamJoin(bundle *bundle.Bundle) http.Handler {
 				// Create a deployment for the team
 				err := createDeploymentForTeam(bundle, team, "very-hashy")
 				if err != nil {
+					bundle.Log.Printf("Failed to create deployment: %s", err)
 					http.Error(responseWriter, "failed to create deployment", http.StatusInternalServerError)
 					return
 				}
 				err = createServiceForTeam(bundle, team)
 				if err != nil {
+					bundle.Log.Printf("Failed to create service: %s", err)
 					http.Error(responseWriter, "failed to create service", http.StatusInternalServerError)
 					return
 				}
@@ -79,7 +81,7 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 			Name: fmt.Sprintf("juiceshop-%s", team),
 			Labels: map[string]string{
 				"team":                        team,
-				"app.kubernetes.io/version":   bundle.Config.JuiceShopTag,
+				"app.kubernetes.io/version":   bundle.Config.JuiceShopConfig.Tag,
 				"app.kubernetes.io/component": "vulnerable-app",
 				"app.kubernetes.io/name":      "juice-shop",
 				"app.kubernetes.io/instance":  fmt.Sprintf("juice-shop-%s", team),
@@ -104,19 +106,30 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
 						"team":                      team,
-						"app.kubernetes.io/version": bundle.Config.JuiceShopTag,
+						"app.kubernetes.io/version": bundle.Config.JuiceShopConfig.Tag,
 						"app.kubernetes.io/name":    "juice-shop",
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  "juice-shop",
-							Image: fmt.Sprintf("%s:%s", bundle.Config.JuiceShopImage, bundle.Config.JuiceShopTag),
+							Name:            "juice-shop",
+							Image:           fmt.Sprintf("%s:%s", bundle.Config.JuiceShopConfig.Image, bundle.Config.JuiceShopConfig.Tag),
+							SecurityContext: &bundle.Config.JuiceShopConfig.ContainerSecurityContext,
 							Ports: []corev1.ContainerPort{
 								{
 									ContainerPort: 3000,
 								},
+							},
+							StartupProbe: &corev1.Probe{
+								ProbeHandler: corev1.ProbeHandler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: "/rest/admin/application-version",
+										Port: intstr.FromInt(3000),
+									},
+								},
+								PeriodSeconds:    2,
+								FailureThreshold: 150,
 							},
 							ReadinessProbe: &corev1.Probe{
 								ProbeHandler: corev1.ProbeHandler{
@@ -125,9 +138,8 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 										Port: intstr.FromInt(3000),
 									},
 								},
-								InitialDelaySeconds: 5,
-								PeriodSeconds:       2,
-								FailureThreshold:    10,
+								PeriodSeconds:    5,
+								FailureThreshold: 3,
 							},
 							LivenessProbe: &corev1.Probe{
 								ProbeHandler: corev1.ProbeHandler{
@@ -139,8 +151,50 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 								InitialDelaySeconds: 30,
 								PeriodSeconds:       15,
 							},
+							Env: append(
+								bundle.Config.JuiceShopConfig.Env,
+								corev1.EnvVar{
+									Name:  "NODE_ENV",
+									Value: bundle.Config.JuiceShopConfig.NodeEnv,
+								},
+								corev1.EnvVar{
+									Name:  "CTF_KEY",
+									Value: bundle.Config.JuiceShopConfig.CtfKey,
+								},
+								corev1.EnvVar{
+									Name:  "SOLUTIONS_WEBHOOK",
+									Value: fmt.Sprintf("http://progress-watchdog.%s.svc/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
+								},
+							),
+							EnvFrom: bundle.Config.JuiceShopConfig.EnvFrom,
+							VolumeMounts: append(
+								bundle.Config.JuiceShopConfig.VolumeMounts,
+								corev1.VolumeMount{
+									Name:      "juice-shop-config",
+									MountPath: "/juice-shop/config/multi-juicer.yaml",
+									ReadOnly:  true,
+									SubPath:   "multi-juicer.yaml",
+								},
+							),
 						},
 					},
+					Volumes: append(
+						bundle.Config.JuiceShopConfig.Volumes,
+						corev1.Volume{
+							Name: "juice-shop-config",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "juice-shop-config",
+									},
+								},
+							},
+						},
+					),
+					Tolerations:      bundle.Config.JuiceShopConfig.Tolerations,
+					Affinity:         &bundle.Config.JuiceShopConfig.Affinity,
+					RuntimeClassName: bundle.Config.JuiceShopConfig.RuntimeClassName,
+					SecurityContext:  &bundle.Config.JuiceShopConfig.PodSecurityContext,
 				},
 			},
 		},
@@ -156,7 +210,7 @@ func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 			Name: fmt.Sprintf("juiceshop-%s", team),
 			Labels: map[string]string{
 				"team":                        team,
-				"app.kubernetes.io/version":   bundle.Config.JuiceShopTag,
+				"app.kubernetes.io/version":   bundle.Config.JuiceShopConfig.Tag,
 				"app.kubernetes.io/name":      "juice-shop",
 				"app.kubernetes.io/component": "vulnerable-app",
 				"app.kubernetes.io/instance":  fmt.Sprintf("juice-shop-%s", team),

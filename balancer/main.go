@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -60,20 +62,22 @@ func createBundle() *bundle.Bundle {
 		},
 		Log: log.New(os.Stdout, "", log.LstdFlags),
 		Config: &bundle.Config{
-			JuiceShopImage:                    "bkimminich/juice-shop",
-			JuiceShopTag:                      "latest",
-			JuiceShopNodeEnv:                  "production",
-			JuiceShopCtfKey:                   "your-ctf-key",
-			JuiceShopImagePullPolicy:          "IfNotPresent",
-			JuiceShopResources:                make(map[string]string),
-			JuiceShopPodSecurityContext:       make(map[string]string),
-			JuiceShopContainerSecurityContext: make(map[string]string),
-			JuiceShopEnvFrom:                  []string{},
-			JuiceShopVolumeMounts:             []string{},
-			JuiceShopVolumes:                  []string{},
-			JuiceShopTolerations:              []string{},
-			JuiceShopAffinity:                 "",
-			DeploymentContext:                 "default-context",
+			JuiceShopConfig: bundle.JuiceShopConfig{
+				ImagePullPolicy: "IfNotPresent",
+				Image:           "bkimminich/juice-shop",
+				Tag:             "latest",
+				NodeEnv:         "multi-juicer",
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("200m"),
+						corev1.ResourceMemory: resource.MustParse("256Mi"),
+					},
+					Limits: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("200m"),
+						corev1.ResourceMemory: resource.MustParse("256Mi"),
+					},
+				},
+			},
 			CookieConfig: bundle.CookieConfig{
 				SigningKey: cookieSigningKey,
 			},
