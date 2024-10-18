@@ -526,6 +526,66 @@ full values render out correctly:
   1: |
     raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward --namespace=\"NAMESPACE\" service/juice-balancer 3000:3000\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:3000\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets juice-balancer-secret --namespace=\"NAMESPACE\" -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
   2: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        foo: bar
+      name: balancer
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          foo: bar
+      template:
+        metadata:
+          annotations:
+            checksum/config: 6d6bc92a94f12493138aa82fe204065d1f1ff6933357494240ac68429af2b01d
+            checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
+          labels:
+            foo: bar
+        spec:
+          containers:
+            - env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookieParserSecret
+                      name: juice-balancer-secret
+              image: local/balancer:v42.0.0
+              imagePullPolicy: IfNotPresent
+              name: multi-juicer
+              ports:
+                - containerPort: 8080
+                  name: http
+              resources:
+                limits:
+                  cpu: 400m
+                  memory: 256Mi
+                requests:
+                  cpu: 400m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /home/app/config/
+                  name: config-volume
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: juice-balancer
+          volumes:
+            - configMap:
+                name: juice-balancer-config
+              name: config-volume
+  3: |
     apiVersion: batch/v1
     kind: CronJob
     metadata:
@@ -572,7 +632,7 @@ full values render out correctly:
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
-  3: |
+  4: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -592,7 +652,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: juice-cleaner
-  4: |
+  5: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -621,7 +681,7 @@ full values render out correctly:
         verbs:
           - get
           - delete
-  5: |
+  6: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -633,7 +693,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-cleaner
-  6: |
+  7: |
     apiVersion: v1
     data:
       instances.json: |-
@@ -2693,7 +2753,7 @@ full values render out correctly:
       labels:
         grafana_dashboard: "1"
       name: multijuicer-instance
-  7: |
+  8: |
     apiVersion: v1
     data:
       config.json: |
@@ -2743,7 +2803,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-balancer-config
-  8: |
+  9: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -2834,7 +2894,7 @@ full values render out correctly:
             - configMap:
                 name: juice-balancer-config
               name: config-volume
-  9: |
+  10: |
     apiVersion: networking.k8s.io/v1
     kind: Ingress
     metadata:
@@ -2865,7 +2925,7 @@ full values render out correctly:
         - hosts:
             - multi-juicer.local
           secretName: tls-secret
-  10: |
+  11: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -2885,7 +2945,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: juice-balancer
-  11: |
+  12: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -2925,7 +2985,7 @@ full values render out correctly:
           - get
           - list
           - delete
-  12: |
+  13: |
     apiVersion: v1
     data:
       adminPassword: QUJDREVGR0g=
@@ -2943,7 +3003,7 @@ full values render out correctly:
         app.kubernetes.io/version: 42.0.0
       name: juice-balancer-secret
     type: Opaque
-  13: |
+  14: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -2955,7 +3015,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-balancer
-  14: |
+  15: |
     apiVersion: v1
     kind: Service
     metadata:
@@ -2976,7 +3036,7 @@ full values render out correctly:
         app.kubernetes.io/name: juice-balancer
         app.kubernetes.io/part-of: multi-juicer
       type: ClusterIP
-  15: |
+  16: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -3004,7 +3064,7 @@ full values render out correctly:
           app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
           app.kubernetes.io/name: juice-balancer
           app.kubernetes.io/part-of: multi-juicer
-  16: |
+  17: |
     apiVersion: v1
     data:
       multi-juicer.yaml: |-
@@ -3029,7 +3089,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-shop-config
-  17: |
+  18: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -3050,7 +3110,7 @@ full values render out correctly:
           app.kubernetes.io/name: juice-shop
       targetLabels:
         - team
-  18: |
+  19: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -3111,7 +3171,7 @@ full values render out correctly:
           securityContext:
             runAsNonRoot: true
           serviceAccountName: progress-watchdog
-  19: |
+  20: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -3131,7 +3191,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: progress-watchdog
-  20: |
+  21: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -3153,7 +3213,7 @@ full values render out correctly:
           - get
           - list
           - patch
-  21: |
+  22: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -3165,7 +3225,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: progress-watchdog
-  22: |
+  23: |
     apiVersion: v1
     kind: Service
     metadata:
