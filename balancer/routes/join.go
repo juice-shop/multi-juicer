@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -24,7 +25,7 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team := req.PathValue("team")
 
-			_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+			deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 			if err != nil && errors.IsNotFound(err) {
 				passcode := bundle.PasscodeGenerator()
 
@@ -77,14 +78,66 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 				http.Error(responseWriter, "failed to get deployment", http.StatusInternalServerError)
 				return
 			} else {
-				errorResponseBody, _ := json.Marshal(map[string]string{"message": "Team requires authentication to join"})
-				responseWriter.WriteHeader(http.StatusUnauthorized)
+				passCodeHashToMatch := deployment.Annotations["multi-juicer.owasp-juice.shop/passcode"]
+				if passCodeHashToMatch == "" {
+					http.Error(responseWriter, "failed to get passcode", http.StatusInternalServerError)
+					return
+				}
+
+				// If there is no body in the request, return 401
+				if req.Body == nil {
+					writeUnauthorizedResponse(responseWriter)
+					return
+				}
+
+				// Read and parse the JSON body
+				body, err := io.ReadAll(req.Body)
+				if err != nil {
+					writeUnauthorizedResponse(responseWriter)
+					return
+				}
+
+				var requestBody map[string]string
+				if err := json.Unmarshal(body, &requestBody); err != nil {
+					writeUnauthorizedResponse(responseWriter)
+					return
+				}
+
+				// Check if the 'passcode' key exists and if it matches the hashed passcode
+				passcode, ok := requestBody["passcode"]
+				if !ok || bcrypt.CompareHashAndPassword([]byte(passCodeHashToMatch), []byte(passcode)) != nil {
+					writeUnauthorizedResponse(responseWriter)
+					return
+				}
+
+				// If passcode matches, return 200 OK
+				responseWriter.WriteHeader(http.StatusOK)
 				responseWriter.Header().Set("Content-Type", "application/json")
-				responseWriter.Write(errorResponseBody)
+				responseWriter.Write([]byte(`{"message": "Joined Team"}`))
+				cookie, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
+				if err != nil {
+					http.Error(responseWriter, "failed to sign team cookie", http.StatusInternalServerError)
+					return
+				}
+				http.SetCookie(responseWriter, &http.Cookie{
+					Name:     "balancer",
+					Value:    cookie,
+					HttpOnly: true,
+					Path:     "/",
+					SameSite: http.SameSiteStrictMode,
+				})
 				return
 			}
 		},
 	)
+}
+
+// Helper function to write a 401 Unauthorized response
+func writeUnauthorizedResponse(responseWriter http.ResponseWriter) {
+	errorResponseBody, _ := json.Marshal(map[string]string{"message": "Team requires authentication to join"})
+	responseWriter.WriteHeader(http.StatusUnauthorized)
+	responseWriter.Header().Set("Content-Type", "application/json")
+	responseWriter.Write(errorResponseBody)
 }
 
 func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash string) error {
