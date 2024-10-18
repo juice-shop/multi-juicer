@@ -35,7 +35,7 @@ jobs:
       - name: "Place index.html file into ui build folder"
         run: |
           mkdir ui/build/
-          touch ui/build/index.html
+          cp ui/index.html ui/build/index.html
       - name: "Lint"
         run: go vet
       - name: "Test"
