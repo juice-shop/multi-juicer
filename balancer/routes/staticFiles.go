@@ -1,4 +1,4 @@
-package staticfiles
+package routes
 
 import (
 	"net/http"
@@ -6,6 +6,6 @@ import (
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 )
 
-func HandleStaticFiles(bundle *bundle.Bundle) http.Handler {
+func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	return http.StripPrefix("/balancer", http.FileServer(http.Dir(bundle.StaticAssetsDirectory)))
 }

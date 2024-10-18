@@ -1,4 +1,4 @@
-package teams
+package routes
 
 import (
 	"context"
@@ -18,7 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
-func HandleTeamJoin(bundle *bundle.Bundle) http.Handler {
+func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team := req.PathValue("team")

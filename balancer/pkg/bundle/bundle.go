@@ -1,10 +1,14 @@
 package bundle
 
 import (
+	"errors"
 	"log"
+	"os"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 type Bundle struct {
@@ -48,4 +52,55 @@ type JuiceShopConfig struct {
 	RuntimeClassName         *string                     `json:"runtimeClassName"`
 	Annotations              map[string]string           `json:"annotations"`
 	Labels                   map[string]string           `json:"labels"`
+}
+
+func New() *Bundle {
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	namespace := os.Getenv("NAMESPACE")
+	if namespace == "" {
+		panic(errors.New("'NAMESPACE' environment variable must be set!"))
+	}
+
+	cookieSigningKey := os.Getenv("MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY")
+	if cookieSigningKey == "" {
+		panic(errors.New("'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' environment variable must be set!"))
+	}
+
+	return &Bundle{
+		ClientSet:             clientset,
+		StaticAssetsDirectory: "/public/",
+		RuntimeEnvironment: RuntimeEnvironment{
+			Namespace: namespace,
+		},
+		Log: log.New(os.Stdout, "", log.LstdFlags),
+		Config: &Config{
+			JuiceShopConfig: JuiceShopConfig{
+				ImagePullPolicy: "IfNotPresent",
+				Image:           "bkimminich/juice-shop",
+				Tag:             "latest",
+				NodeEnv:         "multi-juicer",
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("200m"),
+						corev1.ResourceMemory: resource.MustParse("256Mi"),
+					},
+					Limits: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("200m"),
+						corev1.ResourceMemory: resource.MustParse("256Mi"),
+					},
+				},
+			},
+			CookieConfig: CookieConfig{
+				SigningKey: cookieSigningKey,
+			},
+		},
+	}
 }

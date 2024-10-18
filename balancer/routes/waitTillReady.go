@@ -1,4 +1,4 @@
-package teams
+package routes
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func HandleWaitTillReady(bundle *bundle.Bundle) http.Handler {
+func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team := req.PathValue("team")

@@ -1,4 +1,4 @@
-package proxy
+package routes
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func newReverseProxy(target string) *httputil.ReverseProxy {
 }
 
 // HandleProxy determines the JuiceShop instance of the Team based on the "balancer" cookie and proxies the request to the corresponding JuiceShop instance.
-func HandleProxy(bundle *bundle.Bundle) http.Handler {
+func handleProxy(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			teamSigned, err := req.Cookie("balancer")
