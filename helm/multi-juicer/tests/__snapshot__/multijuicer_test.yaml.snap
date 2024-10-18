@@ -60,14 +60,18 @@ default values render correctly:
       replicas: 1
       selector:
         matchLabels:
-          foo: bar
+          app.kubernetes.io/instance: balancer-RELEASE-NAME
+          app.kubernetes.io/name: balancer
+          app.kubernetes.io/part-of: multi-juicer
       template:
         metadata:
           annotations:
             checksum/config: 1a3396b63c83eb20b6864c4777a95e133972de22b050ccb721efc7a015204a0f
             checksum/secret: 140499bbdb19087c21534a32c6ecaa58916bed2ec9670f6f1871ccd17d9fc64f
           labels:
-            foo: bar
+            app.kubernetes.io/instance: balancer-RELEASE-NAME
+            app.kubernetes.io/name: balancer
+            app.kubernetes.io/part-of: multi-juicer
         spec:
           containers:
             - env:
@@ -560,14 +564,18 @@ full values render out correctly:
       replicas: 3
       selector:
         matchLabels:
-          foo: bar
+          app.kubernetes.io/instance: balancer-RELEASE-NAME
+          app.kubernetes.io/name: balancer
+          app.kubernetes.io/part-of: multi-juicer
       template:
         metadata:
           annotations:
             checksum/config: b87730c1f3af22bc42af30a68a467cb2f7d0ef52e37d6deaa5f5051adb6888d6
             checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
           labels:
-            foo: bar
+            app.kubernetes.io/instance: balancer-RELEASE-NAME
+            app.kubernetes.io/name: balancer
+            app.kubernetes.io/part-of: multi-juicer
         spec:
           containers:
             - env:
@@ -3198,14 +3206,18 @@ production notes work correctly:
       replicas: 3
       selector:
         matchLabels:
-          foo: bar
+          app.kubernetes.io/instance: balancer-RELEASE-NAME
+          app.kubernetes.io/name: balancer
+          app.kubernetes.io/part-of: multi-juicer
       template:
         metadata:
           annotations:
             checksum/config: b87730c1f3af22bc42af30a68a467cb2f7d0ef52e37d6deaa5f5051adb6888d6
             checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
           labels:
-            foo: bar
+            app.kubernetes.io/instance: balancer-RELEASE-NAME
+            app.kubernetes.io/name: balancer
+            app.kubernetes.io/part-of: multi-juicer
         spec:
           containers:
             - env:
