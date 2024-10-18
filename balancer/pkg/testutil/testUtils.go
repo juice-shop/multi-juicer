@@ -5,14 +5,21 @@ import (
 	"os"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
 func NewTestBundle() *bundle.Bundle {
 	clientset := fake.NewSimpleClientset()
+	return NewTestBundleWithCustomFakeClient(clientset)
+}
 
+var testSigningKey = "test-signing-key"
+
+func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.Bundle {
 	return &bundle.Bundle{
 		ClientSet:             clientset,
 		StaticAssetsDirectory: "../ui/build/",
@@ -38,8 +45,16 @@ func NewTestBundle() *bundle.Bundle {
 				},
 			},
 			CookieConfig: bundle.CookieConfig{
-				SigningKey: "test-signing-key",
+				SigningKey: testSigningKey,
 			},
 		},
 	}
+}
+
+func SignTestTeamname(team string) string {
+	signed, err := signutil.Sign(team, testSigningKey)
+	if err != nil {
+		panic(err)
+	}
+	return signed
 }

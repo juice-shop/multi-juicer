@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,13 +22,27 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
+			balancerCookie, err := req.Cookie("balancer")
+			if err != nil {
+				http.Error(responseWriter, "balancer cookie is missing", http.StatusBadRequest)
+				return
+			}
+			cookieTeamname, err := signutil.Unsign(balancerCookie.Value, bundle.Config.CookieConfig.SigningKey)
+			if err != nil || cookieTeamname != team {
+				http.Error(responseWriter, "", http.StatusUnauthorized)
+				return
+			}
+
 			log.Default().Printf("Awaiting readiness of JuiceShop Deployment for team '%s'", team)
 
-			// Loop to check readiness with a 180-second timeout (180 iterations of 1 second sleep)
-			for i := 0; i < 180; i++ {
+			// Loop to check readiness with a 30-second timeout (60 iterations of 0.5 seconds sleep)
+			for i := 0; i < 60; i++ {
 				// Get deployment for the specific team
 				deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
-				if err != nil {
+				if err != nil && errors.IsNotFound(err) {
+					http.Error(responseWriter, "team not found", http.StatusNotFound)
+					return
+				} else if err != nil {
 					log.Default().Printf("Error fetching deployment for team '%s': %v", team, err)
 					http.Error(responseWriter, "Error fetching deployment", http.StatusInternalServerError)
 					return
@@ -39,8 +55,7 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 					return
 				}
 
-				// Wait for 1 second before retrying
-				time.Sleep(1 * time.Second)
+				time.Sleep(500 * time.Millisecond)
 			}
 
 			// If the loop finishes without the deployment becoming ready

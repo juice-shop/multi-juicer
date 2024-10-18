@@ -15,33 +15,40 @@ tasks:
   build:
     aliases: [b]
     cmds:
-      - task: juice-balancer:ui:build
+      - task: balancer:ui:build
 
   test:
     aliases: [t]
     cmds:
       - task: helm:test
-      - task: juice-balancer:api:test
+      - task: balancer:ui:test
+      - task: balancer:api:test
       - task: cleaner:test
       - task: progress-watchdog:test
 
-  juice-balancer:ui:build:
+  balancer:ui:build:
     preconditions:
       - sh: test -d node_modules/
-        msg: "juice-balancer ui dependencies are not installed. run 'npm ci' in juice-balancer/ui/ to install them."
+        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
     cmds:
       - npm run build
-    dir: juice-balancer/ui/
+    dir: balancer/ui/
 
-  juice-balancer:api:test:
+  balancer:ui:test:
+    preconditions:
+      - sh: test -d node_modules/
+        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+    cmds:
+      - npm run test -- --run
+    dir: balancer/ui/
+
+  balancer:api:test:
     preconditions:
       - sh: test -f ui/build/index.html
         msg: "juice balancer ui needs to be compiled for the api tests to work properly. run 'task build' to compile it."
-      - sh: test -d node_modules/
-        msg: "juice-balancer api dependencies are not installed. run 'npm ci' in juice-balancer/ to install them."
     cmds:
-      - npm run test
-    dir: juice-balancer/
+      - go test ./...
+    dir: balancer/
 
   progress-watchdog:test:
     preconditions:
