@@ -18,7 +18,7 @@ jobs:
       - name: "Lint"
         run: go vet
       - name: "Test"
-        run: go test -cover
+        run: go test -cover ./...
 
   balancer:
     name: Balancer
@@ -35,7 +35,7 @@ jobs:
       - name: "Lint"
         run: go vet
       - name: "Test"
-        run: go test -cover
+        run: go test -cover ./...
 
   progress-watchdog:
     name: ProgressWatchdog
@@ -52,7 +52,7 @@ jobs:
       - name: "Lint"
         run: go vet
       - name: "Test"
-        run: go test -cover
+        run: go test -cover ./...
 
   helm:
     name: Helm
