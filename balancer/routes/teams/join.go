@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -28,7 +27,6 @@ func HandleTeamJoin(bundle *bundle.Bundle) http.Handler {
 			if err != nil && errors.IsNotFound(err) {
 
 				// Create a deployment for the team
-
 				err := createDeploymentForTeam(bundle, team, "very-hashy")
 				if err != nil {
 					http.Error(responseWriter, "failed to create deployment", http.StatusInternalServerError)
@@ -40,7 +38,7 @@ func HandleTeamJoin(bundle *bundle.Bundle) http.Handler {
 					return
 				}
 
-				cookie, err := signutil.Sign(team, os.Getenv("COOKIEPARSER_SECRET"))
+				cookie, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
 				if err != nil {
 					http.Error(responseWriter, "failed to sign team cookie", http.StatusInternalServerError)
 					return

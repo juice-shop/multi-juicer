@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/routes/proxy"
 	"github.com/juice-shop/multi-juicer/balancer/routes/teams"
 )
 
@@ -23,4 +24,5 @@ func addRoutes(
 		w.Write([]byte("OK"))
 	})
 
+	router.Handle("/", proxy.HandleProxy(bundle))
 }

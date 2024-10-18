@@ -1,11 +1,16 @@
 package bundle
 
-import "k8s.io/client-go/kubernetes"
+import (
+	"log"
+
+	"k8s.io/client-go/kubernetes"
+)
 
 type Bundle struct {
 	RuntimeEnvironment RuntimeEnvironment
 	ClientSet          kubernetes.Interface
 	Config             *Config
+	Log                *log.Logger
 }
 
 type RuntimeEnvironment struct {
@@ -27,4 +32,10 @@ type Config struct {
 	JuiceShopTolerations              []string
 	JuiceShopAffinity                 string
 	DeploymentContext                 string
+	CookieConfig                      CookieConfig `json:"cookie"`
+}
+
+type CookieConfig struct {
+	// CookieSigningKey is used to create a hmac signature of the team name to have  readable but cryptographically secure cookie name to identify the team
+	SigningKey string `json:"signingKey"`
 }

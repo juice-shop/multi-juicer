@@ -1,66 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"os"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	signutil "github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
 var namespace = os.Getenv("NAMESPACE")
-
-// newReverseProxy creates a reverse proxy for a given target URL.
-func newReverseProxy(target string) *httputil.ReverseProxy {
-	url, err := url.Parse(target)
-	if err != nil {
-		log.Fatalf("Failed to parse target URL: %v", err)
-	}
-
-	return httputil.NewSingleHostReverseProxy(url)
-}
-
-// proxyHandler determines the target based on the "balancer" header and proxies the request.
-func proxyHandler(w http.ResponseWriter, r *http.Request) {
-	cookieSecret := os.Getenv("COOKIEPARSER_SECRET")
-	if cookieSecret == "" {
-		http.Error(w, "", http.StatusInternalServerError)
-		log.Default().Fatalf("COOKIEPARSER_SECRET environment variable must be set")
-		return
-	}
-
-	teamSigned, err := r.Cookie("balancer")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to read balancer cookie: %v", err), http.StatusBadRequest)
-		return
-	}
-	team, err := signutil.Unsign(teamSigned.Value, cookieSecret)
-	if err != nil {
-		http.Error(w, "Team cookie invalid!", http.StatusUnauthorized)
-		return
-	}
-
-	var target string
-
-	if team == "" {
-		http.Error(w, fmt.Sprintf("Empty team for balancer cookie: '%s',", teamSigned), http.StatusBadRequest)
-		return
-	} else {
-		target = fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, namespace)
-	}
-
-	log.Default().Printf("proxing request for team (%s): %s %s to %s", team, r.Method, r.URL, target)
-
-	proxy := newReverseProxy(target)
-	// Rewrite the request to the target server
-	proxy.ServeHTTP(w, r)
-}
 
 func main() {
 	router := http.NewServeMux()
@@ -72,10 +23,7 @@ func main() {
 
 	addRoutes(router, createBundle())
 
-	// Start an HTTP server with our proxy handler
-	router.HandleFunc("/", proxyHandler)
 	log.Println("Starting proxy server on :8080")
-
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
@@ -96,12 +44,21 @@ func createBundle() *bundle.Bundle {
 	}
 
 	namespace := os.Getenv("NAMESPACE")
+	if namespace == "" {
+		panic(errors.New("'NAMESPACE' environment variable must be set!"))
+	}
+
+	cookieSigningKey := os.Getenv("MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY")
+	if cookieSigningKey == "" {
+		panic(errors.New("'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' environment variable must be set!"))
+	}
 
 	return &bundle.Bundle{
 		ClientSet: clientset,
 		RuntimeEnvironment: bundle.RuntimeEnvironment{
 			Namespace: namespace,
 		},
+		Log: log.New(os.Stdout, "", log.LstdFlags),
 		Config: &bundle.Config{
 			JuiceShopImage:                    "bkimminich/juice-shop",
 			JuiceShopTag:                      "latest",
@@ -117,6 +74,9 @@ func createBundle() *bundle.Bundle {
 			JuiceShopTolerations:              []string{},
 			JuiceShopAffinity:                 "",
 			DeploymentContext:                 "default-context",
+			CookieConfig: bundle.CookieConfig{
+				SigningKey: cookieSigningKey,
+			},
 		},
 	}
 }
