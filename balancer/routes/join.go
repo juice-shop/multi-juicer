@@ -26,8 +26,11 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 			_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 			if err != nil && errors.IsNotFound(err) {
 
+				passcode := bundle.PasscodeGenerator()
+				passcodeHash := "todo-acutally-hash-here"
+
 				// Create a deployment for the team
-				err := createDeploymentForTeam(bundle, team, "very-hashy")
+				err := createDeploymentForTeam(bundle, team, passcodeHash)
 				if err != nil {
 					bundle.Log.Printf("Failed to create deployment: %s", err)
 					http.Error(responseWriter, "failed to create deployment", http.StatusInternalServerError)
@@ -48,7 +51,7 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 
 				responseBody, _ := json.Marshal(map[string]string{
 					"message":  "Created Instance",
-					"passcode": "12345678",
+					"passcode": passcode,
 				})
 
 				http.SetCookie(responseWriter, &http.Cookie{

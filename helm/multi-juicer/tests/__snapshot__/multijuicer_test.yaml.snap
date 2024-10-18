@@ -404,9 +404,9 @@ default values render correctly:
                   name: http
               readinessProbe:
                 httpGet:
-                  initialDelaySeconds: 5
                   path: /ready
                   port: http
+                initialDelaySeconds: 5
               resources:
                 limits:
                   cpu: 20m
@@ -3048,9 +3048,9 @@ full values render out correctly:
                   name: http
               readinessProbe:
                 httpGet:
-                  initialDelaySeconds: 5
                   path: /ready
                   port: http
+                initialDelaySeconds: 5
               resources:
                 limits:
                   cpu: 20m
@@ -3550,9 +3550,9 @@ production notes work correctly:
                   name: http
               readinessProbe:
                 httpGet:
-                  initialDelaySeconds: 5
                   path: /ready
                   port: http
+                initialDelaySeconds: 5
               resources:
                 limits:
                   cpu: 20m

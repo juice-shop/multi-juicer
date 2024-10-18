@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/juice-shop/multi-juicer/balancer/pkg/passcode"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
@@ -14,6 +15,7 @@ import (
 type Bundle struct {
 	RuntimeEnvironment    RuntimeEnvironment
 	ClientSet             kubernetes.Interface
+	PasscodeGenerator     func() string
 	StaticAssetsDirectory string `json:"staticAssetsDirectory"`
 	Config                *Config
 	Log                   *log.Logger
@@ -80,7 +82,8 @@ func New() *Bundle {
 		RuntimeEnvironment: RuntimeEnvironment{
 			Namespace: namespace,
 		},
-		Log: log.New(os.Stdout, "", log.LstdFlags),
+		PasscodeGenerator: passcode.GeneratePasscode,
+		Log:               log.New(os.Stdout, "", log.LstdFlags),
 		Config: &Config{
 			JuiceShopConfig: JuiceShopConfig{
 				ImagePullPolicy: "IfNotPresent",
