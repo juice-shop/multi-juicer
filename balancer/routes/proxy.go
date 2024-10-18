@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
@@ -27,20 +26,20 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			teamSigned, err := req.Cookie("balancer")
 			if err != nil {
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", Expires: time.Now().Add(-100000 * time.Second)})
+				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}
 			team, err := signutil.Unsign(teamSigned.Value, bundle.Config.CookieConfig.SigningKey)
 			if err != nil {
 				bundle.Log.Printf("Invalid cookie signature, unsetting cookie and redirecting to balancer page.")
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", Expires: time.Now().Add(-100000 * time.Second)})
+				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}
 			if team == "" {
 				bundle.Log.Printf("Empty team in signed cookie! Unsetting cookie and redirecting to balancer page.")
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", Expires: time.Now().Add(-100000 * time.Second)})
+				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}
