@@ -32,6 +32,10 @@ jobs:
         with:
           go-version-file: "balancer/go.mod"
           cache-dependency-path: "balancer/go.sum"
+      - name: "Place index.html file into ui build folder"
+        run: |
+          mkdir ui/build/
+          touch ui/build/index.html
       - name: "Lint"
         run: go vet
       - name: "Test"
