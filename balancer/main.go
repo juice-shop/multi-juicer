@@ -14,11 +14,12 @@ import (
 )
 
 func main() {
+	bundle := createBundle()
+
 	router := http.NewServeMux()
+	addRoutes(router, bundle)
 
-	addRoutes(router, createBundle())
-
-	log.Println("Starting proxy server on :8080")
+	bundle.Log.Println("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
