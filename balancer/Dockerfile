@@ -4,9 +4,7 @@ COPY go.mod go.sum ./
 # cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
 RUN go mod download
-COPY main.go main.go
-COPY kubernetes.go kubernetes.go
-COPY pkg/ pkg/
+COPY . .
 ARG TARGETOS TARGETARCH
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build
 RUN chmod +x balancer
