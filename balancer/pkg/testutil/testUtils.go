@@ -29,7 +29,8 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 		PasscodeGenerator: func() string {
 			return "12345678"
 		},
-		Log: log.New(os.Stdout, "", log.LstdFlags),
+		BcryptRounds: 2,
+		Log:          log.New(os.Stdout, "", log.LstdFlags),
 		Config: &bundle.Config{
 			JuiceShopConfig: bundle.JuiceShopConfig{
 				ImagePullPolicy: "IfNotPresent",

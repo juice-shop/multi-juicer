@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/stretchr/testify v1.9.0
+	golang.org/x/crypto v0.24.0
 	k8s.io/api v0.31.1
 	k8s.io/apimachinery v0.31.1
 	k8s.io/client-go v0.31.1

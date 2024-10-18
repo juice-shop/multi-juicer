@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/passcode"
+	"golang.org/x/crypto/bcrypt"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
@@ -16,6 +17,7 @@ type Bundle struct {
 	RuntimeEnvironment    RuntimeEnvironment
 	ClientSet             kubernetes.Interface
 	PasscodeGenerator     func() string
+	BcryptRounds          int
 	StaticAssetsDirectory string `json:"staticAssetsDirectory"`
 	Config                *Config
 	Log                   *log.Logger
@@ -83,6 +85,7 @@ func New() *Bundle {
 			Namespace: namespace,
 		},
 		PasscodeGenerator: passcode.GeneratePasscode,
+		BcryptRounds:      bcrypt.DefaultCost,
 		Log:               log.New(os.Stdout, "", log.LstdFlags),
 		Config: &Config{
 			JuiceShopConfig: JuiceShopConfig{

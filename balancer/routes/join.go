@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,12 +28,21 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 			if err != nil && errors.IsNotFound(err) {
 
 				passcode := bundle.PasscodeGenerator()
-				passcodeHash := "todo-acutally-hash-here"
+
+				// Generate a bcrypt hash of the password
+				passcodeHashBytes, err := bcrypt.GenerateFromPassword([]byte(passcode), bundle.BcryptRounds)
+				if err != nil {
+					bundle.Log.Printf("Failed to hash passcode!: %s", err)
+					http.Error(responseWriter, "", http.StatusInternalServerError)
+					return
+				}
+				passcodeHash := string(passcodeHashBytes)
 
 				// Create a deployment for the team
-				err := createDeploymentForTeam(bundle, team, passcodeHash)
+				err = createDeploymentForTeam(bundle, team, passcodeHash)
 				if err != nil {
 					bundle.Log.Printf("Failed to create deployment: %s", err)
+
 					http.Error(responseWriter, "failed to create deployment", http.StatusInternalServerError)
 					return
 				}
