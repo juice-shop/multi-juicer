@@ -26,7 +26,7 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 # to verify every thing is starting up, run:
 kubectl get pods
 
-# This should show you two pods a juice-balancer pod and a progress-watchdog pod
+# This should show you two pods a balancer pod and a progress-watchdog pod
 # Wait until both pods are ready
 ```
 
@@ -37,9 +37,9 @@ This step is optional, but helpful to catch errors quicker.
 ```bash
 # lets test out if the app is working correctly before proceeding
 # for that we can port forward the JuiceBalancer service to your local machine
-kubectl port-forward service/juice-balancer 3000:3000
+kubectl port-forward service/balancer 8080:8080
 
-# Open up your browser for localhost:3000
+# Open up your browser for localhost:8080
 # You should be able to see the MultiJuicer Balancer UI
 
 # Try to create a team and see if everything works correctly
@@ -47,10 +47,10 @@ kubectl port-forward service/juice-balancer 3000:3000
 # and after clicking the "Start Hacking" Button
 
 # You can also try out if the admin UI works correctly
-# Go back to localhost:3000/balancer
+# Go back to localhost:8080/balancer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-kubectl get secrets juice-balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+kubectl get secrets balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. Make a service to expose multi-juicer outside of the cluster

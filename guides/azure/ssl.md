@@ -1,12 +1,11 @@
-
 # Setup SSL for multi-juicer with Microsoft Azure
 
 Following this guide, you should be able to setup a https ingress with certificates from letsencrypt. https://docs.microsoft.com/en-us/azure/aks/ingress-tls?tabs=azure-cli .
-This guide is based on the official microsoft guide and tested on azure. 
+This guide is based on the official microsoft guide and tested on azure.
 
 Please note: Make sure that you haven't setup an ingress already. There is an option for configuring an ingress when installing multi-juicer with your own `values.yaml`. This guide require that you haven't ventured down that path.
 
-## 1. Create the Container registry 
+## 1. Create the Container registry
 
 First create a container registry where you will be storing the images for your cert-manager and nginx controller
 
@@ -137,9 +136,11 @@ helm install cert-manager jetstack/cert-manager \
   --set cainjector.image.repository=$ACR_URL/$CERT_MANAGER_IMAGE_CAINJECTOR \
   --set cainjector.image.tag=$CERT_MANAGER_TAG
 ```
+
 ## 5. Create a cluster issuer
 
 Save the following content as `cluster-issuer.yaml`
+
 ```bash
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -160,7 +161,9 @@ spec:
               nodeSelector:
                 "kubernetes.io/os": linux
 ```
+
 To create the issuer, use the kubectl apply command.
+
 ```bash
 kubectl apply -f cluster-issuer.yaml
 ```
@@ -174,7 +177,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: my-multi-juicer
-  annotations: 
+  annotations:
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: nginx
@@ -190,16 +193,16 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: juice-balancer
+            name: balancer
             port:
-              number: 3000
+              number: 8080
 ```
+
 Edit the host so that it corresponds to the host associated with your public ip. You find the hostname of your public ip by executing this command.
 
 ```bash
 az network public-ip show --ids $PUBLICIPID --query "[dnsSettings.fqdn]" --output tsv
 ```
-
 
 Create the ingress route
 
@@ -215,5 +218,5 @@ $ kubectl get certificate --namespace default
 NAME         READY   SECRET       AGE
 tls-secret   True    tls-secret   11m
 ```
-Test that the ingress is working by opening a browser and trying the host address. Make sure that you use https
 
+Test that the ingress is working by opening a browser and trying the host address. Make sure that you use https

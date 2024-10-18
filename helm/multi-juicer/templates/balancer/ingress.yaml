@@ -6,7 +6,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "multi-juicer.juice-balancer.labels" . | nindent 4 }}
+    {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -35,7 +35,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: juice-balancer
+                name: balancer
                 port: 
                   number: {{ $svcPort }}
         {{- end }}

@@ -12,22 +12,22 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/juice-balancer/config-map.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/juice-balancer/secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/balancer/config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/balancer/secret.yaml") . | sha256sum }}
         {{- with .Values.balancer.pod.annotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
         foo: bar
     spec:
-      serviceAccountName: juice-balancer
+      serviceAccountName: balancer
       {{- with .Values.balancer.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: 'local/balancer:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
+          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           {{- with .Values.balancer.containerSecurityContext }}
           securityContext:
@@ -38,11 +38,16 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: adminPassword
+                name: balancer-secret
           - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
             valueFrom:
               secretKeyRef:
                 key: cookieParserSecret
-                name: juice-balancer-secret
+                name: balancer-secret
           ports:
             - name: http
               containerPort: 8080
@@ -54,7 +59,7 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: juice-balancer-config
+            name: balancer-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

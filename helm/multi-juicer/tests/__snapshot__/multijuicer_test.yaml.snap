@@ -1,5 +1,231 @@
 default values render correctly:
   1: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "port": 3000,
+          "namespace": "NAMESPACE",
+          "deploymentContext": "RELEASE-NAME",
+          "maxJuiceShopInstances": 10,
+          "skipOwnerReference": false,
+          "cookieParser": {
+            "cookieName": "balancer",
+            "secure": false
+          },
+          "admin": {
+            "username": "admin"
+          },
+          "metrics": {
+            "enabled": true
+          },
+          "juiceShop": {
+            "image": "bkimminich/juice-shop",
+            "tag": "v42.42.42",
+            "imagePullPolicy": "IfNotPresent",
+            "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
+            "nodeEnv": "multi-juicer",
+            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
+            "podSecurityContext": {"runAsNonRoot":true},
+            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "env": [],
+            "envFrom": [],
+            "volumes": [],
+            "volumeMounts": [],
+            "affinity": {},
+            "tolerations": [],
+            "runtimeClassName": null,
+            "annotations": {},
+            "labels": {}
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer-config
+  2: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        foo: bar
+      name: balancer
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          foo: bar
+      template:
+        metadata:
+          annotations:
+            checksum/config: 1a3396b63c83eb20b6864c4777a95e133972de22b050ccb721efc7a015204a0f
+            checksum/secret: 140499bbdb19087c21534a32c6ecaa58916bed2ec9670f6f1871ccd17d9fc64f
+          labels:
+            foo: bar
+        spec:
+          containers:
+            - env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: adminPassword
+                      name: balancer-secret
+                - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookieParserSecret
+                      name: balancer-secret
+              image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
+              imagePullPolicy: IfNotPresent
+              name: multi-juicer
+              ports:
+                - containerPort: 8080
+                  name: http
+              resources:
+                limits:
+                  cpu: 400m
+                  memory: 256Mi
+                requests:
+                  cpu: 400m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /home/app/config/
+                  name: config-volume
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: balancer
+          volumes:
+            - configMap:
+                name: balancer-config
+              name: config-volume
+  3: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: balancer
+    subjects:
+      - kind: ServiceAccount
+        name: balancer
+  4: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - create
+          - list
+          - delete
+          - patch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - delete
+  5: |
+    apiVersion: v1
+    data:
+      adminPassword: QUJDREVGR0g=
+      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      metricsBasicAuthPassword: RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k=
+      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer-secret
+    type: Opaque
+  6: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+  7: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+    spec:
+      ports:
+        - name: web
+          port: 3000
+      selector:
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  8: |
     apiVersion: batch/v1
     kind: CronJob
     metadata:
@@ -46,7 +272,7 @@ default values render correctly:
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
-  2: |
+  9: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -66,306 +292,54 @@ default values render correctly:
     subjects:
       - kind: ServiceAccount
         name: juice-cleaner
-  3: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
-      labels:
-        app.kubernetes.io/component: garbage-collector
-        app.kubernetes.io/instance: cleaner-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: cleaner
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-cleaner
-      namespace: NAMESPACE
-    rules:
-      - apiGroups:
-          - apps
-        resources:
-          - deployments
-        verbs:
-          - get
-          - delete
-          - list
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - delete
-  4: |
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      labels:
-        app.kubernetes.io/component: garbage-collector
-        app.kubernetes.io/instance: cleaner-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: cleaner
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-cleaner
-  5: |
-    apiVersion: v1
-    data:
-      config.json: |
-        {
-          "port": 3000,
-          "namespace": "NAMESPACE",
-          "deploymentContext": "RELEASE-NAME",
-          "maxJuiceShopInstances": 10,
-          "skipOwnerReference": false,
-          "cookieParser": {
-            "cookieName": "balancer",
-            "secure": false
-          },
-          "admin": {
-            "username": "admin"
-          },
-          "metrics": {
-            "enabled": true
-          },
-          "juiceShop": {
-            "image": "bkimminich/juice-shop",
-            "tag": "v42.42.42",
-            "imagePullPolicy": "IfNotPresent",
-            "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
-            "nodeEnv": "multi-juicer",
-            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
-            "podSecurityContext": {"runAsNonRoot":true},
-            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
-            "env": [],
-            "envFrom": [],
-            "volumes": [],
-            "volumeMounts": [],
-            "affinity": {},
-            "tolerations": [],
-            "runtimeClassName": null,
-            "annotations": {},
-            "labels": {}
-          }
-        }
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer-config
-  6: |
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-          app.kubernetes.io/name: juice-balancer
-          app.kubernetes.io/part-of: multi-juicer
-      template:
-        metadata:
-          annotations:
-            checksum/config: 4e04b32a6763d0f6788ac2eb7c5728626d7333691d95c412f393001adc1447ea
-            checksum/secret: 251cfd8e9e6e2060f9bce6d7ab720ed1658fee709ffddb5c877b0a366f3ff49c
-          labels:
-            app.kubernetes.io/component: load-balancer
-            app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: juice-balancer
-            app.kubernetes.io/part-of: multi-juicer
-            app.kubernetes.io/version: 42.0.0
-        spec:
-          containers:
-            - env:
-                - name: COOKIEPARSER_SECRET
-                  valueFrom:
-                    secretKeyRef:
-                      key: cookieParserSecret
-                      name: juice-balancer-secret
-                - name: ADMIN_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: adminPassword
-                      name: juice-balancer-secret
-                - name: METRICS_BASICAUTH_USERNAME
-                  valueFrom:
-                    secretKeyRef:
-                      key: metricsBasicAuthUsername
-                      name: juice-balancer-secret
-                - name: METRICS_BASICAUTH_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: metricsBasicAuthPassword
-                      name: juice-balancer-secret
-              image: ghcr.io/juice-shop/multi-juicer/juice-balancer:v42.0.0
-              imagePullPolicy: IfNotPresent
-              livenessProbe:
-                httpGet:
-                  path: /balancer/
-                  port: http
-              name: multi-juicer
-              ports:
-                - containerPort: 3000
-                  name: http
-              readinessProbe:
-                httpGet:
-                  path: /balancer/
-                  port: http
-              resources:
-                limits:
-                  cpu: 400m
-                  memory: 256Mi
-                requests:
-                  cpu: 400m
-                  memory: 256Mi
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                    - ALL
-                readOnlyRootFilesystem: true
-              volumeMounts:
-                - mountPath: /home/app/config/
-                  name: config-volume
-          securityContext:
-            runAsNonRoot: true
-          serviceAccountName: juice-balancer
-          volumes:
-            - configMap:
-                name: juice-balancer-config
-              name: config-volume
-  7: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: RoleBinding
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-      namespace: NAMESPACE
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
-      name: juice-balancer
-    subjects:
-      - kind: ServiceAccount
-        name: juice-balancer
-  8: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-      namespace: NAMESPACE
-    rules:
-      - apiGroups:
-          - apps
-        resources:
-          - deployments
-        verbs:
-          - get
-          - create
-          - list
-          - delete
-          - patch
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - create
-          - delete
-      - apiGroups:
-          - ""
-        resources:
-          - pods
-        verbs:
-          - get
-          - list
-          - delete
-  9: |
-    apiVersion: v1
-    data:
-      adminPassword: QUJDREVGR0g=
-      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
-      metricsBasicAuthPassword: RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k=
-      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
-    kind: Secret
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer-secret
-    type: Opaque
   10: |
-    apiVersion: v1
-    kind: ServiceAccount
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
     metadata:
       labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/name: cleaner
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
+      name: juice-cleaner
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - delete
+          - list
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - delete
   11: |
     apiVersion: v1
-    kind: Service
+    kind: ServiceAccount
     metadata:
       labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/name: cleaner
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      ports:
-        - name: web
-          port: 3000
-      selector:
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-      type: ClusterIP
+      name: juice-cleaner
   12: |
     apiVersion: v1
     data:
       multi-juicer.yaml: |-
         application:
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
-          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
           showVersionNumber: false
           showGitHubLinks: false
         challenges:
@@ -524,8 +498,58 @@ default values render correctly:
       type: ClusterIP
 full values render out correctly:
   1: |
-    raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward --namespace=\"NAMESPACE\" service/juice-balancer 3000:3000\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:3000\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets juice-balancer-secret --namespace=\"NAMESPACE\" -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
+    raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward --namespace=\"NAMESPACE\" service/balancer 8080:8080\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:8080\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets balancer-secret --namespace=\"NAMESPACE\" -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
   2: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "port": 3000,
+          "namespace": "NAMESPACE",
+          "deploymentContext": "RELEASE-NAME",
+          "maxJuiceShopInstances": 42,
+          "skipOwnerReference": false,
+          "cookieParser": {
+            "cookieName": "__Secure-balancer",
+            "secure": true
+          },
+          "admin": {
+            "username": "admin"
+          },
+          "metrics": {
+            "enabled": true
+          },
+          "juiceShop": {
+            "image": "bkimminich/juice-shop",
+            "tag": "v42.42.42",
+            "imagePullPolicy": "IfNotPresent",
+            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
+            "nodeEnv": "ctf",
+            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
+            "podSecurityContext": {"runAsNonRoot":true},
+            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "env": [],
+            "envFrom": [],
+            "volumes": [],
+            "volumeMounts": [],
+            "affinity": {},
+            "tolerations": [],
+            "runtimeClassName": null,
+            "annotations": {},
+            "labels": {}
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer-config
+  3: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -540,8 +564,8 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 6d6bc92a94f12493138aa82fe204065d1f1ff6933357494240ac68429af2b01d
-            checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
+            checksum/config: b87730c1f3af22bc42af30a68a467cb2f7d0ef52e37d6deaa5f5051adb6888d6
+            checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
           labels:
             foo: bar
         spec:
@@ -551,12 +575,17 @@ full values render out correctly:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.namespace
+                - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: adminPassword
+                      name: balancer-secret
                 - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
                   valueFrom:
                     secretKeyRef:
                       key: cookieParserSecret
-                      name: juice-balancer-secret
-              image: local/balancer:v42.0.0
+                      name: balancer-secret
+              image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               name: multi-juicer
               ports:
@@ -580,12 +609,182 @@ full values render out correctly:
                   name: config-volume
           securityContext:
             runAsNonRoot: true
-          serviceAccountName: juice-balancer
+          serviceAccountName: balancer
           volumes:
             - configMap:
-                name: juice-balancer-config
+                name: balancer-config
               name: config-volume
-  3: |
+  4: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        kubernetes.io/tls-acme: "true"
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: RELEASE-NAME-multi-juicer
+    spec:
+      ingressClassName: cool-ingress
+      rules:
+        - host: multi-juicer.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: balancer
+                    port:
+                      number: 3000
+                path: /
+                pathType: ImplementationSpecific
+      tls:
+        - hosts:
+            - multi-juicer.local
+          secretName: tls-secret
+  5: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: balancer
+    subjects:
+      - kind: ServiceAccount
+        name: balancer
+  6: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - create
+          - list
+          - delete
+          - patch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - delete
+  7: |
+    apiVersion: v1
+    data:
+      adminPassword: QUJDREVGR0g=
+      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
+      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer-secret
+    type: Opaque
+  8: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+  9: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+    spec:
+      ports:
+        - name: web
+          port: 3000
+      selector:
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  10: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+    spec:
+      endpoints:
+        - basicAuth:
+            password:
+              key: metricsBasicAuthPassword
+              name: balancer-secret
+            username:
+              key: metricsBasicAuthUsername
+              name: balancer-secret
+          path: /balancer/metrics
+          port: web
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: balancer-RELEASE-NAME
+          app.kubernetes.io/name: balancer
+          app.kubernetes.io/part-of: multi-juicer
+  11: |
     apiVersion: batch/v1
     kind: CronJob
     metadata:
@@ -632,7 +831,7 @@ full values render out correctly:
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
-  4: |
+  12: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -652,7 +851,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: juice-cleaner
-  5: |
+  13: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -681,7 +880,7 @@ full values render out correctly:
         verbs:
           - get
           - delete
-  6: |
+  14: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -693,7 +892,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-cleaner
-  7: |
+  15: |
     apiVersion: v1
     data:
       instances.json: |-
@@ -2753,324 +2952,13 @@ full values render out correctly:
       labels:
         grafana_dashboard: "1"
       name: multijuicer-instance
-  8: |
-    apiVersion: v1
-    data:
-      config.json: |
-        {
-          "port": 3000,
-          "namespace": "NAMESPACE",
-          "deploymentContext": "RELEASE-NAME",
-          "maxJuiceShopInstances": 42,
-          "skipOwnerReference": false,
-          "cookieParser": {
-            "cookieName": "__Secure-balancer",
-            "secure": true
-          },
-          "admin": {
-            "username": "admin"
-          },
-          "metrics": {
-            "enabled": true
-          },
-          "juiceShop": {
-            "image": "bkimminich/juice-shop",
-            "tag": "v42.42.42",
-            "imagePullPolicy": "IfNotPresent",
-            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
-            "nodeEnv": "ctf",
-            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
-            "podSecurityContext": {"runAsNonRoot":true},
-            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
-            "env": [],
-            "envFrom": [],
-            "volumes": [],
-            "volumeMounts": [],
-            "affinity": {},
-            "tolerations": [],
-            "runtimeClassName": null,
-            "annotations": {},
-            "labels": {}
-          }
-        }
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer-config
-  9: |
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      replicas: 3
-      selector:
-        matchLabels:
-          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-          app.kubernetes.io/name: juice-balancer
-          app.kubernetes.io/part-of: multi-juicer
-      template:
-        metadata:
-          annotations:
-            checksum/config: 6d6bc92a94f12493138aa82fe204065d1f1ff6933357494240ac68429af2b01d
-            checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
-          labels:
-            app.kubernetes.io/component: load-balancer
-            app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: juice-balancer
-            app.kubernetes.io/part-of: multi-juicer
-            app.kubernetes.io/version: 42.0.0
-        spec:
-          containers:
-            - env:
-                - name: COOKIEPARSER_SECRET
-                  valueFrom:
-                    secretKeyRef:
-                      key: cookieParserSecret
-                      name: juice-balancer-secret
-                - name: ADMIN_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: adminPassword
-                      name: juice-balancer-secret
-                - name: METRICS_BASICAUTH_USERNAME
-                  valueFrom:
-                    secretKeyRef:
-                      key: metricsBasicAuthUsername
-                      name: juice-balancer-secret
-                - name: METRICS_BASICAUTH_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: metricsBasicAuthPassword
-                      name: juice-balancer-secret
-              image: ghcr.io/juice-shop/multi-juicer/juice-balancer:v42.0.0
-              imagePullPolicy: IfNotPresent
-              livenessProbe:
-                httpGet:
-                  path: /balancer/
-                  port: http
-              name: multi-juicer
-              ports:
-                - containerPort: 3000
-                  name: http
-              readinessProbe:
-                httpGet:
-                  path: /balancer/
-                  port: http
-              resources:
-                limits:
-                  cpu: 400m
-                  memory: 256Mi
-                requests:
-                  cpu: 400m
-                  memory: 256Mi
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                    - ALL
-                readOnlyRootFilesystem: true
-              volumeMounts:
-                - mountPath: /home/app/config/
-                  name: config-volume
-          securityContext:
-            runAsNonRoot: true
-          serviceAccountName: juice-balancer
-          volumes:
-            - configMap:
-                name: juice-balancer-config
-              name: config-volume
-  10: |
-    apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-      annotations:
-        kubernetes.io/tls-acme: "true"
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: RELEASE-NAME-multi-juicer
-    spec:
-      ingressClassName: cool-ingress
-      rules:
-        - host: multi-juicer.local
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: juice-balancer
-                    port:
-                      number: 3000
-                path: /
-                pathType: ImplementationSpecific
-      tls:
-        - hosts:
-            - multi-juicer.local
-          secretName: tls-secret
-  11: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: RoleBinding
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-      namespace: NAMESPACE
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
-      name: juice-balancer
-    subjects:
-      - kind: ServiceAccount
-        name: juice-balancer
-  12: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-      namespace: NAMESPACE
-    rules:
-      - apiGroups:
-          - apps
-        resources:
-          - deployments
-        verbs:
-          - get
-          - create
-          - list
-          - delete
-          - patch
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - create
-          - delete
-      - apiGroups:
-          - ""
-        resources:
-          - pods
-        verbs:
-          - get
-          - list
-          - delete
-  13: |
-    apiVersion: v1
-    data:
-      adminPassword: QUJDREVGR0g=
-      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
-      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
-      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
-    kind: Secret
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer-secret
-    type: Opaque
-  14: |
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-  15: |
-    apiVersion: v1
-    kind: Service
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      ports:
-        - name: web
-          port: 3000
-      selector:
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-      type: ClusterIP
   16: |
-    apiVersion: monitoring.coreos.com/v1
-    kind: ServiceMonitor
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      endpoints:
-        - basicAuth:
-            password:
-              key: metricsBasicAuthPassword
-              name: juice-balancer-secret
-            username:
-              key: metricsBasicAuthUsername
-              name: juice-balancer-secret
-          path: /balancer/metrics
-          port: web
-      selector:
-        matchLabels:
-          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-          app.kubernetes.io/name: juice-balancer
-          app.kubernetes.io/part-of: multi-juicer
-  17: |
     apiVersion: v1
     data:
       multi-juicer.yaml: |-
         application:
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
-          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
           showVersionNumber: false
           showGitHubLinks: false
         challenges:
@@ -3089,7 +2977,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-shop-config
-  18: |
+  17: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -3103,14 +2991,14 @@ full values render out correctly:
       name: juice-shops
     spec:
       endpoints:
-        - targetPort: 3000
+        - targetPort: 8080
       selector:
         matchLabels:
           app.kubernetes.io/managed-by: RELEASE-NAME
           app.kubernetes.io/name: juice-shop
       targetLabels:
         - team
-  19: |
+  18: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -3171,7 +3059,7 @@ full values render out correctly:
           securityContext:
             runAsNonRoot: true
           serviceAccountName: progress-watchdog
-  20: |
+  19: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -3191,7 +3079,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: progress-watchdog
-  21: |
+  20: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -3213,7 +3101,7 @@ full values render out correctly:
           - get
           - list
           - patch
-  22: |
+  21: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -3225,7 +3113,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: progress-watchdog
-  23: |
+  22: |
     apiVersion: v1
     kind: Service
     metadata:
@@ -3250,6 +3138,232 @@ full values render out correctly:
       type: ClusterIP
 production notes work correctly:
   1: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "port": 3000,
+          "namespace": "NAMESPACE",
+          "deploymentContext": "RELEASE-NAME",
+          "maxJuiceShopInstances": 42,
+          "skipOwnerReference": false,
+          "cookieParser": {
+            "cookieName": "__Secure-balancer",
+            "secure": true
+          },
+          "admin": {
+            "username": "admin"
+          },
+          "metrics": {
+            "enabled": true
+          },
+          "juiceShop": {
+            "image": "bkimminich/juice-shop",
+            "tag": "v42.42.42",
+            "imagePullPolicy": "IfNotPresent",
+            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
+            "nodeEnv": "ctf",
+            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
+            "podSecurityContext": {"runAsNonRoot":true},
+            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "env": [],
+            "envFrom": [],
+            "volumes": [],
+            "volumeMounts": [],
+            "affinity": {},
+            "tolerations": [],
+            "runtimeClassName": null,
+            "annotations": {},
+            "labels": {}
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer-config
+  2: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        foo: bar
+      name: balancer
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          foo: bar
+      template:
+        metadata:
+          annotations:
+            checksum/config: b87730c1f3af22bc42af30a68a467cb2f7d0ef52e37d6deaa5f5051adb6888d6
+            checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
+          labels:
+            foo: bar
+        spec:
+          containers:
+            - env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: adminPassword
+                      name: balancer-secret
+                - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookieParserSecret
+                      name: balancer-secret
+              image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
+              imagePullPolicy: IfNotPresent
+              name: multi-juicer
+              ports:
+                - containerPort: 8080
+                  name: http
+              resources:
+                limits:
+                  cpu: 400m
+                  memory: 256Mi
+                requests:
+                  cpu: 400m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /home/app/config/
+                  name: config-volume
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: balancer
+          volumes:
+            - configMap:
+                name: balancer-config
+              name: config-volume
+  3: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+      namespace: NAMESPACE
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: balancer
+    subjects:
+      - kind: ServiceAccount
+        name: balancer
+  4: |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - create
+          - list
+          - delete
+          - patch
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - delete
+  5: |
+    apiVersion: v1
+    data:
+      adminPassword: QUJDREVGR0g=
+      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
+      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer-secret
+    type: Opaque
+  6: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+  7: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: balancer
+    spec:
+      ports:
+        - name: web
+          port: 3000
+      selector:
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  8: |
     apiVersion: batch/v1
     kind: CronJob
     metadata:
@@ -3296,7 +3410,7 @@ production notes work correctly:
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
-  2: |
+  9: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -3316,306 +3430,54 @@ production notes work correctly:
     subjects:
       - kind: ServiceAccount
         name: juice-cleaner
-  3: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
-      labels:
-        app.kubernetes.io/component: garbage-collector
-        app.kubernetes.io/instance: cleaner-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: cleaner
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-cleaner
-      namespace: NAMESPACE
-    rules:
-      - apiGroups:
-          - apps
-        resources:
-          - deployments
-        verbs:
-          - get
-          - delete
-          - list
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - delete
-  4: |
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      labels:
-        app.kubernetes.io/component: garbage-collector
-        app.kubernetes.io/instance: cleaner-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: cleaner
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-cleaner
-  5: |
-    apiVersion: v1
-    data:
-      config.json: |
-        {
-          "port": 3000,
-          "namespace": "NAMESPACE",
-          "deploymentContext": "RELEASE-NAME",
-          "maxJuiceShopInstances": 42,
-          "skipOwnerReference": false,
-          "cookieParser": {
-            "cookieName": "__Secure-balancer",
-            "secure": true
-          },
-          "admin": {
-            "username": "admin"
-          },
-          "metrics": {
-            "enabled": true
-          },
-          "juiceShop": {
-            "image": "bkimminich/juice-shop",
-            "tag": "v42.42.42",
-            "imagePullPolicy": "IfNotPresent",
-            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
-            "nodeEnv": "ctf",
-            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
-            "podSecurityContext": {"runAsNonRoot":true},
-            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
-            "env": [],
-            "envFrom": [],
-            "volumes": [],
-            "volumeMounts": [],
-            "affinity": {},
-            "tolerations": [],
-            "runtimeClassName": null,
-            "annotations": {},
-            "labels": {}
-          }
-        }
-    kind: ConfigMap
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer-config
-  6: |
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      replicas: 3
-      selector:
-        matchLabels:
-          app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-          app.kubernetes.io/name: juice-balancer
-          app.kubernetes.io/part-of: multi-juicer
-      template:
-        metadata:
-          annotations:
-            checksum/config: 6d6bc92a94f12493138aa82fe204065d1f1ff6933357494240ac68429af2b01d
-            checksum/secret: 0e71fd1d122c1673521f3c4baba3d8bf7cb1687efd832017a2a2f9aa7414a283
-          labels:
-            app.kubernetes.io/component: load-balancer
-            app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-            app.kubernetes.io/managed-by: Helm
-            app.kubernetes.io/name: juice-balancer
-            app.kubernetes.io/part-of: multi-juicer
-            app.kubernetes.io/version: 42.0.0
-        spec:
-          containers:
-            - env:
-                - name: COOKIEPARSER_SECRET
-                  valueFrom:
-                    secretKeyRef:
-                      key: cookieParserSecret
-                      name: juice-balancer-secret
-                - name: ADMIN_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: adminPassword
-                      name: juice-balancer-secret
-                - name: METRICS_BASICAUTH_USERNAME
-                  valueFrom:
-                    secretKeyRef:
-                      key: metricsBasicAuthUsername
-                      name: juice-balancer-secret
-                - name: METRICS_BASICAUTH_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: metricsBasicAuthPassword
-                      name: juice-balancer-secret
-              image: ghcr.io/juice-shop/multi-juicer/juice-balancer:v42.0.0
-              imagePullPolicy: IfNotPresent
-              livenessProbe:
-                httpGet:
-                  path: /balancer/
-                  port: http
-              name: multi-juicer
-              ports:
-                - containerPort: 3000
-                  name: http
-              readinessProbe:
-                httpGet:
-                  path: /balancer/
-                  port: http
-              resources:
-                limits:
-                  cpu: 400m
-                  memory: 256Mi
-                requests:
-                  cpu: 400m
-                  memory: 256Mi
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                    - ALL
-                readOnlyRootFilesystem: true
-              volumeMounts:
-                - mountPath: /home/app/config/
-                  name: config-volume
-          securityContext:
-            runAsNonRoot: true
-          serviceAccountName: juice-balancer
-          volumes:
-            - configMap:
-                name: juice-balancer-config
-              name: config-volume
-  7: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: RoleBinding
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-      namespace: NAMESPACE
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
-      name: juice-balancer
-    subjects:
-      - kind: ServiceAccount
-        name: juice-balancer
-  8: |
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-      namespace: NAMESPACE
-    rules:
-      - apiGroups:
-          - apps
-        resources:
-          - deployments
-        verbs:
-          - get
-          - create
-          - list
-          - delete
-          - patch
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - create
-          - delete
-      - apiGroups:
-          - ""
-        resources:
-          - pods
-        verbs:
-          - get
-          - list
-          - delete
-  9: |
-    apiVersion: v1
-    data:
-      adminPassword: QUJDREVGR0g=
-      cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
-      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
-      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
-    kind: Secret
-    metadata:
-      labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-        app.kubernetes.io/version: 42.0.0
-      name: juice-balancer-secret
-    type: Opaque
   10: |
-    apiVersion: v1
-    kind: ServiceAccount
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
     metadata:
       labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/name: cleaner
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
+      name: juice-cleaner
+      namespace: NAMESPACE
+    rules:
+      - apiGroups:
+          - apps
+        resources:
+          - deployments
+        verbs:
+          - get
+          - delete
+          - list
+      - apiGroups:
+          - ""
+        resources:
+          - services
+        verbs:
+          - get
+          - delete
   11: |
     apiVersion: v1
-    kind: Service
+    kind: ServiceAccount
     metadata:
       labels:
-        app.kubernetes.io/component: load-balancer
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
+        app.kubernetes.io/component: garbage-collector
+        app.kubernetes.io/instance: cleaner-RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: juice-balancer
+        app.kubernetes.io/name: cleaner
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: juice-balancer
-    spec:
-      ports:
-        - name: web
-          port: 3000
-      selector:
-        app.kubernetes.io/instance: juice-balancer-RELEASE-NAME
-        app.kubernetes.io/name: juice-balancer
-        app.kubernetes.io/part-of: multi-juicer
-      type: ClusterIP
+      name: juice-cleaner
   12: |
     apiVersion: v1
     data:
       multi-juicer.yaml: |-
         application:
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
-          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
           showVersionNumber: false
           showGitHubLinks: false
         challenges:

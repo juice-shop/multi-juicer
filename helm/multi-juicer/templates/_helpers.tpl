@@ -25,17 +25,17 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-juice-balancer labels
+balancer labels
 */}}
-{{- define "multi-juicer.juice-balancer.labels" -}}
-{{ include "multi-juicer.juice-balancer.selectorLabels" . }}
+{{- define "multi-juicer.balancer.labels" -}}
+{{ include "multi-juicer.balancer.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/component: load-balancer
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
-{{- define "multi-juicer.juice-balancer.selectorLabels" -}}
-app.kubernetes.io/name: juice-balancer
-app.kubernetes.io/instance: juice-balancer-{{ .Release.Name }}
+{{- define "multi-juicer.balancer.selectorLabels" -}}
+app.kubernetes.io/name: balancer
+app.kubernetes.io/instance: balancer-{{ .Release.Name }}
 app.kubernetes.io/part-of: multi-juicer
 {{- end -}}
 

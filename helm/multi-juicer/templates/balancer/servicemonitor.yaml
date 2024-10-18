@@ -2,9 +2,9 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: juice-balancer
+  name: balancer
   labels:
-    {{ include "multi-juicer.juice-balancer.labels" . | nindent 4 }}
+    {{ include "multi-juicer.balancer.labels" . | nindent 4 }}
     {{- with .Values.balancer.metrics.serviceMonitor.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -15,15 +15,15 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "multi-juicer.juice-balancer.selectorLabels" . | nindent 6 }}
+      {{- include "multi-juicer.balancer.selectorLabels" . | nindent 6 }}
   endpoints:
     - port: web
       path: '/balancer/metrics'
       basicAuth:
         username:
-          name: juice-balancer-secret
+          name: balancer-secret
           key: metricsBasicAuthUsername
         password:
-          name: juice-balancer-secret
+          name: balancer-secret
           key: metricsBasicAuthPassword
 {{- end }}

@@ -34,9 +34,9 @@ balancer:
     name: balancer
     # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
     cookieParserSecret: null
-  repository: ghcr.io/juice-shop/multi-juicer/juice-balancer
+  repository: ghcr.io/juice-shop/multi-juicer/balancer
   tag: null
-  # -- Number of replicas of the juice-balancer deployment
+  # -- Number of replicas of the balancer deployment
   replicas: 1
   service:
     # -- Kubernetes service type
@@ -107,7 +107,7 @@ juiceShop:
   config: |
     application:
       logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
-      favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
+      favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
       showVersionNumber: false
       showGitHubLinks: false
     challenges:

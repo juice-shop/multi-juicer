@@ -6,7 +6,7 @@ tasks:
     aliases: [d]
     desc: |
       Builds and Deploys MultiJuicer to the default kubernetes context.
-      Then forwards the balancer service to localhost:3000
+      Then forwards the balancer service to localhost:8080
     cmds:
       - ./build-and-deploy.sh
       - kubectl rollout status deployment balancer

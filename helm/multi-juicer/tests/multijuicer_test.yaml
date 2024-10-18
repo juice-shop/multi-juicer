@@ -17,13 +17,13 @@ tests:
       - templates/progress-watchdog/service-account.yaml
       - templates/progress-watchdog/service.yaml
 
-      - templates/juice-balancer/config-map.yaml
-      - templates/juice-balancer/deployment.yaml
-      - templates/juice-balancer/role-binding.yaml
-      - templates/juice-balancer/role.yaml
-      - templates/juice-balancer/secret.yaml
-      - templates/juice-balancer/service-account.yaml
-      - templates/juice-balancer/service.yaml
+      - templates/balancer/config-map.yaml
+      - templates/balancer/deployment.yaml
+      - templates/balancer/role-binding.yaml
+      - templates/balancer/role.yaml
+      - templates/balancer/secret.yaml
+      - templates/balancer/service-account.yaml
+      - templates/balancer/service.yaml
     chart:
       version: 42.0.0
       appVersion: 42.0.0
@@ -53,13 +53,13 @@ tests:
       - templates/progress-watchdog/service-account.yaml
       - templates/progress-watchdog/service.yaml
 
-      - templates/juice-balancer/config-map.yaml
-      - templates/juice-balancer/deployment.yaml
-      - templates/juice-balancer/role-binding.yaml
-      - templates/juice-balancer/role.yaml
-      - templates/juice-balancer/secret.yaml
-      - templates/juice-balancer/service-account.yaml
-      - templates/juice-balancer/service.yaml
+      - templates/balancer/config-map.yaml
+      - templates/balancer/deployment.yaml
+      - templates/balancer/role-binding.yaml
+      - templates/balancer/role.yaml
+      - templates/balancer/secret.yaml
+      - templates/balancer/service-account.yaml
+      - templates/balancer/service.yaml
     chart:
       version: 42.0.0
       appVersion: 42.0.0
