@@ -26,7 +26,6 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 
 			_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 			if err != nil && errors.IsNotFound(err) {
-
 				passcode := bundle.PasscodeGenerator()
 
 				// Generate a bcrypt hash of the password
