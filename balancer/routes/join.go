@@ -111,14 +111,7 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 				}
 
 				// If passcode matches, return 200 OK
-				responseWriter.WriteHeader(http.StatusOK)
-				responseWriter.Header().Set("Content-Type", "application/json")
-				responseWriter.Write([]byte(`{"message": "Joined Team"}`))
 				cookie, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
-				if err != nil {
-					http.Error(responseWriter, "failed to sign team cookie", http.StatusInternalServerError)
-					return
-				}
 				http.SetCookie(responseWriter, &http.Cookie{
 					Name:     "balancer",
 					Value:    cookie,
@@ -126,6 +119,13 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 					Path:     "/",
 					SameSite: http.SameSiteStrictMode,
 				})
+				responseWriter.Header().Set("Content-Type", "application/json")
+				responseWriter.Write([]byte(`{"message": "Joined Team"}`))
+				responseWriter.WriteHeader(http.StatusOK)
+				if err != nil {
+					http.Error(responseWriter, "failed to sign team cookie", http.StatusInternalServerError)
+					return
+				}
 				return
 			}
 		},
