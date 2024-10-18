@@ -16,7 +16,6 @@ import (
 	clientgotesting "k8s.io/client-go/testing"
 )
 
-// Test for the HelloHandler
 func TestWaitTillReadyHandler(t *testing.T) {
 	team := "foobar"
 
