@@ -25,24 +25,17 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: juice-balancer
+        working-directory: balancer
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: "22"
-      - name: Install Backend Dependencies
-        run: npm ci
-      - name: "Install UI Dependencies"
-        working-directory: juice-balancer/ui
-        run: npm ci
-      - name: "Build UI"
-        working-directory: juice-balancer/ui
-        run: npm run build
-      - name: Lint
-        run: npm run lint
-      - name: Test
-        run: npm test -- --ci --color --verbose
+          go-version-file: "balancer/go.mod"
+          cache-dependency-path: "balancer/go.sum"
+      - name: "Lint"
+        run: go vet
+      - name: "Test"
+        run: go test -cover
 
   progress-watchdog:
     name: ProgressWatchdog

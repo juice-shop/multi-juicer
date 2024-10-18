@@ -47,7 +47,7 @@ jobs:
         component:
           - progress-watchdog
           - cleaner
-          - juice-balancer
+          - balancer
     steps:
       - name: Checkout
         uses: actions/checkout@v4
