@@ -13,8 +13,6 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-var namespace = os.Getenv("NAMESPACE")
-
 func main() {
 	router := http.NewServeMux()
 
