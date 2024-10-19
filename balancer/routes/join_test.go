@@ -51,7 +51,7 @@ func TestJoinHandler(t *testing.T) {
 		assert.JSONEq(t, `{"message":"Created Instance","passcode":"12345678"}`, rr.Body.String())
 	})
 
-	t.Run("if team already exists, join requires a passcode", func(t *testing.T) {
+	t.Run("if team already exists then join requires a passcode", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 

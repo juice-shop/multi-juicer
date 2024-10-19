@@ -20,115 +20,133 @@ import (
 )
 
 func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
-	return http.HandlerFunc(
-		func(responseWriter http.ResponseWriter, req *http.Request) {
-			team := req.PathValue("team")
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		team := r.PathValue("team")
+		deployment, err := getDeployment(bundle, team)
+		if err != nil && errors.IsNotFound(err) {
+			createANewTeam(bundle, team, w)
+		} else if err == nil {
+			joinExistingTeam(bundle, team, deployment, w, r)
+		} else {
+			http.Error(w, "failed to get deployment", http.StatusInternalServerError)
+		}
+	})
+}
 
-			deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
-			if err != nil && errors.IsNotFound(err) {
-				passcode := bundle.PasscodeGenerator()
-
-				// Generate a bcrypt hash of the password
-				passcodeHashBytes, err := bcrypt.GenerateFromPassword([]byte(passcode), bundle.BcryptRounds)
-				if err != nil {
-					bundle.Log.Printf("Failed to hash passcode!: %s", err)
-					http.Error(responseWriter, "", http.StatusInternalServerError)
-					return
-				}
-				passcodeHash := string(passcodeHashBytes)
-
-				// Create a deployment for the team
-				err = createDeploymentForTeam(bundle, team, passcodeHash)
-				if err != nil {
-					bundle.Log.Printf("Failed to create deployment: %s", err)
-
-					http.Error(responseWriter, "failed to create deployment", http.StatusInternalServerError)
-					return
-				}
-				err = createServiceForTeam(bundle, team)
-				if err != nil {
-					bundle.Log.Printf("Failed to create service: %s", err)
-					http.Error(responseWriter, "failed to create service", http.StatusInternalServerError)
-					return
-				}
-
-				cookie, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
-				if err != nil {
-					http.Error(responseWriter, "failed to sign team cookie", http.StatusInternalServerError)
-					return
-				}
-
-				responseBody, _ := json.Marshal(map[string]string{
-					"message":  "Created Instance",
-					"passcode": passcode,
-				})
-
-				http.SetCookie(responseWriter, &http.Cookie{
-					Name:     "balancer",
-					Value:    cookie,
-					HttpOnly: true,
-					Path:     "/",
-					SameSite: http.SameSiteStrictMode,
-				})
-				responseWriter.Header().Set("Content-Type", "application/json")
-				responseWriter.WriteHeader(http.StatusOK)
-				responseWriter.Write(responseBody)
-			} else if err != nil && !errors.IsNotFound(err) {
-				http.Error(responseWriter, "failed to get deployment", http.StatusInternalServerError)
-				return
-			} else {
-				passCodeHashToMatch := deployment.Annotations["multi-juicer.owasp-juice.shop/passcode"]
-				if passCodeHashToMatch == "" {
-					http.Error(responseWriter, "failed to get passcode", http.StatusInternalServerError)
-					return
-				}
-
-				// If there is no body in the request, return 401
-				if req.Body == nil {
-					writeUnauthorizedResponse(responseWriter)
-					return
-				}
-
-				// Read and parse the JSON body
-				body, err := io.ReadAll(req.Body)
-				if err != nil {
-					writeUnauthorizedResponse(responseWriter)
-					return
-				}
-
-				var requestBody map[string]string
-				if err := json.Unmarshal(body, &requestBody); err != nil {
-					writeUnauthorizedResponse(responseWriter)
-					return
-				}
-
-				// Check if the 'passcode' key exists and if it matches the hashed passcode
-				passcode, ok := requestBody["passcode"]
-				if !ok || bcrypt.CompareHashAndPassword([]byte(passCodeHashToMatch), []byte(passcode)) != nil {
-					writeUnauthorizedResponse(responseWriter)
-					return
-				}
-
-				// If passcode matches, return 200 OK
-				cookie, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
-				http.SetCookie(responseWriter, &http.Cookie{
-					Name:     "balancer",
-					Value:    cookie,
-					HttpOnly: true,
-					Path:     "/",
-					SameSite: http.SameSiteStrictMode,
-				})
-				responseWriter.Header().Set("Content-Type", "application/json")
-				responseWriter.Write([]byte(`{"message": "Joined Team"}`))
-				responseWriter.WriteHeader(http.StatusOK)
-				if err != nil {
-					http.Error(responseWriter, "failed to sign team cookie", http.StatusInternalServerError)
-					return
-				}
-				return
-			}
-		},
+func getDeployment(bundle *bundle.Bundle, team string) (*appsv1.Deployment, error) {
+	return bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(
+		context.Background(),
+		fmt.Sprintf("juiceshop-%s", team),
+		metav1.GetOptions{},
 	)
+}
+
+func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
+	passcode, passcodeHash, err := generatePasscode(bundle)
+	if err != nil {
+		bundle.Log.Printf("Failed to hash passcode!: %s", err)
+		http.Error(w, "failed to generate passcode", http.StatusInternalServerError)
+		return
+	}
+
+	err = createDeploymentForTeam(bundle, team, passcodeHash)
+	if err != nil {
+		bundle.Log.Printf("Failed to create deployment: %s", err)
+		http.Error(w, "failed to create deployment", http.StatusInternalServerError)
+		return
+	}
+
+	err = createServiceForTeam(bundle, team)
+	if err != nil {
+		bundle.Log.Printf("Failed to create service: %s", err)
+		http.Error(w, "failed to create service", http.StatusInternalServerError)
+		return
+	}
+
+	err = setSignedTeamCookie(bundle, team, w)
+	if err != nil {
+		http.Error(w, "failed to sign team cookie", http.StatusInternalServerError)
+		return
+	}
+
+	sendSuccessResponse(w, "Created Instance", passcode)
+}
+
+func generatePasscode(bundle *bundle.Bundle) (string, string, error) {
+	passcode := bundle.PasscodeGenerator()
+	hashBytes, err := bcrypt.GenerateFromPassword([]byte(passcode), bundle.BcryptRounds)
+	if err != nil {
+		return "", "", err
+	}
+	return passcode, string(hashBytes), nil
+}
+
+func setSignedTeamCookie(bundle *bundle.Bundle, team string, w http.ResponseWriter) error {
+	cookieValue, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
+	if err != nil {
+		return err
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "balancer",
+		Value:    cookieValue,
+		HttpOnly: true,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+	})
+	return nil
+}
+
+func sendSuccessResponse(w http.ResponseWriter, message, passcode string) {
+	responseBody, _ := json.Marshal(map[string]string{
+		"message":  message,
+		"passcode": passcode,
+	})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseBody)
+}
+
+func joinExistingTeam(bundle *bundle.Bundle, team string, deployment *appsv1.Deployment, w http.ResponseWriter, r *http.Request) {
+	passCodeHashToMatch := deployment.Annotations["multi-juicer.owasp-juice.shop/passcode"]
+	if passCodeHashToMatch == "" {
+		http.Error(w, "failed to get passcode", http.StatusInternalServerError)
+		return
+	}
+	if r.Body == nil {
+		writeUnauthorizedResponse(w)
+		return
+	}
+	body, err := io.ReadAll(r.Body)
+	if err != nil || len(body) == 0 {
+		writeUnauthorizedResponse(w)
+		return
+	}
+
+	var requestBody map[string]string
+	if err := json.Unmarshal(body, &requestBody); err != nil {
+		writeUnauthorizedResponse(w)
+		return
+	}
+
+	passcode, ok := requestBody["passcode"]
+	if !ok || bcrypt.CompareHashAndPassword([]byte(passCodeHashToMatch), []byte(passcode)) != nil {
+		writeUnauthorizedResponse(w)
+		return
+	}
+
+	err = setSignedTeamCookie(bundle, team, w)
+	if err != nil {
+		http.Error(w, "failed to sign team cookie", http.StatusInternalServerError)
+		return
+	}
+
+	sendJoinedResponse(w)
+}
+
+func sendJoinedResponse(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message": "Joined Team"}`))
 }
 
 // Helper function to write a 401 Unauthorized response
@@ -264,7 +282,7 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 		},
 	}
 
-	_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
+	_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), deployment, metav1.CreateOptions{})
 	return err
 }
 
@@ -294,6 +312,6 @@ func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 		},
 	}
 
-	_, err := bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.TODO(), service, metav1.CreateOptions{})
+	_, err := bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), service, metav1.CreateOptions{})
 	return err
 }
