@@ -3,7 +3,6 @@ package routes
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -33,7 +32,7 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			log.Default().Printf("Awaiting readiness of JuiceShop Deployment for team '%s'", team)
+			bundle.Log.Printf("Awaiting readiness of JuiceShop Deployment for team '%s'", team)
 
 			// Loop to check readiness with a 30-second timeout (60 iterations of 0.5 seconds sleep)
 			for i := 0; i < 60; i++ {
@@ -43,14 +42,14 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 					http.Error(responseWriter, "team not found", http.StatusNotFound)
 					return
 				} else if err != nil {
-					log.Default().Printf("Error fetching deployment for team '%s': %v", team, err)
+					bundle.Log.Printf("Error fetching deployment for team '%s': %v", team, err)
 					http.Error(responseWriter, "Error fetching deployment", http.StatusInternalServerError)
 					return
 				}
 
 				// Check if deployment is ready
 				if deployment.Status.ReadyReplicas == 1 {
-					log.Default().Printf("JuiceShop Deployment for team '%s' is ready", team)
+					bundle.Log.Printf("JuiceShop Deployment for team '%s' is ready", team)
 					responseWriter.WriteHeader(http.StatusOK)
 					return
 				}
@@ -59,7 +58,7 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 			}
 
 			// If the loop finishes without the deployment becoming ready
-			log.Default().Printf("Waiting for deployment of team '%s' timed out", team)
+			bundle.Log.Printf("Waiting for deployment of team '%s' timed out", team)
 			http.Error(responseWriter, "Waiting for Deployment Readiness Timed Out", http.StatusInternalServerError)
 		},
 	)
