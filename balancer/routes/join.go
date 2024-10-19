@@ -73,7 +73,7 @@ func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
 }
 
 func generatePasscode(bundle *bundle.Bundle) (string, string, error) {
-	passcode := bundle.PasscodeGenerator()
+	passcode := bundle.GeneratePasscode()
 	hashBytes, err := bcrypt.GenerateFromPassword([]byte(passcode), bundle.BcryptRounds)
 	if err != nil {
 		return "", "", err

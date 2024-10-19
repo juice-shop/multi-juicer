@@ -33,7 +33,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			newPasscode := bundle.PasscodeGenerator()
+			newPasscode := bundle.GeneratePasscode()
 
 			deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(req.Context(), fmt.Sprintf("juiceshop-%s", team), v1.GetOptions{})
 			if err != nil {

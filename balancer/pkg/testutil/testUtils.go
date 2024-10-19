@@ -26,7 +26,7 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 		RuntimeEnvironment: bundle.RuntimeEnvironment{
 			Namespace: "test-namespace",
 		},
-		PasscodeGenerator: func() string {
+		GeneratePasscode: func() string {
 			return "12345678"
 		},
 		BcryptRounds: 2,

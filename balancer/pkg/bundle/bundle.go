@@ -16,7 +16,7 @@ import (
 type Bundle struct {
 	RuntimeEnvironment    RuntimeEnvironment
 	ClientSet             kubernetes.Interface
-	PasscodeGenerator     func() string
+	GeneratePasscode      func() string
 	BcryptRounds          int
 	StaticAssetsDirectory string `json:"staticAssetsDirectory"`
 	Config                *Config
@@ -84,9 +84,9 @@ func New() *Bundle {
 		RuntimeEnvironment: RuntimeEnvironment{
 			Namespace: namespace,
 		},
-		PasscodeGenerator: passcode.GeneratePasscode,
-		BcryptRounds:      bcrypt.DefaultCost,
-		Log:               log.New(os.Stdout, "", log.LstdFlags),
+		GeneratePasscode: passcode.GeneratePasscode,
+		BcryptRounds:     bcrypt.DefaultCost,
+		Log:              log.New(os.Stdout, "", log.LstdFlags),
 		Config: &Config{
 			JuiceShopConfig: JuiceShopConfig{
 				ImagePullPolicy: "IfNotPresent",
