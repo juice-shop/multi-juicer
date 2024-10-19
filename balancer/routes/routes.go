@@ -14,6 +14,7 @@ func AddRoutes(
 	router.Handle("POST /balancer/teams/{team}/join", handleTeamJoin(bundle))
 	router.Handle("GET /balancer/teams/{team}/wait-till-ready", handleWaitTillReady(bundle))
 	router.Handle("POST /balancer/teams/logout", handleLogout(bundle))
+	router.Handle("POST /balancer/teams/reset-passcode", handleResetPasscode(bundle))
 
 	router.HandleFunc("GET /balancer/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
