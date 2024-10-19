@@ -22,6 +22,7 @@ jobs:
       - uses: dominikh/staticcheck-action@v1.3.1
         with:
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+          working-directory: cleaner
       - name: "Test"
         run: go test -cover ./...
 
@@ -46,6 +47,7 @@ jobs:
       - uses: dominikh/staticcheck-action@v1.3.1
         with:
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+          working-directory: balancer
       - name: "Test"
         run: go test -cover ./...
 
@@ -66,6 +68,7 @@ jobs:
       - uses: dominikh/staticcheck-action@v1.3.1
         with:
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+          working-directory: progress-watchdog
       - name: "Test"
         run: go test -cover ./...
 
