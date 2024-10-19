@@ -70,12 +70,12 @@ func New() *Bundle {
 
 	namespace := os.Getenv("NAMESPACE")
 	if namespace == "" {
-		panic(errors.New("'NAMESPACE' environment variable must be set!"))
+		panic(errors.New("environment variable 'NAMESPACE' must be set"))
 	}
 
 	cookieSigningKey := os.Getenv("MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY")
 	if cookieSigningKey == "" {
-		panic(errors.New("'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' environment variable must be set!"))
+		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' must be set"))
 	}
 
 	return &Bundle{
