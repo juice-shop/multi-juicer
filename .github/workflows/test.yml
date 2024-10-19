@@ -2,6 +2,8 @@ on: [push, pull_request]
 name: "Tests"
 permissions:
   contents: read
+env:
+  GO_STATIC_CHECK_VERSION: "2024.1.1"
 jobs:
   cleaner:
     name: Cleaner
@@ -17,6 +19,9 @@ jobs:
           cache-dependency-path: "cleaner/go.sum"
       - name: "Lint"
         run: go vet ./...
+      - uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
       - name: "Test"
         run: go test -cover ./...
 
@@ -38,6 +43,9 @@ jobs:
           cp ui/index.html ui/build/index.html
       - name: "Lint"
         run: go vet ./...
+      - uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
       - name: "Test"
         run: go test -cover ./...
 
@@ -55,6 +63,9 @@ jobs:
           cache-dependency-path: "progress-watchdog/go.sum"
       - name: "Lint"
         run: go vet ./...
+      - uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
       - name: "Test"
         run: go test -cover ./...
 
