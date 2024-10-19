@@ -17,6 +17,13 @@ tasks:
     cmds:
       - task: balancer:ui:build
 
+  lint:
+    aliases: [l]
+    cmds:
+      - task: cleaner:lint
+      - task: balancer:api:lint
+      - task: progress-watchdog:lint
+
   test:
     aliases: [t]
     cmds:
@@ -50,6 +57,15 @@ tasks:
       - go test ./...
     dir: balancer/
 
+  balancer:api:lint:
+    preconditions:
+      - sh: which staticcheck
+        msg: "staticcheck needs to be installed for running the balancer api linter."
+    cmds:
+      - go vet ./...
+      - staticcheck ./...
+    dir: balancer/
+
   progress-watchdog:test:
     preconditions:
       - sh: which go
@@ -58,9 +74,27 @@ tasks:
       - go test ./...
     dir: progress-watchdog/
 
+  progress-watchdog:lint:
+    preconditions:
+      - sh: which staticcheck
+        msg: "staticcheck needs to be installed for running the progress-watchdog linter."
+    cmds:
+      - go vet ./...
+      - staticcheck ./...
+    dir: progress-watchdog/
+
   cleaner:test:
     cmds:
       - go test ./...
+    dir: cleaner/
+
+  cleaner:lint:
+    preconditions:
+      - sh: which staticcheck
+        msg: "staticcheck needs to be installed for running the cleaner linter."
+    cmds:
+      - go vet ./...
+      - staticcheck ./...
     dir: cleaner/
 
   helm:test:
