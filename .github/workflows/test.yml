@@ -16,7 +16,7 @@ jobs:
           go-version-file: "cleaner/go.mod"
           cache-dependency-path: "cleaner/go.sum"
       - name: "Lint"
-        run: go vet
+        run: go vet ./...
       - name: "Test"
         run: go test -cover ./...
 
@@ -37,7 +37,7 @@ jobs:
           mkdir ui/build/
           cp ui/index.html ui/build/index.html
       - name: "Lint"
-        run: go vet
+        run: go vet ./...
       - name: "Test"
         run: go test -cover ./...
 
@@ -54,7 +54,7 @@ jobs:
           go-version-file: "progress-watchdog/go.mod"
           cache-dependency-path: "progress-watchdog/go.sum"
       - name: "Lint"
-        run: go vet
+        run: go vet ./...
       - name: "Test"
         run: go test -cover ./...
 
