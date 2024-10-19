@@ -12,7 +12,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
@@ -142,7 +141,7 @@ func writeUnauthorizedResponse(responseWriter http.ResponseWriter) {
 
 func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash string) error {
 	deployment := &appsv1.Deployment{
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("juiceshop-%s", team),
 			Labels: map[string]string{
 				"team":                        team,
@@ -161,14 +160,14 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Selector: &v1.LabelSelector{
+			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"team":                   team,
 					"app.kubernetes.io/name": "juice-shop",
 				},
 			},
 			Template: corev1.PodTemplateSpec{
-				ObjectMeta: v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
 						"team":                      team,
 						"app.kubernetes.io/version": bundle.Config.JuiceShopConfig.Tag,
@@ -265,13 +264,13 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 		},
 	}
 
-	_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.TODO(), deployment, v1.CreateOptions{})
+	_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
 	return err
 }
 
 func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 	service := &corev1.Service{
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("juiceshop-%s", team),
 			Labels: map[string]string{
 				"team":                        team,
@@ -295,6 +294,6 @@ func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 		},
 	}
 
-	_, err := bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.TODO(), service, v1.CreateOptions{})
+	_, err := bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.TODO(), service, metav1.CreateOptions{})
 	return err
 }
