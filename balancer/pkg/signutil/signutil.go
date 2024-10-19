@@ -36,12 +36,12 @@ func Unsign(input, secret string) (string, error) {
 		return "", errors.New("signed cookie string must be provided")
 	}
 	if secret == "" {
-		return "", errors.New("secret key must be provided")
+		panic("missing secret key for signed cookies")
 	}
 
 	lastDotIndex := strings.LastIndex(input, ".")
 	if lastDotIndex == -1 {
-		return "", nil
+		return "", errors.New("invalid signed cookie string. no '.' found")
 	}
 
 	tentativeValue := input[:lastDotIndex]
