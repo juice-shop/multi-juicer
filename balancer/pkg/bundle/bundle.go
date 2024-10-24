@@ -1,6 +1,7 @@
 package bundle
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -9,7 +10,6 @@ import (
 	"github.com/juice-shop/multi-juicer/balancer/pkg/passcode"
 	"golang.org/x/crypto/bcrypt"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -67,11 +67,11 @@ func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {
 }
 
 func New() *Bundle {
-	config, err := rest.InClusterConfig()
+	kubeClientConfig, err := rest.InClusterConfig()
 	if err != nil {
 		panic(err.Error())
 	}
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := kubernetes.NewForConfig(kubeClientConfig)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -86,6 +86,13 @@ func New() *Bundle {
 		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' must be set"))
 	}
 
+	config, err := readConfigFromFile("/config/config.json")
+	if err != nil {
+		panic(err)
+	}
+
+	config.CookieConfig.SigningKey = cookieSigningKey
+
 	return &Bundle{
 		ClientSet:             clientset,
 		StaticAssetsDirectory: "/public/",
@@ -96,26 +103,23 @@ func New() *Bundle {
 		GetJuiceShopUrlForTeam: getJuiceShopUrlForTeam,
 		BcryptRounds:           bcrypt.DefaultCost,
 		Log:                    log.New(os.Stdout, "", log.LstdFlags),
-		Config: &Config{
-			JuiceShopConfig: JuiceShopConfig{
-				ImagePullPolicy: "IfNotPresent",
-				Image:           "bkimminich/juice-shop",
-				Tag:             "latest",
-				NodeEnv:         "multi-juicer",
-				Resources: corev1.ResourceRequirements{
-					Requests: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("200m"),
-						corev1.ResourceMemory: resource.MustParse("256Mi"),
-					},
-					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("200m"),
-						corev1.ResourceMemory: resource.MustParse("256Mi"),
-					},
-				},
-			},
-			CookieConfig: CookieConfig{
-				SigningKey: cookieSigningKey,
-			},
-		},
+		Config:                 config,
 	}
+}
+
+func readConfigFromFile(filePath string) (*Config, error) {
+	var config Config
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open config file: %w", err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		return nil, fmt.Errorf("failed to decode config file: %w", err)
+	}
+
+	return &config, err
 }

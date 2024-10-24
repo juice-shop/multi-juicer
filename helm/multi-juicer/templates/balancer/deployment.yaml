@@ -53,7 +53,9 @@ spec:
               containerPort: 8080
           volumeMounts:
             - name: config-volume
-              mountPath: /home/app/config/
+              mountPath: /config/config.json
+              subPath: config.json
+              readOnly: true
           resources:
             {{- toYaml .Values.balancer.resources | nindent 12 }}
       volumes:

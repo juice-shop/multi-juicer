@@ -2,42 +2,61 @@ default values render correctly:
   1: |
     apiVersion: v1
     data:
-      config.json: |
+      config.json: |2
         {
-          "port": 3000,
-          "namespace": "NAMESPACE",
-          "deploymentContext": "RELEASE-NAME",
-          "maxJuiceShopInstances": 10,
-          "skipOwnerReference": false,
-          "cookieParser": {
-            "cookieName": "balancer",
-            "secure": false
-          },
-          "admin": {
-            "username": "admin"
-          },
-          "metrics": {
-            "enabled": true
-          },
           "juiceShop": {
-            "image": "bkimminich/juice-shop",
-            "tag": "v42.42.42",
-            "imagePullPolicy": "IfNotPresent",
+            "affinity": {},
+            "config": {
+              "application": {
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico",
+                "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
+                "showGitHubLinks": false,
+                "showVersionNumber": false
+              },
+              "challenges": {
+                "showHints": true
+              },
+              "ctf": {
+                "showFlagsInNotifications": false
+              },
+              "hackingInstructor": {
+                "isEnabled": true
+              }
+            },
+            "containerSecurityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
             "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
-            "nodeEnv": "multi-juicer",
-            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
-            "podSecurityContext": {"runAsNonRoot":true},
-            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
             "env": [],
             "envFrom": [],
-            "volumes": [],
-            "volumeMounts": [],
-            "affinity": {},
-            "tolerations": [],
+            "image": "bkimminich/juice-shop",
+            "imagePullPolicy": "IfNotPresent",
+            "nodeEnv": "multi-juicer",
+            "pod": {
+              "annotations": {},
+              "labels": {}
+            },
+            "podSecurityContext": {
+              "runAsNonRoot": true
+            },
+            "resources": {
+              "requests": {
+                "cpu": "150m",
+                "memory": "300Mi"
+              }
+            },
             "runtimeClassName": null,
-            "annotations": {},
-            "labels": {}
-          }
+            "tag": "v17.1.1",
+            "tolerations": [],
+            "volumeMounts": [],
+            "volumes": []
+          },
+          "maxInstances": 10
         }
     kind: ConfigMap
     metadata:
@@ -66,7 +85,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1a3396b63c83eb20b6864c4777a95e133972de22b050ccb721efc7a015204a0f
+            checksum/config: fb78ac33022f2b079fd8a08fafaa3d3c5b20f4ed5f6c0c322a5d7befdd22a7d2
             checksum/secret: 140499bbdb19087c21534a32c6ecaa58916bed2ec9670f6f1871ccd17d9fc64f
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -109,8 +128,10 @@ default values render correctly:
                     - ALL
                 readOnlyRootFilesystem: true
               volumeMounts:
-                - mountPath: /home/app/config/
+                - mountPath: /config/config.json
                   name: config-volume
+                  readOnly: true
+                  subPath: config.json
           securityContext:
             runAsNonRoot: true
           serviceAccountName: balancer
@@ -340,18 +361,18 @@ default values render correctly:
   12: |
     apiVersion: v1
     data:
-      multi-juicer.yaml: |-
+      multi-juicer.yaml: |2-
         application:
-          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
-          showVersionNumber: false
+          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           showGitHubLinks: false
+          showVersionNumber: false
         challenges:
           showHints: true
-        hackingInstructor:
-          isEnabled: true
         ctf:
           showFlagsInNotifications: false
+        hackingInstructor:
+          isEnabled: true
     kind: ConfigMap
     metadata:
       labels:
@@ -506,42 +527,61 @@ full values render out correctly:
   2: |
     apiVersion: v1
     data:
-      config.json: |
+      config.json: |2
         {
-          "port": 3000,
-          "namespace": "NAMESPACE",
-          "deploymentContext": "RELEASE-NAME",
-          "maxJuiceShopInstances": 42,
-          "skipOwnerReference": false,
-          "cookieParser": {
-            "cookieName": "__Secure-balancer",
-            "secure": true
-          },
-          "admin": {
-            "username": "admin"
-          },
-          "metrics": {
-            "enabled": true
-          },
           "juiceShop": {
-            "image": "bkimminich/juice-shop",
-            "tag": "v42.42.42",
-            "imagePullPolicy": "IfNotPresent",
-            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
-            "nodeEnv": "ctf",
-            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
-            "podSecurityContext": {"runAsNonRoot":true},
-            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "affinity": {},
+            "config": {
+              "application": {
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico",
+                "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
+                "showGitHubLinks": false,
+                "showVersionNumber": false
+              },
+              "challenges": {
+                "showHints": true
+              },
+              "ctf": {
+                "showFlagsInNotifications": false
+              },
+              "hackingInstructor": {
+                "isEnabled": true
+              }
+            },
+            "containerSecurityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
             "env": [],
             "envFrom": [],
-            "volumes": [],
-            "volumeMounts": [],
-            "affinity": {},
-            "tolerations": [],
+            "image": "bkimminich/juice-shop",
+            "imagePullPolicy": "IfNotPresent",
+            "nodeEnv": "multi-juicer",
+            "pod": {
+              "annotations": {},
+              "labels": {}
+            },
+            "podSecurityContext": {
+              "runAsNonRoot": true
+            },
+            "resources": {
+              "requests": {
+                "cpu": "150m",
+                "memory": "300Mi"
+              }
+            },
             "runtimeClassName": null,
-            "annotations": {},
-            "labels": {}
-          }
+            "tag": "v17.1.1",
+            "tolerations": [],
+            "volumeMounts": [],
+            "volumes": []
+          },
+          "maxInstances": 10
         }
     kind: ConfigMap
     metadata:
@@ -570,7 +610,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: b87730c1f3af22bc42af30a68a467cb2f7d0ef52e37d6deaa5f5051adb6888d6
+            checksum/config: fb78ac33022f2b079fd8a08fafaa3d3c5b20f4ed5f6c0c322a5d7befdd22a7d2
             checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -613,8 +653,10 @@ full values render out correctly:
                     - ALL
                 readOnlyRootFilesystem: true
               volumeMounts:
-                - mountPath: /home/app/config/
+                - mountPath: /config/config.json
                   name: config-volume
+                  readOnly: true
+                  subPath: config.json
           securityContext:
             runAsNonRoot: true
           serviceAccountName: balancer
@@ -2963,18 +3005,18 @@ full values render out correctly:
   16: |
     apiVersion: v1
     data:
-      multi-juicer.yaml: |-
+      multi-juicer.yaml: |2-
         application:
-          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
-          showVersionNumber: false
+          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           showGitHubLinks: false
+          showVersionNumber: false
         challenges:
           showHints: true
-        hackingInstructor:
-          isEnabled: true
         ctf:
           showFlagsInNotifications: false
+        hackingInstructor:
+          isEnabled: true
     kind: ConfigMap
     metadata:
       labels:
@@ -3148,42 +3190,61 @@ production notes work correctly:
   1: |
     apiVersion: v1
     data:
-      config.json: |
+      config.json: |2
         {
-          "port": 3000,
-          "namespace": "NAMESPACE",
-          "deploymentContext": "RELEASE-NAME",
-          "maxJuiceShopInstances": 42,
-          "skipOwnerReference": false,
-          "cookieParser": {
-            "cookieName": "__Secure-balancer",
-            "secure": true
-          },
-          "admin": {
-            "username": "admin"
-          },
-          "metrics": {
-            "enabled": true
-          },
           "juiceShop": {
-            "image": "bkimminich/juice-shop",
-            "tag": "v42.42.42",
-            "imagePullPolicy": "IfNotPresent",
-            "ctfKey": "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE",
-            "nodeEnv": "ctf",
-            "resources": {"requests":{"cpu":"150m","memory":"300Mi"}},
-            "podSecurityContext": {"runAsNonRoot":true},
-            "containerSecurityContext": {"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}},
+            "affinity": {},
+            "config": {
+              "application": {
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico",
+                "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
+                "showGitHubLinks": false,
+                "showVersionNumber": false
+              },
+              "challenges": {
+                "showHints": true
+              },
+              "ctf": {
+                "showFlagsInNotifications": false
+              },
+              "hackingInstructor": {
+                "isEnabled": true
+              }
+            },
+            "containerSecurityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
             "env": [],
             "envFrom": [],
-            "volumes": [],
-            "volumeMounts": [],
-            "affinity": {},
-            "tolerations": [],
+            "image": "bkimminich/juice-shop",
+            "imagePullPolicy": "IfNotPresent",
+            "nodeEnv": "multi-juicer",
+            "pod": {
+              "annotations": {},
+              "labels": {}
+            },
+            "podSecurityContext": {
+              "runAsNonRoot": true
+            },
+            "resources": {
+              "requests": {
+                "cpu": "150m",
+                "memory": "300Mi"
+              }
+            },
             "runtimeClassName": null,
-            "annotations": {},
-            "labels": {}
-          }
+            "tag": "v17.1.1",
+            "tolerations": [],
+            "volumeMounts": [],
+            "volumes": []
+          },
+          "maxInstances": 10
         }
     kind: ConfigMap
     metadata:
@@ -3212,7 +3273,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: b87730c1f3af22bc42af30a68a467cb2f7d0ef52e37d6deaa5f5051adb6888d6
+            checksum/config: fb78ac33022f2b079fd8a08fafaa3d3c5b20f4ed5f6c0c322a5d7befdd22a7d2
             checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -3255,8 +3316,10 @@ production notes work correctly:
                     - ALL
                 readOnlyRootFilesystem: true
               volumeMounts:
-                - mountPath: /home/app/config/
+                - mountPath: /config/config.json
                   name: config-volume
+                  readOnly: true
+                  subPath: config.json
           securityContext:
             runAsNonRoot: true
           serviceAccountName: balancer
@@ -3486,18 +3549,18 @@ production notes work correctly:
   12: |
     apiVersion: v1
     data:
-      multi-juicer.yaml: |-
+      multi-juicer.yaml: |2-
         application:
-          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
-          showVersionNumber: false
+          logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           showGitHubLinks: false
+          showVersionNumber: false
         challenges:
           showHints: true
-        hackingInstructor:
-          isEnabled: true
         ctf:
           showFlagsInNotifications: false
+        hackingInstructor:
+          isEnabled: true
     kind: ConfigMap
     metadata:
       labels:
