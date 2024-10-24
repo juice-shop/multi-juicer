@@ -29,6 +29,9 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 		GeneratePasscode: func() string {
 			return "12345678"
 		},
+		GetJuiceShopUrlForTeam: func(team string, bundle *bundle.Bundle) string {
+			return "http://localhost:8080"
+		},
 		BcryptRounds: 2,
 		Log:          log.New(os.Stdout, "", log.LstdFlags),
 		Config: &bundle.Config{

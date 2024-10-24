@@ -2,6 +2,7 @@ package bundle
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -17,11 +18,13 @@ type Bundle struct {
 	RuntimeEnvironment RuntimeEnvironment
 	ClientSet          kubernetes.Interface
 	// generates a random passcode. On the bundle to have a static passcode in tests for easier assertions
-	GeneratePasscode      func() string
-	BcryptRounds          int
-	StaticAssetsDirectory string `json:"staticAssetsDirectory"`
-	Config                *Config
-	Log                   *log.Logger
+	GeneratePasscode func() string
+	// returns the (cluster internal) url for a team used by the balancer to proxy the request to. On the bundle to allow the tests to proxy requests to a local testing server
+	GetJuiceShopUrlForTeam func(team string, bundle *Bundle) string
+	BcryptRounds           int
+	StaticAssetsDirectory  string `json:"staticAssetsDirectory"`
+	Config                 *Config
+	Log                    *log.Logger
 }
 
 type RuntimeEnvironment struct {
@@ -86,8 +89,11 @@ func New() *Bundle {
 			Namespace: namespace,
 		},
 		GeneratePasscode: passcode.GeneratePasscode,
-		BcryptRounds:     bcrypt.DefaultCost,
-		Log:              log.New(os.Stdout, "", log.LstdFlags),
+		GetJuiceShopUrlForTeam: func(team string, bundle *Bundle) string {
+			return fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
+		},
+		BcryptRounds: bcrypt.DefaultCost,
+		Log:          log.New(os.Stdout, "", log.LstdFlags),
 		Config: &Config{
 			JuiceShopConfig: JuiceShopConfig{
 				ImagePullPolicy: "IfNotPresent",

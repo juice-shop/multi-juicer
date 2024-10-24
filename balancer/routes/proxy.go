@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -44,7 +43,7 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			target := fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
+			target := bundle.GetJuiceShopUrlForTeam(team, bundle)
 			bundle.Log.Printf("Proxying request for team (%s): %s %s to %s", team, req.Method, req.URL, target)
 			// Rewrite the request to the target server
 			newReverseProxy(target).ServeHTTP(responseWriter, req)
