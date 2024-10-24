@@ -52,6 +52,7 @@ func requestCounterMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// statusRecorder captures the status code of the response to be used prometheus metrics
 type statusRecorder struct {
 	http.ResponseWriter
 	statusCode int
