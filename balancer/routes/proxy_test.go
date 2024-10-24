@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
@@ -43,6 +44,27 @@ func TestProxyHandler(t *testing.T) {
 	t.Run("redirects to /balancer when the balancer cookie is missing", func(t *testing.T) {
 		defer clearInstanceUpCache()
 		req, _ := http.NewRequest("POST", "/hello-world", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusFound, rr.Result().StatusCode)
+		assert.Equal(t, "/balancer", rr.Header().Get("Location"))
+		assert.Empty(t, rr.Body.String())
+	})
+
+	t.Run("redirects to /balancer when the balancer cookie is signed with another secret", func(t *testing.T) {
+		defer clearInstanceUpCache()
+		req, _ := http.NewRequest("POST", "/hello-world", nil)
+		invalidlySignedTeam, err := signutil.Sign("invalid-team", "this-isn't-the-right-secret")
+		assert.Nil(t, err)
+		req.Header.Set("Cookie", fmt.Sprintf("balancer=%s", invalidlySignedTeam))
+
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
