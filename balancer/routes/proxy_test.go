@@ -16,7 +16,6 @@ import (
 
 func TestProxyHandler(t *testing.T) {
 	teamFoo := "foobar"
-	// teamBar := "foobar"
 
 	readyDeployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
