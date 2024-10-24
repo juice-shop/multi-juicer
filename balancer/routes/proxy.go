@@ -58,10 +58,15 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 			if !wasInstanceUptimeStatusCheckedRecently(team) {
-				if isInstanceUp(bundle, team) {
+				status := isInstanceUp(bundle, team)
+				if status == instanceUp {
 					cacheMutex.Lock()
 					instanceUpCache[team] = time.Now().UnixMilli()
 					cacheMutex.Unlock()
+				} else if status == instanceMissing {
+					bundle.Log.Printf("Instance for team (%s) is missing. Redirecting to balancer page.", team)
+					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-not-found&teamname=%s", team), http.StatusFound)
+					return
 				} else {
 					bundle.Log.Printf("Instance for team (%s) is down. Redirecting to balancer page.", team)
 					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&teamname=%s", team), http.StatusFound)
@@ -83,15 +88,24 @@ func wasInstanceUptimeStatusCheckedRecently(team string) bool {
 	return ok && lastConnect > time.Now().Add(-10*time.Second).UnixMilli()
 }
 
-func isInstanceUp(bundle *bundle.Bundle, team string) bool {
+type instanceStatus string
+
+const (
+	instanceUp      instanceStatus = "up"
+	instanceDown    instanceStatus = "down"
+	instanceMissing instanceStatus = "missing"
+)
+
+func isInstanceUp(bundle *bundle.Bundle, team string) instanceStatus {
 	deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 
 	if errors.IsNotFound(err) {
-		return false
+		return instanceMissing
 	} else if err != nil {
 		bundle.Log.Printf("Failed to lookup if a instance is up in the kubernetes api. Assuming it's missing: %s", err)
-		return false
-	} else {
-		return deployment.Status.ReadyReplicas > 0
+		return instanceMissing
+	} else if deployment.Status.ReadyReplicas > 0 {
+		return instanceUp
 	}
+	return instanceDown
 }

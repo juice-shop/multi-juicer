@@ -110,4 +110,32 @@ func TestProxyHandler(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-restarting&teamname=%s", teamFoo), rr.Header().Get("Location"))
 		assert.Empty(t, rr.Body.String())
 	})
+	t.Run("redirects to /balancer?msg=instance-not-found when the deployment doesn't exist", func(t *testing.T) {
+		defer clearInstanceUpCache()
+		req, _ := http.NewRequest("POST", "/hello-world", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("balancer=%s", testutil.SignTestTeamname(teamFoo)))
+		rr := httptest.NewRecorder()
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, "Hello, Test from "+r.URL.Path)
+		}))
+		defer ts.Close()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset()
+		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
+
+		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
+			return fmt.Sprintf("%s/%s/", ts.URL, team)
+		}
+		AddRoutes(server, bu)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusFound, rr.Code)
+		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-not-found&teamname=%s", teamFoo), rr.Header().Get("Location"))
+		assert.Empty(t, rr.Body.String())
+	})
 }
