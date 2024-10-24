@@ -62,6 +62,10 @@ type JuiceShopConfig struct {
 	Labels                   map[string]string           `json:"labels"`
 }
 
+func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {
+	return fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
+}
+
 func New() *Bundle {
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -88,12 +92,10 @@ func New() *Bundle {
 		RuntimeEnvironment: RuntimeEnvironment{
 			Namespace: namespace,
 		},
-		GeneratePasscode: passcode.GeneratePasscode,
-		GetJuiceShopUrlForTeam: func(team string, bundle *Bundle) string {
-			return fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
-		},
-		BcryptRounds: bcrypt.DefaultCost,
-		Log:          log.New(os.Stdout, "", log.LstdFlags),
+		GeneratePasscode:       passcode.GeneratePasscode,
+		GetJuiceShopUrlForTeam: getJuiceShopUrlForTeam,
+		BcryptRounds:           bcrypt.DefaultCost,
+		Log:                    log.New(os.Stdout, "", log.LstdFlags),
 		Config: &Config{
 			JuiceShopConfig: JuiceShopConfig{
 				ImagePullPolicy: "IfNotPresent",
