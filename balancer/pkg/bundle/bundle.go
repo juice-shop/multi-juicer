@@ -14,8 +14,9 @@ import (
 )
 
 type Bundle struct {
-	RuntimeEnvironment    RuntimeEnvironment
-	ClientSet             kubernetes.Interface
+	RuntimeEnvironment RuntimeEnvironment
+	ClientSet          kubernetes.Interface
+	// generates a random passcode. On the bundle to have a static passcode in tests for easier assertions
 	GeneratePasscode      func() string
 	BcryptRounds          int
 	StaticAssetsDirectory string `json:"staticAssetsDirectory"`
