@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
@@ -15,7 +16,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var instanceUpCache = map[string]int64{}
+var (
+	instanceUpCache = map[string]int64{}
+	cacheMutex      = &sync.Mutex{}
+)
 
 func clearInstanceUpCache() {
 	instanceUpCache = map[string]int64{}
@@ -53,10 +57,11 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}
-
 			if !wasInstanceUptimeStatusCheckedRecently(team) {
 				if isInstanceUp(bundle, team) {
+					cacheMutex.Lock()
 					instanceUpCache[team] = time.Now().UnixMilli()
+					cacheMutex.Unlock()
 				} else {
 					bundle.Log.Printf("Instance for team (%s) is down. Redirecting to balancer page.", team)
 					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&teamname=%s", team), http.StatusFound)
@@ -68,7 +73,8 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 			bundle.Log.Printf("Proxying request for team (%s): %s %s to %s", team, req.Method, req.URL, target)
 			// Rewrite the request to the target server
 			newReverseProxy(target).ServeHTTP(responseWriter, req)
-		})
+		},
+	)
 }
 
 // checks if the instance uptime status was checked in the last ten seconds by looking into the instanceUpCache
