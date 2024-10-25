@@ -16,8 +16,29 @@ import (
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/api/errors"
 )
+
+var loginCounter = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "multijuicer_logins",
+		Help: `Number of logins (including registrations, see label "userType").`,
+	},
+	[]string{"type", "userType"},
+)
+var failedLoginCounter = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "multijuicer_failed_logins",
+		Help: `Number of failed logins, bad password (including admin logins, see label "userType").`,
+	},
+	[]string{"userType"},
+)
+
+func init() {
+	prometheus.MustRegister(loginCounter)
+	prometheus.MustRegister(failedLoginCounter)
+}
 
 func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +91,7 @@ func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
 	}
 
 	sendSuccessResponse(w, "Created Instance", passcode)
+	loginCounter.WithLabelValues("registration", "user").Inc()
 }
 
 func generatePasscode(bundle *bundle.Bundle) (string, string, error) {
@@ -106,6 +128,10 @@ func sendSuccessResponse(w http.ResponseWriter, message, passcode string) {
 	w.Write(responseBody)
 }
 
+type joinRequestBody struct {
+	Passcode string `json:"passcode"`
+}
+
 func joinExistingTeam(bundle *bundle.Bundle, team string, deployment *appsv1.Deployment, w http.ResponseWriter, r *http.Request) {
 	passCodeHashToMatch := deployment.Annotations["multi-juicer.owasp-juice.shop/passcode"]
 	if passCodeHashToMatch == "" {
@@ -113,23 +139,26 @@ func joinExistingTeam(bundle *bundle.Bundle, team string, deployment *appsv1.Dep
 		return
 	}
 	if r.Body == nil {
+		// this not a failed login, but just a failed "team creation" for a already existing team, so we don't increment the counter
 		writeUnauthorizedResponse(w)
 		return
 	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
+		failedLoginCounter.WithLabelValues("user").Inc()
 		writeUnauthorizedResponse(w)
 		return
 	}
 
-	var requestBody map[string]string
+	var requestBody joinRequestBody
 	if err := json.Unmarshal(body, &requestBody); err != nil {
-		writeUnauthorizedResponse(w)
+		http.Error(w, "invalid json", http.StatusBadRequest)
 		return
 	}
 
-	passcode, ok := requestBody["passcode"]
-	if !ok || bcrypt.CompareHashAndPassword([]byte(passCodeHashToMatch), []byte(passcode)) != nil {
+	passcode := requestBody.Passcode
+	if bcrypt.CompareHashAndPassword([]byte(passCodeHashToMatch), []byte(passcode)) != nil {
+		failedLoginCounter.WithLabelValues("user").Inc()
 		writeUnauthorizedResponse(w)
 		return
 	}
