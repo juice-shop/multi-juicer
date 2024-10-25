@@ -1,4 +1,4 @@
-{{- if and .Values.balancer.metrics.enabled .Values.balancer.metrics.serviceMonitor.enabled }}
+{{- if .Values.balancer.metrics.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -16,14 +16,8 @@ spec:
   selector:
     matchLabels:
       {{- include "multi-juicer.balancer.selectorLabels" . | nindent 6 }}
+      type: metrics
   endpoints:
-    - port: web
+    - port: metrics
       path: '/balancer/metrics'
-      basicAuth:
-        username:
-          name: balancer-secret
-          key: metricsBasicAuthUsername
-        password:
-          name: balancer-secret
-          key: metricsBasicAuthPassword
 {{- end }}

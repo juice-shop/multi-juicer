@@ -6,9 +6,15 @@ import (
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/routes"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
+	go StartMetricsServer()
+	StartBalanerServer()
+}
+
+func StartBalanerServer() {
 	bundle := bundle.New()
 
 	router := http.NewServeMux()
@@ -19,7 +25,21 @@ func main() {
 		Addr:    ":8080",
 		Handler: router,
 	}
+
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("Server failed: %v", err)
+		log.Fatalf("Failed to start balancer server: %v", err)
+	}
+}
+
+func StartMetricsServer() {
+	metricsRouter := http.NewServeMux()
+	metricsRouter.Handle("GET /balancer/metrics", promhttp.Handler())
+	metricServer := &http.Server{
+		Addr:    ":8081",
+		Handler: metricsRouter,
+	}
+
+	if err := metricServer.ListenAndServe(); err != nil {
+		log.Fatalf("Failed to start balancer server: %v", err)
 	}
 }

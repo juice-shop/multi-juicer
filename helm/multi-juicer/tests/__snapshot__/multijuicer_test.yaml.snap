@@ -86,7 +86,7 @@ default values render correctly:
         metadata:
           annotations:
             checksum/config: fb78ac33022f2b079fd8a08fafaa3d3c5b20f4ed5f6c0c322a5d7befdd22a7d2
-            checksum/secret: 140499bbdb19087c21534a32c6ecaa58916bed2ec9670f6f1871ccd17d9fc64f
+            checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
             app.kubernetes.io/name: balancer
@@ -114,6 +114,8 @@ default values render correctly:
               ports:
                 - containerPort: 8080
                   name: http
+                - containerPort: 8081
+                  name: metrics
               resources:
                 limits:
                   cpu: 400m
@@ -204,8 +206,6 @@ default values render correctly:
     data:
       adminPassword: QUJDREVGR0g=
       cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
-      metricsBasicAuthPassword: RVJ6Q1Q0cHdCRHhmQ0tSR21mck1hOEtROHNYZjhHS3k=
-      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
     kind: Secret
     metadata:
       labels:
@@ -611,7 +611,7 @@ full values render out correctly:
         metadata:
           annotations:
             checksum/config: fb78ac33022f2b079fd8a08fafaa3d3c5b20f4ed5f6c0c322a5d7befdd22a7d2
-            checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
+            checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
             app.kubernetes.io/name: balancer
@@ -639,6 +639,8 @@ full values render out correctly:
               ports:
                 - containerPort: 8080
                   name: http
+                - containerPort: 8081
+                  name: metrics
               resources:
                 limits:
                   cpu: 400m
@@ -696,6 +698,28 @@ full values render out correctly:
             - multi-juicer.local
           secretName: tls-secret
   5: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+        type: metrics
+      name: balancer-metrics
+    spec:
+      ports:
+        - name: metrics
+          port: 80
+      selector:
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+      type: ClusterIP
+  6: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -715,7 +739,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: balancer
-  6: |
+  7: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -755,13 +779,11 @@ full values render out correctly:
           - get
           - list
           - delete
-  7: |
+  8: |
     apiVersion: v1
     data:
       adminPassword: QUJDREVGR0g=
       cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
-      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
-      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
     kind: Secret
     metadata:
       labels:
@@ -773,7 +795,7 @@ full values render out correctly:
         app.kubernetes.io/version: 42.0.0
       name: balancer-secret
     type: Opaque
-  8: |
+  9: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -785,7 +807,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: balancer
-  9: |
+  10: |
     apiVersion: v1
     kind: Service
     metadata:
@@ -806,7 +828,7 @@ full values render out correctly:
         app.kubernetes.io/name: balancer
         app.kubernetes.io/part-of: multi-juicer
       type: ClusterIP
-  10: |
+  11: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -820,21 +842,15 @@ full values render out correctly:
       name: balancer
     spec:
       endpoints:
-        - basicAuth:
-            password:
-              key: metricsBasicAuthPassword
-              name: balancer-secret
-            username:
-              key: metricsBasicAuthUsername
-              name: balancer-secret
-          path: /balancer/metrics
-          port: web
+        - path: /balancer/metrics
+          port: metrics
       selector:
         matchLabels:
           app.kubernetes.io/instance: balancer-RELEASE-NAME
           app.kubernetes.io/name: balancer
           app.kubernetes.io/part-of: multi-juicer
-  11: |
+          type: metrics
+  12: |
     apiVersion: batch/v1
     kind: CronJob
     metadata:
@@ -881,7 +897,7 @@ full values render out correctly:
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
-  12: |
+  13: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -901,7 +917,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: juice-cleaner
-  13: |
+  14: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -930,7 +946,7 @@ full values render out correctly:
         verbs:
           - get
           - delete
-  14: |
+  15: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -942,7 +958,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-cleaner
-  15: |
+  16: |
     apiVersion: v1
     data:
       instances.json: |-
@@ -3002,7 +3018,7 @@ full values render out correctly:
       labels:
         grafana_dashboard: "1"
       name: multijuicer-instance
-  16: |
+  17: |
     apiVersion: v1
     data:
       multi-juicer.yaml: |2-
@@ -3027,7 +3043,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: juice-shop-config
-  17: |
+  18: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -3048,7 +3064,7 @@ full values render out correctly:
           app.kubernetes.io/name: juice-shop
       targetLabels:
         - team
-  18: |
+  19: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -3109,7 +3125,7 @@ full values render out correctly:
           securityContext:
             runAsNonRoot: true
           serviceAccountName: progress-watchdog
-  19: |
+  20: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
@@ -3129,7 +3145,7 @@ full values render out correctly:
     subjects:
       - kind: ServiceAccount
         name: progress-watchdog
-  20: |
+  21: |
     apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
@@ -3151,7 +3167,7 @@ full values render out correctly:
           - get
           - list
           - patch
-  21: |
+  22: |
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -3163,7 +3179,7 @@ full values render out correctly:
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
       name: progress-watchdog
-  22: |
+  23: |
     apiVersion: v1
     kind: Service
     metadata:
@@ -3274,7 +3290,7 @@ production notes work correctly:
         metadata:
           annotations:
             checksum/config: fb78ac33022f2b079fd8a08fafaa3d3c5b20f4ed5f6c0c322a5d7befdd22a7d2
-            checksum/secret: 8648fa79b7af7023c3ab6154f42420f3bcf49d7cf102ab23db3619a3bb1a3775
+            checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
             app.kubernetes.io/name: balancer
@@ -3302,6 +3318,8 @@ production notes work correctly:
               ports:
                 - containerPort: 8080
                   name: http
+                - containerPort: 8081
+                  name: metrics
               resources:
                 limits:
                   cpu: 400m
@@ -3392,8 +3410,6 @@ production notes work correctly:
     data:
       adminPassword: QUJDREVGR0g=
       cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
-      metricsBasicAuthPassword: Uk9UQVRFX1RISVNfWU9VX0xBWllfQVNT
-      metricsBasicAuthUsername: cHJvbWV0aGV1cy1zY3JhcGVy
     kind: Secret
     metadata:
       labels:

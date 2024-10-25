@@ -78,8 +78,6 @@ balancer:
     # -- Optional Additional labels for the balancer pods.
     labels: {}
   metrics:
-    # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
-    enabled: true
     dashboards:
       # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards
       enabled: false
@@ -89,10 +87,6 @@ balancer:
       # -- Optional Allows to add additional labels to the service monitor. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
       # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
       labels: {}
-    basicAuth:
-      username: prometheus-scraper
-      # -- Should be changed when metrics are enabled.
-      password: ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy
 
 config:
   # todo(@J12934): implement
