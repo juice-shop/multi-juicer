@@ -46,7 +46,13 @@ tasks:
       - sh: test -d node_modules/
         msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
     cmds:
-      - npm run test -- --run
+      - |
+        # run with bun if installed, otherwise use npm
+        if command -v bun &> /dev/null; then
+          bun run test -- --run
+        else
+          npm test -- --run
+        fi
     dir: balancer/ui/
 
   balancer:api:test:
