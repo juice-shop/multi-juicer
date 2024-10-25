@@ -11,10 +11,10 @@ import (
 
 func main() {
 	go StartMetricsServer()
-	StartBalanerServer()
+	StartBalancerServer()
 }
 
-func StartBalanerServer() {
+func StartBalancerServer() {
 	bundle := bundle.New()
 
 	router := http.NewServeMux()
