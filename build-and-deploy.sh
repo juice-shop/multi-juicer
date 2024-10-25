@@ -29,4 +29,6 @@ helm upgrade --install multi-juicer ./helm/multi-juicer \
   --set="progressWatchdog.repository=local/progress-watchdog" \
   --set="progressWatchdog.tag=$version" \
   --set="juiceShopCleanup.repository=local/cleaner" \
-  --set="juiceShopCleanup.tag=$version"
+  --set="juiceShopCleanup.tag=$version" \
+  --set="balancer.cookie.cookieParserSecret=dev-secret"
+
