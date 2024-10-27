@@ -51,6 +51,26 @@ func TestJoinHandler(t *testing.T) {
 		assert.JSONEq(t, `{"message":"Created Instance","passcode":"12345678"}`, rr.Body.String())
 	})
 
+	t.Run("rejects invalid teamnames", func(t *testing.T) {
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		AddRoutes(server, bundle)
+
+		invalidTeamnames := []string{
+			"foo bar",
+			"foo-bar",
+			"FOOOBAR",
+			"fooooooooooooooooooooooooooooo",
+		}
+		for _, team := range invalidTeamnames {
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+			rr := httptest.NewRecorder()
+			server.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusBadRequest, rr.Code, fmt.Sprintf("expected status code 400 for teamname '%s'", team))
+		}
+	})
+
 	t.Run("if team already exists then join requires a passcode", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()

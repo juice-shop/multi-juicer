@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -62,7 +63,18 @@ func getDeployment(bundle *bundle.Bundle, team string) (*appsv1.Deployment, erro
 	)
 }
 
+var validTeamnamePattern = regexp.MustCompile("^[a-z]{1,16}$")
+
+func isValidTeamName(s string) bool {
+	matched := validTeamnamePattern.MatchString(s)
+	return matched
+}
 func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
+	if !isValidTeamName(team) {
+		http.Error(w, "invalid team name", http.StatusBadRequest)
+		return
+	}
+
 	passcode, passcodeHash, err := generatePasscode(bundle)
 	if err != nil {
 		bundle.Log.Printf("Failed to hash passcode!: %s", err)
