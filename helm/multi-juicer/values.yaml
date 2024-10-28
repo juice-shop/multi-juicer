@@ -70,8 +70,6 @@ balancer:
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
-  # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
-  skipOwnerReference: false
   pod:
     # -- Optional Additional annotations for the balancer pods.
     annotations: {}
