@@ -13,6 +13,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
@@ -198,7 +199,41 @@ func writeUnauthorizedResponse(responseWriter http.ResponseWriter) {
 	responseWriter.Write(errorResponseBody)
 }
 
+// uid of the balancer kubernetes deployment resource. used to "attach" created juice shop deployments and services to the balancer deployment so that they get deleted when the balancer gets deleted
+var deploymentUid types.UID
+
+func getOwnerReferences(bundle *bundle.Bundle) ([]metav1.OwnerReference, error) {
+	if deploymentUid == "" {
+		balancerDeployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(
+			context.Background(),
+			"balancer",
+			metav1.GetOptions{},
+		)
+		deploymentUid = balancerDeployment.ObjectMeta.UID
+		if err != nil {
+			return nil, fmt.Errorf("failed to get balancer deployment to attach correct owner reference to start juice shop: %w", err)
+		}
+	}
+
+	truePointer := true
+	ownerReferences := []metav1.OwnerReference{
+		{
+			APIVersion:         "apps/v1",
+			Kind:               "Deployment",
+			Name:               "balancer",
+			UID:                deploymentUid,
+			Controller:         &truePointer,
+			BlockOwnerDeletion: &truePointer,
+		},
+	}
+	return ownerReferences, nil
+}
+
 func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash string) error {
+	ownerReferences, err := getOwnerReferences(bundle)
+	if err != nil {
+		return err
+	}
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("juiceshop-%s", team),
@@ -217,6 +252,7 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 				"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
 				"multi-juicer.owasp-juice.shop/challenges":          "[]",
 			},
+			OwnerReferences: ownerReferences,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
@@ -323,11 +359,16 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 		},
 	}
 
-	_, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), deployment, metav1.CreateOptions{})
+	_, err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), deployment, metav1.CreateOptions{})
 	return err
 }
 
 func createServiceForTeam(bundle *bundle.Bundle, team string) error {
+	ownerReferences, err := getOwnerReferences(bundle)
+	if err != nil {
+		return err
+	}
+
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("juiceshop-%s", team),
@@ -339,6 +380,7 @@ func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 				"app.kubernetes.io/instance":  fmt.Sprintf("juice-shop-%s", team),
 				"app.kubernetes.io/part-of":   "multi-juicer",
 			},
+			OwnerReferences: ownerReferences,
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: map[string]string{
@@ -353,6 +395,6 @@ func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 		},
 	}
 
-	_, err := bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), service, metav1.CreateOptions{})
+	_, err = bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), service, metav1.CreateOptions{})
 	return err
 }

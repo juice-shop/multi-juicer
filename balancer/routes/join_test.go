@@ -2,6 +2,7 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -20,13 +21,21 @@ import (
 func TestJoinHandler(t *testing.T) {
 	team := "foobar"
 
+	balancerDeployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "balancer",
+			Namespace: "test-namespace",
+			UID:       "34c0bb8a-240b-4f2a-84ae-2eb2258298f9",
+		},
+	}
+
 	t.Run("creates a deployment and service on join", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewSimpleClientset(balancerDeployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -34,21 +43,53 @@ func TestJoinHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		actions := clientset.Actions()
-		_ = actions
 		assert.Equal(t, http.StatusOK, rr.Code)
 
 		// should first check if deployment exists
 		assert.Equal(t, "get", actions[0].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[0].GetResource())
 
-		// because it doesn't it should create it and a service for it
-		assert.Equal(t, "create", actions[1].GetVerb())
+		// then get the deployment uid of the balancer
+		assert.Equal(t, "get", actions[1].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[1].GetResource())
+
+		// because the juice shop doesn't exist it should create it and a service for it
 		assert.Equal(t, "create", actions[2].GetVerb())
-		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[2].GetResource())
+		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[2].GetResource())
+		assert.Equal(t, "create", actions[3].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[3].GetResource())
 
 		assert.Regexp(t, regexp.MustCompile(`balancer=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
 		assert.JSONEq(t, `{"message":"Created Instance","passcode":"12345678"}`, rr.Body.String())
+
+		deployment, err := clientset.AppsV1().Deployments("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+		assert.NoError(t, err)
+
+		var truePointer = true
+		assert.Equal(t, []metav1.OwnerReference{
+			{
+				APIVersion:         "apps/v1",
+				Kind:               "Deployment",
+				Name:               "balancer",
+				UID:                "34c0bb8a-240b-4f2a-84ae-2eb2258298f9",
+				Controller:         &truePointer,
+				BlockOwnerDeletion: &truePointer,
+			},
+		}, deployment.OwnerReferences)
+
+		service, err := clientset.CoreV1().Services("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, []metav1.OwnerReference{
+			{
+				APIVersion:         "apps/v1",
+				Kind:               "Deployment",
+				Name:               "balancer",
+				UID:                "34c0bb8a-240b-4f2a-84ae-2eb2258298f9",
+				Controller:         &truePointer,
+				BlockOwnerDeletion: &truePointer,
+			},
+		}, service.OwnerReferences)
 	})
 
 	t.Run("rejects invalid teamnames", func(t *testing.T) {
@@ -77,7 +118,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(&appsv1.Deployment{
+		clientset := fake.NewSimpleClientset(balancerDeployment, &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
 				Namespace: "test-namespace",
@@ -116,7 +157,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(&appsv1.Deployment{
+		clientset := fake.NewSimpleClientset(balancerDeployment, &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
 				Namespace: "test-namespace",
@@ -155,7 +196,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(&appsv1.Deployment{
+		clientset := fake.NewSimpleClientset(balancerDeployment, &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
 				Namespace: "test-namespace",
