@@ -9,7 +9,7 @@ import (
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
 	"golang.org/x/crypto/bcrypt"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -35,7 +35,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 
 			newPasscode := bundle.GeneratePasscode()
 
-			deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(req.Context(), fmt.Sprintf("juiceshop-%s", team), v1.GetOptions{})
+			deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(req.Context(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 			if err != nil {
 				http.NotFound(responseWriter, req)
 				return
@@ -67,7 +67,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 				context.Background(),
 				deployment.Name, types.StrategicMergePatchType,
 				patch,
-				v1.PatchOptions{},
+				metav1.PatchOptions{},
 			)
 
 			responseBody := ResetPasscodeResponse{
