@@ -22,8 +22,33 @@ func TestStaticFileHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		assert.Equal(t, rr.Code, http.StatusOK)
-		assert.Equal(t, rr.Header().Get("Content-Type"), "text/html; charset=utf-8")
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "text/html; charset=utf-8", rr.Header().Get("Content-Type"))
 		assert.Contains(t, rr.Body.String(), "<title>MultiJuicer</title>")
+	})
+
+	t.Run("should return index.html too when requesting a route handled by the frontend router", func(t *testing.T) {
+
+		frontendRoutes := []string{
+			"/balancer/admin",
+			"/balancer/teams/abc/joining/",
+			"/balancer/teams/abc/joined/",
+			"/balancer/score-board/",
+		}
+
+		server := http.NewServeMux()
+		bundle := testutil.NewTestBundle()
+		bundle.StaticAssetsDirectory = "../ui/build/"
+		AddRoutes(server, bundle)
+
+		for _, route := range frontendRoutes {
+			req, _ := http.NewRequest("GET", route, nil)
+			rr := httptest.NewRecorder()
+			server.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusOK, rr.Code)
+			assert.Equal(t, "text/html; charset=utf-8", rr.Header().Get("Content-Type"))
+			assert.Contains(t, rr.Body.String(), "<title>MultiJuicer</title>")
+		}
 	})
 }
