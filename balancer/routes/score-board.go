@@ -48,6 +48,13 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 				return
 			}
 
+			totalTeams := len(deployments.Items)
+
+			// limit deployment to calculate score for to 24
+			if totalTeams > 24 {
+				deployments.Items = deployments.Items[:24]
+			}
+
 			teamScores := []TeamScore{}
 			for _, teamDeployment := range deployments.Items {
 				teamScores = append(teamScores, CalculateScore(bundle, &teamDeployment))
@@ -58,7 +65,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 			})
 
 			response := ScoreBoardResponse{
-				TotalTeams: len(teamScores),
+				TotalTeams: totalTeams,
 				TopTeams:   teamScores,
 			}
 
