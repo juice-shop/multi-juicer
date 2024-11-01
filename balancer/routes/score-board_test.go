@@ -15,51 +15,37 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func TestScoreBoardHandler(t *testing.T) {
-	team := "foobar"
-	team2 := "barfoo"
+func createTeam(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
+	return &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("juiceshop-%s", team),
+			Namespace: "test-namespace",
+			Annotations: map[string]string{
+				"multi-juicer.owasp-juice.shop/challenges":       challenges,
+				"multi-juicer.owasp-juice.shop/challengesSolved": solvedChallenges,
+			},
+			Labels: map[string]string{
+				"app.kubernetes.io/name":    "juice-shop",
+				"app.kubernetes.io/part-of": "multi-juicer",
+				"team":                      team,
+			},
+		},
+		Status: appsv1.DeploymentStatus{
+			ReadyReplicas: 1,
+		},
+	}
+}
 
+func TestScoreBoardHandler(t *testing.T) {
 	t.Run("lists teams and calculates the score", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
-		req.Header.Set("Cookie", fmt.Sprintf("balancer=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(&appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("juiceshop-%s", team),
-				Namespace: "test-namespace",
-				Annotations: map[string]string{
-					"multi-juicer.owasp-juice.shop/challenges":       `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`,
-					"multi-juicer.owasp-juice.shop/challengesSolved": "2",
-				},
-				Labels: map[string]string{
-					"app.kubernetes.io/name":    "juice-shop",
-					"app.kubernetes.io/part-of": "multi-juicer",
-					"team":                      team,
-				},
-			},
-			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
-			},
-		}, &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("juiceshop-%s", team2),
-				Namespace: "test-namespace",
-				Annotations: map[string]string{
-					"multi-juicer.owasp-juice.shop/challenges":       `[]`,
-					"multi-juicer.owasp-juice.shop/challengesSolved": "0",
-				},
-				Labels: map[string]string{
-					"app.kubernetes.io/name":    "juice-shop",
-					"app.kubernetes.io/part-of": "multi-juicer",
-					"team":                      team2,
-				},
-			},
-			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
-			},
-		})
+		clientset := fake.NewSimpleClientset(
+			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
+			createTeam("barfoo", `[]`, "0"),
+		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		bundle.JuiceShopChallenges = []b.JuiceShopChallenge{
 			{
@@ -83,12 +69,12 @@ func TestScoreBoardHandler(t *testing.T) {
 
 		assert.Equal(t, []TeamScore{
 			{
-				Name:       team,
+				Name:       "foobar",
 				Score:      50,
 				Challenges: []string{"scoreBoardChallenge", "nullByteChallenge"},
 			},
 			{
-				Name:       team2,
+				Name:       "barfoo",
 				Score:      0,
 				Challenges: []string{},
 			},
