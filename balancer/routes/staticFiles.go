@@ -11,9 +11,9 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	// these routes should serve the index.html file and let the frontend handle the routing
 	frontendRoutePatterns := []*regexp.Regexp{
 		regexp.MustCompile("/balancer/admin"),
-		regexp.MustCompile("/balancer/teams/[a-z]*/joining/"),
-		regexp.MustCompile("/balancer/teams/[a-z]*/joined/"),
-		regexp.MustCompile("/balancer/score-board/"),
+		regexp.MustCompile("/balancer/teams/[a-z]*/joining"),
+		regexp.MustCompile("/balancer/teams/[a-z]*/joined"),
+		regexp.MustCompile("/balancer/score-board"),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
