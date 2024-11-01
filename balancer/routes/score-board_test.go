@@ -109,4 +109,44 @@ func TestScoreBoardHandler(t *testing.T) {
 		assert.Equal(t, 25, response.TotalTeams)
 		assert.Equal(t, 24, len(response.TopTeams))
 	})
+
+	t.Run("calculates score for known challenges and skip unknown challenges", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		clientset := fake.NewSimpleClientset(
+			createTeam("foobar", `[{"key":"thisChallengeDoesNotAcutallyExistButIsOnlyForMultiJuicerTests","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
+			createTeam("barfoo", `[]`, "0"),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bundle.JuiceShopChallenges = []b.JuiceShopChallenge{
+			{
+				Key:        "nullByteChallenge",
+				Difficulty: 4,
+			},
+		}
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response ScoreBoardResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Nil(t, err)
+
+		assert.Equal(t, []TeamScore{
+			{
+				Name:       "foobar",
+				Score:      40,
+				Challenges: []string{"nullByteChallenge"},
+			},
+			{
+				Name:       "barfoo",
+				Score:      0,
+				Challenges: []string{},
+			},
+		}, response.TopTeams)
+	})
 }

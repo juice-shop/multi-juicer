@@ -107,6 +107,7 @@ func CalculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment) TeamSco
 	}
 
 	score := 0
+	solvedChallengeNames := []string{}
 	for _, challengeSolved := range solvedChallenges {
 		challenge, ok := challengesMap[challengeSolved.Key]
 		if !ok {
@@ -114,10 +115,6 @@ func CalculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment) TeamSco
 			continue
 		}
 		score += challenge.Difficulty * 10
-	}
-
-	solvedChallengeNames := []string{}
-	for _, challengeSolved := range solvedChallenges {
 		solvedChallengeNames = append(solvedChallengeNames, challengeSolved.Key)
 	}
 
