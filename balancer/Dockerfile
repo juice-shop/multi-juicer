@@ -17,7 +17,14 @@ RUN npm ci
 COPY ui/ ./
 RUN npm run build
 
+# get the challenges from the juice-shop image
+FROM bkimminich/juice-shop:latest AS juice-shop
+FROM mikefarah/yq:4 AS challenges-json
+COPY --from=juice-shop /juice-shop/data/static/challenges.yml /workdir/challenges.yaml
+RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challenges.json
+
 FROM gcr.io/distroless/static:nonroot
 COPY --from=ui --chown=nonroot:nonroot /home/app/build/ /public/
+COPY --from=challenges-json --chown=nonroot:nonroot /workdir/challenges.json /challenges.json
 COPY --from=builder --chown=nonroot:nonroot /src/balancer /balancer
 CMD ["/balancer"]

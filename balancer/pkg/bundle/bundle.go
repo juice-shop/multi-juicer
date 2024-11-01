@@ -25,6 +25,8 @@ type Bundle struct {
 	StaticAssetsDirectory  string `json:"staticAssetsDirectory"`
 	Config                 *Config
 	Log                    *log.Logger
+
+	JuiceShopChallenges []JuiceShopChallenge
 }
 
 type RuntimeEnvironment struct {
@@ -62,6 +64,20 @@ type JuiceShopConfig struct {
 	Labels                   map[string]string           `json:"labels"`
 }
 
+// JuiceShopChallenge represents a challenge in the Juice Shop that can be solved by the participants
+type JuiceShopChallenge struct {
+	Name          string   `json:"name"`
+	Category      string   `json:"category"`
+	Tags          []string `json:"tags"`
+	Description   string   `json:"description"`
+	Difficulty    int      `json:"difficulty"`
+	Hint          string   `json:"hint"`
+	HintUrl       string   `json:"hintUrl"`
+	MitigationUrl string   `json:"mitigationUrl"`
+	Key           string   `json:"key"`
+	DisabledEnv   []string `json:"disabledEnv"`
+}
+
 func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {
 	return fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
 }
@@ -93,6 +109,18 @@ func New() *Bundle {
 
 	config.CookieConfig.SigningKey = cookieSigningKey
 
+	// read /challenges.json file
+	challengesBytes, err := os.ReadFile("/challenges.json")
+	if err != nil {
+		panic(err)
+	}
+
+	var challenges []JuiceShopChallenge
+	err = json.Unmarshal(challengesBytes, &challenges)
+	if err != nil {
+		panic(err)
+	}
+
 	return &Bundle{
 		ClientSet:             clientset,
 		StaticAssetsDirectory: "/public/",
@@ -104,6 +132,7 @@ func New() *Bundle {
 		BcryptRounds:           bcrypt.DefaultCost,
 		Log:                    log.New(os.Stdout, "", log.LstdFlags),
 		Config:                 config,
+		JuiceShopChallenges:    challenges,
 	}
 }
 
