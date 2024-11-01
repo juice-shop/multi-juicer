@@ -40,7 +40,8 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 				LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 			})
 			if err != nil {
-				http.Error(responseWriter, "failed to list deployments", http.StatusInternalServerError)
+				bundle.Log.Printf("Failed to list deployments: %s", err)
+				http.Error(responseWriter, "unable to get team scores", http.StatusInternalServerError)
 				return
 			}
 
