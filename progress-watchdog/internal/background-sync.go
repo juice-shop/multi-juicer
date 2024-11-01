@@ -224,7 +224,7 @@ func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clients
 }
 
 func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/api/challenges", team)
+	url := fmt.Sprintf("http://juiceshop-%s:3000/api/challenges", team)
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
@@ -273,7 +273,7 @@ func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
 		return
 	}
 
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code/apply/%s", team, continueCode)
+	url := fmt.Sprintf("http://juiceshop-%s:3000/rest/continue-code/apply/%s", team, continueCode)
 
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
