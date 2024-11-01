@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -87,33 +88,12 @@ func TestScoreBoardHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(
-			createTeam("team-01", `[]`, "0"),
-			createTeam("team-02", `[]`, "0"),
-			createTeam("team-03", `[]`, "0"),
-			createTeam("team-04", `[]`, "0"),
-			createTeam("team-05", `[]`, "0"),
-			createTeam("team-06", `[]`, "0"),
-			createTeam("team-07", `[]`, "0"),
-			createTeam("team-08", `[]`, "0"),
-			createTeam("team-09", `[]`, "0"),
-			createTeam("team-10", `[]`, "0"),
-			createTeam("team-11", `[]`, "0"),
-			createTeam("team-12", `[]`, "0"),
-			createTeam("team-13", `[]`, "0"),
-			createTeam("team-14", `[]`, "0"),
-			createTeam("team-15", `[]`, "0"),
-			createTeam("team-16", `[]`, "0"),
-			createTeam("team-17", `[]`, "0"),
-			createTeam("team-18", `[]`, "0"),
-			createTeam("team-19", `[]`, "0"),
-			createTeam("team-20", `[]`, "0"),
-			createTeam("team-21", `[]`, "0"),
-			createTeam("team-22", `[]`, "0"),
-			createTeam("team-23", `[]`, "0"),
-			createTeam("team-24", `[]`, "0"),
-			createTeam("team-25", `[]`, "0"),
-		)
+		var teams []runtime.Object
+		for i := 1; i <= 25; i++ {
+			teamName := fmt.Sprintf("team-%02d", i)
+			teams = append(teams, createTeam(teamName, `[]`, "0"))
+		}
+		clientset := fake.NewSimpleClientset(teams...)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
