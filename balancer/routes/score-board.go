@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,10 +27,12 @@ type PersistedChallengeProgress struct {
 	SolvedAt string `json:"solvedAt"`
 }
 
+var challengesMap map[string](b.JuiceShopChallenge)
+
 func handleScoreBoard(bundle *b.Bundle) http.Handler {
 
-	// create a map of challenges
-	challengesMap := make(map[string](b.JuiceShopChallenge))
+	// create a map of challenges for easy lookup by challenge key
+	challengesMap = make(map[string](b.JuiceShopChallenge))
 	for _, challenge := range bundle.JuiceShopChallenges {
 		challengesMap[challenge.Key] = challenge
 	}
@@ -46,52 +49,8 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 			}
 
 			teamScores := []TeamScore{}
-
 			for _, teamDeployment := range deployments.Items {
-				solvedChallengesString := teamDeployment.Annotations["multi-juicer.owasp-juice.shop/challenges"]
-				team := teamDeployment.Labels["team"]
-				if solvedChallengesString == "" {
-					teamScores = append(teamScores, TeamScore{
-						Name:       team,
-						Score:      0,
-						Challenges: []string{},
-					})
-					continue
-				}
-
-				solvedChallenges := []PersistedChallengeProgress{}
-				err = json.Unmarshal([]byte(solvedChallengesString), &solvedChallenges)
-
-				if err != nil {
-					bundle.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
-					teamScores = append(teamScores, TeamScore{
-						Name:       team,
-						Score:      0,
-						Challenges: []string{},
-					})
-					continue
-				}
-
-				score := 0
-
-				for _, challengeSolved := range solvedChallenges {
-					challenge, ok := challengesMap[challengeSolved.Key]
-					if !ok {
-						continue
-					}
-					score += challenge.Difficulty * 10
-				}
-
-				solvedChallengeNames := []string{}
-				for _, challengeSolved := range solvedChallenges {
-					solvedChallengeNames = append(solvedChallengeNames, challengeSolved.Key)
-				}
-
-				teamScores = append(teamScores, TeamScore{
-					Name:       team,
-					Score:      score,
-					Challenges: solvedChallengeNames,
-				})
+				teamScores = append(teamScores, CalculateScore(bundle, &teamDeployment))
 			}
 
 			sort.Slice(teamScores, func(i, j int) bool {
@@ -105,7 +64,8 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 
 			responseBytes, err := json.Marshal(response)
 			if err != nil {
-				http.Error(responseWriter, "failed to marshal response", http.StatusInternalServerError)
+				bundle.Log.Printf("Failed to marshal response: %s", err)
+				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}
 
@@ -114,4 +74,49 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 			responseWriter.WriteHeader(http.StatusOK)
 		},
 	)
+}
+
+func CalculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment) TeamScore {
+	solvedChallengesString := teamDeployment.Annotations["multi-juicer.owasp-juice.shop/challenges"]
+	team := teamDeployment.Labels["team"]
+	if solvedChallengesString == "" {
+		return TeamScore{
+			Name:       team,
+			Score:      0,
+			Challenges: []string{},
+		}
+	}
+
+	solvedChallenges := []PersistedChallengeProgress{}
+	err := json.Unmarshal([]byte(solvedChallengesString), &solvedChallenges)
+
+	if err != nil {
+		bundle.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
+		return TeamScore{
+			Name:       team,
+			Score:      0,
+			Challenges: []string{},
+		}
+	}
+
+	score := 0
+	for _, challengeSolved := range solvedChallenges {
+		challenge, ok := challengesMap[challengeSolved.Key]
+		if !ok {
+			bundle.Log.Printf("JuiceShop deployment '%s' has a solved challenge '%s' that is not in the challenges map. The used JuiceShop version might be incompatible with this MultiJuicer version.", team, challengeSolved.Key)
+			continue
+		}
+		score += challenge.Difficulty * 10
+	}
+
+	solvedChallengeNames := []string{}
+	for _, challengeSolved := range solvedChallenges {
+		solvedChallengeNames = append(solvedChallengeNames, challengeSolved.Key)
+	}
+
+	return TeamScore{
+		Name:       team,
+		Score:      score,
+		Challenges: solvedChallengeNames,
+	}
 }
