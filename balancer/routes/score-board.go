@@ -62,6 +62,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 				err = json.Unmarshal([]byte(solvedChallengesString), &solvedChallenges)
 
 				if err != nil {
+					bundle.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
 					teamScores = append(teamScores, TeamScore{
 						Name:       team,
 						Score:      0,
