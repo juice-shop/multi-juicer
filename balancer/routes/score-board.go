@@ -50,7 +50,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 
 			totalTeams := len(deployments.Items)
 
-			// limit deployment to calculate score for to 24
+			// limit deployment to calculate score for the top 24 teams only
 			if totalTeams > 24 {
 				deployments.Items = deployments.Items[:24]
 			}
