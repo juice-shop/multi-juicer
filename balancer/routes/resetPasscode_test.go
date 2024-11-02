@@ -21,7 +21,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 
 	t.Run("reset passcode updates the saved passcode of the deployment", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", "/balancer/teams/reset-passcode", nil)
-		req.Header.Set("Cookie", fmt.Sprintf("balancer=%s", testutil.SignTestTeamname(team)))
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

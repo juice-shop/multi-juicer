@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -38,25 +38,13 @@ func newReverseProxy(target string) *httputil.ReverseProxy {
 func handleProxy(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			teamSigned, err := req.Cookie("balancer")
+			team, err := teamcookie.GetTeamFromRequest(bundle, req)
 			if err != nil {
 				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}
-			team, err := signutil.Unsign(teamSigned.Value, bundle.Config.CookieConfig.SigningKey)
-			if err != nil {
-				bundle.Log.Printf("Invalid cookie signature, unsetting cookie and redirecting to balancer page.")
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
-				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
-				return
-			}
-			if team == "" {
-				bundle.Log.Printf("Empty team in signed cookie! Unsetting cookie and redirecting to balancer page.")
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
-				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
-				return
-			}
+
 			if !wasInstanceUptimeStatusCheckedRecently(team) {
 				status := isInstanceUp(bundle, team)
 				if status == instanceUp {

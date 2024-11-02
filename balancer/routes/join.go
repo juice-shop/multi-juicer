@@ -122,7 +122,7 @@ func setSignedTeamCookie(bundle *bundle.Bundle, team string, w http.ResponseWrit
 		return err
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name:     "balancer",
+		Name:     bundle.Config.CookieConfig.Name,
 		Value:    cookieValue,
 		HttpOnly: true,
 		Path:     "/",

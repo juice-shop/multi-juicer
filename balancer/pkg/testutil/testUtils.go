@@ -53,6 +53,8 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 			},
 			CookieConfig: bundle.CookieConfig{
 				SigningKey: testSigningKey,
+				Name:       "team",
+				Secure:     false,
 			},
 		},
 	}

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -20,6 +21,6 @@ func TestLogoutHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, rr.Code, http.StatusOK)
-		assert.Equal(t, "balancer=; Path=/; Max-Age=0", rr.Header().Get("Set-Cookie"))
+		assert.Equal(t, fmt.Sprintf("%s=; Path=/; Max-Age=0", bundle.Config.CookieConfig.Name), rr.Header().Get("Set-Cookie"))
 	})
 }

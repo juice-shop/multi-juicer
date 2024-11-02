@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	"golang.org/x/crypto/bcrypt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -22,14 +22,9 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 
-			teamSigned, err := req.Cookie("balancer")
+			team, err := teamcookie.GetTeamFromRequest(bundle, req)
 			if err != nil {
-				http.Error(responseWriter, "requires auth", http.StatusUnauthorized)
-				return
-			}
-			team, err := signutil.Unsign(teamSigned.Value, bundle.Config.CookieConfig.SigningKey)
-			if err != nil {
-				http.Error(responseWriter, "requires auth", http.StatusUnauthorized)
+				http.Error(responseWriter, "", http.StatusUnauthorized)
 				return
 			}
 

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -21,13 +21,8 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			balancerCookie, err := req.Cookie("balancer")
-			if err != nil {
-				http.Error(responseWriter, "balancer cookie is missing", http.StatusBadRequest)
-				return
-			}
-			cookieTeamname, err := signutil.Unsign(balancerCookie.Value, bundle.Config.CookieConfig.SigningKey)
-			if err != nil || cookieTeamname != team {
+			teamFromCookie, err := teamcookie.GetTeamFromRequest(bundle, req)
+			if err != nil || teamFromCookie != team {
 				http.Error(responseWriter, "", http.StatusUnauthorized)
 				return
 			}

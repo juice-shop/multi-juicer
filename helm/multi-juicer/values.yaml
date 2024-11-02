@@ -30,7 +30,7 @@ balancer:
     # Sets secure Flag in cookie
     # -- Sets the secure attribute on cookie so that it only be send over https
     secure: false
-    # -- Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true`
+    # -- Changes the cookies name used to identify teams.
     name: balancer
     # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
     cookieParserSecret: null

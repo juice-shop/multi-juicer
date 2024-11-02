@@ -43,6 +43,12 @@ type Config struct {
 type CookieConfig struct {
 	// CookieSigningKey is used to create a hmac signature of the team name to have  readable but cryptographically secure cookie name to identify the team
 	SigningKey string `json:"signingKey"`
+
+	// CookieName is the name of the cookie that is used to store the team name
+	Name string `json:"name"`
+
+	// Secure controls if the Secure attribute is set on the cookie.
+	Secure bool `json:"secure"`
 }
 
 type JuiceShopConfig struct {

@@ -6,4 +6,7 @@ metadata:
     {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
 data:
   config.json: |
-    {{ .Values.config | toPrettyJson | nindent 6 }}
+
+    {{
+      (merge .Values.config (dict "cookie" (dict "name" .Values.balancer.cookie.name "secure" .Values.balancer.cookie.secure))) | toPrettyJson | nindent 6 
+    }}

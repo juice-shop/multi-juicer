@@ -59,7 +59,7 @@ func TestJoinHandler(t *testing.T) {
 		assert.Equal(t, "create", actions[3].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[3].GetResource())
 
-		assert.Regexp(t, regexp.MustCompile(`balancer=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
+		assert.Regexp(t, regexp.MustCompile(`team=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
 		assert.JSONEq(t, `{"message":"Created Instance","passcode":"12345678"}`, rr.Body.String())
 
 		deployment, err := clientset.AppsV1().Deployments("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
@@ -186,7 +186,7 @@ func TestJoinHandler(t *testing.T) {
 		actions := clientset.Actions()
 		_ = actions
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Regexp(t, regexp.MustCompile(`balancer=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
+		assert.Regexp(t, regexp.MustCompile(`team=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
 	})
 
 	t.Run("join is rejected when the passcode doesn't match", func(t *testing.T) {
