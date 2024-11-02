@@ -14,6 +14,8 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+// Bundle holds all the dependencies and configurationthat are used by the routes
+// for testing it can be mocked out, see testutil/testUtils.go for helper functions to easily mock out the bundle
 type Bundle struct {
 	RuntimeEnvironment RuntimeEnvironment
 	ClientSet          kubernetes.Interface
