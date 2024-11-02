@@ -21,6 +21,7 @@ RUN npm run build
 
 # get the challenges from the juice-shop image
 FROM bkimminich/juice-shop:${JUICE_SHOP_VERSION} AS juice-shop
+# convert them to json so that we don't need to pull in a yaml lib
 FROM mikefarah/yq:4 AS challenges-json
 COPY --from=juice-shop /juice-shop/data/static/challenges.yml /workdir/challenges.yaml
 RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challenges.json
