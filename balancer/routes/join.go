@@ -256,23 +256,17 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 		return err
 	}
 
-	podLabels := map[string]string{
-		"team":                      team,
-		"app.kubernetes.io/version": bundle.Config.JuiceShopConfig.Tag,
-		"app.kubernetes.io/name":    "juice-shop",
-	}
-
+	podLabels := map[string]string{}
 	if bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Labels != nil {
-		for k, v := range bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Labels {
-			podLabels[k] = v
-		}
+		podLabels = bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Labels
 	}
+	podLabels["team"] = team
+	podLabels["app.kubernetes.io/version"] = bundle.Config.JuiceShopConfig.Tag
+	podLabels["app.kubernetes.io/name"] = "juice-shop"
 
 	podAnnotations := map[string]string{}
 	if bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Annotations != nil {
-		for k, v := range bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Annotations {
-			podAnnotations[k] = v
-		}
+		podAnnotations = bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Annotations
 	}
 
 	deployment := &appsv1.Deployment{
