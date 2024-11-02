@@ -73,11 +73,11 @@ func getDeployment(bundle *bundle.Bundle, team string) (*appsv1.Deployment, erro
 	)
 }
 
-var validTeamnamePattern = regexp.MustCompile("^[a-z]{1,16}$")
+var validTeamnamePattern = regexp.MustCompile("^[a-z0-9]([-a-z0-9])+[a-z0-9]$")
 
 func isValidTeamName(s string) bool {
 	matched := validTeamnamePattern.MatchString(s)
-	return matched
+	return matched && len(s) <= 16
 }
 
 func isMaxInstanceLimitReached(context context.Context, bundle *bundle.Bundle) (bool, error) {
