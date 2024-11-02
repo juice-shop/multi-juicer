@@ -21,6 +21,29 @@ import (
 func TestJoinHandler(t *testing.T) {
 	team := "foobar"
 
+	createTeam := func(team string) *appsv1.Deployment {
+		return &appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("juiceshop-%s", team),
+				Namespace: "test-namespace",
+				Annotations: map[string]string{
+					"multi-juicer.owasp-juice.shop/challenges":          "[]",
+					"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
+					"multi-juicer.owasp-juice.shop/lastRequest":         "1729259667397",
+					"multi-juicer.owasp-juice.shop/lastRequestReadable": "2024-10-18 13:55:18.08198884+0000 UTC m=+11.556786174",
+					"multi-juicer.owasp-juice.shop/passcode":            "$2a$10$wnxvqClPk/13SbdowdJtu.2thGxrZe4qrsaVdTVUsYIrVVClhPMfS",
+				},
+				Labels: map[string]string{
+					"app.kubernetes.io/name":    "juice-shop",
+					"app.kubernetes.io/part-of": "multi-juicer",
+				},
+			},
+			Status: appsv1.DeploymentStatus{
+				ReadyReplicas: 1,
+			},
+		}
+	}
+
 	balancerDeployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "balancer",
@@ -136,26 +159,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment, &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("juiceshop-%s", team),
-				Namespace: "test-namespace",
-				Annotations: map[string]string{
-					"multi-juicer.owasp-juice.shop/challenges":          "[]",
-					"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
-					"multi-juicer.owasp-juice.shop/lastRequest":         "1729259667397",
-					"multi-juicer.owasp-juice.shop/lastRequestReadable": "2024-10-18 13:55:18.08198884+0000 UTC m=+11.556786174",
-					"multi-juicer.owasp-juice.shop/passcode":            "$2a$10$rSXobFHXy7dVo9CPYPh9w.VJHoek0OvoGpwu6Fv18Z/8UEFkeVFwK",
-				},
-				Labels: map[string]string{
-					"app.kubernetes.io/name":    "juice-shop",
-					"app.kubernetes.io/part-of": "multi-juicer",
-				},
-			},
-			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
-			},
-		})
+		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -175,26 +179,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment, &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("juiceshop-%s", team),
-				Namespace: "test-namespace",
-				Annotations: map[string]string{
-					"multi-juicer.owasp-juice.shop/challenges":          "[]",
-					"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
-					"multi-juicer.owasp-juice.shop/lastRequest":         "1729259667397",
-					"multi-juicer.owasp-juice.shop/lastRequestReadable": "2024-10-18 13:55:18.08198884+0000 UTC m=+11.556786174",
-					"multi-juicer.owasp-juice.shop/passcode":            "$2a$10$wnxvqClPk/13SbdowdJtu.2thGxrZe4qrsaVdTVUsYIrVVClhPMfS",
-				},
-				Labels: map[string]string{
-					"app.kubernetes.io/name":    "juice-shop",
-					"app.kubernetes.io/part-of": "multi-juicer",
-				},
-			},
-			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
-			},
-		})
+		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -214,26 +199,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment, &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("juiceshop-%s", team),
-				Namespace: "test-namespace",
-				Annotations: map[string]string{
-					"multi-juicer.owasp-juice.shop/challenges":          "[]",
-					"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
-					"multi-juicer.owasp-juice.shop/lastRequest":         "1729259667397",
-					"multi-juicer.owasp-juice.shop/lastRequestReadable": "2024-10-18 13:55:18.08198884+0000 UTC m=+11.556786174",
-					"multi-juicer.owasp-juice.shop/passcode":            "$2a$10$rSXobFHXy7dVo9CPYPh9w.VJHoek0OvoGpwu6Fv18Z/8UEFkeVFwK",
-				},
-				Labels: map[string]string{
-					"app.kubernetes.io/name":    "juice-shop",
-					"app.kubernetes.io/part-of": "multi-juicer",
-				},
-			},
-			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
-			},
-		})
+		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)

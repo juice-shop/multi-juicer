@@ -16,28 +16,27 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func createTeam(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
-	return &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("juiceshop-%s", team),
-			Namespace: "test-namespace",
-			Annotations: map[string]string{
-				"multi-juicer.owasp-juice.shop/challenges":       challenges,
-				"multi-juicer.owasp-juice.shop/challengesSolved": solvedChallenges,
-			},
-			Labels: map[string]string{
-				"app.kubernetes.io/name":    "juice-shop",
-				"app.kubernetes.io/part-of": "multi-juicer",
-				"team":                      team,
-			},
-		},
-		Status: appsv1.DeploymentStatus{
-			ReadyReplicas: 1,
-		},
-	}
-}
-
 func TestScoreBoardHandler(t *testing.T) {
+	createTeam := func(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
+		return &appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("juiceshop-%s", team),
+				Namespace: "test-namespace",
+				Annotations: map[string]string{
+					"multi-juicer.owasp-juice.shop/challenges":       challenges,
+					"multi-juicer.owasp-juice.shop/challengesSolved": solvedChallenges,
+				},
+				Labels: map[string]string{
+					"app.kubernetes.io/name":    "juice-shop",
+					"app.kubernetes.io/part-of": "multi-juicer",
+					"team":                      team,
+				},
+			},
+			Status: appsv1.DeploymentStatus{
+				ReadyReplicas: 1,
+			},
+		}
+	}
 	t.Run("lists teams and calculates the score", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
 		rr := httptest.NewRecorder()
