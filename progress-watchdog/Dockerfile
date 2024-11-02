@@ -1,3 +1,5 @@
+ARG JUICE_SHOP_VERSION=latest
+
 FROM --platform=$BUILDPLATFORM docker.io/golang:1.23 AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
@@ -10,6 +12,15 @@ ARG TARGETOS TARGETARCH
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build
 RUN chmod +x progress-watchdog
 
+ARG JUICE_SHOP_VERSION=latest
+
+# get the challenges from the juice-shop image
+FROM bkimminich/juice-shop:${JUICE_SHOP_VERSION} AS juice-shop
+FROM mikefarah/yq:4 AS challenges-json
+COPY --from=juice-shop /juice-shop/data/static/challenges.yml /workdir/challenges.yaml
+RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challenges.json
+
 FROM gcr.io/distroless/static:nonroot
+COPY --from=challenges-json --chown=nonroot:nonroot /workdir/challenges.json /challenges.json
 COPY --from=builder --chown=nonroot:nonroot /src/progress-watchdog /progress-watchdog
 CMD ["/progress-watchdog"]

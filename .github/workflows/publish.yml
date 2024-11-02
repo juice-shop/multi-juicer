@@ -74,6 +74,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract JuiceShop Version from Helm Values
+        id: extract-juice-shop-version
+        run: |
+          JUICE_SHOP_VERSION=$(yq eval '.config.juiceShop.tag' helm/multi-juicer/values.yaml)
+          echo "version=$JUICE_SHOP_VERSION" >> "$GITHUB_OUTPUT"
+
       - id: build-and-push
         name: Build and Push
         uses: docker/build-push-action@v6
@@ -84,6 +90,8 @@ jobs:
           push: true
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
+          build-args: |
+            JUICE_SHOP_VERSION=${{ steps.extract-juice-shop-version.outputs.version }}
 
       - name: Sign the images with GitHub OIDC Token
         env:
