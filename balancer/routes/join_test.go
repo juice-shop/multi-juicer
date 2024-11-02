@@ -201,8 +201,6 @@ func TestJoinHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		actions := clientset.Actions()
-		_ = actions
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 		assert.Equal(t, "", rr.Header().Get("Set-Cookie"))
 	})
@@ -221,8 +219,6 @@ func TestJoinHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		actions := clientset.Actions()
-		_ = actions
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Regexp(t, regexp.MustCompile(`team=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
 	})
@@ -241,9 +237,71 @@ func TestJoinHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		actions := clientset.Actions()
-		_ = actions
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 		assert.Equal(t, "", rr.Header().Get("Set-Cookie"))
+	})
+
+	t.Run("allows admins login with the correct passcode", func(t *testing.T) {
+		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
+		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", bytes.NewReader(jsonPayload))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Regexp(t, regexp.MustCompile(`team=admin\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
+	})
+
+	t.Run("admin login returns usual 'requires auth' response when it get's no request body passed", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		assert.Equal(t, "", rr.Header().Get("Set-Cookie"))
+	})
+
+	t.Run("admin account requires the correct passcod", func(t *testing.T) {
+		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "wrong-password"})
+		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", bytes.NewReader(jsonPayload))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		assert.Equal(t, "", rr.Header().Get("Set-Cookie"))
+	})
+
+	t.Run("admin login doesn't make any kubernetes api calls / creates not kubernetes resources", func(t *testing.T) {
+		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
+		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", bytes.NewReader(jsonPayload))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset(balancerDeployment)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Len(t, clientset.Actions(), 0)
 	})
 }

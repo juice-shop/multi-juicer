@@ -57,6 +57,9 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 				Name:       "team",
 				Secure:     false,
 			},
+			AdminConfig: &bundle.AdminConfig{
+				Password: "mock-admin-password",
+			},
 		},
 	}
 }

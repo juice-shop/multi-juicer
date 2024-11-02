@@ -45,6 +45,12 @@ func init() {
 func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		team := r.PathValue("team")
+
+		if team == "admin" {
+			handleAdminLogin(bundle, w, r)
+			return
+		}
+
 		deployment, err := getDeployment(r.Context(), bundle, team)
 		if err != nil && errors.IsNotFound(err) {
 			isMaxLimitReached, err := isMaxInstanceLimitReached(r.Context(), bundle)
@@ -63,6 +69,41 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 			http.Error(w, "failed to get deployment", http.StatusInternalServerError)
 		}
 	})
+}
+
+func handleAdminLogin(bundle *bundle.Bundle, w http.ResponseWriter, r *http.Request) {
+	if r.Body == nil {
+		writeUnauthorizedResponse(w)
+		return
+	}
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "failed to read request body", http.StatusInternalServerError)
+		return
+	}
+
+	var requestBody joinRequestBody
+	if err := json.Unmarshal(body, &requestBody); err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	if requestBody.Passcode != bundle.Config.AdminConfig.Password {
+		failedLoginCounter.WithLabelValues("admin").Inc()
+		writeUnauthorizedResponse(w)
+		return
+	}
+
+	err = setSignedTeamCookie(bundle, "admin", w)
+	if err != nil {
+		http.Error(w, "failed to sign team cookie", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message": "Signed in as admin"}`))
+	loginCounter.WithLabelValues("login", "admin").Inc()
 }
 
 func getDeployment(context context.Context, bundle *bundle.Bundle, team string) (*appsv1.Deployment, error) {

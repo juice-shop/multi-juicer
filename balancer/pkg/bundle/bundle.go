@@ -39,6 +39,11 @@ type Config struct {
 	JuiceShopConfig JuiceShopConfig `json:"juiceShop"`
 	MaxInstances    int             `json:"maxInstances"`
 	CookieConfig    CookieConfig    `json:"cookie"`
+	AdminConfig     *AdminConfig
+}
+
+type AdminConfig struct {
+	Password string `json:"password"`
 }
 
 type CookieConfig struct {
@@ -116,12 +121,18 @@ func New() *Bundle {
 		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' must be set"))
 	}
 
+	adminPasswordKey := os.Getenv("MULTI_JUICER_CONFIG_ADMIN_PASSWORD")
+	if adminPasswordKey == "" {
+		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_ADMIN_PASSWORD' must be set"))
+	}
+
 	config, err := readConfigFromFile("/config/config.json")
 	if err != nil {
 		panic(err)
 	}
 
 	config.CookieConfig.SigningKey = cookieSigningKey
+	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
 
 	// read /challenges.json file
 	challengesBytes, err := os.ReadFile("/challenges.json")
