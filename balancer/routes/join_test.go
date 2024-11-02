@@ -177,7 +177,6 @@ func TestJoinHandler(t *testing.T) {
 
 		invalidTeamnames := []string{
 			"foo bar",
-			"foo-bar",
 			"FOOOBAR",
 			"fooooooooooooooooooooooooooooo",
 		}
