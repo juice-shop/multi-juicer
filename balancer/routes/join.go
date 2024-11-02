@@ -255,6 +255,26 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 	if err != nil {
 		return err
 	}
+
+	podLabels := map[string]string{
+		"team":                      team,
+		"app.kubernetes.io/version": bundle.Config.JuiceShopConfig.Tag,
+		"app.kubernetes.io/name":    "juice-shop",
+	}
+
+	if bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Labels != nil {
+		for k, v := range bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Labels {
+			podLabels[k] = v
+		}
+	}
+
+	podAnnotations := map[string]string{}
+	if bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Annotations != nil {
+		for k, v := range bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Annotations {
+			podAnnotations[k] = v
+		}
+	}
+
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("juiceshop-%s", team),
@@ -284,11 +304,8 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						"team":                      team,
-						"app.kubernetes.io/version": bundle.Config.JuiceShopConfig.Tag,
-						"app.kubernetes.io/name":    "juice-shop",
-					},
+					Labels:      podLabels,
+					Annotations: podAnnotations,
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{

@@ -69,8 +69,13 @@ type JuiceShopConfig struct {
 	Volumes                  []corev1.Volume             `json:"volumes"`
 	VolumeMounts             []corev1.VolumeMount        `json:"volumeMounts"`
 	RuntimeClassName         *string                     `json:"runtimeClassName"`
-	Annotations              map[string]string           `json:"annotations"`
-	Labels                   map[string]string           `json:"labels"`
+
+	JuiceShopPodConfig JuiceShopPodConfig `json:"pod"`
+}
+
+type JuiceShopPodConfig struct {
+	Annotations map[string]string `json:"annotations"`
+	Labels      map[string]string `json:"labels"`
 }
 
 // JuiceShopChallenge represents a challenge in the Juice Shop that can be solved by the participants

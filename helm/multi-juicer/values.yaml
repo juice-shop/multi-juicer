@@ -159,7 +159,6 @@ config:
     affinity: {}
     # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
     tolerations: []
-    # todo(@J12934): implement
     pod:
       # -- Optional Additional annotations for the Juice Shop pods.
       annotations: {}
