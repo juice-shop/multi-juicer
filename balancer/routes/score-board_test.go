@@ -110,7 +110,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		assert.Equal(t, 24, len(response.TopTeams))
 	})
 
-	t.Run("calculates score for known challenges and skip unknown challenges", func(t *testing.T) {
+	t.Run("calculates score for known challenges only and skip unknown challenges", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
 		rr := httptest.NewRecorder()
 
