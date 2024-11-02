@@ -45,7 +45,7 @@ func init() {
 func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		team := r.PathValue("team")
-		deployment, err := getDeployment(bundle, team)
+		deployment, err := getDeployment(r.Context(), bundle, team)
 		if err != nil && errors.IsNotFound(err) {
 			isMaxLimitReached, err := isMaxInstanceLimitReached(r.Context(), bundle)
 			if err != nil {
@@ -56,7 +56,7 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 				http.Error(w, `{"message":"Reached Maximum Instance Count","description":"Find an admin to handle this."}`, http.StatusInternalServerError)
 				return
 			}
-			createANewTeam(bundle, team, w)
+			createANewTeam(r.Context(), bundle, team, w)
 		} else if err == nil {
 			joinExistingTeam(bundle, team, deployment, w, r)
 		} else {
@@ -65,9 +65,9 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 	})
 }
 
-func getDeployment(bundle *bundle.Bundle, team string) (*appsv1.Deployment, error) {
+func getDeployment(context context.Context, bundle *bundle.Bundle, team string) (*appsv1.Deployment, error) {
 	return bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(
-		context.Background(),
+		context,
 		fmt.Sprintf("juiceshop-%s", team),
 		metav1.GetOptions{},
 	)
@@ -90,7 +90,7 @@ func isMaxInstanceLimitReached(context context.Context, bundle *bundle.Bundle) (
 	return len(deployments.Items)+1 >= bundle.Config.MaxInstances, nil
 }
 
-func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
+func createANewTeam(context context.Context, bundle *bundle.Bundle, team string, w http.ResponseWriter) {
 	if !isValidTeamName(team) {
 		http.Error(w, "invalid team name", http.StatusBadRequest)
 		return
@@ -103,14 +103,14 @@ func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
 		return
 	}
 
-	err = createDeploymentForTeam(bundle, team, passcodeHash)
+	err = createDeploymentForTeam(context, bundle, team, passcodeHash)
 	if err != nil {
 		bundle.Log.Printf("Failed to create deployment: %s", err)
 		http.Error(w, "failed to create deployment", http.StatusInternalServerError)
 		return
 	}
 
-	err = createServiceForTeam(bundle, team)
+	err = createServiceForTeam(context, bundle, team)
 	if err != nil {
 		bundle.Log.Printf("Failed to create service: %s", err)
 		http.Error(w, "failed to create service", http.StatusInternalServerError)
@@ -223,10 +223,10 @@ func writeUnauthorizedResponse(responseWriter http.ResponseWriter) {
 // uid of the balancer kubernetes deployment resource. used to "attach" created juice shop deployments and services to the balancer deployment so that they get deleted when the balancer gets deleted
 var deploymentUid types.UID
 
-func getOwnerReferences(bundle *bundle.Bundle) ([]metav1.OwnerReference, error) {
+func getOwnerReferences(context context.Context, bundle *bundle.Bundle) ([]metav1.OwnerReference, error) {
 	if deploymentUid == "" {
 		balancerDeployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(
-			context.Background(),
+			context,
 			"balancer",
 			metav1.GetOptions{},
 		)
@@ -250,8 +250,8 @@ func getOwnerReferences(bundle *bundle.Bundle) ([]metav1.OwnerReference, error) 
 	return ownerReferences, nil
 }
 
-func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash string) error {
-	ownerReferences, err := getOwnerReferences(bundle)
+func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, team string, passcodeHash string) error {
+	ownerReferences, err := getOwnerReferences(context, bundle)
 	if err != nil {
 		return err
 	}
@@ -391,12 +391,12 @@ func createDeploymentForTeam(bundle *bundle.Bundle, team string, passcodeHash st
 		},
 	}
 
-	_, err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), deployment, metav1.CreateOptions{})
+	_, err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context, deployment, metav1.CreateOptions{})
 	return err
 }
 
-func createServiceForTeam(bundle *bundle.Bundle, team string) error {
-	ownerReferences, err := getOwnerReferences(bundle)
+func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team string) error {
+	ownerReferences, err := getOwnerReferences(context, bundle)
 	if err != nil {
 		return err
 	}
@@ -427,6 +427,6 @@ func createServiceForTeam(bundle *bundle.Bundle, team string) error {
 		},
 	}
 
-	_, err = bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), service, metav1.CreateOptions{})
+	_, err = bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context, service, metav1.CreateOptions{})
 	return err
 }
