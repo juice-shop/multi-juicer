@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -9,13 +10,14 @@ import (
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
 func TestAdminDeleteInstanceHandler(t *testing.T) {
-	createTeam := func(team string) *appsv1.Deployment {
+	createDeploymentForTeam := func(team string) *appsv1.Deployment {
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
@@ -38,6 +40,26 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 			},
 		}
 	}
+	createServiceForTeam := func(team string) *corev1.Service {
+		return &corev1.Service{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("juiceshop-%s", team),
+				Namespace: "test-namespace",
+				Labels: map[string]string{
+					"app.kubernetes.io/name":    "juice-shop",
+					"app.kubernetes.io/part-of": "multi-juicer",
+					"team":                      team,
+				},
+			},
+			Spec: corev1.ServiceSpec{
+				Ports: []corev1.ServicePort{
+					{
+						Port: 3000,
+					},
+				},
+			},
+		}
+	}
 
 	t.Run("deleting instances requires admin login", func(t *testing.T) {
 		req, _ := http.NewRequest("DELETE", "/balancer/admin/teams/foobar/delete", nil)
@@ -46,7 +68,7 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(createTeam("foobar"))
+		clientset := fake.NewSimpleClientset(createDeploymentForTeam("foobar"), createServiceForTeam("foobar"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
 
@@ -63,7 +85,12 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(createTeam("foobar"))
+		clientset := fake.NewSimpleClientset(
+			createDeploymentForTeam("foobar"),
+			createServiceForTeam("foobar"),
+			createDeploymentForTeam("other-team"),
+			createServiceForTeam("other-team"),
+		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
 
@@ -78,6 +105,14 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[0].GetResource())
 		assert.Equal(t, "delete", actions[1].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[1].GetResource())
+
+		deployments, err := clientset.AppsV1().Deployments("test-namespace").List(context.Background(), metav1.ListOptions{})
+		assert.Nil(t, err)
+		assert.Len(t, deployments.Items, 1)
+
+		services, err := clientset.CoreV1().Services("test-namespace").List(context.Background(), metav1.ListOptions{})
+		assert.Nil(t, err)
+		assert.Len(t, services.Items, 1)
 	})
 
 }
