@@ -304,6 +304,7 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 	podLabels["team"] = team
 	podLabels["app.kubernetes.io/version"] = bundle.Config.JuiceShopConfig.Tag
 	podLabels["app.kubernetes.io/name"] = "juice-shop"
+	podLabels["app.kubernetes.io/part-of"] = "multi-juicer"
 
 	podAnnotations := map[string]string{}
 	if bundle.Config.JuiceShopConfig.JuiceShopPodConfig.Annotations != nil {
@@ -333,8 +334,9 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"team":                   team,
-					"app.kubernetes.io/name": "juice-shop",
+					"team":                      team,
+					"app.kubernetes.io/name":    "juice-shop",
+					"app.kubernetes.io/part-of": "multi-juicer",
 				},
 			},
 			Template: corev1.PodTemplateSpec{
