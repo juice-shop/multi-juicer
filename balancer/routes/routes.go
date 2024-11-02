@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
@@ -18,7 +17,6 @@ var httpRequestsCount = prometheus.NewCounterVec(
 )
 
 func init() {
-	fmt.Println("Registering prometheus metrics")
 	prometheus.MustRegister(httpRequestsCount)
 }
 
