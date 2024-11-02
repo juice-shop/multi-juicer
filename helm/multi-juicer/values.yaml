@@ -87,7 +87,6 @@ balancer:
       labels: {}
 
 config:
-  # todo(@J12934): implement
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
   juiceShop:

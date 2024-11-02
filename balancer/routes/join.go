@@ -47,6 +47,15 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 		team := r.PathValue("team")
 		deployment, err := getDeployment(bundle, team)
 		if err != nil && errors.IsNotFound(err) {
+			isMaxLimitReached, err := isMaxInstanceLimitReached(r.Context(), bundle)
+			if err != nil {
+				http.Error(w, "failed to check max instance limit", http.StatusInternalServerError)
+				return
+			} else if isMaxLimitReached {
+				bundle.Log.Printf("Max instance limit reached! Cannot create any more new teams. Increase the count via the helm values or delete existing teams.")
+				http.Error(w, `{"message":"Reached Maximum Instance Count","description":"Find an admin to handle this."}`, http.StatusInternalServerError)
+				return
+			}
 			createANewTeam(bundle, team, w)
 		} else if err == nil {
 			joinExistingTeam(bundle, team, deployment, w, r)
@@ -70,6 +79,17 @@ func isValidTeamName(s string) bool {
 	matched := validTeamnamePattern.MatchString(s)
 	return matched
 }
+
+func isMaxInstanceLimitReached(context context.Context, bundle *bundle.Bundle) (bool, error) {
+	deployments, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).List(context, metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
+	})
+	if err != nil {
+		return false, fmt.Errorf("failed to list deployments: %w", err)
+	}
+	return len(deployments.Items)+1 >= bundle.Config.MaxInstances, nil
+}
+
 func createANewTeam(bundle *bundle.Bundle, team string, w http.ResponseWriter) {
 	if !isValidTeamName(team) {
 		http.Error(w, "invalid team name", http.StatusBadRequest)

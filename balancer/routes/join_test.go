@@ -36,6 +36,7 @@ func TestJoinHandler(t *testing.T) {
 				Labels: map[string]string{
 					"app.kubernetes.io/name":    "juice-shop",
 					"app.kubernetes.io/part-of": "multi-juicer",
+					"team":                      team,
 				},
 			},
 			Status: appsv1.DeploymentStatus{
@@ -68,19 +69,30 @@ func TestJoinHandler(t *testing.T) {
 		actions := clientset.Actions()
 		assert.Equal(t, http.StatusOK, rr.Code)
 
+		actionCounter := 0
+
 		// should first check if deployment exists
-		assert.Equal(t, "get", actions[0].GetVerb())
-		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[0].GetResource())
+		assert.Equal(t, "get", actions[actionCounter].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
+		actionCounter++
+
+		// should then list deployments to get the current count of deployments
+		assert.Equal(t, "list", actions[actionCounter].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
+		actionCounter++
 
 		// then get the deployment uid of the balancer
-		assert.Equal(t, "get", actions[1].GetVerb())
-		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[1].GetResource())
+		assert.Equal(t, "get", actions[actionCounter].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
+		actionCounter++
 
 		// because the juice shop doesn't exist it should create it and a service for it
-		assert.Equal(t, "create", actions[2].GetVerb())
-		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[2].GetResource())
-		assert.Equal(t, "create", actions[3].GetVerb())
-		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[3].GetResource())
+		assert.Equal(t, "create", actions[actionCounter].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
+		actionCounter++
+		assert.Equal(t, "create", actions[actionCounter].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[actionCounter].GetResource())
+		actionCounter++
 
 		assert.Regexp(t, regexp.MustCompile(`team=foobar\..*; Path=/; HttpOnly; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
 		assert.JSONEq(t, `{"message":"Created Instance","passcode":"12345678"}`, rr.Body.String())
@@ -131,6 +143,30 @@ func TestJoinHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Regexp(t, regexp.MustCompile(`team=foobar\..*; Path=/; HttpOnly; Secure; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
+	})
+
+	t.Run("refuses to create a team if max instances limit is reached", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset(
+			balancerDeployment,
+			createTeam("team-1"),
+			createTeam("team-2"),
+			createTeam("team-3"),
+		)
+
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bundle.Config.MaxInstances = 3
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, "", rr.Header().Get("Set-Cookie"))
+		assert.JSONEq(t, `{"message":"Reached Maximum Instance Count","description":"Find an admin to handle this."}`, rr.Body.String())
 	})
 
 	t.Run("rejects invalid teamnames", func(t *testing.T) {

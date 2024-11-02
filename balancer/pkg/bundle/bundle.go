@@ -37,6 +37,7 @@ type RuntimeEnvironment struct {
 
 type Config struct {
 	JuiceShopConfig JuiceShopConfig `json:"juiceShop"`
+	MaxInstances    int             `json:"maxInstances"`
 	CookieConfig    CookieConfig    `json:"cookie"`
 }
 
