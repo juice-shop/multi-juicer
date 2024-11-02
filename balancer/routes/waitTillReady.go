@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -32,7 +31,7 @@ func handleWaitTillReady(bundle *bundle.Bundle) http.Handler {
 			// Loop to check readiness with a 30-second timeout (60 iterations of 0.5 seconds sleep)
 			for i := 0; i < 60; i++ {
 				// Get deployment for the specific team
-				deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+				deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(req.Context(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 				if err != nil && errors.IsNotFound(err) {
 					http.Error(responseWriter, "team not found", http.StatusNotFound)
 					return

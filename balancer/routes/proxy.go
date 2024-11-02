@@ -46,7 +46,7 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 			}
 
 			if !wasInstanceUptimeStatusCheckedRecently(team) {
-				status := isInstanceUp(bundle, team)
+				status := isInstanceUp(req.Context(), bundle, team)
 				if status == instanceUp {
 					cacheMutex.Lock()
 					instanceUpCache[team] = time.Now().UnixMilli()
@@ -84,8 +84,8 @@ const (
 	instanceMissing instanceStatus = "missing"
 )
 
-func isInstanceUp(bundle *bundle.Bundle, team string) instanceStatus {
-	deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) instanceStatus {
+	deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context, fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 
 	if errors.IsNotFound(err) {
 		return instanceMissing

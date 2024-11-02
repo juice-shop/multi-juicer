@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -59,7 +58,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 			}
 
 			bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Patch(
-				context.Background(),
+				req.Context(),
 				deployment.Name, types.StrategicMergePatchType,
 				patch,
 				metav1.PatchOptions{},
