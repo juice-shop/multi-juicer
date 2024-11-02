@@ -127,6 +127,7 @@ func setSignedTeamCookie(bundle *bundle.Bundle, team string, w http.ResponseWrit
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
+		Secure:   bundle.Config.CookieConfig.Secure,
 	})
 	return nil
 }

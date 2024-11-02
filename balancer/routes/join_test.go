@@ -92,6 +92,24 @@ func TestJoinHandler(t *testing.T) {
 		}, service.OwnerReferences)
 	})
 
+	t.Run("set secure flag on team cookie when configured", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset(balancerDeployment)
+
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bundle.Config.CookieConfig.Secure = true
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Regexp(t, regexp.MustCompile(`team=foobar\..*; Path=/; HttpOnly; Secure; SameSite=Strict`), rr.Header().Get("Set-Cookie"))
+	})
+
 	t.Run("rejects invalid teamnames", func(t *testing.T) {
 		server := http.NewServeMux()
 
