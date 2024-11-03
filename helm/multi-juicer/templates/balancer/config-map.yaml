@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: balancer-config
+  labels:
+    {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
+data:
+  config.json: |
+
+    {{
+      (merge .Values.config (dict "cookie" (dict "name" .Values.balancer.cookie.name "secure" .Values.balancer.cookie.secure))) | toPrettyJson | nindent 6 
+    }}

@@ -2,6 +2,8 @@ on: [push, pull_request]
 name: "Tests"
 permissions:
   contents: read
+env:
+  GO_STATIC_CHECK_VERSION: "2024.1.1"
 jobs:
   cleaner:
     name: Cleaner
@@ -16,33 +18,38 @@ jobs:
           go-version-file: "cleaner/go.mod"
           cache-dependency-path: "cleaner/go.sum"
       - name: "Lint"
-        run: go vet
+        run: go vet ./...
+      - uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+          working-directory: cleaner
       - name: "Test"
-        run: go test -cover
+        run: go test -cover ./...
 
   balancer:
     name: Balancer
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: juice-balancer
+        working-directory: balancer
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: "22"
-      - name: Install Backend Dependencies
-        run: npm ci
-      - name: "Install UI Dependencies"
-        working-directory: juice-balancer/ui
-        run: npm ci
-      - name: "Build UI"
-        working-directory: juice-balancer/ui
-        run: npm run build
-      - name: Lint
-        run: npm run lint
-      - name: Test
-        run: npm test -- --ci --color --verbose
+          go-version-file: "balancer/go.mod"
+          cache-dependency-path: "balancer/go.sum"
+      - name: "Place index.html file into ui build folder"
+        run: |
+          mkdir ui/build/
+          cp ui/index.html ui/build/index.html
+      - name: "Lint"
+        run: go vet ./...
+      - uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+          working-directory: balancer
+      - name: "Test"
+        run: go test -cover ./...
 
   progress-watchdog:
     name: ProgressWatchdog
@@ -57,9 +64,13 @@ jobs:
           go-version-file: "progress-watchdog/go.mod"
           cache-dependency-path: "progress-watchdog/go.sum"
       - name: "Lint"
-        run: go vet
+        run: go vet ./...
+      - uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+          working-directory: progress-watchdog
       - name: "Test"
-        run: go test -cover
+        run: go test -cover ./...
 
   helm:
     name: Helm

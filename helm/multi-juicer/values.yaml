@@ -30,13 +30,13 @@ balancer:
     # Sets secure Flag in cookie
     # -- Sets the secure attribute on cookie so that it only be send over https
     secure: false
-    # -- Changes the cookies name used to identify teams. Note will automatically be prefixed with "__Secure-" when balancer.cookie.secure is set to `true`
+    # -- Changes the cookies name used to identify teams.
     name: balancer
     # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
     cookieParserSecret: null
-  repository: ghcr.io/juice-shop/multi-juicer/juice-balancer
+  repository: ghcr.io/juice-shop/multi-juicer/balancer
   tag: null
-  # -- Number of replicas of the juice-balancer deployment
+  # -- Number of replicas of the balancer deployment
   replicas: 1
   service:
     # -- Kubernetes service type
@@ -70,16 +70,12 @@ balancer:
   affinity: {}
   # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
-  # -- If set to true this skips setting ownerReferences on the teams JuiceShop Deployment and Services. This lets MultiJuicer run in older kubernetes cluster which don't support the reference type or the app/v1 deployment type
-  skipOwnerReference: false
   pod:
     # -- Optional Additional annotations for the balancer pods.
     annotations: {}
     # -- Optional Additional labels for the balancer pods.
     labels: {}
   metrics:
-    # -- enables prometheus metrics for the balancer. If set to true you should change the prometheus-scraper password
-    enabled: true
     dashboards:
       # -- if true, creates a Grafana Dashboard Config Map. (also requires metrics.enabled to be true). These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards
       enabled: false
@@ -89,89 +85,87 @@ balancer:
       # -- Optional Allows to add additional labels to the service monitor. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
       # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
       labels: {}
-    basicAuth:
-      username: prometheus-scraper
-      # -- Should be changed when metrics are enabled.
-      password: ERzCT4pwBDxfCKRGmfrMa8KQ8sXf8GKy
 
-juiceShop:
+config:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
-  # -- Juice Shop Image to use
-  image: bkimminich/juice-shop
-  tag: v17.1.1
-  # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/companion-guide/latest/part4/ctf.html#_overriding_the_ctf_key
-  ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
-  # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/companion-guide/latest/part4/customization.html#_yaml_configuration_file
-  # @default -- See values.yaml for full details
-  config: |
-    application:
-      logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
-      favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juice-balancer/ui/public/favicon.ico
-      showVersionNumber: false
-      showGitHubLinks: false
-    challenges:
-      showHints: true
-    hackingInstructor:
-      isEnabled: true
-    ctf:
-      showFlagsInNotifications: false
-  # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
-  nodeEnv: "multi-juicer"
-  # -- Optional resources definitions to set for each JuiceShop instance
-  resources:
-    requests:
-      cpu: 150m
-      memory: 300Mi
-  #  limits:
-  #    cpu: 100m
-  #    memory: 200Mi
-  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext:
-    runAsNonRoot: true
-  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-  # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
-  env: []
-  # env:
-  #   - name: FOO
-  #     valueFrom:
-  #       secretKeyRef:
-  #         key: FOO
-  #         name: secret-resource
-  # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
-  envFrom: []
-  # -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumes: []
-  # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
-  # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
-  # volumes:
-  # - name: logo
-  #   configMap:
-  #     name: custom-logo
-  # -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumeMounts: []
-  # volumeMounts:
-  # - name: logo
-  #   mountPath: /juice-shop/frontend/dist/frontend/assets/public/images/custom.png
-  #   subPath: custom.png
-  #   readOnly: true
+  juiceShop:
+    # -- Juice Shop Image to use
+    image: bkimminich/juice-shop
+    tag: v17.1.1
+    imagePullPolicy: IfNotPresent
+    # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/companion-guide/latest/part4/ctf.html#_overriding_the_ctf_key
+    ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
+    # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/companion-guide/latest/part4/customization.html#_yaml_configuration_file
+    # @default -- See values.yaml for full details
+    config:
+      application:
+        logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
+        favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
+        showVersionNumber: false
+        showGitHubLinks: false
+      challenges:
+        showHints: true
+      hackingInstructor:
+        isEnabled: true
+      ctf:
+        showFlagsInNotifications: false
+    # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
+    nodeEnv: "multi-juicer"
+    # -- Optional resources definitions to set for each JuiceShop instance
+    resources:
+      requests:
+        cpu: 150m
+        memory: 300Mi
+    #  limits:
+    #    cpu: 100m
+    #    memory: 200Mi
+    # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
+    podSecurityContext:
+      runAsNonRoot: true
+    # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+    # -- Optional environment variables to set for each JuiceShop instance (see: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
+    env: []
+    # env:
+    #   - name: FOO
+    #     valueFrom:
+    #       secretKeyRef:
+    #         key: FOO
+    #         name: secret-resource
+    # -- Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+    envFrom: []
+    # -- Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
+    volumes: []
+    # create config map with a custom logo via: kubectl create configmap custom-logo --from-file custom.png=your-logo.png
+    # then switch out the logo parameter in the juice-shop config section above to the mounted filename.
+    # volumes:
+    # - name: logo
+    #   configMap:
+    #     name: custom-logo
+    # -- Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/)
+    volumeMounts: []
+    # volumeMounts:
+    # - name: logo
+    #   mountPath: /juice-shop/frontend/dist/frontend/assets/public/images/custom.png
+    #   subPath: custom.png
+    #   readOnly: true
 
-  # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-  # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
-  pod:
-    # -- Optional Additional annotations for the Juice Shop pods.
-    annotations: {}
-    # -- Optional Additional labels for the Juice Shop pods.
-    labels: {}
-  # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
-  runtimeClassName: null
+    # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+    affinity: {}
+    # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+    tolerations: []
+    pod:
+      # -- Optional Additional annotations for the Juice Shop pods.
+      annotations: {}
+      # -- Optional Additional labels for the Juice Shop pods.
+      labels: {}
+    # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
+    runtimeClassName: null
 
 # Collects JuiceShop progress and sends and backs it up to the related kubernetes deployment
 progressWatchdog:

@@ -6,4 +6,4 @@ metadata:
     {{- include "multi-juicer.juice-shop.labels" . | nindent 4 }}
 data:
   multi-juicer.yaml: |-
-{{ .Values.juiceShop.config | indent 4 }}
+    {{ .Values.config.juiceShop.config | toYaml | nindent 4 }}

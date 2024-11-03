@@ -1,4 +1,4 @@
-{{- if and .Values.balancer.metrics.enabled .Values.balancer.metrics.dashboards.enabled }}
+{{- if .Values.balancer.metrics.dashboards.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -1,0 +1,23 @@
+{{- if .Values.balancer.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: balancer
+  labels:
+    {{ include "multi-juicer.balancer.labels" . | nindent 4 }}
+    {{- with .Values.balancer.metrics.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.balancer.metrics.serviceMonitor.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "multi-juicer.balancer.selectorLabels" . | nindent 6 }}
+      type: metrics
+  endpoints:
+    - port: metrics
+      path: '/balancer/metrics'
+{{- end }}

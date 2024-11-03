@@ -6,8 +6,8 @@ This guide walks you through setting up one or more Raspberry Pis to run a kuber
 
 - 1 computer with an MicroSD / SD card slot to flash the operating system
 - 1 or more Raspberry Pi (Model 4b or 5 recommended, older ones might also work)
-- 1 * Micro SD Card per RaspberryPi
-- 1 * Ethernet cable per RaspberryPi
+- 1 \* Micro SD Card per RaspberryPi
+- 1 \* Ethernet cable per RaspberryPi
 - 1 Network switch or router
 
 ## Step 1. Flashing the operating system on the SD card
@@ -91,7 +91,7 @@ To register more nodes onto the cluster you need to get the node token from the 
 
 ```bash
 # ssh onto the primary Pi first
-sudo cat /var/lib/rancher/k3s/server/node-token 
+sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
 ### Install k3s and connect secondary node against primary
@@ -140,7 +140,7 @@ kubectl --namespace multi-juicer get pods
 ## Step 6. Exposing MultiJuicer to the network
 
 k3s automatically comes with a traefik ingress controller which allows to expose http applications running on the cluster.
-k3s will automatically start a traefik worker on all nodes. 
+k3s will automatically start a traefik worker on all nodes.
 If http requests are send to to port 80 or 443 of a cluster node traefik will forward it to the application of the cluster if you have configured an ingress rule for it.
 
 Ideally you setup a DNS name for MultiJuicer on your local network by setting up a DNS A (IPv4) / AAAA (IPv6) pointing to all cluster nodes.
@@ -151,7 +151,7 @@ Ideally you setup a DNS name for MultiJuicer on your local network by setting up
 # create a kubernetes secret with a tls cert & key
 kubectl create secret tls multi-juicer-tls --cert=path/to/tls.cert --key=path/to/tls.key
 
-kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=juice-balancer:3000,tls=multi-juicer-tls"
+kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=balancer:8080,tls=multi-juicer-tls"
 ```
 
 ### With a DNS hostname and no TLS Cert
@@ -159,11 +159,11 @@ kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --r
 If you don't have DNS setup you can register a ingress rule route all traffic for any host to MultiJuicer.
 
 ```bash
-kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=juice-balancer:3000"
+kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=balancer:8080"
 ```
 
 ### Without a DNS hostname and no TLS Cert
 
 ```bash
-kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="/*=juice-balancer:3000"
+kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="/*=balancer:8080"
 ```

@@ -61,7 +61,7 @@ func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallen
 	}
 
 	namespace := os.Getenv("NAMESPACE")
-	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("t-%s-juiceshop", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
+	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
 	if err != nil {
 		logger.Println(fmt.Errorf("failed to patch new ContinueCode into deployment for team %s: %w", team, err))
 	}

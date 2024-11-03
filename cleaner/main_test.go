@@ -21,7 +21,7 @@ func TestRunCleanup(t *testing.T) {
 	createDeployment := func(team string, lastRequest string) *appsv1.Deployment {
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("t-%s-juiceshop", team),
+				Name:      fmt.Sprintf("juiceshop-%s", team),
 				Namespace: testNamespace,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":    "juice-shop",
@@ -36,7 +36,7 @@ func TestRunCleanup(t *testing.T) {
 	createService := func(team string) *corev1.Service {
 		return &corev1.Service{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("t-%s-juiceshop", team),
+				Name:      fmt.Sprintf("juiceshop-%s", team),
 				Namespace: testNamespace,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":    "juice-shop",

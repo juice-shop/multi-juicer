@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: balancer
+  labels: {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "create", "list", "delete", "patch"]
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["services"]
+    verbs: ["get", "create", "delete"]
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]

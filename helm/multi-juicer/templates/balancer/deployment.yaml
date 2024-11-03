@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balancer
+  labels:
+    foo: bar
+spec:
+  replicas: {{ .Values.balancer.replicas }}
+  selector:
+    matchLabels:
+      {{- include "multi-juicer.balancer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/balancer/config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/balancer/secret.yaml") . | sha256sum }}
+        {{- with .Values.balancer.pod.annotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "multi-juicer.balancer.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: balancer
+      {{- with .Values.balancer.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
+          imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
+          {{- with .Values.balancer.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: adminPassword
+                name: balancer-secret
+          - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
+            valueFrom:
+              secretKeyRef:
+                key: cookieParserSecret
+                name: balancer-secret
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: metrics
+              containerPort: 8081
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config/config.json
+              subPath: config.json
+              readOnly: true
+          resources:
+            {{- toYaml .Values.balancer.resources | nindent 12 }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: balancer-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.balancer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: balancer
+  labels:
+    {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
+spec:
+{{- if (or (eq .Values.balancer.service.type "ClusterIP") (empty .Values.balancer.service.type)) }}
+  type: ClusterIP
+  {{- if .Values.balancer.service.clusterIP }}
+  clusterIP: {{ .Values.balancer.service.clusterIP }}
+  {{end}}
+{{- else if eq .Values.balancer.service.type "LoadBalancer" }}
+  type: {{ .Values.balancer.service.type }}
+  {{- if .Values.balancer.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.balancer.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.balancer.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{ toYaml .Values.balancer.service.loadBalancerSourceRanges | indent 4 }}
+  {{- end -}}
+{{- else }}
+  type: {{ .Values.balancer.service.type }}
+{{- end }}
+{{- if .Values.balancer.service.externalIPs }}
+  externalIPs:
+{{ toYaml .Values.balancer.service.externalIPs | indent 4 }}
+{{- end }}
+  selector:
+    {{ include "multi-juicer.balancer.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.service.port }}
+      name: web

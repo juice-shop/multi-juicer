@@ -36,119 +36,17 @@ type Challenge struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-// can be generated / update using: curl https://demo.owasp-juice.shop/api/challenges | jq '.data | map({ key: .key, value: .id }) | from_entries'
-var challengeIdLookup = map[string]int{
-	"restfulXssChallenge":                       1,
-	"accessLogDisclosureChallenge":              2,
-	"registerAdminChallenge":                    3,
-	"adminSectionChallenge":                     4,
-	"fileWriteChallenge":                        5,
-	"resetPasswordBjoernOwaspChallenge":         6,
-	"tokenSaleChallenge":                        7,
-	"nftUnlockChallenge":                        8,
-	"nftMintChallenge":                          9,
-	"web3WalletChallenge":                       10,
-	"web3SandboxChallenge":                      11,
-	"rceChallenge":                              12,
-	"captchaBypassChallenge":                    13,
-	"changePasswordBenderChallenge":             14,
-	"christmasSpecialChallenge":                 15,
-	"usernameXssChallenge":                      16,
-	"persistedXssUserChallenge":                 17,
-	"directoryListingChallenge":                 18,
-	"localXssChallenge":                         19,
-	"dbSchemaChallenge":                         20,
-	"deprecatedInterfaceChallenge":              21,
-	"easterEggLevelOneChallenge":                22,
-	"emailLeakChallenge":                        23,
-	"emptyUserRegistration":                     24,
-	"ephemeralAccountantChallenge":              25,
-	"errorHandlingChallenge":                    26,
-	"manipulateClockChallenge":                  27,
-	"extraLanguageChallenge":                    28,
-	"feedbackChallenge":                         29,
-	"forgedCouponChallenge":                     30,
-	"forgedFeedbackChallenge":                   31,
-	"forgedReviewChallenge":                     32,
-	"jwtForgedChallenge":                        33,
-	"forgottenDevBackupChallenge":               34,
-	"forgottenBackupChallenge":                  35,
-	"typosquattingAngularChallenge":             36,
-	"ghostLoginChallenge":                       37,
-	"dataExportChallenge":                       38,
-	"httpHeaderXssChallenge":                    39,
-	"continueCodeChallenge":                     40,
-	"dlpPasswordSprayingChallenge":              41,
-	"dlpPastebinDataLeakChallenge":              42,
-	"typosquattingNpmChallenge":                 43,
-	"loginAdminChallenge":                       44,
-	"loginAmyChallenge":                         45,
-	"loginBenderChallenge":                      46,
-	"oauthUserPasswordChallenge":                47,
-	"loginJimChallenge":                         48,
-	"loginRapperChallenge":                      49,
-	"loginSupportChallenge":                     50,
-	"basketManipulateChallenge":                 51,
-	"misplacedSignatureFileChallenge":           52,
-	"timingAttackChallenge":                     53,
-	"easterEggLevelTwoChallenge":                54,
-	"noSqlCommandChallenge":                     55,
-	"noSqlOrdersChallenge":                      56,
-	"noSqlReviewsChallenge":                     57,
-	"redirectCryptoCurrencyChallenge":           58,
-	"weakPasswordChallenge":                     59,
-	"negativeOrderChallenge":                    60,
-	"premiumPaywallChallenge":                   61,
-	"privacyPolicyChallenge":                    62,
-	"privacyPolicyProofChallenge":               63,
-	"changeProductChallenge":                    64,
-	"reflectedXssChallenge":                     65,
-	"passwordRepeatChallenge":                   66,
-	"resetPasswordBenderChallenge":              67,
-	"resetPasswordBjoernChallenge":              68,
-	"resetPasswordJimChallenge":                 69,
-	"resetPasswordMortyChallenge":               70,
-	"retrieveBlueprintChallenge":                71,
-	"ssrfChallenge":                             72,
-	"sstiChallenge":                             73,
-	"scoreBoardChallenge":                       74,
-	"securityPolicyChallenge":                   75,
-	"persistedXssFeedbackChallenge":             76,
-	"hiddenImageChallenge":                      77,
-	"rceOccupyChallenge":                        78,
-	"supplyChainAttackChallenge":                79,
-	"twoFactorAuthUnsafeSecretStorageChallenge": 80,
-	"jwtUnsignedChallenge":                      81,
-	"uploadSizeChallenge":                       82,
-	"uploadTypeChallenge":                       83,
-	"unionSqlInjectionChallenge":                84,
-	"videoXssChallenge":                         85,
-	"basketAccessChallenge":                     86,
-	"knownVulnerableComponentChallenge":         87,
-	"weirdCryptoChallenge":                      88,
-	"redirectChallenge":                         89,
-	"xxeFileDisclosureChallenge":                90,
-	"xxeDosChallenge":                           91,
-	"zeroStarsChallenge":                        92,
-	"missingEncodingChallenge":                  93,
-	"svgInjectionChallenge":                     94,
-	"exposedMetricsChallenge":                   95,
-	"freeDeluxeChallenge":                       96,
-	"csrfChallenge":                             97,
-	"xssBonusChallenge":                         98,
-	"resetPasswordUvoginChallenge":              99,
-	"geoStalkingMetaChallenge":                  100,
-	"geoStalkingVisualChallenge":                101,
-	"killChatbotChallenge":                      102,
-	"nullByteChallenge":                         103,
-	"bullyChatbotChallenge":                     104,
-	"lfrChallenge":                              105,
-	"closeNotificationsChallenge":               106,
-	"csafChallenge":                             107,
+var challengeIdLookup = map[string]int{}
+
+// JuiceShopChallenge represents a challenge in the Juice Shop config file. reduced to just the key, everything else is not needed
+type JuiceShopChallenge struct {
+	Key string `json:"key"`
 }
 
 func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
 	logger.Printf("Starting background-sync looking for JuiceShop challenge progress changes with %d workers", workerCount)
+
+	createChallengeIdLookup()
 
 	progressUpdateJobs := make(chan ProgressUpdateJobs)
 
@@ -158,6 +56,23 @@ func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
 	}
 
 	go createProgressUpdateJobs(progressUpdateJobs, clientset)
+}
+
+func createChallengeIdLookup() {
+	challengesBytes, err := os.ReadFile("/challenges.json")
+	if err != nil {
+		panic(fmt.Errorf("failed to read challenges.json. This is fatal as the progress watchdog needs it to map between challenge keys and challenge ids: %w", err))
+	}
+
+	var challenges []JuiceShopChallenge
+	err = json.Unmarshal(challengesBytes, &challenges)
+	if err != nil {
+		panic(fmt.Errorf("failed to decode challenges.json. This is fatal as the progress watchdog needs it to map between challenge keys and challenge ids: %w", err))
+	}
+
+	for i, challenge := range challenges {
+		challengeIdLookup[challenge.Key] = i + 1
+	}
 }
 
 // Constantly lists all JuiceShops in managed by MultiJuicer and queues progressUpdatesJobs for them
@@ -224,7 +139,7 @@ func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clients
 }
 
 func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/api/challenges", team)
+	url := fmt.Sprintf("http://juiceshop-%s:3000/api/challenges", team)
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
@@ -273,7 +188,7 @@ func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
 		return
 	}
 
-	url := fmt.Sprintf("http://t-%s-juiceshop:3000/rest/continue-code/apply/%s", team, continueCode)
+	url := fmt.Sprintf("http://juiceshop-%s:3000/rest/continue-code/apply/%s", team, continueCode)
 
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
