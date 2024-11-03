@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const H1 = styled.h1`
   font-size: 36px;
@@ -13,8 +13,14 @@ export const H2 = styled.h2`
   margin-bottom: 24px;
 `;
 
-export const H3 = styled.h2`
+export const H3 = styled.h3`
   font-size: 32px;
+  font-weight: 500;
+  margin: 0;
+`;
+
+export const H4 = styled.h4`
+  font-size: 24px;
   font-weight: 500;
   margin: 0;
 `;
@@ -66,10 +72,9 @@ export const Button = styled.button`
     background-color: #cf3a234d;
     cursor: wait;
   }
-  `;
-  
-  export const SecondaryButton = styled(Button)`
-  margin: 0 0 0 5px;
+`;
+
+export const SecondaryButton = styled(Button)`
   width: auto;
   background-color: #d8d8d8;
   color: #232323;
@@ -82,7 +87,7 @@ export const Button = styled.button`
 export const Card = styled.div`
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.4) 1px 1px 4px 0px;
-  background-color: #fff;
+  background-color: var(--background-highlight);
 `;
 
 export const BodyCard = styled(Card)`
