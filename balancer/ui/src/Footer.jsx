@@ -1,35 +1,8 @@
 import React from 'react';
 import Popup from 'reactjs-popup';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
 import translations from './translations';
-
-const LanguageSwitchButton = styled.button`
-  border: none;
-  background-color: var(--background-highlight);
-  color: var(--font-color)
-  font-size: 12px;
-  cursor: pointer;
-  align-items: baseline;
-  padding: 4px 8px;
-  border-radius: 2px;
-`;
-
-const LanguageSelectionButton = styled(LanguageSwitchButton)`
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: ${(props) => (props.$showAsActive ? '600' : 'initial')};
-`;
-
-const LangPopupWrapper = styled.div`
-  padding: 8px;
-  display: flex;
-  align-content: center;
-  flex-direction: column;
-  max-height: 400px;
-  overflow-y: scroll;
-`;
 
 export const Footer = ({ switchLanguage, selectedLocale }) => {
   const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -47,23 +20,23 @@ export const Footer = ({ switchLanguage, selectedLocale }) => {
         color: prefersDarkScheme ? '#2d3848' : '#fff',
       }}
       trigger={
-        <LanguageSwitchButton>
+        <button className="border-none bg-background-highlight text-font-color text-sm cursor-pointer flex items-baseline p-1 rounded">
           <span role="img" aria-label="globe">
             🌍
           </span>{' '}
           <span>
             <FormattedMessage id="change_language" defaultMessage="Change Language" />
           </span>
-        </LanguageSwitchButton>
+        </button>
       }
       position="top center"
     >
-      <LangPopupWrapper>
+      <div className="p-2 flex flex-col items-center max-h-96 overflow-y-scroll">
         {translations.map((translation) => {
           return (
-            <LanguageSelectionButton
+            <button
               key={`translation-${translation.key}`}
-              $showAsActive={selectedLocale === translation.key}
+              className={`border-none bg-background-highlight text-font-color text-base mb-2 p-1 rounded ${selectedLocale === translation.key ? 'font-semibold' : ''}`}
               onClick={() =>
                 switchLanguage({
                   key: translation.key,
@@ -75,10 +48,10 @@ export const Footer = ({ switchLanguage, selectedLocale }) => {
                 {translation.flag}
               </span>{' '}
               <span>{translation.name}</span>
-            </LanguageSelectionButton>
+            </button>
           );
         })}
-      </LangPopupWrapper>
+      </div>
     </Popup>
   );
 };

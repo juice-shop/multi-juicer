@@ -1,119 +1,86 @@
-import styled from "styled-components";
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
-export const H1 = styled.h1`
-  font-size: 36px;
-  font-weight: 600;
-  margin: 0;
-`;
+export const H1 = ({ children }) => (
+  <h1 className="text-3xl font-semibold m-0">{children}</h1>
+);
 
-export const H2 = styled.h2`
-  font-size: 36px;
-  font-weight: 500;
-  margin: 0;
-  margin-bottom: 24px;
-`;
+export const H2 = ({ children }) => (
+  <h2 className="text-3xl font-medium m-0 mb-6">{children}</h2>
+);
 
-export const H3 = styled.h3`
-  font-size: 32px;
-  font-weight: 500;
-  margin: 0;
-`;
+export const H3 = ({ children }) => (
+  <h3 className="text-2xl font-medium m-0">{children}</h3>
+);
 
-export const H4 = styled.h4`
-  font-size: 24px;
-  font-weight: 500;
-  margin: 0;
-`;
+export const H4 = ({ children }) => (
+  <h4 className="text-xl font-medium m-0">{children}</h4>
+);
 
-export const Input = styled.input`
-  background-color: #d8d8d8;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 4px;
-  font-size: 14px;
-  display: block;
-  width: 100%;
+export const Input = ({ ...props }) => (
+  <input
+    className="bg-gray-300 border-none rounded p-3 text-sm block w-full invalid:outline-red-500"
+    {...props}
+  />
+);
 
-  &:invalid {
-    outline-color: red;
-    outline-width: 2px;
-    outline-style: solid;
-  }
-`;
-export const Label = styled.label`
-  font-weight: 300;
-  display: block;
-  margin-bottom: 4px;
-`;
-export const Form = styled.form`
-  margin-top: 32px;
-`;
+export const Label = ({ children, ...props }) => (
+  <label className="font-light block mb-1" {...props}>
+    {children}
+  </label>
+);
 
-export const Button = styled.button`
-  background-color: #cf3a23;
-  padding: 12px 32px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-  display: block;
-  width: 100%;
-  border-radius: 4px;
-  border: none;
-  margin-top: 12px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
+export const Form = ({ children, ...props }) => (
+  <form className="mt-8" {...props}>
+    {children}
+  </form>
+);
 
-  @media (max-width: 640px) {
-    padding: 8px 12px;
-  }
+export const Button = ({ children, ...props }) => (
+  <button
+    className="bg-red-600 p-3 text-sm font-semibold text-white block w-full rounded border-none mt-3 cursor-pointer text-center no-underline disabled:bg-red-600/30 disabled:cursor-wait"
+    {...props}
+  >
+    {children}
+  </button>
+);
 
-  &:disabled {
-    background-color: #cf3a234d;
-    cursor: wait;
-  }
-`;
+export const SecondaryButton = ({ children, ...props }) => (
+  <Button
+    className="bg-gray-300 text-gray-900 disabled:bg-gray-300/50"
+    {...props}
+  >
+    {children}
+  </Button>
+);
 
-export const SecondaryButton = styled(Button)`
-  width: auto;
-  background-color: #d8d8d8;
-  color: #232323;
+export const Card = ({ children, className, ...props }) => (
+  <div
+    className={classNames(
+      "rounded shadow-md bg-white dark:bg-gray-800",
+      classNames
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-  &:disabled {
-    background-color: #d8d8d87d;
-  }
-`;
+export const BodyCard = ({ children, className, ...props }) => (
+  <div
+    className={classNames(
+      "rounded shadow-md bg-white dark:bg-gray-800 p-12 w-2/5 min-w-[400px] max-w-[650px] mb-8 md:min-w-[328px] lg:w-9/20 lg:my-2 lg:p-12 dark:bg-gray-800",
+      classNames
+    )}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-export const Card = styled.div`
-  border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.4) 1px 1px 4px 0px;
-  background-color: var(--background-highlight);
-`;
-
-export const BodyCard = styled(Card)`
-  padding: 48px 32px;
-  width: 40vw;
-  min-width: 400px;
-  max-width: 650px;
-  margin-bottom: 32px;
-
-  @media (max-width: 1280px) {
-    min-width: 328px;
-  }
-
-  @media (min-width: 1280px) {
-    width: 45vw;
-    margin: 8px 0;
-    padding: 48px 32px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #2d3848;
-  }
-`;
-
-export const CenteredCard = styled(BodyCard)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+export const CenteredCard = ({ children, ...props }) => (
+  <BodyCard className="flex justify-center items-center" {...props}>
+    {children}
+  </BodyCard>
+);

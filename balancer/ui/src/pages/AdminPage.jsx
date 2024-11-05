@@ -1,26 +1,8 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
 import { FormattedMessage } from "react-intl";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
 import { Card, H4, SecondaryButton } from "../Components";
-
-const SmallSecondary = styled(SecondaryButton)`
-  padding: 8px;
-  min-width: 70px;
-  margin: 0;
-`;
-
-const WarnSmallSecondary = styled(SmallSecondary)`
-  padding: 8px;
-  min-width: 70px;
-  background-color: #ef4444;
-  color: var(--font-color);
-`;
-
-const Text = styled.span`
-  color: var(--font-color);
-`;
 
 function RestartInstanceButton({ team }) {
   const [restarting, setRestarting] = useState(false);
@@ -37,7 +19,7 @@ function RestartInstanceButton({ team }) {
     }
   };
   return (
-    <SmallSecondary onClick={restart}>
+    <SecondaryButton onClick={restart} className="p-2 min-w-[70px] m-0">
       {restarting ? (
         <FormattedMessage
           id="admin_table.restarting"
@@ -46,7 +28,7 @@ function RestartInstanceButton({ team }) {
       ) : (
         <FormattedMessage id="admin_table.restart" defaultMessage="Restart" />
       )}
-    </SmallSecondary>
+    </SecondaryButton>
   );
 }
 
@@ -70,7 +52,7 @@ function DeleteInstanceButton({ team }) {
     }
   };
   return (
-    <WarnSmallSecondary onClick={remove}>
+    <SecondaryButton onClick={remove} className="p-2 min-w-[70px] m-0 bg-red-500 text-white">
       {deleting ? (
         <FormattedMessage
           id="admin_table.deleting"
@@ -79,49 +61,18 @@ function DeleteInstanceButton({ team }) {
       ) : (
         <FormattedMessage id="admin_table.delete" defaultMessage="Delete" />
       )}
-    </WarnSmallSecondary>
+    </SecondaryButton>
   );
 }
-
-const AdminPageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: flex-start;
-  width: 70vw;
-`;
-
-const AdminCardRow = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: baseline;
-  gap: 2rem;
-`;
-
-const ValueDisplayWrapper = styled.div`
-  display: inline-flex;
-  gap: 0.5rem;
-
-  strong {
-    font-weight: bold;
-  }
-`;
 
 function ValueDisplay({ label, value }) {
   return (
-    <ValueDisplayWrapper>
+    <div className="inline-flex gap-2">
       <span>{label}</span>
       <strong>{value}</strong>
-    </ValueDisplayWrapper>
+    </div>
   );
 }
-
-const TeamCard = styled(Card)`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-`;
 
 export default function AdminPage() {
   const [teams, setTeams] = useState([]);
@@ -150,7 +101,7 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <AdminPageWrapper>
+    <div className="flex flex-col gap-2 justify-start w-[70vw]">
       <h1>
         <FormattedMessage
           id="admin_table.table_header"
@@ -159,12 +110,12 @@ export default function AdminPage() {
       </h1>
 
       {teams.length === 0 && (
-        <Text>
+        <span className="text-gray-700">
           <FormattedMessage
             id="admin_table.no_teams"
             defaultMessage="No active teams"
           />
-        </Text>
+        </span>
       )}
 
       {teams.map((team) => {
@@ -172,8 +123,8 @@ export default function AdminPage() {
         const lastConnect = new Date(team.lastConnect);
 
         return (
-          <TeamCard key={team.team}>
-            <AdminCardRow>
+          <Card key={team.team} className="flex flex-col gap-4 p-4">
+            <div className="flex justify-start items-baseline gap-8">
               <H4>{team.team}</H4>
               <ValueDisplay
                 label={
@@ -202,14 +153,14 @@ export default function AdminPage() {
                 }
                 value={<ReadableTimestamp date={lastConnect} />}
               />
-            </AdminCardRow>
-            <AdminCardRow>
+            </div>
+            <div className="flex justify-start items-baseline gap-8">
               <DeleteInstanceButton team={team.team} />
               <RestartInstanceButton team={team.team} />
-            </AdminCardRow>
-          </TeamCard>
+            </div>
+          </Card>
         );
       })}
-    </AdminPageWrapper>
+    </div>
   );
 }

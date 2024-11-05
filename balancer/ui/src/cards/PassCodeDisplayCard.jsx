@@ -1,42 +1,30 @@
 import React from 'react';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
 import { BodyCard, H2, Label } from '../Components';
 
-const CharDisplay = styled.span`
-  font-family: monospace;
-  padding: 12px 8px;
-  @media (prefers-color-scheme: dark) {
-    background-color: var(--background);
-  }
+const CharDisplay = ({ children, addOffset }) => (
+  <span
+    className={`font-mono p-3 rounded ${addOffset ? 'ml-2' : 'ml-0'} inline-block`}
+    style={{ backgroundColor: 'var(--background)' }}
+  >
+    {children}
+  </span>
+);
 
-  border-radius: 4px;
-  margin-right: 8px;
-  margin-left: ${(props) => (props.$addOffset ? '8px' : '0')};
-  display: inline-block;
-`;
+const PasscodeDisplayWrapper = ({ children }) => <div>{children}</div>;
 
-const PasscodeDisplayWrapper = styled.div``;
+const FakePasscodeDisplay = ({ children }) => (
+  <span className="hover:hidden">{children}</span>
+);
 
-const FakePasscodeDisplay = styled.span`
-  ${PasscodeDisplayWrapper}:hover & {
-    display: none;
-  }
-`;
+const PasscodeDisplay = ({ children }) => (
+  <span className="hidden hover:block">{children}</span>
+);
 
-const PasscodeDisplay = styled.span`
-  display: none;
-  ${PasscodeDisplayWrapper}:hover & {
-    display: block;
-  }
-`;
-
-const CenteredContent = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-`;
+const CenteredContent = ({ children }) => (
+  <div className="flex justify-center mt-4">{children}</div>
+);
 
 const PasscodeTitle = ({ reset }) => {
   if (reset) {
@@ -73,14 +61,14 @@ export const PasscodeDisplayCard = ({ passcode = '', reset = false }) => {
           <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
             <FakePasscodeDisplay>
               {'●●●●●●●●'.split('').map((char, index) => (
-                <CharDisplay $addOffset={index === 4} key={index} aria-hidden="true">
+                <CharDisplay addOffset={index === 4} key={index} aria-hidden="true">
                   {char}
                 </CharDisplay>
               ))}
             </FakePasscodeDisplay>
             <PasscodeDisplay data-test-id="passcode-display">
               {passcode.split('').map((char, index) => (
-                <CharDisplay $addOffset={index === 4} key={index}>
+                <CharDisplay addOffset={index === 4} key={index}>
                   {char}
                 </CharDisplay>
               ))}

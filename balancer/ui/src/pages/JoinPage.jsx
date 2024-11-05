@@ -5,7 +5,6 @@ import { BodyCard, H2, Label, Input, Form, Button } from '../Components';
 import { InstanceRestartingCard } from '../cards/InstanceRestartingCard';
 import { InstanceNotFoundCard } from '../cards/InstanceNotFoundCard';
 import { TeamDisplayCard } from '../cards/TeamDisplayCard';
-import styled from 'styled-components';
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
@@ -15,22 +14,11 @@ const messages = defineMessages({
   },
 });
 
-const ErrorBox = styled.div`
-  border: 1px solid red;
-  border-radius: 4px;
-  margin: 1rem 0;
-  padding: 0.5rem;
-  background-color: rgba(255, 0, 0, 0.1);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-
-  p {
-    margin: 0;
-  }
-`;
+const ErrorBox = ({ children }) => (
+  <div className="border border-red-500 rounded p-4 bg-red-100 flex flex-col items-center gap-2">
+    {children}
+  </div>
+);
 
 export const JoinPage = injectIntl(({ intl }) => {
   const [teamname, setTeamname] = useState('');

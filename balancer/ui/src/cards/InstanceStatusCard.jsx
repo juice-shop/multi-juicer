@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import promiseRetry from 'promise-retry';
 
 import { BodyCard, CenteredCard, Button } from '../Components';
 import { Spinner } from '../Spinner';
-
-const CenteredText = styled.span`
-  text-align: center;
-  display: block;
-`;
 
 // Instance is starting up
 const waiting = Symbol('WAITING');
@@ -60,9 +54,9 @@ export const InstanceStatusCard = ({ teamname }) => {
   switch (instanceStatus) {
     case waiting:
       return (
-        <CenteredCard>
+        <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
           <Spinner />
-          <span data-test-id="instance-status">
+          <span data-test-id="instance-status" className="text-gray-700">
             <FormattedMessage
               id="instance_status_starting"
               defaultMessage="Starting a new Juice Shop Instance"
@@ -72,8 +66,8 @@ export const InstanceStatusCard = ({ teamname }) => {
       );
     case ready:
       return (
-        <BodyCard>
-          <CenteredText>
+        <BodyCard className="p-12 bg-white shadow-md rounded-md">
+          <span className="block text-center">
             <span role="img" aria-label="Done">
               ✅
             </span>{' '}
@@ -83,17 +77,17 @@ export const InstanceStatusCard = ({ teamname }) => {
                 defaultMessage="Juice Shop Instance Ready"
               />
             </span>
-          </CenteredText>
-          <Button as="a" data-test-id="start-hacking-button" href="/">
+          </span>
+          <Button as="a" data-test-id="start-hacking-button" href="/" className="mt-4 bg-red-500 text-white py-2 px-4 rounded">
             <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
           </Button>
         </BodyCard>
       );
     case waitingForLong:
       return (
-        <CenteredCard>
+        <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
           <Spinner />
-          <span data-test-id="instance-status">
+          <span data-test-id="instance-status" className="text-gray-700">
             <FormattedMessage
               id="instance_status_starting_taking_longer_than_usual"
               defaultMessage="Instance starting up is taking longer than usual..."
@@ -103,8 +97,8 @@ export const InstanceStatusCard = ({ teamname }) => {
       );
     default:
       return (
-        <CenteredCard>
-          <span data-test-id="instance-status">
+        <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
+          <span data-test-id="instance-status" className="text-gray-700">
             <span role="img" aria-label="Error">
               ❌
             </span>{' '}

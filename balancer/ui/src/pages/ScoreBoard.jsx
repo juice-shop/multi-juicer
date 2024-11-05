@@ -1,49 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { injectIntl } from 'react-intl';
 
-import styled from 'styled-components';
-
 import { BodyCard } from '../Components';
-
-const Table = styled.table`
-  width: 100%;
-  text-indent: 0;
-  border-color: inherit;
-  border-collapse: collapse;
-`;
-const Thead = styled.thead`
-  width: 100%;
-  text-align: left;
-  background-color: rgb(249, 250, 251);
-  border: none;
-`;
-const Tbody = styled.thead`
-  width: 100%;
-
-  tr {
-    border-top: 1px solid rgb(229, 231, 235);
-  }
-`;
-const Th = styled.th`
-  background-color: rgb(249, 250, 251);
-  border: none;
-  padding: 12px 16px;
-  color: rgb(107, 114, 128);
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-`;
-const Td = styled.td`
-  padding: 8px 16px;
-`;
-const Tr = styled.tr`
-  background-color: rgb(249, 250, 251);
-`;
-
-const NoPaddingBodyCard = styled(BodyCard)`
-  padding: 0;
-  overflow: hidden;
-`;
 
 function FirstPlace(props) {
   return (
@@ -166,11 +124,6 @@ function PlaceDisplay({ place }) {
   }
 }
 
-const Undertitle = styled.p`
-  color: rgb(107, 114, 128);
-  margin: 4px 0 0;
-`;
-
 export const ScoreBoard = injectIntl(() => {
   const [teams, setTeams] = useState([]);
   useEffect(() => {
@@ -195,37 +148,37 @@ export const ScoreBoard = injectIntl(() => {
 
   return (
     <>
-      <NoPaddingBodyCard>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th scope="col" style={{ textAlign: 'center' }} width="48px">
+      <BodyCard className="p-0 overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="w-full bg-gray-50 border-none">
+            <tr className="w-full">
+              <th scope="col" className="text-center w-12 p-3 text-gray-500 text-xs font-medium uppercase">
                 #
-              </Th>
-              <Th scope="col">Name</Th>
-              <Th scope="col" style={{ textAlign: 'right' }}>
+              </th>
+              <th scope="col" className="p-3 text-gray-500 text-xs font-medium uppercase">Name</th>
+              <th scope="col" className="text-right p-3 text-gray-500 text-xs font-medium uppercase">
                 Score
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="w-full">
             {teams.map((team, index) => {
               return (
-                <tr href="https://wikipedia.com">
-                  <Td style={{ textAlign: 'center' }}>
+                <tr className="border-t border-gray-200 bg-gray-50">
+                  <td className="text-center p-2">
                     <PlaceDisplay place={index + 1}></PlaceDisplay>
-                  </Td>
-                  <Td>{team.name}</Td>
-                  <Td style={{ textAlign: 'right' }}>
+                  </td>
+                  <td className="p-2">{team.name}</td>
+                  <td className="text-right p-2">
                     {team.score} points
-                    <Undertitle>{team.challenges.length} solved challenges</Undertitle>
-                  </Td>
+                    <p className="text-gray-500 m-1">{team.challenges.length} solved challenges</p>
+                  </td>
                 </tr>
               );
             })}
-          </Tbody>
-        </Table>
-      </NoPaddingBodyCard>
+          </tbody>
+        </table>
+      </BodyCard>
     </>
   );
 });

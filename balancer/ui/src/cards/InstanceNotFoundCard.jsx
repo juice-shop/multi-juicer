@@ -1,25 +1,15 @@
 import React from 'react';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
 import { CenteredCard } from '../Components';
 
 import warning from './warning.svg';
 
-const WarningIcon = styled.img`
-  height: 48px;
-  width: auto;
-  margin-right: 12px;
-`;
-WarningIcon.defaultProps = {
-  src: warning,
-};
-
 export const InstanceNotFoundCard = () => {
   return (
-    <CenteredCard>
-      <WarningIcon />
-      <span data-test-id="instance-not-found">
+    <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
+      <img src={warning} alt="Warning" className="h-12 w-auto mr-3" />
+      <span data-test-id="instance-not-found" className="text-gray-700">
         <FormattedMessage
           id="instance_status_not_found"
           defaultMessage="Could not find the instance for the team. You can recreate it by logging back in."

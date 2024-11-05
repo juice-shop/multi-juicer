@@ -1,39 +1,24 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
-import { BodyCard, SecondaryButton, H3 } from '../Components';
 import astronaut from './astronaut.svg';
 
-const TeamDisplayCardWrapper = styled(BodyCard)`
-  display: flex;
-  padding: 16px 32px;
-  align-items: center;
+const TeamDisplayCardWrapper = ({ children }) => (
+  <div className="flex items-center p-4 bg-white shadow-md rounded-md">{children}</div>
+);
 
-  @media (max-width: 1280px) {
-    padding: 12px 16px;
-  }
-`;
+const AstronautIcon = () => (
+  <img src={astronaut} alt="Astronaut" className="h-12 w-auto mr-3" />
+);
 
-const AstronautIcon = styled.img`
-  height: 48px;
-  width: auto;
-  margin-right: 12px;
-`;
-AstronautIcon.defaultProps = {
-  src: astronaut,
-};
+const TeamDisplayTextWrapper = ({ children }) => (
+  <div className="flex-grow">{children}</div>
+);
 
-const TeamDisplayTextWrapper = styled.div`
-  flex-grow: 1;
-`;
-
-const Subtitle = styled.span`
-  font-size: 14px;
-  color: var(--font-color-highlight);
-  font-weight: 300;
-`;
+const Subtitle = ({ children }) => (
+  <span className="text-sm text-gray-500 font-light">{children}</span>
+);
 
 const LogoutButton = () => {
   const navigate = useNavigate();
@@ -50,9 +35,12 @@ const LogoutButton = () => {
   }
 
   return (
-    <SecondaryButton onClick={logout}>
+    <button
+      onClick={logout}
+      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+    >
       <FormattedMessage id="log_out" defaultMessage="Log Out" />
-    </SecondaryButton>
+    </button>
   );
 };
 
@@ -76,9 +64,13 @@ const PasscodeResetButton = ({ teamname }) => {
   }
 
   return (
-    <SecondaryButton onClick={resetPasscode} disabled={isResetting}>
+    <button
+      onClick={resetPasscode}
+      disabled={isResetting}
+      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+    >
       <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
-    </SecondaryButton>
+    </button>
   );
 };
 
@@ -90,7 +82,7 @@ export const TeamDisplayCard = ({ teamname }) => {
         <Subtitle>
           <FormattedMessage id="logged_in_as" defaultMessage="Logged in as" />
         </Subtitle>
-        <H3>{teamname}</H3>
+        <h3 className="text-lg font-medium">{teamname}</h3>
       </TeamDisplayTextWrapper>
       <LogoutButton />
       <PasscodeResetButton teamname={teamname} />
