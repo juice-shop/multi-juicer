@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
-import { Card, H4, SecondaryButton } from "../Components";
+import { Card, SecondaryButton } from "../Components";
 
 function RestartInstanceButton({ team }) {
   const [restarting, setRestarting] = useState(false);
@@ -52,7 +52,10 @@ function DeleteInstanceButton({ team }) {
     }
   };
   return (
-    <SecondaryButton onClick={remove} className="p-2 min-w-[70px] m-0 bg-red-500 text-white">
+    <SecondaryButton
+      onClick={remove}
+      className="p-2 min-w-[70px] m-0 bg-red-500 text-white"
+    >
       {deleting ? (
         <FormattedMessage
           id="admin_table.deleting"
@@ -125,7 +128,7 @@ export default function AdminPage() {
         return (
           <Card key={team.team} className="flex flex-col gap-4 p-4">
             <div className="flex justify-start items-baseline gap-8">
-              <H4>{team.team}</H4>
+              <h4>{team.team}</h4>
               <ValueDisplay
                 label={
                   <FormattedMessage

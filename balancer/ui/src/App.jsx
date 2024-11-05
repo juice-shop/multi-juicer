@@ -1,23 +1,23 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy, useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { IntlProvider } from 'react-intl';
+import { IntlProvider } from "react-intl";
 
-import { JoinPage } from './pages/JoinPage';
-import { JoiningPage } from './pages/JoiningPage';
-import { JoinedPage } from './pages/JoinedPage';
-import { ScoreBoard } from './pages/ScoreBoard';
+import { JoinPage } from "./pages/JoinPage";
+import { JoiningPage } from "./pages/JoiningPage";
+import { JoinedPage } from "./pages/JoinedPage";
+import { ScoreBoard } from "./pages/ScoreBoard";
 
-import { Layout } from './Layout';
-import { Spinner } from './Spinner';
-import { Footer } from './Footer';
+import { Layout } from "./Layout";
+import { Spinner } from "./Spinner";
+import { Footer } from "./Footer";
 
-const AdminPage = lazy(() => import('./pages/AdminPage'));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 const LoadingPage = () => <Spinner />;
 
 function App() {
-  const [locale, setLocale] = useState('en');
+  const [locale, setLocale] = useState("en");
   const [messages, setMessages] = useState({});
 
   const navigatorLocale = navigator.language;
@@ -43,7 +43,12 @@ function App() {
                 exact
                 element={
                   <Layout
-                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                    footer={
+                      <Footer
+                        selectedLocale={locale}
+                        switchLanguage={switchLanguage}
+                      />
+                    }
                   >
                     <JoinPage />
                   </Layout>
@@ -53,8 +58,12 @@ function App() {
                 path="/admin"
                 element={
                   <Layout
-                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
-                    siteHeader="Admin"
+                    footer={
+                      <Footer
+                        selectedLocale={locale}
+                        switchLanguage={switchLanguage}
+                      />
+                    }
                     wide={true}
                   >
                     <AdminPage />
@@ -65,7 +74,12 @@ function App() {
                 path="/teams/:team/joining/"
                 element={
                   <Layout
-                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                    footer={
+                      <Footer
+                        selectedLocale={locale}
+                        switchLanguage={switchLanguage}
+                      />
+                    }
                   >
                     <JoiningPage />
                   </Layout>
@@ -75,7 +89,12 @@ function App() {
                 path="/teams/:team/joined/"
                 element={
                   <Layout
-                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
+                    footer={
+                      <Footer
+                        selectedLocale={locale}
+                        switchLanguage={switchLanguage}
+                      />
+                    }
                   >
                     <JoinedPage />
                   </Layout>
@@ -85,8 +104,12 @@ function App() {
                 path="/score-board/"
                 element={
                   <Layout
-                    footer={<Footer selectedLocale={locale} switchLanguage={switchLanguage} />}
-                    siteHeader="ScoreBoard"
+                    footer={
+                      <Footer
+                        selectedLocale={locale}
+                        switchLanguage={switchLanguage}
+                      />
+                    }
                   >
                     <ScoreBoard />
                   </Layout>

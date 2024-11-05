@@ -1,12 +1,14 @@
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import React from "react";
+import { FormattedMessage } from "react-intl";
 
-import { BodyCard, H2, Label } from '../Components';
+import { BodyCard, Label } from "../Components";
 
 const CharDisplay = ({ children, addOffset }) => (
   <span
-    className={`font-mono p-3 rounded ${addOffset ? 'ml-2' : 'ml-0'} inline-block`}
-    style={{ backgroundColor: 'var(--background)' }}
+    className={`font-mono p-3 rounded ${
+      addOffset ? "ml-2" : "ml-0"
+    } inline-block`}
+    style={{ backgroundColor: "var(--background)" }}
   >
     {children}
   </span>
@@ -29,20 +31,20 @@ const CenteredContent = ({ children }) => (
 const PasscodeTitle = ({ reset }) => {
   if (reset) {
     return (
-      <H2>
+      <h2 className="text-2xl font-medium m-0">
         <FormattedMessage id="passcode_reset" defaultMessage="Passcode Reset" />
-      </H2>
+      </h2>
     );
   } else {
     return (
-      <H2>
+      <h2 className="text-2xl font-medium m-0">
         <FormattedMessage id="team_created" defaultMessage="Team Created" />
-      </H2>
+      </h2>
     );
   }
 };
 
-export const PasscodeDisplayCard = ({ passcode = '', reset = false }) => {
+export const PasscodeDisplayCard = ({ passcode = "", reset = false }) => {
   return (
     <BodyCard>
       <PasscodeTitle reset={reset} />
@@ -60,14 +62,18 @@ export const PasscodeDisplayCard = ({ passcode = '', reset = false }) => {
           </Label>
           <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
             <FakePasscodeDisplay>
-              {'●●●●●●●●'.split('').map((char, index) => (
-                <CharDisplay addOffset={index === 4} key={index} aria-hidden="true">
+              {"●●●●●●●●".split("").map((char, index) => (
+                <CharDisplay
+                  addOffset={index === 4}
+                  key={index}
+                  aria-hidden="true"
+                >
                   {char}
                 </CharDisplay>
               ))}
             </FakePasscodeDisplay>
             <PasscodeDisplay data-test-id="passcode-display">
-              {passcode.split('').map((char, index) => (
+              {passcode.split("").map((char, index) => (
                 <CharDisplay addOffset={index === 4} key={index}>
                   {char}
                 </CharDisplay>

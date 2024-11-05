@@ -1,36 +1,20 @@
-import React, { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { FormattedMessage } from "react-intl";
+import { useNavigate } from "react-router-dom";
 
-import astronaut from './astronaut.svg';
-
-const TeamDisplayCardWrapper = ({ children }) => (
-  <div className="flex items-center p-4 bg-white shadow-md rounded-md">{children}</div>
-);
-
-const AstronautIcon = () => (
-  <img src={astronaut} alt="Astronaut" className="h-12 w-auto mr-3" />
-);
-
-const TeamDisplayTextWrapper = ({ children }) => (
-  <div className="flex-grow">{children}</div>
-);
-
-const Subtitle = ({ children }) => (
-  <span className="text-sm text-gray-500 font-light">{children}</span>
-);
+import astronaut from "./astronaut.svg";
 
 const LogoutButton = () => {
   const navigate = useNavigate();
 
   async function logout() {
     try {
-      await fetch('/balancer/teams/logout', {
-        method: 'POST',
+      await fetch("/balancer/teams/logout", {
+        method: "POST",
       });
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Failed to log out', error);
+      console.error("Failed to log out", error);
     }
   }
 
@@ -51,15 +35,17 @@ const PasscodeResetButton = ({ teamname }) => {
   async function resetPasscode() {
     setIsResetting(true);
     try {
-      const response = await fetch('/balancer/teams/reset-passcode', {
-        method: 'POST',
+      const response = await fetch("/balancer/teams/reset-passcode", {
+        method: "POST",
       });
       const data = await response.json();
-      navigate(`/teams/${teamname}/joined/`, { state: { passcode: data.passcode, reset: true }});
+      navigate(`/teams/${teamname}/joined/`, {
+        state: { passcode: data.passcode, reset: true },
+      });
     } catch (error) {
-      console.error('Failed to reset passcode', error);
+      console.error("Failed to reset passcode", error);
     } finally {
-      setIsResetting(false)
+      setIsResetting(false);
     }
   }
 
@@ -76,16 +62,16 @@ const PasscodeResetButton = ({ teamname }) => {
 
 export const TeamDisplayCard = ({ teamname }) => {
   return (
-    <TeamDisplayCardWrapper>
-      <AstronautIcon />
-      <TeamDisplayTextWrapper>
-        <Subtitle>
+    <div className="flex items-center p-4 bg-white shadow-md rounded-md">
+      <img src={astronaut} alt="Astronaut" className="h-12 w-auto mr-3" />
+      <div className="flex-grow">
+        <span className="text-sm text-gray-500 font-light">
           <FormattedMessage id="logged_in_as" defaultMessage="Logged in as" />
-        </Subtitle>
+        </span>
         <h3 className="text-lg font-medium">{teamname}</h3>
-      </TeamDisplayTextWrapper>
+      </div>
       <LogoutButton />
       <PasscodeResetButton teamname={teamname} />
-    </TeamDisplayCardWrapper>
+    </div>
   );
 };
