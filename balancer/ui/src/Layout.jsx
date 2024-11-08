@@ -3,15 +3,11 @@ import React from "react";
 import multiJuicerLogo from "./multi-juicer.svg";
 import { Card } from "./Components";
 
-export function Layout({ children, footer, siteHeader = null, wide = false }) {
+export function Layout({ children, footer }) {
   return (
-    <div className="flex flex-col h-screen w-screen">
-      <div className="min-h-32 flex justify-center my-16 mb-0 md:min-h-24">
-        <Card
-          className={`flex justify-evenly items-center min-w-[360px] bg-background-highlight ${
-            wide ? "w-7/10" : "w-1/2"
-          } md:w-13/20 sm:w-3/4 sm:flex-wrap sm:p-5`}
-        >
+    <div className="grid grid-rows-[min-content_auto_min-content] h-screen w-screen gap-6 p-8">
+      <div className="min-h-32 md:min-h-24 2xl:mx-80 lg:mx-48 md:mx-32 sm:mx-16 xs:mx-4">
+        <Card className="flex items-center justify-center bg-background-highlight p-5">
           <img
             src={multiJuicerLogo}
             alt="MultiJuicer Logo"
@@ -19,12 +15,10 @@ export function Layout({ children, footer, siteHeader = null, wide = false }) {
           />
         </Card>
       </div>
-      <div className="flex-grow flex flex-col items-center justify-center">
-        <div className="flex-grow-50 flex flex-col items-center justify-center">
-          {children}
-        </div>
-        <div className="flex-grow-1">{footer}</div>
+      <div className="flex flex-col items-center justify-center">
+        {children}
       </div>
+      <footer className="flex justify-center">{footer}</footer>
     </div>
   );
 }
