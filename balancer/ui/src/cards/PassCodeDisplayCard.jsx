@@ -1,7 +1,7 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard } from "../Components";
+import { Card } from "../Components";
 
 const CharDisplay = ({ children, addOffset }) => (
   <span
@@ -46,7 +46,7 @@ const PasscodeTitle = ({ reset }) => {
 
 export const PasscodeDisplayCard = ({ passcode = "", reset = false }) => {
   return (
-    <BodyCard>
+    <Card>
       <PasscodeTitle reset={reset} />
       <p>
         <FormattedMessage
@@ -82,6 +82,6 @@ export const PasscodeDisplayCard = ({ passcode = "", reset = false }) => {
           </PasscodeDisplayWrapper>
         </div>
       </CenteredContent>
-    </BodyCard>
+    </Card>
   );
 };

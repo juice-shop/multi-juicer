@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { injectIntl } from "react-intl";
 
-import { BodyCard } from "../Components";
+import { Card } from "../Components";
 
 function FirstPlace(props) {
   return (
@@ -171,7 +171,7 @@ export const ScoreBoard = injectIntl(() => {
 
   return (
     <>
-      <BodyCard className="p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead className="w-full bg-gray-50 border-none">
             <tr className="w-full">
@@ -214,7 +214,7 @@ export const ScoreBoard = injectIntl(() => {
             })}
           </tbody>
         </table>
-      </BodyCard>
+      </Card>
     </>
   );
 });

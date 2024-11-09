@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 import promiseRetry from "promise-retry";
 
-import { BodyCard, CenteredCard } from "../Components";
+import { Card } from "../Components";
 import { Button } from "../components/Button";
 import { Spinner } from "../Spinner";
 
@@ -55,7 +55,7 @@ export const InstanceStatusCard = ({ teamname }) => {
   switch (instanceStatus) {
     case waiting:
       return (
-        <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
+        <Card className="flex items-center p-4 bg-white shadow-md rounded-md">
           <Spinner />
           <span data-test-id="instance-status" className="text-gray-700">
             <FormattedMessage
@@ -63,11 +63,11 @@ export const InstanceStatusCard = ({ teamname }) => {
               defaultMessage="Starting a new Juice Shop Instance"
             />
           </span>
-        </CenteredCard>
+        </Card>
       );
     case ready:
       return (
-        <BodyCard className="p-12 bg-white shadow-md rounded-md">
+        <Card className="p-12 bg-white shadow-md rounded-md">
           <span className="block text-center">
             <span role="img" aria-label="Done">
               ✅
@@ -90,11 +90,11 @@ export const InstanceStatusCard = ({ teamname }) => {
               defaultMessage="Start Hacking"
             />
           </Button>
-        </BodyCard>
+        </Card>
       );
     case waitingForLong:
       return (
-        <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
+        <Card className="flex items-center p-4 bg-white shadow-md rounded-md">
           <Spinner />
           <span data-test-id="instance-status" className="text-gray-700">
             <FormattedMessage
@@ -102,11 +102,11 @@ export const InstanceStatusCard = ({ teamname }) => {
               defaultMessage="Instance starting up is taking longer than usual..."
             />
           </span>
-        </CenteredCard>
+        </Card>
       );
     default:
       return (
-        <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
+        <Card className="flex items-center p-4 bg-white shadow-md rounded-md">
           <span data-test-id="instance-status" className="text-gray-700">
             <span role="img" aria-label="Error">
               ❌
@@ -116,7 +116,7 @@ export const InstanceStatusCard = ({ teamname }) => {
               defaultMessage="Instance starting timed out!"
             />
           </span>
-        </CenteredCard>
+        </Card>
       );
   }
 };

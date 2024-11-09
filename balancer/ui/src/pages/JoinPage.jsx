@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
-import { Card, Input } from "../Components";
+import { Card } from "../Components";
 import { InstanceRestartingCard } from "../cards/InstanceRestartingCard";
 import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
 import { TeamDisplayCard } from "../cards/TeamDisplayCard";
@@ -135,7 +135,8 @@ export const JoinPage = injectIntl(({ intl }) => {
           <label className="font-light block mb-1" htmlFor="teamname">
             <FormattedMessage id="teamname" defaultMessage="Teamname" />
           </label>
-          <Input
+          <input
+            className="bg-gray-300 border-none rounded p-3 text-sm block w-full text-gray-800 invalid:outline-red-500 invalid:bg-red-100 outline"
             type="text"
             id="teamname"
             data-test-id="teamname-input"

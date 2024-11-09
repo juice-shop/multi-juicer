@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useNavigate } from "react-router-dom";
 
+import { Card } from "../Components";
+
 import astronaut from "./astronaut.svg";
 
 const LogoutButton = () => {
@@ -62,7 +64,7 @@ const PasscodeResetButton = ({ teamname }) => {
 
 export const TeamDisplayCard = ({ teamname }) => {
   return (
-    <div className="flex items-center p-4 bg-white shadow-md rounded-md">
+    <Card className="flex items-center p-4 bg-white shadow-md rounded-md">
       <img src={astronaut} alt="Astronaut" className="h-12 w-auto mr-3" />
       <div className="flex-grow">
         <span className="text-sm text-gray-500 font-light">
@@ -72,6 +74,6 @@ export const TeamDisplayCard = ({ teamname }) => {
       </div>
       <LogoutButton />
       <PasscodeResetButton teamname={teamname} />
-    </div>
+    </Card>
   );
 };

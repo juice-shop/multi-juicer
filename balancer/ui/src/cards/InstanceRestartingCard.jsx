@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard, CenteredCard } from "../Components";
+import { Card } from "../Components";
 import { Spinner } from "../Spinner";
 import { Button } from "../components/Button";
 
@@ -29,7 +29,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
 
   if (ready) {
     return (
-      <BodyCard className="p-12 bg-white shadow-md rounded-md">
+      <Card className="p-12 bg-white shadow-md rounded-md">
         <span className="block text-center">
           <span role="img" aria-label="Done">
             ✅
@@ -52,11 +52,11 @@ export const InstanceRestartingCard = ({ teamname }) => {
             defaultMessage="Get back to Hacking"
           />
         </Button>
-      </BodyCard>
+      </Card>
     );
   } else {
     return (
-      <CenteredCard className="flex items-center p-4 bg-white shadow-md rounded-md">
+      <Card className="flex items-center p-4 bg-white shadow-md rounded-md">
         <Spinner />
         <span data-test-id="instance-status" className="text-gray-700">
           <FormattedMessage
@@ -64,7 +64,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
             defaultMessage="Juice Shop Instance is currently restarting. It should be ready in a couple of seconds."
           />
         </span>
-      </CenteredCard>
+      </Card>
     );
   }
 };

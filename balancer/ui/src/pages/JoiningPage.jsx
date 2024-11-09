@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard, Input } from "../Components";
+import { Card } from "../Components";
 import { Button } from "../components/Button";
 
 export const JoiningPage = () => {
@@ -45,7 +45,7 @@ export const JoiningPage = () => {
   }
 
   return (
-    <BodyCard>
+    <Card>
       <h2 className="text-2xl font-medium m-0">
         <FormattedMessage
           id="joining_team"
@@ -73,7 +73,8 @@ export const JoiningPage = () => {
         <label className="font-light block mb-1" htmlFor="passcode">
           <FormattedMessage id="team_passcode" defaultMessage="Team Passcode" />
         </label>
-        <Input
+        <input
+          className="bg-gray-300 border-none rounded p-3 text-sm block w-full text-gray-800 invalid:outline-red-500 invalid:bg-red-100 outline"
           type="password"
           id="passcode"
           name="passcode"
@@ -88,6 +89,6 @@ export const JoiningPage = () => {
           <FormattedMessage id="join_team" defaultMessage="Join Team" />
         </Button>
       </form>
-    </BodyCard>
+    </Card>
   );
 };
