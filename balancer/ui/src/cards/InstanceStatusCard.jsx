@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 import promiseRetry from "promise-retry";
 
-import { BodyCard, CenteredCard, Button } from "../Components";
+import { BodyCard, CenteredCard } from "../Components";
+import { Button } from "../components/Button";
 import { Spinner } from "../Spinner";
 
 // Instance is starting up

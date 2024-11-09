@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard, CenteredCard, Button } from "../Components";
+import { BodyCard, CenteredCard } from "../Components";
 import { Spinner } from "../Spinner";
+import { Button } from "../components/Button";
 
 export const InstanceRestartingCard = ({ teamname }) => {
   const [ready, setReady] = useState(false);

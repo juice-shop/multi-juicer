@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
-import { Card, SecondaryButton } from "../Components";
+import { Card } from "../Components";
+import { SecondaryButton } from "../components/Button";
 
 function RestartInstanceButton({ team }) {
   const [restarting, setRestarting] = useState(false);

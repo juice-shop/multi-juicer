@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard, Label, Input, Form, Button } from "../Components";
+import { BodyCard, Label, Input, Form } from "../Components";
+import { Button } from "../components/Button";
 
 export const JoiningPage = () => {
   const [passcode, setPasscode] = useState("");

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
-import { Card, Label, Input, Form, Button } from "../Components";
+import { Card, Label, Input, Form } from "../Components";
 import { InstanceRestartingCard } from "../cards/InstanceRestartingCard";
 import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
 import { TeamDisplayCard } from "../cards/TeamDisplayCard";
+import { Button } from "../components/Button";
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
