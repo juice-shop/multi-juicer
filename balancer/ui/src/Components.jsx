@@ -1,6 +1,5 @@
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import React from "react";
+import { classNames } from "./util/classNames";
 
 export const Input = ({ ...props }) => (
   <input

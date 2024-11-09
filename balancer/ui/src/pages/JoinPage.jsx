@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
-import { BodyCard, Label, Input, Form, Button } from "../Components";
+import { Card, Label, Input, Form, Button } from "../Components";
 import { InstanceRestartingCard } from "../cards/InstanceRestartingCard";
 import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
 import { TeamDisplayCard } from "../cards/TeamDisplayCard";
@@ -92,7 +92,7 @@ export const JoinPage = injectIntl(({ intl }) => {
   console.log("render", isSubmitting);
 
   return (
-    <>
+    <div className="max-w-3xl">
       {queryMessage === "instance-restarting" ? (
         <InstanceRestartingCard teamname={queryTeamname} />
       ) : null}
@@ -101,7 +101,7 @@ export const JoinPage = injectIntl(({ intl }) => {
         <TeamDisplayCard teamname={queryTeamname} />
       ) : null}
 
-      <BodyCard>
+      <Card className="p-8">
         <h2 className="text-2xl font-medium m-0">
           <FormattedMessage
             id="getting_started"
@@ -158,7 +158,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             />
           </Button>
         </Form>
-      </BodyCard>
-    </>
+      </Card>
+    </div>
   );
 });
