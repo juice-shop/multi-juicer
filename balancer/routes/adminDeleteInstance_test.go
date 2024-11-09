@@ -62,7 +62,7 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 	}
 
 	t.Run("deleting instances requires admin login", func(t *testing.T) {
-		req, _ := http.NewRequest("DELETE", "/balancer/admin/teams/foobar/delete", nil)
+		req, _ := http.NewRequest("DELETE", "/balancer/api/admin/teams/foobar/delete", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("some team")))
 		rr := httptest.NewRecorder()
 
@@ -79,7 +79,7 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 	})
 
 	t.Run("deletes both deployments and services of teams", func(t *testing.T) {
-		req, _ := http.NewRequest("DELETE", "/balancer/admin/teams/foobar/delete", nil)
+		req, _ := http.NewRequest("DELETE", "/balancer/api/admin/teams/foobar/delete", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 

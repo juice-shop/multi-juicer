@@ -38,7 +38,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		}
 	}
 	t.Run("lists teams and calculates the score", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -82,7 +82,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("should only include the top 24 teams", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -110,7 +110,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("calculates score for known challenges only and skip unknown challenges", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/score-board/top", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

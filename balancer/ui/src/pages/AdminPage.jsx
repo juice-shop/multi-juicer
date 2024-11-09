@@ -11,7 +11,7 @@ function RestartInstanceButton({ team }) {
     event.preventDefault();
     setRestarting(true);
     try {
-      await fetch(`/balancer/admin/teams/${team}/restart`, {
+      await fetch(`/balancer/api/admin/teams/${team}/restart`, {
         method: "POST",
       });
     } finally {
@@ -43,7 +43,7 @@ function DeleteInstanceButton({ team }) {
     try {
       await Promise.all([
         sleep(3000),
-        fetch(`/balancer/admin/teams/${team}/delete`, {
+        fetch(`/balancer/api/admin/teams/${team}/delete`, {
           method: "DELETE",
         }),
       ]);
@@ -82,7 +82,7 @@ export default function AdminPage() {
 
   async function updateAdminData() {
     try {
-      const response = await fetch(`/balancer/admin/all`);
+      const response = await fetch(`/balancer/api/admin/all`);
       if (!response.ok) {
         throw new Error("Failed to fetch current teams");
       }

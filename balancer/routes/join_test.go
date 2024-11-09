@@ -54,7 +54,7 @@ func TestJoinHandler(t *testing.T) {
 	}
 
 	t.Run("creates a deployment and service on join", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -128,7 +128,7 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("set secure flag on team cookie when configured", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -146,7 +146,7 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("refuses to create a team if max instances limit is reached", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -181,7 +181,7 @@ func TestJoinHandler(t *testing.T) {
 			"fooooooooooooooooooooooooooooo",
 		}
 		for _, team := range invalidTeamnames {
-			req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
 			rr := httptest.NewRecorder()
 			server.ServeHTTP(rr, req)
 			assert.Equal(t, http.StatusBadRequest, rr.Code, fmt.Sprintf("expected status code 400 for teamname '%s'", team))
@@ -189,7 +189,7 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("if team already exists then join requires a passcode", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -207,7 +207,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("is able to join team when the requests includes a correct passcode", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "02101791"})
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -225,7 +225,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("join is rejected when the passcode doesn't match", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "00000000"})
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/teams/%s/join", team), bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -243,7 +243,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("allows admins login with the correct passcode", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
-		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -258,7 +258,7 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("admin login returns usual 'requires auth' response when it get's no request body passed", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", nil)
+		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -274,7 +274,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("admin account requires the correct passcod", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "wrong-password"})
-		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -290,7 +290,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("admin login doesn't make any kubernetes api calls / creates not kubernetes resources", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
-		req, _ := http.NewRequest("POST", "/balancer/teams/admin/join", bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

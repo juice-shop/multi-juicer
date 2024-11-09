@@ -9,7 +9,7 @@ const LogoutButton = () => {
 
   async function logout() {
     try {
-      await fetch("/balancer/teams/logout", {
+      await fetch("/balancer/api/teams/logout", {
         method: "POST",
       });
       navigate("/");
@@ -35,7 +35,7 @@ const PasscodeResetButton = ({ teamname }) => {
   async function resetPasscode() {
     setIsResetting(true);
     try {
-      const response = await fetch("/balancer/teams/reset-passcode", {
+      const response = await fetch("/balancer/api/teams/reset-passcode", {
         method: "POST",
       });
       const data = await response.json();

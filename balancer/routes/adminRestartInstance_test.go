@@ -32,7 +32,7 @@ func TestAdminRestartInstanceHandler(t *testing.T) {
 	}
 
 	t.Run("restarting instances requires admin login", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/admin/teams/foobar/restart", nil)
+		req, _ := http.NewRequest("POST", "/balancer/api/admin/teams/foobar/restart", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("some team")))
 		rr := httptest.NewRecorder()
 
@@ -49,7 +49,7 @@ func TestAdminRestartInstanceHandler(t *testing.T) {
 	})
 
 	t.Run("restart instances deletes the pod for the instance", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/admin/teams/foobar/restart", nil)
+		req, _ := http.NewRequest("POST", "/balancer/api/admin/teams/foobar/restart", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 

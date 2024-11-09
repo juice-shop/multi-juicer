@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { injectIntl } from 'react-intl';
+import React, { useState, useEffect } from "react";
+import { injectIntl } from "react-intl";
 
-import { BodyCard } from '../Components';
+import { BodyCard } from "../Components";
 
 function FirstPlace(props) {
   return (
@@ -28,7 +28,13 @@ function FirstPlace(props) {
       <circle cx={36} cy={44.975} r={23} fill="#fcea2b" />
       <g fill="none" stroke="#000" strokeMiterlimit={10} strokeWidth={2}>
         <circle cx={36} cy={44.975} r={23} />
-        <circle cx={36} cy={44.975} r={23} strokeLinecap="round" strokeLinejoin="round" />
+        <circle
+          cx={36}
+          cy={44.975}
+          r={23}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -64,7 +70,13 @@ function SecondPlace(props) {
       <circle cx={36} cy={44.975} r={23} fill="#9b9b9a" />
       <g fill="none" stroke="#000" strokeMiterlimit={10} strokeWidth={2}>
         <circle cx={36} cy={44.975} r={23} />
-        <circle cx={36} cy={44.975} r={23} strokeLinecap="round" strokeLinejoin="round" />
+        <circle
+          cx={36}
+          cy={44.975}
+          r={23}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -100,7 +112,13 @@ function ThirdPlace(props) {
       />
       <g fill="none" stroke="#000" strokeMiterlimit={10} strokeWidth={2}>
         <circle cx={36} cy={45.021} r={23} />
-        <circle cx={36} cy={45.021} r={23} strokeLinecap="round" strokeLinejoin="round" />
+        <circle
+          cx={36}
+          cy={45.021}
+          r={23}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -120,22 +138,27 @@ function PlaceDisplay({ place }) {
     case 3:
       return <ThirdPlace height="32" />;
     default:
-      return <><small>#</small>{place}</>;
+      return (
+        <>
+          <small>#</small>
+          {place}
+        </>
+      );
   }
 }
 
 export const ScoreBoard = injectIntl(() => {
   const [teams, setTeams] = useState([]);
   useEffect(() => {
-    fetch('/balancer/score-board/top')
-        .then(response => response.json())
-        .then(({ teams }) => {
-          setTeams(teams);
-        });
+    fetch("/balancer/api/score-board/top")
+      .then((response) => response.json())
+      .then(({ teams }) => {
+        setTeams(teams);
+      });
 
     const timer = setInterval(() => {
-      fetch('/balancer/score-board/top')
-        .then(response => response.json())
+      fetch("/balancer/api/score-board/top")
+        .then((response) => response.json())
         .then(({ teams }) => {
           setTeams(teams);
         });
@@ -144,7 +167,7 @@ export const ScoreBoard = injectIntl(() => {
     return () => {
       clearInterval(timer);
     };
-  }, [])
+  }, []);
 
   return (
     <>
@@ -152,11 +175,22 @@ export const ScoreBoard = injectIntl(() => {
         <table className="w-full text-left border-collapse">
           <thead className="w-full bg-gray-50 border-none">
             <tr className="w-full">
-              <th scope="col" className="text-center w-12 p-3 text-gray-500 text-xs font-medium uppercase">
+              <th
+                scope="col"
+                className="text-center w-12 p-3 text-gray-500 text-xs font-medium uppercase"
+              >
                 #
               </th>
-              <th scope="col" className="p-3 text-gray-500 text-xs font-medium uppercase">Name</th>
-              <th scope="col" className="text-right p-3 text-gray-500 text-xs font-medium uppercase">
+              <th
+                scope="col"
+                className="p-3 text-gray-500 text-xs font-medium uppercase"
+              >
+                Name
+              </th>
+              <th
+                scope="col"
+                className="text-right p-3 text-gray-500 text-xs font-medium uppercase"
+              >
                 Score
               </th>
             </tr>
@@ -171,7 +205,9 @@ export const ScoreBoard = injectIntl(() => {
                   <td className="p-2">{team.name}</td>
                   <td className="text-right p-2">
                     {team.score} points
-                    <p className="text-gray-500 m-1">{team.challenges.length} solved challenges</p>
+                    <p className="text-gray-500 m-1">
+                      {team.challenges.length} solved challenges
+                    </p>
                   </td>
                 </tr>
               );

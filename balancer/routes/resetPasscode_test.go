@@ -20,7 +20,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 	team := "foobar"
 
 	t.Run("reset passcode updates the saved passcode of the deployment", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/teams/reset-passcode", nil)
+		req, _ := http.NewRequest("POST", "/balancer/api/teams/reset-passcode", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 
@@ -70,7 +70,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 		assert.Nil(t, bcrypt.CompareHashAndPassword([]byte(updatedHash), []byte(response.Passcode)), "Returned passcode should match the updated hash")
 	})
 	t.Run("reset passcode requries a signed team cookie", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/teams/reset-passcode", nil)
+		req, _ := http.NewRequest("POST", "/balancer/api/teams/reset-passcode", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

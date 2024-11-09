@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { FormattedMessage } from 'react-intl';
+import React, { useState, useEffect } from "react";
+import { FormattedMessage } from "react-intl";
 
-import { BodyCard, CenteredCard, Button } from '../Components';
-import { Spinner } from '../Spinner';
+import { BodyCard, CenteredCard, Button } from "../Components";
+import { Spinner } from "../Spinner";
 
 export const InstanceRestartingCard = ({ teamname }) => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    fetch(`/balancer/teams/${teamname}/wait-till-ready`, {
-      method: 'GET',
+    fetch(`/balancer/api/teams/${teamname}/wait-till-ready`, {
+      method: "GET",
       timeout: 3 * 60 * 1000,
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         return response;
       })
@@ -22,7 +22,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
         setReady(true);
       })
       .catch(() => {
-        console.error('Failed to wait for deployment readiness');
+        console.error("Failed to wait for deployment readiness");
       });
   }, [teamname]);
 
@@ -32,7 +32,7 @@ export const InstanceRestartingCard = ({ teamname }) => {
         <span className="block text-center">
           <span role="img" aria-label="Done">
             ✅
-          </span>{' '}
+          </span>{" "}
           <span data-test-id="instance-status">
             <FormattedMessage
               id="instance_status_restarted"
@@ -40,7 +40,12 @@ export const InstanceRestartingCard = ({ teamname }) => {
             />
           </span>
         </span>
-        <Button as="a" data-test-id="start-hacking-button" href="/" className="mt-4 bg-red-500 text-white py-2 px-4 rounded">
+        <Button
+          as="a"
+          data-test-id="start-hacking-button"
+          href="/"
+          className="mt-4 bg-red-500 text-white py-2 px-4 rounded"
+        >
           <FormattedMessage
             id="instance_status_back_to_hacking"
             defaultMessage="Get back to Hacking"

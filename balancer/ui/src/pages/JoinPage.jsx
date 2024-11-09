@@ -43,7 +43,7 @@ export const JoinPage = injectIntl(({ intl }) => {
 
   async function sendJoinRequest() {
     try {
-      const response = await fetch(`/balancer/teams/${teamname}/join`, {
+      const response = await fetch(`/balancer/api/teams/${teamname}/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

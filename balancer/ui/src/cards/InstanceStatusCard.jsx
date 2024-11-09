@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { FormattedMessage } from 'react-intl';
-import promiseRetry from 'promise-retry';
+import React, { useState, useEffect } from "react";
+import { FormattedMessage } from "react-intl";
+import promiseRetry from "promise-retry";
 
-import { BodyCard, CenteredCard, Button } from '../Components';
-import { Spinner } from '../Spinner';
+import { BodyCard, CenteredCard, Button } from "../Components";
+import { Spinner } from "../Spinner";
 
 // Instance is starting up
-const waiting = Symbol('WAITING');
+const waiting = Symbol("WAITING");
 // Instance is ready
-const ready = Symbol('READY');
+const ready = Symbol("READY");
 // Still waiting, just longer than expected
-const waitingForLong = Symbol('WAITING_FOR_LONG');
+const waitingForLong = Symbol("WAITING_FOR_LONG");
 // Error, instance startup took way to long.
-const timedOut = Symbol('TIMED_OUT');
+const timedOut = Symbol("TIMED_OUT");
 
 export const InstanceStatusCard = ({ teamname }) => {
   const [instanceStatus, setInstanceStatus] = useState(waiting);
@@ -21,17 +21,17 @@ export const InstanceStatusCard = ({ teamname }) => {
     promiseRetry(
       (retry, number) => {
         if (number > 1) {
-          console.warn('Starting the Instance takes longer than expected.');
+          console.warn("Starting the Instance takes longer than expected.");
           setInstanceStatus(waitingForLong);
         }
 
-        return fetch(`/balancer/teams/${teamname}/wait-till-ready`, {
-          method: 'GET',
+        return fetch(`/balancer/api/teams/${teamname}/wait-till-ready`, {
+          method: "GET",
           timeout: 3 * 60 * 1000,
         })
-          .then(response => {
+          .then((response) => {
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+              throw new Error("Network response was not ok");
             }
             return response;
           })
@@ -46,7 +46,7 @@ export const InstanceStatusCard = ({ teamname }) => {
         setInstanceStatus(ready);
       })
       .catch(() => {
-        console.error('Failed to wait for deployment readiness');
+        console.error("Failed to wait for deployment readiness");
         setInstanceStatus(timedOut);
       });
   }, [teamname]);
@@ -70,7 +70,7 @@ export const InstanceStatusCard = ({ teamname }) => {
           <span className="block text-center">
             <span role="img" aria-label="Done">
               ✅
-            </span>{' '}
+            </span>{" "}
             <span data-test-id="instance-status">
               <FormattedMessage
                 id="instance_status_ready"
@@ -78,8 +78,16 @@ export const InstanceStatusCard = ({ teamname }) => {
               />
             </span>
           </span>
-          <Button as="a" data-test-id="start-hacking-button" href="/" className="mt-4 bg-red-500 text-white py-2 px-4 rounded">
-            <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
+          <Button
+            as="a"
+            data-test-id="start-hacking-button"
+            href="/"
+            className="mt-4 bg-red-500 text-white py-2 px-4 rounded"
+          >
+            <FormattedMessage
+              id="instance_status_start_hacking"
+              defaultMessage="Start Hacking"
+            />
           </Button>
         </BodyCard>
       );
@@ -101,7 +109,7 @@ export const InstanceStatusCard = ({ teamname }) => {
           <span data-test-id="instance-status" className="text-gray-700">
             <span role="img" aria-label="Error">
               ❌
-            </span>{' '}
+            </span>{" "}
             <FormattedMessage
               id="instance_status_timed_out"
               defaultMessage="Instance starting timed out!"

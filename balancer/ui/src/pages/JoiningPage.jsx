@@ -12,7 +12,7 @@ export const JoiningPage = () => {
 
   async function sendJoinRequest() {
     try {
-      const response = await fetch(`/balancer/teams/${team}/join`, {
+      const response = await fetch(`/balancer/api/teams/${team}/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

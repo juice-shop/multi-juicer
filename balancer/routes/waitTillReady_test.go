@@ -20,7 +20,7 @@ func TestWaitTillReadyHandler(t *testing.T) {
 	team := "foobar"
 
 	t.Run("returns immediately when deployment is ready", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/teams/%s/wait-till-ready", team), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/teams/%s/wait-till-ready", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 
@@ -50,7 +50,7 @@ func TestWaitTillReadyHandler(t *testing.T) {
 	})
 
 	t.Run("returns a 404 if the team doesn't have a deployment", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/teams/%s/wait-till-ready", team), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/teams/%s/wait-till-ready", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
@@ -65,7 +65,7 @@ func TestWaitTillReadyHandler(t *testing.T) {
 	})
 
 	t.Run("returns a 401 if the balancer cookie isn't signed", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/teams/%s/wait-till-ready", team), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/teams/%s/wait-till-ready", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", team))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
@@ -107,7 +107,7 @@ func TestWaitTillReadyHandler(t *testing.T) {
 			}, nil
 		})
 
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/teams/%s/wait-till-ready", team), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/teams/%s/wait-till-ready", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 
