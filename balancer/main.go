@@ -5,18 +5,20 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/routes"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
-	go StartMetricsServer()
-	StartBalancerServer()
-}
-
-func StartBalancerServer() {
 	bundle := bundle.New()
 
+	go StartMetricsServer()
+	go scoring.StartingScoringWorker(bundle)
+	StartBalancerServer(bundle)
+}
+
+func StartBalancerServer(bundle *bundle.Bundle) {
 	router := http.NewServeMux()
 	routes.AddRoutes(router, bundle)
 

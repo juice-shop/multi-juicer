@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"testing"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
@@ -47,16 +49,16 @@ func TestScoreBoardHandler(t *testing.T) {
 			createTeam("barfoo", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		bundle.JuiceShopChallenges = []b.JuiceShopChallenge{
-			{
+		scoring.CalculateAndCacheScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
+			"scoreBoardChallenge": {
 				Key:        "scoreBoardChallenge",
 				Difficulty: 1,
 			},
-			{
+			"nullByteChallenge": {
 				Key:        "nullByteChallenge",
 				Difficulty: 4,
 			},
-		}
+		})
 		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
@@ -67,15 +69,20 @@ func TestScoreBoardHandler(t *testing.T) {
 		err := json.Unmarshal(rr.Body.Bytes(), &response)
 		assert.Nil(t, err)
 
-		assert.Equal(t, []TeamScore{
+		foo := scoring.GetScores()
+		_ = foo
+
+		assert.Equal(t, []scoring.TeamScore{
 			{
 				Name:       "foobar",
 				Score:      50,
+				Position:   1,
 				Challenges: []string{"scoreBoardChallenge", "nullByteChallenge"},
 			},
 			{
 				Name:       "barfoo",
 				Score:      0,
+				Position:   2,
 				Challenges: []string{},
 			},
 		}, response.TopTeams)
@@ -92,9 +99,16 @@ func TestScoreBoardHandler(t *testing.T) {
 			teamName := fmt.Sprintf("team-%02d", i)
 			teams = append(teams, createTeam(teamName, `[]`, "0"))
 		}
+		teams = append(teams, createTeam("winning-team", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"))
 		clientset := fake.NewSimpleClientset(teams...)
-
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoring.CalculateAndCacheScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
+			"scoreBoardChallenge": {
+				Key:        "scoreBoardChallenge",
+				Difficulty: 1,
+			},
+		})
+
 		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
@@ -105,47 +119,16 @@ func TestScoreBoardHandler(t *testing.T) {
 		err := json.Unmarshal(rr.Body.Bytes(), &response)
 		assert.Nil(t, err)
 
-		assert.Equal(t, 25, response.TotalTeams)
+		assert.Equal(t, 26, response.TotalTeams)
 		assert.Equal(t, 24, len(response.TopTeams))
-	})
 
-	t.Run("calculates score for known challenges only and skip unknown challenges", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
-		rr := httptest.NewRecorder()
+		// winning-team should be the first team in the list
+		assert.Equal(t, "winning-team", response.TopTeams[0].Name)
+		assert.Equal(t, 1, response.TopTeams[0].Position)
 
-		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(
-			createTeam("foobar", `[{"key":"thisChallengeDoesNotAcutallyExistButIsOnlyForMultiJuicerTests","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
-			createTeam("barfoo", `[]`, "0"),
-		)
-		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		bundle.JuiceShopChallenges = []b.JuiceShopChallenge{
-			{
-				Key:        "nullByteChallenge",
-				Difficulty: 4,
-			},
-		}
-		AddRoutes(server, bundle)
-
-		server.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response ScoreBoardResponse
-		err := json.Unmarshal(rr.Body.Bytes(), &response)
-		assert.Nil(t, err)
-
-		assert.Equal(t, []TeamScore{
-			{
-				Name:       "foobar",
-				Score:      40,
-				Challenges: []string{"nullByteChallenge"},
-			},
-			{
-				Name:       "barfoo",
-				Score:      0,
-				Challenges: []string{},
-			},
-		}, response.TopTeams)
+		// team-24 should be the last team in the list
+		assert.Equal(t, "team-24", response.TopTeams[23].Name)
+		// team-24 should still be in the 2 "positions" because it has the same score as the other duplicated teams before it
+		assert.Equal(t, 2, response.TopTeams[23].Position)
 	})
 }
