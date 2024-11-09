@@ -1,4 +1,4 @@
-const germanTranslations = {
+export default {
   getting_started_text:
     'Wähle einen Teamnamen, damit wir dich wiedererkennen können. Wenn du dich mit anderen zusammenschließen möchtest, benutzt denselben Teamnamen.',
   getting_started: "Los geht's",
@@ -37,5 +37,3 @@ const germanTranslations = {
   'admin_table.restarting': 'Wird neu gestartet',
   'admin_table.restart': 'Neu starten',
 };
-
-export default germanTranslations;

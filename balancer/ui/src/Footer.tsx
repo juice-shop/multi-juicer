@@ -1,10 +1,16 @@
-import React from "react";
 import Popup from "reactjs-popup";
 import { FormattedMessage } from "react-intl";
 
-import translations from "./translations";
+import availableLanguages, { type Language } from "./translations";
+import { classNames } from "./util/classNames";
 
-export const Footer = ({ switchLanguage, selectedLocale }) => {
+export const Footer = ({
+  switchLanguage,
+  selectedLocale,
+}: {
+  switchLanguage: (language: Language) => void;
+  selectedLocale: string;
+}) => {
   const prefersDarkScheme =
     window?.matchMedia?.("(prefers-color-scheme: dark)") ?? false;
 
@@ -36,24 +42,20 @@ export const Footer = ({ switchLanguage, selectedLocale }) => {
       position="top center"
     >
       <div className="p-2 flex flex-col items-center max-h-96 overflow-y-scroll">
-        {translations.map((translation) => {
+        {availableLanguages.map((language) => {
           return (
             <button
-              key={`translation-${translation.key}`}
-              className={`border-none bg-background-highlight text-font-color text-base mb-2 p-1 rounded ${
-                selectedLocale === translation.key ? "font-semibold" : ""
-              }`}
-              onClick={() =>
-                switchLanguage({
-                  key: translation.key,
-                  messageLoader: translation.messageLoader(),
-                })
-              }
+              key={`translation-${language.key}`}
+              className={classNames(
+                "border-none bg-background-highlight text-font-color text-base mb-2 p-1 rounded",
+                selectedLocale === language.key ? "font-semibold" : ""
+              )}
+              onClick={() => switchLanguage(language)}
             >
-              <span role="img" aria-label={`${translation.name} Flag`}>
-                {translation.flag}
+              <span role="img" aria-label={`${language.name} Flag`}>
+                {language.flag}
               </span>{" "}
-              <span>{translation.name}</span>
+              <span>{language.name}</span>
             </button>
           );
         })}

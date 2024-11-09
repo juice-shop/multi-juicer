@@ -1,4 +1,4 @@
-const ukrainianTranslations = {
+export default {
     getting_started_text:
         'Виберіть назву команди, щоб ми могли вас впізнати. Якщо ви хочете об’єднатися з іншими учасниками, використовуйте ту саму назву команди. Назва команди має бути англійською мовою в нижньому регістрі і може містити цифри. На початку та в кінці не повинно бути «-».',
     getting_started: 'Давайте почнемо!',
@@ -37,5 +37,3 @@ const ukrainianTranslations = {
     'admin_table.restarting': 'Перезапускаємо',
     'admin_table.restart': 'Рестарт',
 };
-
-export default ukrainianTranslations;

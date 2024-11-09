@@ -1,4 +1,4 @@
-const dutchTranslations = {
+export default {
   getting_started_text:
     'Kies een teamnaam zodat we je kunnen herkennen. Als je wilt samenwerken met andere personen dan kan je meedoen onder dezelfde teamnaam.',
   getting_started: 'Starten',
@@ -30,5 +30,3 @@ const dutchTranslations = {
   'admin_table.restarting': 'Wordt nu opnieuw gestart',
   'admin_table.restart': 'Herstarten',
 };
-
-export default dutchTranslations;

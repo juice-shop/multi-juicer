@@ -8,7 +8,7 @@ import { JoiningPage } from "./pages/JoiningPage";
 import { JoinedPage } from "./pages/JoinedPage";
 import { ScoreBoard } from "./pages/ScoreBoard";
 
-import { Layout } from "./Layout";
+import { Layout } from "./Layout.tsx";
 import { Spinner } from "./Spinner";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
@@ -29,7 +29,7 @@ function App() {
   }, [navigatorLocale]);
 
   const switchLanguage = async ({ key, messageLoader }) => {
-    const messages = (await messageLoader).default;
+    const { default: messages } = await messageLoader();
 
     setMessages(messages);
     setLocale(key);

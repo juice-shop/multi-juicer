@@ -1,4 +1,3 @@
-import React from "react";
 import { classNames } from "./util/classNames";
 
 export const Input = ({ ...props }) => (
@@ -8,37 +7,31 @@ export const Input = ({ ...props }) => (
   />
 );
 
-export const Label = ({ children, ...props }) => (
+export const Label = ({
+  children,
+  ...props
+}: {
+  children: React.ReactNode;
+}) => (
   <label className="font-light block mb-1" {...props}>
     {children}
   </label>
 );
 
-export const Form = ({ children, ...props }) => (
+export const Form = ({ children, ...props }: { children: React.ReactNode }) => (
   <form className="mt-8" {...props}>
     {children}
   </form>
 );
 
-export const Button = ({ children, ...props }) => (
-  <button
-    className="bg-red-600 p-3 text-sm font-semibold text-white block w-full rounded border-none mt-3 cursor-pointer text-center no-underline disabled:bg-red-600/30 disabled:cursor-wait"
-    {...props}
-  >
-    {children}
-  </button>
-);
-
-export const SecondaryButton = ({ children, ...props }) => (
-  <Button
-    className="bg-gray-300 text-gray-900 disabled:bg-gray-300/50"
-    {...props}
-  >
-    {children}
-  </Button>
-);
-
-export const Card = ({ children, className, ...props }) => (
+export const Card = ({
+  children,
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <div
     className={classNames(
       "rounded-lg shadow-md bg-white dark:bg-gray-800",
@@ -50,7 +43,14 @@ export const Card = ({ children, className, ...props }) => (
   </div>
 );
 
-export const BodyCard = ({ children, className, ...props }) => (
+export const BodyCard = ({
+  children,
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
   <div
     className={classNames(
       "rounded-lg shadow-md bg-white dark:bg-gray-800 p-12 w-2/5 min-w-[400px] max-w-[650px] mb-8 md:min-w-[328px] lg:w-9/20 lg:my-2 lg:p-12",
@@ -62,7 +62,12 @@ export const BodyCard = ({ children, className, ...props }) => (
   </div>
 );
 
-export const CenteredCard = ({ children, ...props }) => (
+export const CenteredCard = ({
+  children,
+  ...props
+}: {
+  children: React.ReactNode;
+}) => (
   <BodyCard className="flex justify-center items-center" {...props}>
     {children}
   </BodyCard>
