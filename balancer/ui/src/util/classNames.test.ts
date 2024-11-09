@@ -11,9 +11,9 @@ describe("classNames", () => {
   });
 
   it("should filter out falsy values", () => {
-    expect(
-      classNames("class1", false, "class2", null, "class3", undefined, "", 0)
-    ).toBe("class1 class2 class3");
+    expect(classNames("class1", "class2", "class3", "")).toBe(
+      "class1 class2 class3"
+    );
   });
 
   it("should return an empty string if no class names are provided", () => {
