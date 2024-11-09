@@ -1,7 +1,15 @@
-import React from "react";
 import { classNames } from "../util/classNames";
 
-export function Button({ children, as, className, ...props }) {
+export function Button({
+  children,
+  as,
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  as?: "button" | "a";
+  className?: string;
+}) {
   if (as === "button" || as === undefined) {
     return (
       <button
@@ -31,7 +39,14 @@ export function Button({ children, as, className, ...props }) {
   throw new Error(`Invalid "as" prop passed to Button component: "${as}"`);
 }
 
-export function SecondaryButton({ children, className, ...props }) {
+export function SecondaryButton({
+  children,
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <Button
       className={classNames(
