@@ -6,12 +6,12 @@ import { IntlProvider } from "react-intl";
 import { JoinPage } from "./pages/JoinPage";
 import { JoiningPage } from "./pages/JoiningPage";
 import { JoinedPage } from "./pages/JoinedPage";
-import { ScoreBoard } from "./pages/ScoreBoard";
+import { ScoreBoard } from "./pages/ScoreBoard.tsx";
 
 import { Layout } from "./Layout.tsx";
 import { Spinner } from "./Spinner.tsx";
 
-const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage.tsx"));
 
 const LoadingPage = () => <Spinner />;
 
