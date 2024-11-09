@@ -21,7 +21,11 @@ function App() {
 
   const navigatorLocale = navigator.language;
   useEffect(() => {
-    setLocale(navigatorLocale);
+    let locale = navigatorLocale;
+    if (navigatorLocale.startsWith("en")) {
+      locale = "en";
+    }
+    setLocale(locale);
   }, [navigatorLocale]);
 
   const switchLanguage = async ({ key, messageLoader }) => {

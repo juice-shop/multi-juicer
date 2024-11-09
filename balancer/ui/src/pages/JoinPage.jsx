@@ -90,8 +90,6 @@ export const JoinPage = injectIntl(({ intl }) => {
     sendJoinRequest({ teamname });
   }
 
-  console.log("render", isSubmitting);
-
   return (
     <div className="max-w-3xl">
       {queryMessage === "instance-restarting" ? (
