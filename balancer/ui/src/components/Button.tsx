@@ -9,7 +9,8 @@ export function Button({
   children: React.ReactNode;
   as?: "button" | "a";
   className?: string;
-}) {
+} & React.ButtonHTMLAttributes<HTMLButtonElement> &
+  React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   if (as === "button" || as === undefined) {
     return (
       <button
@@ -46,7 +47,8 @@ export function SecondaryButton({
 }: {
   children: React.ReactNode;
   className?: string;
-}) {
+} & React.ButtonHTMLAttributes<HTMLButtonElement> &
+  React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
     <Button
       className={classNames(

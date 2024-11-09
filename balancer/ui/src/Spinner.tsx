@@ -1,6 +1,4 @@
-import React from "react";
-
-export const Spinner = () => (
+export function Spinner() {
   <svg className="animate-spin h-8 w-8 mr-4" viewBox="0 0 30 30">
     <circle
       className="path"
@@ -14,5 +12,5 @@ export const Spinner = () => (
       strokeDasharray="1, 150"
       strokeDashoffset="0"
     />
-  </svg>
-);
+  </svg>;
+}

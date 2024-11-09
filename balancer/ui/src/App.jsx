@@ -9,7 +9,7 @@ import { JoinedPage } from "./pages/JoinedPage";
 import { ScoreBoard } from "./pages/ScoreBoard";
 
 import { Layout } from "./Layout.tsx";
-import { Spinner } from "./Spinner";
+import { Spinner } from "./Spinner.tsx";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 

@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
 import { Card } from "../Components";
 import { SecondaryButton } from "../components/Button";
 
-function RestartInstanceButton({ team }) {
+function RestartInstanceButton({ team }: { team: string }) {
   const [restarting, setRestarting] = useState(false);
 
-  const restart = async (event) => {
+  const restart = async (event: React.MouseEvent) => {
     event.preventDefault();
     setRestarting(true);
     try {
@@ -33,12 +33,12 @@ function RestartInstanceButton({ team }) {
   );
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function DeleteInstanceButton({ team }) {
+function DeleteInstanceButton({ team }: { team: string }) {
   const [deleting, setDeleting] = useState(false);
 
-  const remove = async (event) => {
+  const remove = async (event: React.MouseEvent) => {
     event.preventDefault();
     setDeleting(true);
     try {
@@ -69,7 +69,13 @@ function DeleteInstanceButton({ team }) {
   );
 }
 
-function ValueDisplay({ label, value }) {
+function ValueDisplay({
+  label,
+  value,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) {
   return (
     <div className="inline-flex gap-2">
       <span>{label}</span>
@@ -78,8 +84,36 @@ function ValueDisplay({ label, value }) {
   );
 }
 
+interface Team {
+  team: string;
+  ready: boolean;
+  createdAt: Date;
+  lastConnect: Date;
+}
+
+interface TeamRaw {
+  team: string;
+  ready: boolean;
+  createdAt: string;
+  lastConnect: string;
+}
+
+async function fetchAdminData(): Promise<Team[]> {
+  const response = await fetch(`/balancer/api/admin/all`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch current teams");
+  }
+  const { instances } = (await response.json()) as { instances: TeamRaw[] };
+
+  return instances.map((team) => ({
+    ...team,
+    createdAt: new Date(team.createdAt),
+    lastConnect: new Date(team.lastConnect),
+  }));
+}
+
 export default function AdminPage() {
-  const [teams, setTeams] = useState([]);
+  const [teams, setTeams] = useState<Team[]>([]);
 
   async function updateAdminData() {
     try {
@@ -87,8 +121,7 @@ export default function AdminPage() {
       if (!response.ok) {
         throw new Error("Failed to fetch current teams");
       }
-      const data = await response.json();
-      setTeams(data.instances);
+      setTeams(await fetchAdminData());
     } catch (err) {
       console.error("Failed to fetch current teams!", err);
     }
