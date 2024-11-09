@@ -15,7 +15,7 @@ function ThirdPlace({ ...props }) {
   return <img src="/balancer/icons/third-place.svg" height="32" {...props} />;
 }
 
-function PlaceDisplay({ place }: { place: number }) {
+function PositionDisplay({ place }: { place: number }) {
   switch (place) {
     case 1:
       return <FirstPlace height="32" />;
@@ -36,6 +36,7 @@ function PlaceDisplay({ place }: { place: number }) {
 interface Team {
   name: string;
   score: number;
+  position: number;
   challenges: string[];
 }
 
@@ -86,11 +87,11 @@ export const ScoreBoard = injectIntl(() => {
             </tr>
           </thead>
           <tbody className="w-full">
-            {teams.map((team, index) => {
+            {teams.map((team) => {
               return (
                 <tr className="border-t border-gray-600">
                   <td className="text-center p-2">
-                    <PlaceDisplay place={index + 1}></PlaceDisplay>
+                    <PositionDisplay place={team.position} />
                   </td>
                   <td className="p-2">{team.name}</td>
                   <td className="text-right p-2">
