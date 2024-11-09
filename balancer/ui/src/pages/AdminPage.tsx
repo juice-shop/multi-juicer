@@ -3,7 +3,9 @@ import { FormattedMessage } from "react-intl";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
 import { Card } from "../Components";
-import { SecondaryButton } from "../components/Button";
+
+const buttonClasses =
+  "inline m-0 bg-gray-700 text-white p-2 px-3 text-sm rounded disabled:cursor-wait disabled:opacity-50";
 
 function RestartInstanceButton({ team }: { team: string }) {
   const [restarting, setRestarting] = useState(false);
@@ -12,24 +14,27 @@ function RestartInstanceButton({ team }: { team: string }) {
     event.preventDefault();
     setRestarting(true);
     try {
-      await fetch(`/balancer/api/admin/teams/${team}/restart`, {
-        method: "POST",
-      });
+      await Promise.all([
+        sleep(10000), // wait at least 3 seconds to signal to the user that the restart is happening, restart takes longer than the delete
+        fetch(`/balancer/api/admin/teams/${team}/restart`, {
+          method: "POST",
+        }),
+      ]);
     } finally {
       setRestarting(false);
     }
   };
   return (
-    <SecondaryButton onClick={restart} className="p-2 min-w-[70px] m-0">
+    <button className={buttonClasses} disabled={restarting} onClick={restart}>
       {restarting ? (
         <FormattedMessage
           id="admin_table.restarting"
-          defaultMessage="Restarting..."
+          defaultMessage="restarting..."
         />
       ) : (
-        <FormattedMessage id="admin_table.restart" defaultMessage="Restart" />
+        <FormattedMessage id="admin_table.restart" defaultMessage="restart" />
       )}
-    </SecondaryButton>
+    </button>
   );
 }
 
@@ -43,7 +48,7 @@ function DeleteInstanceButton({ team }: { team: string }) {
     setDeleting(true);
     try {
       await Promise.all([
-        sleep(3000),
+        sleep(3000), // wait at least 3 seconds to signal to the user that the delete is happening
         fetch(`/balancer/api/admin/teams/${team}/delete`, {
           method: "DELETE",
         }),
@@ -53,34 +58,16 @@ function DeleteInstanceButton({ team }: { team: string }) {
     }
   };
   return (
-    <SecondaryButton
-      onClick={remove}
-      className="p-2 min-w-[70px] m-0 bg-red-500 text-white"
-    >
+    <button className={buttonClasses} disabled={deleting} onClick={remove}>
       {deleting ? (
         <FormattedMessage
           id="admin_table.deleting"
-          defaultMessage="Deleting..."
+          defaultMessage="deleting..."
         />
       ) : (
-        <FormattedMessage id="admin_table.delete" defaultMessage="Delete" />
+        <FormattedMessage id="admin_table.delete" defaultMessage="delete" />
       )}
-    </SecondaryButton>
-  );
-}
-
-function ValueDisplay({
-  label,
-  value,
-}: {
-  label: React.ReactNode;
-  value: React.ReactNode;
-}) {
-  return (
-    <div className="inline-flex gap-2">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
+    </button>
   );
 }
 
@@ -138,8 +125,8 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 justify-start w-[70vw]">
-      <h1>
+    <div className="flex flex-col gap-2 w-full max-w-3xl">
+      <h1 className="text-xl font-semibold">
         <FormattedMessage
           id="admin_table.table_header"
           defaultMessage="Active Teams"
@@ -160,41 +147,36 @@ export default function AdminPage() {
         const lastConnect = new Date(team.lastConnect);
 
         return (
-          <Card key={team.team} className="flex flex-col gap-4 p-4">
-            <div className="flex justify-start items-baseline gap-8">
-              <h4>{team.team}</h4>
-              <ValueDisplay
-                label={
-                  <FormattedMessage
-                    id="admin_table.ready"
-                    defaultMessage="Ready"
-                  />
-                }
-                value={team.ready ? "✅" : "❌"}
-              />
-              <ValueDisplay
-                label={
-                  <FormattedMessage
-                    id="admin_table.created"
-                    defaultMessage="Created"
-                  />
-                }
-                value={<ReadableTimestamp date={createdAt} />}
-              />
-              <ValueDisplay
-                label={
-                  <FormattedMessage
-                    id="admin_table.latUsed"
-                    defaultMessage="Last Used"
-                  />
-                }
-                value={<ReadableTimestamp date={lastConnect} />}
-              />
+          <Card
+            key={team.team}
+            className="grid grid-cols-2 sm:grid-cols-4 items-center gap-8 gap-y-2 p-4"
+          >
+            <div>
+              <h4 className="font-semibold">{team.team}</h4>
+              <p className="text-sm text-gray-200">
+                <FormattedMessage
+                  id="admin_table.created"
+                  defaultMessage="created"
+                />{" "}
+                <ReadableTimestamp date={createdAt} />
+              </p>
             </div>
-            <div className="flex justify-start items-baseline gap-8">
-              <DeleteInstanceButton team={team.team} />
-              <RestartInstanceButton team={team.team} />
+            <div>
+              <p className="text-sm text-gray-200">
+                {team.ready ? "up and running 🟢" : "down ⚠️"}
+              </p>
+              <p className="text-sm text-gray-200">
+                {" "}
+                <FormattedMessage
+                  id="admin_table.latUsed"
+                  defaultMessage="last used"
+                />{" "}
+                <ReadableTimestamp date={lastConnect} />
+              </p>
             </div>
+
+            <DeleteInstanceButton team={team.team} />
+            <RestartInstanceButton team={team.team} />
           </Card>
         );
       })}

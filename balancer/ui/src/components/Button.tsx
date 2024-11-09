@@ -39,25 +39,3 @@ export function Button({
 
   throw new Error(`Invalid "as" prop passed to Button component: "${as}"`);
 }
-
-export function SecondaryButton({
-  children,
-  className,
-  ...props
-}: {
-  children: React.ReactNode;
-  className?: string;
-} & React.ButtonHTMLAttributes<HTMLButtonElement> &
-  React.AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return (
-    <Button
-      className={classNames(
-        "bg-gray-300 text-gray-900 disabled:bg-gray-300/50",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </Button>
-  );
-}

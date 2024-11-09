@@ -17,15 +17,17 @@ export function Layout({
   selectedLocale: string;
 }) {
   return (
-    <div className="grid grid-rows-[min-content_auto_min-content] h-screen w-screen gap-6 p-3 md:p-8">
-      <div className={classNames("min-h-32", pageMargins)}>
-        <Card className="flex items-center justify-center bg-background-highlight p-5">
-          <img
-            src="/balancer/multi-juicer.svg"
-            alt="MultiJuicer Logo"
-            className="max-h-24"
-          />
-        </Card>
+    <div className="grid grid-rows-[min-content_auto_min-content] h-screen w-screen gap-6">
+      <div className={classNames("min-h-32 mt-3 md:mt-8", pageMargins)}>
+        <a href="/balancer/">
+          <Card className="flex items-center justify-center bg-background-highlight p-5">
+            <img
+              src="/balancer/multi-juicer.svg"
+              alt="MultiJuicer Logo"
+              className="max-h-24"
+            />
+          </Card>
+        </a>
       </div>
       <div
         className={classNames(
@@ -35,7 +37,7 @@ export function Layout({
       >
         {children}
       </div>
-      <footer className="flex justify-center">
+      <footer className="flex justify-center mb-3 md:mb-8">
         <Footer
           switchLanguage={switchLanguage}
           selectedLocale={selectedLocale}
