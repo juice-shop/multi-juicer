@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard, Label, Input, Form } from "../Components";
+import { BodyCard, Input } from "../Components";
 import { Button } from "../components/Button";
 
 export const JoiningPage = () => {
@@ -63,16 +63,16 @@ export const JoiningPage = () => {
         </strong>
       ) : null}
 
-      <Form onSubmit={onSubmit}>
+      <form className="mt-8" onSubmit={onSubmit}>
         <input
           type="hidden"
           name="teamname"
           autoComplete="username"
           value={team}
         />
-        <Label htmlFor="passcode">
+        <label className="font-light block mb-1" htmlFor="passcode">
           <FormattedMessage id="team_passcode" defaultMessage="Team Passcode" />
-        </Label>
+        </label>
         <Input
           type="password"
           id="passcode"
@@ -87,7 +87,7 @@ export const JoiningPage = () => {
         <Button data-test-id="join-team-button" type="submit">
           <FormattedMessage id="join_team" defaultMessage="Join Team" />
         </Button>
-      </Form>
+      </form>
     </BodyCard>
   );
 };

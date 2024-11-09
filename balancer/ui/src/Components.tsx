@@ -2,26 +2,9 @@ import { classNames } from "./util/classNames";
 
 export const Input = ({ ...props }) => (
   <input
-    className="bg-gray-300 border-none rounded p-3 text-sm block w-full invalid:outline-red-500"
+    className="bg-gray-300 border-none rounded p-3 text-sm block w-full text-gray-800 invalid:outline-red-500 invalid:bg-red-100 outline"
     {...props}
   />
-);
-
-export const Label = ({
-  children,
-  ...props
-}: {
-  children: React.ReactNode;
-}) => (
-  <label className="font-light block mb-1" {...props}>
-    {children}
-  </label>
-);
-
-export const Form = ({ children, ...props }: { children: React.ReactNode }) => (
-  <form className="mt-8" {...props}>
-    {children}
-  </form>
 );
 
 export const Card = ({

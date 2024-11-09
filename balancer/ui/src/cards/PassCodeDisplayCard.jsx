@@ -1,7 +1,7 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
 
-import { BodyCard, Label } from "../Components";
+import { BodyCard } from "../Components";
 
 const CharDisplay = ({ children, addOffset }) => (
   <span
@@ -57,9 +57,9 @@ export const PasscodeDisplayCard = ({ passcode = "", reset = false }) => {
 
       <CenteredContent>
         <div>
-          <Label>
+          <label className="font-light block mb-1">
             <FormattedMessage id="passcode" defaultMessage="Passcode" />
-          </Label>
+          </label>
           <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
             <FakePasscodeDisplay>
               {"●●●●●●●●".split("").map((char, index) => (
