@@ -5,8 +5,8 @@ import { IntlProvider } from "react-intl";
 
 import { JoinPage } from "./pages/JoinPage";
 import { JoiningPage } from "./pages/JoiningPage";
-import { JoinedPage } from "./pages/JoinedPage";
 import { ScoreBoard } from "./pages/ScoreBoard.tsx";
+import { TeamStatusPage } from "./pages/TeamStatusPage.tsx";
 
 import { Layout } from "./Layout.tsx";
 import { Spinner } from "./Spinner.tsx";
@@ -43,8 +43,8 @@ function App() {
             <Routes>
               <Route path="/" exact element={<JoinPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/teams/:team/status/" element={<TeamStatusPage />} />
               <Route path="/teams/:team/joining/" element={<JoiningPage />} />
-              <Route path="/teams/:team/joined/" element={<JoinedPage />} />
               <Route path="/score-board/" element={<ScoreBoard />} />
             </Routes>
           </Suspense>

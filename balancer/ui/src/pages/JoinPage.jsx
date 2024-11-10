@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
 import { Card } from "../Components";
-import { InstanceRestartingCard } from "../cards/InstanceRestartingCard";
 import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
-import { TeamDisplayCard } from "../cards/TeamDisplayCard";
 import { Button } from "../components/Button";
 
 const messages = defineMessages({
@@ -92,13 +90,7 @@ export const JoinPage = injectIntl(({ intl }) => {
 
   return (
     <div className="max-w-3xl">
-      {queryMessage === "instance-restarting" ? (
-        <InstanceRestartingCard teamname={queryTeamname} />
-      ) : null}
       {queryMessage === "instance-not-found" ? <InstanceNotFoundCard /> : null}
-      {queryMessage === "logged-in" && queryTeamname ? (
-        <TeamDisplayCard teamname={queryTeamname} />
-      ) : null}
 
       <Card className="p-8">
         <h2 className="text-2xl font-medium m-0">

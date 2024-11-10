@@ -1,8 +1,6 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
 
-import { Card } from "../Components";
-
 const CharDisplay = ({ children, addOffset }) => (
   <span
     className={`font-mono p-3 rounded ${
@@ -24,64 +22,37 @@ const PasscodeDisplay = ({ children }) => (
   <span className="hidden hover:block">{children}</span>
 );
 
-const CenteredContent = ({ children }) => (
-  <div className="flex justify-center mt-4">{children}</div>
-);
-
-const PasscodeTitle = ({ reset }) => {
-  if (reset) {
-    return (
-      <h2 className="text-2xl font-medium m-0">
-        <FormattedMessage id="passcode_reset" defaultMessage="Passcode Reset" />
-      </h2>
-    );
-  } else {
-    return (
-      <h2 className="text-2xl font-medium m-0">
-        <FormattedMessage id="team_created" defaultMessage="Team Created" />
-      </h2>
-    );
-  }
-};
-
-export const PasscodeDisplayCard = ({ passcode = "", reset = false }) => {
+export const PasscodeDisplayCard = ({ passcode = "" }) => {
   return (
-    <Card>
-      <PasscodeTitle reset={reset} />
-      <p>
+    <>
+      <p className="text-sm mb-2">
         <FormattedMessage
           id="passcode_explanation"
-          defaultMessage="To make sure not just anyone can join your team, we created a shared passcode for your team. If your teammates want to access the same instance they are required to enter the passcode first. You can copy the passcode from the display below."
+          defaultMessage="You can join the same team using this passcode, on another device or with another teammate."
         />
       </p>
-
-      <CenteredContent>
-        <div>
-          <label className="font-light block mb-1">
-            <FormattedMessage id="passcode" defaultMessage="Passcode" />
-          </label>
-          <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
-            <FakePasscodeDisplay>
-              {"●●●●●●●●".split("").map((char, index) => (
-                <CharDisplay
-                  addOffset={index === 4}
-                  key={index}
-                  aria-hidden="true"
-                >
-                  {char}
-                </CharDisplay>
-              ))}
-            </FakePasscodeDisplay>
-            <PasscodeDisplay data-test-id="passcode-display">
-              {passcode.split("").map((char, index) => (
-                <CharDisplay addOffset={index === 4} key={index}>
-                  {char}
-                </CharDisplay>
-              ))}
-            </PasscodeDisplay>
-          </PasscodeDisplayWrapper>
-        </div>
-      </CenteredContent>
-    </Card>
+      <div className="flex justify-center">
+        <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
+          <FakePasscodeDisplay>
+            {"●●●●●●●●".split("").map((char, index) => (
+              <CharDisplay
+                addOffset={index === 4}
+                key={index}
+                aria-hidden="true"
+              >
+                {char}
+              </CharDisplay>
+            ))}
+          </FakePasscodeDisplay>
+          <PasscodeDisplay data-test-id="passcode-display">
+            {passcode.split("").map((char, index) => (
+              <CharDisplay addOffset={index === 4} key={index}>
+                {char}
+              </CharDisplay>
+            ))}
+          </PasscodeDisplay>
+        </PasscodeDisplayWrapper>
+      </div>
+    </>
   );
 };

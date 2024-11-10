@@ -31,6 +31,7 @@ func AddRoutes(
 	router.Handle("POST /balancer/api/teams/logout", handleLogout(bundle))
 	router.Handle("POST /balancer/api/teams/reset-passcode", handleResetPasscode(bundle))
 	router.Handle("GET /balancer/api/score-board/top", handleScoreBoard(bundle))
+	router.Handle("GET /balancer/api/teams/status", handleTeamStatus(bundle))
 
 	router.Handle("GET /balancer/api/admin/all", handleAdminListInstances(bundle))
 	router.Handle("DELETE /balancer/api/admin/teams/{team}/delete", handleAdminDeleteInstance(bundle))

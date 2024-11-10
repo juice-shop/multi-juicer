@@ -15,7 +15,7 @@ function ThirdPlace({ ...props }) {
   return <img src="/balancer/icons/third-place.svg" height="32" {...props} />;
 }
 
-function PositionDisplay({ place }: { place: number }) {
+export function PositionDisplay({ place }: { place: number }) {
   switch (place) {
     case 1:
       return <FirstPlace height="32" />;

@@ -18,6 +18,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
+    "@types/promise-retry": "^1.1.6",
     "@vitejs/plugin-react": "^4.3.2",
     "jsdom": "^25.0.1",
     "vite": "^5.4.8",

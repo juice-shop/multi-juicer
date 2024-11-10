@@ -6,62 +6,6 @@ import { Card } from "../Components";
 
 import astronaut from "./astronaut.svg";
 
-const LogoutButton = () => {
-  const navigate = useNavigate();
-
-  async function logout() {
-    try {
-      await fetch("/balancer/api/teams/logout", {
-        method: "POST",
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  }
-
-  return (
-    <button
-      onClick={logout}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
-    >
-      <FormattedMessage id="log_out" defaultMessage="Log Out" />
-    </button>
-  );
-};
-
-const PasscodeResetButton = ({ teamname }) => {
-  const navigate = useNavigate();
-  const [isResetting, setIsResetting] = useState(false);
-
-  async function resetPasscode() {
-    setIsResetting(true);
-    try {
-      const response = await fetch("/balancer/api/teams/reset-passcode", {
-        method: "POST",
-      });
-      const data = await response.json();
-      navigate(`/teams/${teamname}/joined/`, {
-        state: { passcode: data.passcode, reset: true },
-      });
-    } catch (error) {
-      console.error("Failed to reset passcode", error);
-    } finally {
-      setIsResetting(false);
-    }
-  }
-
-  return (
-    <button
-      onClick={resetPasscode}
-      disabled={isResetting}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
-    >
-      <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
-    </button>
-  );
-};
-
 export const TeamDisplayCard = ({ teamname }) => {
   return (
     <Card className="flex items-center p-4 bg-white shadow-md rounded-md">
@@ -72,8 +16,6 @@ export const TeamDisplayCard = ({ teamname }) => {
         </span>
         <h3 className="text-lg font-medium">{teamname}</h3>
       </div>
-      <LogoutButton />
-      <PasscodeResetButton teamname={teamname} />
     </Card>
   );
 };
