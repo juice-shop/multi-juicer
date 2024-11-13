@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 
@@ -39,7 +39,7 @@ export const JoiningPage = () => {
     }
   }
 
-  function onSubmit(event) {
+  function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     sendJoinRequest();
   }
@@ -79,8 +79,8 @@ export const JoiningPage = () => {
           id="passcode"
           name="passcode"
           data-test-id="passcode-input"
-          minLength="8"
-          maxLength="8"
+          minLength={8}
+          maxLength={8}
           autoComplete="current-password"
           value={passcode}
           onChange={({ target }) => setPasscode(target.value)}

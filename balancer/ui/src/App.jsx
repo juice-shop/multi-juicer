@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
 import { JoinPage } from "./pages/JoinPage.tsx";
-import { JoiningPage } from "./pages/JoiningPage";
+import { JoiningPage } from "./pages/JoiningPage.tsx";
 import { ScoreBoard } from "./pages/ScoreBoard.tsx";
 import { TeamStatusPage } from "./pages/TeamStatusPage.tsx";
 
