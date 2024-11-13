@@ -15,11 +15,16 @@ interface TeamStatusResponse {
   readiness: boolean;
 }
 
-const LogoutButton = () => {
+const LogoutButton = ({
+  setActiveTeam,
+}: {
+  setActiveTeam: (team: string | null) => void;
+}) => {
   const navigate = useNavigate();
 
   async function logout() {
     try {
+      setActiveTeam(null);
       await fetch("/balancer/api/teams/logout", {
         method: "POST",
       });
@@ -50,7 +55,7 @@ const PasscodeResetButton = ({ team }: { team: string }) => {
         method: "POST",
       });
       const data = await response.json();
-      navigate(`/teams/${team}/joined/`, {
+      navigate(`/teams/${team}/status/`, {
         state: { passcode: data.passcode, reset: true },
       });
     } catch (error) {
@@ -80,7 +85,11 @@ async function fetchTeamStatusData(): Promise<TeamStatusResponse> {
   return status;
 }
 
-export const TeamStatusPage = () => {
+export const TeamStatusPage = ({
+  setActiveTeam,
+}: {
+  setActiveTeam: (team: string | null) => void;
+}) => {
   const { team } = useParams();
 
   const [instanceStatus, setInstanceStatus] =
@@ -132,7 +141,7 @@ export const TeamStatusPage = () => {
           </div>
         </div>
         <div className="flex flex-row-reverse items-center p-4 gap-3">
-          <LogoutButton />
+          <LogoutButton setActiveTeam={setActiveTeam} />
           <PasscodeResetButton team={team} />
         </div>
       </div>

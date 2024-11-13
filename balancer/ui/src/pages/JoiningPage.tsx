@@ -5,7 +5,11 @@ import { FormattedMessage } from "react-intl";
 import { Card } from "../Components";
 import { Button } from "../components/Button";
 
-export const JoiningPage = () => {
+export const JoiningPage = ({
+  setActiveTeam,
+}: {
+  setActiveTeam: (team: string | null) => void;
+}) => {
   const [passcode, setPasscode] = useState("");
   const [failed, setFailed] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +30,8 @@ export const JoiningPage = () => {
       }
 
       const data = await response.json();
+
+      setActiveTeam(team!);
 
       if (data.message === "Signed in as admin") {
         navigate(`/admin`);

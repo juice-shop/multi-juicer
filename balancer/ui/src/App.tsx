@@ -19,6 +19,7 @@ const LoadingPage = () => <Spinner />;
 function App() {
   const [locale, setLocale] = useState("en");
   const [messages, setMessages] = useState({});
+  const [activeTeam, setActiveTeam] = useState<string | null>(null);
 
   const navigatorLocale = navigator.language;
   useEffect(() => {
@@ -49,18 +50,30 @@ function App() {
           <Route
             path="*"
             element={
-              <Layout switchLanguage={switchLanguage} selectedLocale={locale}>
+              <Layout
+                activeTeam={activeTeam}
+                switchLanguage={switchLanguage}
+                selectedLocale={locale}
+              >
                 <Suspense fallback={<LoadingPage />}>
                   <Routes>
-                    <Route path="/" element={<JoinPage />} />
+                    <Route
+                      path="/"
+                      element={
+                        <JoinPage
+                          activeTeam={activeTeam}
+                          setActiveTeam={setActiveTeam}
+                        />
+                      }
+                    />
                     <Route path="/admin" element={<AdminPage />} />
                     <Route
                       path="/teams/:team/status/"
-                      element={<TeamStatusPage />}
+                      element={<TeamStatusPage setActiveTeam={setActiveTeam} />}
                     />
                     <Route
                       path="/teams/:team/joining/"
-                      element={<JoiningPage />}
+                      element={<JoiningPage setActiveTeam={setActiveTeam} />}
                     />
                     <Route path="/score-board/" element={<ScoreBoard />} />
                   </Routes>

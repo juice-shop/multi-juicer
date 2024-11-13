@@ -12,15 +12,24 @@ export function Layout({
   children,
   switchLanguage,
   selectedLocale,
+  activeTeam,
 }: {
   children: React.ReactNode;
   switchLanguage: (language: Language) => void;
   selectedLocale: string;
+  activeTeam: string | null;
 }) {
+  let primaryBackLink = "/";
+  if (activeTeam === "admin") {
+    primaryBackLink = "/admin";
+  } else if (activeTeam !== null) {
+    primaryBackLink = `/teams/${activeTeam}/status`;
+  }
+
   return (
     <div className="grid grid-rows-[min-content_auto_min-content] h-screen w-screen gap-6">
       <div className={classNames("min-h-32 mt-3 md:mt-8", pageMargins)}>
-        <Link to="/">
+        <Link to={primaryBackLink}>
           <Card className="flex items-center justify-center bg-background-highlight p-5">
             <img
               src="/balancer/multi-juicer.svg"
