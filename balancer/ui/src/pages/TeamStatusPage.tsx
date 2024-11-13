@@ -168,7 +168,7 @@ function ScoreDisplay({
 }) {
   if (!instanceStatus?.position || instanceStatus?.position === -1) {
     return (
-      <div className="p-4">
+      <div className="p-4 text-sm">
         <FormattedMessage
           id="updating_score"
           defaultMessage="Your score is getting calculated..."
