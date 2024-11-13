@@ -89,7 +89,7 @@ export const ScoreBoard = injectIntl(() => {
           <tbody className="w-full">
             {teams.map((team) => {
               return (
-                <tr className="border-t border-gray-600">
+                <tr className="border-t border-gray-600" key={team.name}>
                   <td className="text-center p-2">
                     <PositionDisplay place={team.position} />
                   </td>
