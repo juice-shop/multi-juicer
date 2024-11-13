@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../Components";
-import { FormattedMessage } from "react-intl";
+import {
+  defineMessages,
+  FormattedMessage,
+  injectIntl,
+  IntlShape,
+} from "react-intl";
 import { PositionDisplay } from "./ScoreBoard";
 import { PasscodeDisplayCard } from "../cards/PassCodeDisplayCard";
 import { Button } from "../components/Button";
@@ -15,34 +20,55 @@ interface TeamStatusResponse {
   readiness: boolean;
 }
 
-const LogoutButton = ({
-  setActiveTeam,
-}: {
-  setActiveTeam: (team: string | null) => void;
-}) => {
-  const navigate = useNavigate();
+const messages = defineMessages({
+  teamnameValidationConstraints: {
+    id: "logout_confirmation",
+    defaultMessage:
+      "Are you sure you want to logout? If you don't have the passcode saved, you won't be able to rejoin.",
+  },
+});
 
-  async function logout() {
-    try {
-      setActiveTeam(null);
-      await fetch("/balancer/api/teams/logout", {
-        method: "POST",
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Failed to log out", error);
+const LogoutButton = injectIntl(
+  ({
+    intl,
+    setActiveTeam,
+  }: {
+    intl: IntlShape;
+    setActiveTeam: (team: string | null) => void;
+  }) => {
+    const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    async function logout() {
+      const confirmed = confirm(
+        intl.formatMessage(messages.teamnameValidationConstraints)
+      );
+      if (!confirmed) {
+        return;
+      }
+      try {
+        setActiveTeam(null);
+        setIsLoggingOut(true);
+        await fetch("/balancer/api/teams/logout", {
+          method: "POST",
+        });
+        navigate("/");
+      } catch (error) {
+        console.error("Failed to log out", error);
+      }
     }
-  }
 
-  return (
-    <button
-      onClick={logout}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
-    >
-      <FormattedMessage id="log_out" defaultMessage="Log Out" />
-    </button>
-  );
-};
+    return (
+      <button
+        disabled={isLoggingOut}
+        onClick={logout}
+        className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+      >
+        <FormattedMessage id="log_out" defaultMessage="Log Out" />
+      </button>
+    );
+  }
+);
 
 const PasscodeResetButton = ({ team }: { team: string }) => {
   const navigate = useNavigate();
