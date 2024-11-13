@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -105,6 +106,45 @@ func TestProxyHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, "Hello, Test from /foobar/hello-world\n", rr.Body.String())
+	})
+
+	t.Run("updates the deployment lastRequests annotation after a successful instance check", func(t *testing.T) {
+		defer clearInstanceUpCache()
+		req, _ := http.NewRequest("POST", "/hello-world", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
+		rr := httptest.NewRecorder()
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, "Hello, Test from "+r.URL.Path)
+		}))
+		defer ts.Close()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset(readyDeployment)
+		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
+
+		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
+			return fmt.Sprintf("%s/%s/", ts.URL, team)
+		}
+		AddRoutes(server, bu)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		updatedDeployment, err := clientset.AppsV1().Deployments(bu.RuntimeEnvironment.Namespace).Get(context.Background(), readyDeployment.Name, metav1.GetOptions{})
+		assert.Nil(t, err)
+
+		assert.NotEqual(t,
+			readyDeployment.ObjectMeta.Annotations["multi-juicer.owasp-juice.shop/lastRequest"],
+			updatedDeployment.ObjectMeta.Annotations["multi-juicer.owasp-juice.shop/lastRequest"],
+		)
+		assert.NotEqual(t,
+			readyDeployment.ObjectMeta.Annotations["multi-juicer.owasp-juice.shop/lastRequestReadable"],
+			updatedDeployment.ObjectMeta.Annotations["multi-juicer.owasp-juice.shop/lastRequestReadable"],
+		)
 	})
 
 	t.Run("redirects to /balancer?msg=instance-restarting when the instance isn't ready", func(t *testing.T) {

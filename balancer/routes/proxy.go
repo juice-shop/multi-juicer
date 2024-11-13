@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 var (
@@ -93,7 +95,52 @@ func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) i
 		bundle.Log.Printf("Failed to lookup if a instance is up in the kubernetes api. Assuming it's missing: %s", err)
 		return instanceMissing
 	} else if deployment.Status.ReadyReplicas > 0 {
+		err = updateLastRequestTimestamp(context, bundle, team)
+		if err != nil {
+			// we will continue here, as a working proxy is more important than a up to date timestamp.
+			bundle.Log.Printf("failed to update last request time stamp on deployment. last request timestamps shown on the admin page might be out of sync.")
+		}
 		return instanceUp
 	}
 	return instanceDown
+}
+
+type UpdateProgressDeploymentDiff struct {
+	Metadata UpdateProgressDeploymentMetadata `json:"metadata"`
+}
+
+// UpdateProgressDeploymentMetadata a shim of the k8s metadata object containing only annotations
+type UpdateProgressDeploymentMetadata struct {
+	Annotations UpdateProgressDeploymentDiffAnnotations `json:"annotations"`
+}
+
+// UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
+type UpdateProgressDeploymentDiffAnnotations struct {
+	LastRequest         string `json:"multi-juicer.owasp-juice.shop/lastRequest"`
+	LastRequestReadable string `json:"multi-juicer.owasp-juice.shop/lastRequestReadable"`
+}
+
+func updateLastRequestTimestamp(context context.Context, bundle *bundle.Bundle, team string) error {
+	bundle.Log.Printf("Updating saved ContinueCode of team '%s'", team)
+
+	diff := UpdateProgressDeploymentDiff{
+		Metadata: UpdateProgressDeploymentMetadata{
+			Annotations: UpdateProgressDeploymentDiffAnnotations{
+				LastRequest:         fmt.Sprintf("%d", time.Now().UnixMilli()),
+				LastRequestReadable: time.Now().String(),
+			},
+		},
+	}
+
+	jsonBytes, err := json.Marshal(diff)
+	if err != nil {
+		return fmt.Errorf("could not encode json, to update lastRequest timestamp on deployment")
+	}
+
+	_, err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Patch(context, fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, metav1.PatchOptions{})
+
+	if err != nil {
+		return fmt.Errorf("failed to last request timestamp for deployment. %w", err)
+	}
+	return nil
 }
