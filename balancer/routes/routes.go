@@ -25,6 +25,7 @@ func AddRoutes(
 	bundle *bundle.Bundle,
 ) {
 	router.Handle("/", trackRequestMetrics(handleProxy(bundle)))
+	router.Handle("GET /balancer", redirectLoggedInTeamsToStatus(bundle, handleStaticFiles(bundle)))
 	router.Handle("GET /balancer/", handleStaticFiles(bundle))
 	router.Handle("POST /balancer/api/teams/{team}/join", handleTeamJoin(bundle))
 	router.Handle("POST /balancer/api/teams/logout", handleLogout(bundle))
