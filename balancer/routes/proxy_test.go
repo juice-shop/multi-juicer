@@ -172,7 +172,7 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Code)
-		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-restarting&teamname=%s", teamFoo), rr.Header().Get("Location"))
+		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-restarting&team=%s", teamFoo), rr.Header().Get("Location"))
 		assert.Empty(t, rr.Body.String())
 	})
 	t.Run("redirects to /balancer?msg=instance-not-found when the deployment doesn't exist", func(t *testing.T) {
@@ -200,7 +200,7 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Code)
-		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-not-found&teamname=%s", teamFoo), rr.Header().Get("Location"))
+		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-not-found&team=%s", teamFoo), rr.Header().Get("Location"))
 		assert.Empty(t, rr.Body.String())
 	})
 }

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
-import { Card } from "../Components";
+import { Card } from "../Components.tsx";
 import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard.tsx";
-import { Button } from "../components/Button";
+import { Button } from "../components/Button.tsx";
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
 });
 
-const ErrorBox = ({ children }) => (
+const ErrorBox = ({ children }: { children: React.ReactNode }) => (
   <div className="border border-red-500 rounded p-4 bg-red-100 flex flex-col items-center gap-2">
     {children}
   </div>
@@ -21,7 +21,7 @@ const ErrorBox = ({ children }) => (
 
 export const JoinPage = injectIntl(({ intl }) => {
   const [teamname, setTeamname] = useState("");
-  const [failureMessage, setFailureMessage] = useState(null);
+  const [failureMessage, setFailureMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,25 +29,23 @@ export const JoinPage = injectIntl(({ intl }) => {
   const queryParams = new URLSearchParams(location.search);
 
   const queryMessage = queryParams.get("msg");
-  const queryTeamname = queryParams.get("teamname");
+  const queryTeamname = queryParams.get("team");
   useEffect(() => {
-    if (queryMessage === "instance-not-found") {
+    if (queryMessage === "instance-not-found" && queryTeamname !== null) {
       setTeamname(queryTeamname);
     }
   }, [queryMessage, queryTeamname]);
 
-  const passcode = undefined;
-
   const { formatMessage } = intl;
 
-  async function sendJoinRequest() {
+  async function sendJoinRequest(team: string) {
     try {
-      const response = await fetch(`/balancer/api/teams/${teamname}/join`, {
+      const response = await fetch(`/balancer/api/teams/${team}/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ passcode }),
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {
@@ -56,7 +54,7 @@ export const JoinPage = injectIntl(({ intl }) => {
           response.status === 401 &&
           errorData.message === "Team requires authentication to join"
         ) {
-          navigate(`/teams/${teamname}/joining/`);
+          navigate(`/teams/${team}/joining/`);
         } else if (
           response.status === 500 &&
           errorData.message === "Reached Maximum Instance Count"
@@ -74,7 +72,7 @@ export const JoinPage = injectIntl(({ intl }) => {
 
       const data = await response.json();
       setFailureMessage(null);
-      navigate(`/teams/${teamname}/status/`, {
+      navigate(`/teams/${team}/status/`, {
         state: { passcode: data.passcode },
       });
     } catch (error) {
@@ -82,10 +80,10 @@ export const JoinPage = injectIntl(({ intl }) => {
     }
   }
 
-  function onSubmit(event) {
+  function onSubmit(event: React.FormEvent) {
     setIsSubmitting(true);
     event.preventDefault();
-    sendJoinRequest({ teamname });
+    sendJoinRequest(teamname);
   }
 
   return (
@@ -136,7 +134,7 @@ export const JoinPage = injectIntl(({ intl }) => {
             value={teamname}
             title={formatMessage(messages.teamnameValidationConstraints)}
             pattern="^[a-z0-9]([\-a-z0-9])+[a-z0-9]$"
-            maxLength="16"
+            maxLength={16}
             onChange={({ target }) => setTeamname(target.value)}
           />
           <Button

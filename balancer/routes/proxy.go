@@ -55,11 +55,11 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 					cacheMutex.Unlock()
 				} else if status == instanceMissing {
 					bundle.Log.Printf("Instance for team (%s) is missing. Redirecting to balancer page.", team)
-					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-not-found&teamname=%s", team), http.StatusFound)
+					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-not-found&team=%s", team), http.StatusFound)
 					return
 				} else {
 					bundle.Log.Printf("Instance for team (%s) is down. Redirecting to balancer page.", team)
-					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&teamname=%s", team), http.StatusFound)
+					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&team=%s", team), http.StatusFound)
 					return
 				}
 			}
