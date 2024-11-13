@@ -22,7 +22,7 @@ ingress:
 
 service:
   type: ClusterIP
-  port: 3000
+  port: 8080
 
 balancer:
   cookie:
