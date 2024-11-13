@@ -15,7 +15,7 @@ export function Button({
     return (
       <button
         className={classNames(
-          "bg-red-600 p-3 text-sm font-semibold text-white block w-full rounded border-none mt-3 cursor-pointer text-center no-underline disabled:bg-red-600/30 disabled:cursor-wait",
+          "bg-red-600 p-3 text-sm font-semibold text-white block w-full rounded border-none cursor-pointer text-center no-underline disabled:bg-red-600/30 disabled:cursor-wait",
           className
         )}
         {...props}
@@ -27,7 +27,7 @@ export function Button({
     return (
       <a
         className={classNames(
-          "bg-red-600 p-3 text-sm font-semibold text-white block w-full rounded border-none mt-3 cursor-pointer text-center no-underline disabled:bg-red-600/30 disabled:cursor-wait",
+          "bg-red-600 p-3 text-sm font-semibold text-white block w-full rounded border-none cursor-pointer text-center no-underline disabled:bg-red-600/30 disabled:cursor-wait",
           className
         )}
         {...props}

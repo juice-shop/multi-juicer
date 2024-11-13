@@ -1,7 +1,6 @@
-import React from "react";
 import { FormattedMessage } from "react-intl";
 
-const CharDisplay = ({ children, addOffset }) => (
+const CharDisplay = ({ children, addOffset }: { children: React.ReactNode, addOffset: boolean }) => (
   <span
     className={`font-mono p-3 rounded ${
       addOffset ? "ml-2" : "ml-0"
@@ -12,13 +11,13 @@ const CharDisplay = ({ children, addOffset }) => (
   </span>
 );
 
-const PasscodeDisplayWrapper = ({ children }) => <div>{children}</div>;
+const PasscodeDisplayWrapper = ({ children }:  { children: React.ReactNode }) => <div>{children}</div>;
 
-const FakePasscodeDisplay = ({ children }) => (
+const FakePasscodeDisplay = ({ children }:  { children: React.ReactNode }) => (
   <span className="hover:hidden">{children}</span>
 );
 
-const PasscodeDisplay = ({ children }) => (
+const PasscodeDisplay = ({ children }:  { children: React.ReactNode }) => (
   <span className="hidden hover:block">{children}</span>
 );
 

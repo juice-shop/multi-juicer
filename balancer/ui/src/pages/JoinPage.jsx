@@ -74,7 +74,7 @@ export const JoinPage = injectIntl(({ intl }) => {
 
       const data = await response.json();
       setFailureMessage(null);
-      navigate(`/teams/${teamname}/joined/`, {
+      navigate(`/teams/${teamname}/status/`, {
         state: { passcode: data.passcode },
       });
     } catch (error) {

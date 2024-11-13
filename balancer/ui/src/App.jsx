@@ -37,19 +37,32 @@ function App() {
 
   return (
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
-      <Layout switchLanguage={switchLanguage} selectedLocale={locale}>
-        <BrowserRouter basename="/balancer">
-          <Suspense fallback={<LoadingPage />}>
-            <Routes>
-              <Route path="/" exact element={<JoinPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/teams/:team/status/" element={<TeamStatusPage />} />
-              <Route path="/teams/:team/joining/" element={<JoiningPage />} />
-              <Route path="/score-board/" element={<ScoreBoard />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </Layout>
+      <BrowserRouter basename="/balancer">
+        <Routes>
+          <Route
+            path="*"
+            element={
+              <Layout switchLanguage={switchLanguage} selectedLocale={locale}>
+                <Suspense fallback={<LoadingPage />}>
+                  <Routes>
+                    <Route path="/" exact element={<JoinPage />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                    <Route
+                      path="/teams/:team/status/"
+                      element={<TeamStatusPage />}
+                    />
+                    <Route
+                      path="/teams/:team/joining/"
+                      element={<JoiningPage />}
+                    />
+                    <Route path="/score-board/" element={<ScoreBoard />} />
+                  </Routes>
+                </Suspense>
+              </Layout>
+            }
+          ></Route>
+        </Routes>
+      </BrowserRouter>
     </IntlProvider>
   );
 }

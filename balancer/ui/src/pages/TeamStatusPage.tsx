@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../Components";
 import { FormattedMessage } from "react-intl";
 import { PositionDisplay } from "./ScoreBoard";
-import { PasscodeDisplayCard } from "../cards/PasscodeDisplayCard";
+import { PasscodeDisplayCard } from "../cards/PassCodeDisplayCard";
+import { Button } from "../components/Button";
 
 interface TeamStatusResponse {
   name: string;
@@ -115,7 +116,7 @@ export const TeamStatusPage = () => {
           <img
             src="/balancer/icons/astronaut.svg"
             alt="Astronaut"
-            className="h-12 w-auto mr-3"
+            className="h-12 w-12 shrink-0 w-auto mr-3"
           />
 
           <div className="text-sm font-light">
@@ -138,42 +139,95 @@ export const TeamStatusPage = () => {
 
       <hr className="border-gray-500" />
 
-      <div className="grid grid-cols-2 items-center">
-        <div className="flex flex-row items-center p-4">
-          <div className="h-12 w-auto mr-3 flex items-center">
-            <PositionDisplay place={instanceStatus?.position || -1} />
-          </div>
-
-          <span className="text-sm font-light ml-2">
-            <FormattedMessage
-              id="joining_team"
-              defaultMessage="You're in the {position}/{totalTeams} place with {solvedChallengeCount} solved challenges"
-              values={{
-                position: instanceStatus?.position,
-                totalTeams: instanceStatus?.totalTeams,
-                solvedChallengeCount: instanceStatus?.solvedChallenges,
-              }}
-            />
-          </span>
-        </div>
-        <div className="flex flex-row-reverse items-center p-4">
-          <a
-            href="/balancer/score-board"
-            className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
-          >
-            Score Overview →
-          </a>
-        </div>
-      </div>
+      <ScoreDisplay instanceStatus={instanceStatus} />
       <hr className="border-gray-500" />
       <div className="flex flex-col justify-start p-4">
         <PasscodeDisplayCard passcode="12345678" />
       </div>
 
-      <li>team: {instanceStatus?.name}</li>
-      <li>readiness: {instanceStatus?.readiness ? "ready" : "down"}</li>
-      <li>score: {instanceStatus?.score}</li>
-      <li>position: {instanceStatus?.position}</li>
+      <hr className="border-gray-500" />
+
+      <StatusDisplay instanceStatus={instanceStatus} />
     </Card>
   );
 };
+
+function ScoreDisplay({
+  instanceStatus,
+}: {
+  instanceStatus: TeamStatusResponse | null;
+}) {
+  if (!instanceStatus?.position || instanceStatus?.position === -1) {
+    return (
+      <div className="p-4">
+        <FormattedMessage
+          id="updating_score"
+          defaultMessage="Your score is getting calculated..."
+          values={{
+            position: instanceStatus?.position,
+            totalTeams: instanceStatus?.totalTeams,
+            solvedChallengeCount: instanceStatus?.solvedChallenges,
+          }}
+        />
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-2 items-center">
+      <div className="flex flex-row items-center p-4">
+        <div className="h-12 w-12 mr-3 flex shrink-0 items-center justify-center">
+          <PositionDisplay place={instanceStatus?.position || -1} />
+        </div>
+        <span className="text-sm font-light">
+          <FormattedMessage
+            id="joining_team"
+            defaultMessage="You're in the {position}/{totalTeams} place with {solvedChallengeCount} solved challenges"
+            values={{
+              position: instanceStatus?.position,
+              totalTeams: instanceStatus?.totalTeams,
+              solvedChallengeCount: instanceStatus?.solvedChallenges,
+            }}
+          />
+        </span>
+      </div>
+      <div className="flex flex-row-reverse items-center p-4">
+        <Link
+          to="/score-board"
+          className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+        >
+          Score Overview →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function StatusDisplay({
+  instanceStatus,
+}: {
+  instanceStatus: TeamStatusResponse | null;
+}) {
+  if (!instanceStatus?.readiness) {
+    return (
+      <div className="p-6">
+        <Button disabled>
+          <FormattedMessage
+            id="instance_status_starting"
+            defaultMessage="JuiceShop instance is starting..."
+          />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <Button as="a" href="/" target="_blank">
+        <FormattedMessage
+          id="instance_status_start_hacking"
+          defaultMessage="Start Hacking!"
+        />
+      </Button>
+    </div>
+  );
+}

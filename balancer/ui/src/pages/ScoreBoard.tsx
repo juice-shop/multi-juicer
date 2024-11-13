@@ -4,25 +4,25 @@ import { injectIntl } from "react-intl";
 import { Card } from "../Components";
 
 function FirstPlace({ ...props }) {
-  return <img src="/balancer/icons/first-place.svg" height="32" {...props} />;
+  return <img src="/balancer/icons/first-place.svg" {...props} />;
 }
 
 function SecondPlace({ ...props }) {
-  return <img src="/balancer/icons/second-place.svg" height="32" {...props} />;
+  return <img src="/balancer/icons/second-place.svg" {...props} />;
 }
 
 function ThirdPlace({ ...props }) {
-  return <img src="/balancer/icons/third-place.svg" height="32" {...props} />;
+  return <img src="/balancer/icons/third-place.svg" {...props} />;
 }
 
 export function PositionDisplay({ place }: { place: number }) {
   switch (place) {
     case 1:
-      return <FirstPlace height="32" />;
+      return <FirstPlace className="h-10" />;
     case 2:
-      return <SecondPlace height="32" />;
+      return <SecondPlace className="h-10" />;
     case 3:
-      return <ThirdPlace height="32" />;
+      return <ThirdPlace className="h-10" />;
     default:
       return (
         <>

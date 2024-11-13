@@ -4,6 +4,7 @@ import { Card } from "./Components.tsx";
 import { Footer } from "./Footer";
 import { classNames } from "./util/classNames";
 import { type Language } from "./translations";
+import { Link } from "react-router-dom";
 
 const pageMargins = "2xl:mx-80 lg:mx-48 md:mx-24 sm:mx-16 mx-2";
 
@@ -19,7 +20,7 @@ export function Layout({
   return (
     <div className="grid grid-rows-[min-content_auto_min-content] h-screen w-screen gap-6">
       <div className={classNames("min-h-32 mt-3 md:mt-8", pageMargins)}>
-        <a href="/balancer/">
+        <Link to="/">
           <Card className="flex items-center justify-center bg-background-highlight p-5">
             <img
               src="/balancer/multi-juicer.svg"
@@ -27,7 +28,7 @@ export function Layout({
               className="max-h-24"
             />
           </Card>
-        </a>
+        </Link>
       </div>
       <div
         className={classNames(
