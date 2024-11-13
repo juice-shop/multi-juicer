@@ -27,7 +27,6 @@ func AddRoutes(
 	router.Handle("/", trackRequestMetrics(handleProxy(bundle)))
 	router.Handle("GET /balancer/", handleStaticFiles(bundle))
 	router.Handle("POST /balancer/api/teams/{team}/join", handleTeamJoin(bundle))
-	router.Handle("GET /balancer/api/teams/{team}/wait-till-ready", handleWaitTillReady(bundle))
 	router.Handle("POST /balancer/api/teams/logout", handleLogout(bundle))
 	router.Handle("POST /balancer/api/teams/reset-passcode", handleResetPasscode(bundle))
 	router.Handle("GET /balancer/api/score-board/top", handleScoreBoard(bundle))
