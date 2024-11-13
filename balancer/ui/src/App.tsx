@@ -1,17 +1,18 @@
-import React, { Suspense, lazy, useState, useEffect } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { IntlProvider } from "react-intl";
 
-import { JoinPage } from "./pages/JoinPage.tsx";
-import { JoiningPage } from "./pages/JoiningPage.tsx";
-import { ScoreBoard } from "./pages/ScoreBoard.tsx";
-import { TeamStatusPage } from "./pages/TeamStatusPage.tsx";
+import { JoinPage } from "./pages/JoinPage";
+import { JoiningPage } from "./pages/JoiningPage";
+import { ScoreBoard } from "./pages/ScoreBoard";
+import { TeamStatusPage } from "./pages/TeamStatusPage";
 
-import { Layout } from "./Layout.tsx";
-import { Spinner } from "./Spinner.tsx";
+import { Layout } from "./Layout";
+import { Spinner } from "./Spinner";
+import { MessageLoader } from "./translations/index";
 
-const AdminPage = lazy(() => import("./pages/AdminPage.tsx"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 const LoadingPage = () => <Spinner />;
 
@@ -28,7 +29,13 @@ function App() {
     setLocale(locale);
   }, [navigatorLocale]);
 
-  const switchLanguage = async ({ key, messageLoader }) => {
+  const switchLanguage = async ({
+    key,
+    messageLoader,
+  }: {
+    key: string;
+    messageLoader: MessageLoader;
+  }) => {
     const { default: messages } = await messageLoader();
 
     setMessages(messages);
@@ -45,7 +52,7 @@ function App() {
               <Layout switchLanguage={switchLanguage} selectedLocale={locale}>
                 <Suspense fallback={<LoadingPage />}>
                   <Routes>
-                    <Route path="/" exact element={<JoinPage />} />
+                    <Route path="/" element={<JoinPage />} />
                     <Route path="/admin" element={<AdminPage />} />
                     <Route
                       path="/teams/:team/status/"

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Card } from "./Components.tsx";
+import { Card } from "./Components";
 import { Footer } from "./Footer";
 import { classNames } from "./util/classNames";
 import { type Language } from "./translations";

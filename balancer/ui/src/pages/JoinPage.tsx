@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
-import { Card } from "../Components.tsx";
-import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard.tsx";
-import { Button } from "../components/Button.tsx";
+import { Card } from "../Components";
+import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
+import { Button } from "../components/Button";
 
 const messages = defineMessages({
   teamnameValidationConstraints: {

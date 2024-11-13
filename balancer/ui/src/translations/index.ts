@@ -18,21 +18,21 @@ const availableLanguages: Language[] = [
     name: "German",
     key: "de-DE",
     messageLoader: () =>
-      import("./de-DE.ts") as Promise<{ default: Record<string, string> }>,
+      import("./de-DE") as Promise<{ default: Record<string, string> }>,
   },
   {
     flag: "🇳🇱",
     name: "Dutch",
     key: "nl-NL",
     messageLoader: () =>
-      import("./nl-NL.ts") as Promise<{ default: Record<string, string> }>,
+      import("./nl-NL") as Promise<{ default: Record<string, string> }>,
   },
   {
     flag: "🇺🇦",
     name: "Ukrainian",
     key: "uk-UA",
     messageLoader: () =>
-      import("./uk-UA.ts") as Promise<{ default: Record<string, string> }>,
+      import("./uk-UA") as Promise<{ default: Record<string, string> }>,
   },
 ];
 
