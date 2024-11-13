@@ -18,7 +18,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: 'juice-shop'
-      app.kubernetes.io/managed-by: {{ .Release.Name | quote }}
+      app.kubernetes.io/part-of: multi-juicer
   endpoints:
     - targetPort: 8080
 {{- end }}
