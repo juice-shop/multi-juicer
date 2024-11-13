@@ -71,8 +71,8 @@ func handleTeamStatus(bundle *bundle.Bundle) http.Handler {
 			}
 
 			responseWriter.Header().Set("Content-Type", "application/json")
-			responseWriter.Write(responseBytes)
 			responseWriter.WriteHeader(http.StatusOK)
+			responseWriter.Write(responseBytes)
 		},
 	)
 }

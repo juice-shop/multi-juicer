@@ -39,8 +39,8 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 			}
 
 			responseWriter.Header().Set("Content-Type", "application/json")
-			responseWriter.Write(responseBytes)
 			responseWriter.WriteHeader(http.StatusOK)
+			responseWriter.Write(responseBytes)
 		},
 	)
 }
