@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FormattedMessage, defineMessages, injectIntl } from "react-intl";
 import { Card } from "../Components";
-import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
+import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard.tsx";
 import { Button } from "../components/Button";
 
 const messages = defineMessages({
