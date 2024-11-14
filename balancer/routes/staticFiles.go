@@ -12,7 +12,7 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	frontendRoutePatterns := []*regexp.Regexp{
 		regexp.MustCompile("/balancer/admin"),
 		regexp.MustCompile("/balancer/teams/[a-z]*/joining"),
-		regexp.MustCompile("/balancer/teams/[a-z]*/joined"),
+		regexp.MustCompile("/balancer/teams/[a-z]*/status"),
 		regexp.MustCompile("/balancer/score-board"),
 	}
 
