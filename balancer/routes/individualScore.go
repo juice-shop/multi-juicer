@@ -21,7 +21,7 @@ func handleIndividualScore(bundle *b.Bundle) http.Handler {
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team := req.PathValue("team")
 
-			if !validTeamnamePattern.MatchString(team) {
+			if !isValidTeamName(team) {
 				http.Error(responseWriter, "invalid team name", http.StatusBadRequest)
 				return
 			}

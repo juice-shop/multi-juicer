@@ -19,6 +19,10 @@ func handleAdminRestartInstance(bundle *bundle.Bundle) http.Handler {
 			}
 
 			teamToRestart := req.PathValue("team")
+			if !isValidTeamName(teamToRestart) {
+				http.Error(responseWriter, "invalid team name", http.StatusBadRequest)
+				return
+			}
 
 			// find pod for service
 

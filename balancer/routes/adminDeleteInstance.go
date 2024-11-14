@@ -20,6 +20,10 @@ func handleAdminDeleteInstance(bundle *bundle.Bundle) http.Handler {
 			}
 
 			teamToDelete := req.PathValue("team")
+			if !isValidTeamName(teamToDelete) {
+				http.Error(responseWriter, "invalid team name", http.StatusBadRequest)
+				return
+			}
 
 			err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), fmt.Sprintf("juiceshop-%s", teamToDelete), metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {

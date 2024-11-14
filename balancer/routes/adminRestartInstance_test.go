@@ -48,6 +48,22 @@ func TestAdminRestartInstanceHandler(t *testing.T) {
 		assert.Equal(t, "\n", rr.Body.String())
 	})
 
+	t.Run("rejects invalid team names", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/restart", "invälid"), nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset(createPodForTeam("foobar"))
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
 	t.Run("restart instances deletes the pod for the instance", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", "/balancer/api/admin/teams/foobar/restart", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))

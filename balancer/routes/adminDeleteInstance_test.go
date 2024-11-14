@@ -78,6 +78,22 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 		assert.Equal(t, "\n", rr.Body.String())
 	})
 
+	t.Run("rejects invalid team names", func(t *testing.T) {
+		req, _ := http.NewRequest("DELETE", fmt.Sprintf("/balancer/api/admin/teams/%s/delete", "invälid"), nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewSimpleClientset(createDeploymentForTeam("foobar"), createServiceForTeam("foobar"))
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
 	t.Run("deletes both deployments and services of teams", func(t *testing.T) {
 		req, _ := http.NewRequest("DELETE", "/balancer/api/admin/teams/foobar/delete", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
