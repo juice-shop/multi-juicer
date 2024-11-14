@@ -103,7 +103,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	})
 
 	t.Run("returns a 401 if the balancer cookie isn't signed", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/teams/%s/wait-till-ready", team), nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", team))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
