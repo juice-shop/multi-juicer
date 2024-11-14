@@ -249,7 +249,7 @@ default values render correctly:
     spec:
       ports:
         - name: web
-          port: 3000
+          port: 8080
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer
@@ -700,7 +700,7 @@ full values render out correctly:
                   service:
                     name: balancer
                     port:
-                      number: 3000
+                      number: 8080
                 path: /
                 pathType: ImplementationSpecific
       tls:
@@ -832,7 +832,7 @@ full values render out correctly:
     spec:
       ports:
         - name: web
-          port: 3000
+          port: 8080
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer
@@ -3067,11 +3067,11 @@ full values render out correctly:
       name: juice-shops
     spec:
       endpoints:
-        - targetPort: 8080
+        - targetPort: 3000
       selector:
         matchLabels:
-          app.kubernetes.io/managed-by: RELEASE-NAME
           app.kubernetes.io/name: juice-shop
+          app.kubernetes.io/part-of: multi-juicer
       targetLabels:
         - team
   19: |
@@ -3463,7 +3463,7 @@ production notes work correctly:
     spec:
       ports:
         - name: web
-          port: 3000
+          port: 8080
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer
