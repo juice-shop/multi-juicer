@@ -101,7 +101,7 @@ NB: See this guide if you have your own domain: https://docs.microsoft.com/en-us
 IP="MY_EXTERNAL_IP"
 
 # Name to associate with public IP address
-DNSNAME="my-multi-juicer"
+DNSNAME="MY_EXTERNAL_DOMAIN"
 
 # Get the resource-id of the public ip
 PUBLICIPID=$(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv)
@@ -176,26 +176,26 @@ Save the following content as `ingress.yaml`
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: my-multi-juicer
+  name: MY_EXTERNAL_DOMAIN
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - my-multi-juicer.<availability zone>.cloudapp.azure.com
+    - MY_EXTERNAL_DOMAIN.<availability zone>.cloudapp.azure.com
     secretName: tls-secret
   rules:
-  - host: my-multi-juicer.<availability zone>.cloudapp.azure.com
+  - host: MY_EXTERNAL_DOMAIN.<availability zone>.cloudapp.azure.com
     http:
       paths:
       - path: /
         pathType: ImplementationSpecific
         backend:
           service:
-            name: balancer
+            name: juice-balancer
             port:
-              number: 8080
+              number: 3000
 ```
 
 Edit the host so that it corresponds to the host associated with your public ip. You find the hostname of your public ip by executing this command.
