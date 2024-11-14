@@ -14,8 +14,6 @@ import { MessageLoader } from "./translations/index";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 
-const LoadingPage = () => <Spinner />;
-
 function App() {
   const [locale, setLocale] = useState("en");
   const [messages, setMessages] = useState({});
@@ -55,7 +53,7 @@ function App() {
                 switchLanguage={switchLanguage}
                 selectedLocale={locale}
               >
-                <Suspense fallback={<LoadingPage />}>
+                <Suspense fallback={<Spinner />}>
                   <Routes>
                     <Route
                       path="/"
