@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { injectIntl } from "react-intl";
 
-import { Card } from "../Components";
+import { Card } from "../components/Card";
 
 function FirstPlace({ ...props }) {
   return <img src="/balancer/icons/first-place.svg" {...props} />;

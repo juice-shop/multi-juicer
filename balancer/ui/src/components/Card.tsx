@@ -1,4 +1,4 @@
-import { classNames } from "./util/classNames";
+import { classNames } from "../util/classNames";
 
 export const Card = ({
   children,

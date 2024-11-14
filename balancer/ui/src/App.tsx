@@ -9,7 +9,7 @@ import { ScoreBoard } from "./pages/ScoreBoard";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
 
 import { Layout } from "./Layout";
-import { Spinner } from "./Spinner";
+import { Spinner } from "./components/Spinner";
 import { MessageLoader } from "./translations/index";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));

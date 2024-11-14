@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 
-import { Card } from "../Components";
+import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 
 export const JoiningPage = ({

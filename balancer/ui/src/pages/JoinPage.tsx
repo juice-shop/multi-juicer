@@ -6,7 +6,7 @@ import {
   defineMessages,
   injectIntl,
 } from "react-intl";
-import { Card } from "../Components";
+import { Card } from "../components/Card";
 import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
 import { Button } from "../components/Button";
 

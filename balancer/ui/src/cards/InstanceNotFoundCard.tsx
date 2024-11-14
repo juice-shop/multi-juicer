@@ -1,6 +1,6 @@
 import { FormattedMessage } from "react-intl";
 
-import { Card } from "../Components";
+import { Card } from "../components/Card";
 
 export const InstanceNotFoundCard = () => {
   return (
