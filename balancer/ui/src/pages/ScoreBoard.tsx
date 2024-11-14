@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { injectIntl } from "react-intl";
 
-import { Card } from "../components/Card";
-
 function FirstPlace({ ...props }) {
   return <img src="/balancer/icons/first-place.svg" {...props} />;
 }
@@ -62,7 +60,10 @@ export const ScoreBoard = injectIntl(() => {
 
   return (
     <>
-      <Card className="p-0 overflow-hidden w-full max-w-2xl">
+      <div className="p-0 overflow-hidden w-full max-w-2xl rounded-lg bg-gradient-to-b from-gray-100 via-gray-100 to-gray-500">
+        <h1 className="text-gray-500 px-4 pt-4 font-bold tracking-wide">
+          ScoreBoard
+        </h1>
         <table className="w-full text-left border-collapse">
           <thead className="w-full border-none bg-gray-100 text-gray-800">
             <tr className="w-full">
@@ -86,7 +87,7 @@ export const ScoreBoard = injectIntl(() => {
               </th>
             </tr>
           </thead>
-          <tbody className="w-full">
+          <tbody className="w-full dark:bg-gray-800">
             {teams.map((team) => {
               return (
                 <tr className="border-t border-gray-600" key={team.name}>
@@ -105,7 +106,7 @@ export const ScoreBoard = injectIntl(() => {
             })}
           </tbody>
         </table>
-      </Card>
+      </div>
     </>
   );
 });
