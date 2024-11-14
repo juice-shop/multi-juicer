@@ -151,7 +151,7 @@ export const TeamStatusPage = ({
           <img
             src="/balancer/icons/astronaut.svg"
             alt="Astronaut"
-            className="h-12 w-12 shrink-0 w-auto mr-3"
+            className="h-12 w-12 shrink-0 mr-3"
           />
 
           <div className="text-sm font-light">
