@@ -34,6 +34,7 @@ func TestStaticFileHandler(t *testing.T) {
 			"/balancer/teams/foo-bar-123/status/",
 			"/balancer/teams/abc/joined/",
 			"/balancer/score-board/",
+			"/balancer/score-board/teams/abc/score/",
 		}
 
 		server := http.NewServeMux()

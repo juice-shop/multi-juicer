@@ -9,11 +9,11 @@ import (
 )
 
 type IndividualScore struct {
-	Name             string `json:"name"`
-	Score            int    `json:"score"`
-	SolvedChallenges int    `json:"solvedChallenges"`
-	Position         int    `json:"position"`
-	TotalTeams       int    `json:"totalTeams"`
+	Name             string   `json:"name"`
+	Score            int      `json:"score"`
+	SolvedChallenges []string `json:"solvedChallenges"`
+	Position         int      `json:"position"`
+	TotalTeams       int      `json:"totalTeams"`
 }
 
 func handleIndividualScore(bundle *b.Bundle) http.Handler {
@@ -45,7 +45,7 @@ func handleIndividualScore(bundle *b.Bundle) http.Handler {
 				Score:            teamScore.Score,
 				Position:         teamScore.Position,
 				TotalTeams:       teamCount,
-				SolvedChallenges: len(teamScore.Challenges),
+				SolvedChallenges: teamScore.Challenges,
 			}
 
 			responseBytes, err := json.Marshal(response)

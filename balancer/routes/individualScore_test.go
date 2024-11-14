@@ -59,7 +59,7 @@ func TestIndividualScoreHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1}`, rr.Body.String())
+		assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":["scoreBoardChallenge"],"totalTeams":1}`, rr.Body.String())
 	})
 
 	t.Run("returns a 404 if the scores haven't been calculated yet", func(t *testing.T) {

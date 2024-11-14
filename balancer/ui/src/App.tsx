@@ -4,9 +4,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
 import { JoinPage } from "./pages/JoinPage";
-import { JoiningPage } from "./pages/JoiningPage";
 import { ScoreBoard } from "./pages/ScoreBoard";
+import { JoiningPage } from "./pages/JoiningPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
+import { IndividualScorePage } from "./pages/IndividualScorePage";
 
 import { Layout } from "./Layout";
 import { Spinner } from "./components/Spinner";
@@ -74,6 +75,10 @@ function App() {
                       element={<JoiningPage setActiveTeam={setActiveTeam} />}
                     />
                     <Route path="/score-board/" element={<ScoreBoard />} />
+                    <Route
+                      path="/score-board/teams/:team"
+                      element={<IndividualScorePage />}
+                    />
                   </Routes>
                 </Suspense>
               </Layout>

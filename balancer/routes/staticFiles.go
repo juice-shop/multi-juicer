@@ -14,6 +14,7 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 		regexp.MustCompile("/balancer/teams/" + teamNamePatternString + "/status"),
 		regexp.MustCompile("/balancer/teams/" + teamNamePatternString + "/joined"),
 		regexp.MustCompile("/balancer/score-board"),
+		regexp.MustCompile("/balancer/score-board/teams/" + teamNamePatternString + "/score"),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

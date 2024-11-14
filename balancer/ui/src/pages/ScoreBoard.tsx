@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { injectIntl } from "react-intl";
+import { Link } from "react-router-dom";
 
 function FirstPlace({ ...props }) {
   return <img src="/balancer/icons/first-place.svg" {...props} />;
@@ -44,7 +44,7 @@ async function fetchTeams(): Promise<Team[]> {
   return teams;
 }
 
-export const ScoreBoard = injectIntl(() => {
+export function ScoreBoard() {
   const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     fetchTeams().then(setTeams);
@@ -94,7 +94,11 @@ export const ScoreBoard = injectIntl(() => {
                   <td className="text-center p-2">
                     <PositionDisplay place={team.position} />
                   </td>
-                  <td className="p-2">{team.name}</td>
+                  <td className="p-2">
+                    <Link to={`/score-board/teams/${team.name}`}>
+                      {team.name}
+                    </Link>
+                  </td>
                   <td className="text-right p-2">
                     {team.score} points
                     <p className="text-gray-500 m-1">
@@ -109,4 +113,4 @@ export const ScoreBoard = injectIntl(() => {
       </div>
     </>
   );
-});
+}
