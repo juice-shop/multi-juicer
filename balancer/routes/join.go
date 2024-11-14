@@ -114,7 +114,8 @@ func getDeployment(context context.Context, bundle *bundle.Bundle, team string) 
 	)
 }
 
-var validTeamnamePattern = regexp.MustCompile("^[a-z0-9]([-a-z0-9])+[a-z0-9]$")
+var teamNamePatternString = "[a-z0-9]([-a-z0-9])+[a-z0-9]"
+var validTeamnamePattern = regexp.MustCompile("^" + teamNamePatternString + "$")
 
 func isValidTeamName(s string) bool {
 	matched := validTeamnamePattern.MatchString(s)

@@ -28,10 +28,10 @@ func TestStaticFileHandler(t *testing.T) {
 	})
 
 	t.Run("should return index.html too when requesting a route handled by the frontend router", func(t *testing.T) {
-
 		frontendRoutes := []string{
 			"/balancer/admin",
-			"/balancer/teams/abc/joining/",
+			"/balancer/teams/abc/status/",
+			"/balancer/teams/foo-bar-123/status/",
 			"/balancer/teams/abc/joined/",
 			"/balancer/score-board/",
 		}
