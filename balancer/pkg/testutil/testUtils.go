@@ -32,6 +32,18 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 		GetJuiceShopUrlForTeam: func(team string, bundle *bundle.Bundle) string {
 			return "http://localhost:8080"
 		},
+		JuiceShopChallenges: []bundle.JuiceShopChallenge{
+			{
+				Key:        "scoreBoardChallenge",
+				Name:       "Score Board",
+				Difficulty: 1,
+			},
+			{
+				Key:        "nullByteChallenge",
+				Name:       "Poison Null Byte",
+				Difficulty: 4,
+			},
+		},
 		BcryptRounds: 2,
 		Log:          log.New(os.Stdout, "", log.LstdFlags),
 		Config: &bundle.Config{

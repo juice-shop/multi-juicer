@@ -11,26 +11,30 @@ interface IndividualTeamScore<T> {
   solvedChallenges: T[];
 }
 
-interface ChallengeProgressResponse {
+interface SolvedChallengeResponse {
   key: string;
   solvedAt: string;
+  name: string;
+  difficulty: string;
 }
-interface ChallengeProgress {
+interface SolvedChallenge {
   key: string;
   solvedAt: Date;
+  name: string;
+  difficulty: string;
 }
 
 async function fetchScore(
   team: string
-): Promise<IndividualTeamScore<ChallengeProgress>> {
+): Promise<IndividualTeamScore<SolvedChallenge>> {
   const response = await fetch(`/balancer/api/score-board/teams/${team}/score`);
   const rawScore =
-    (await response.json()) as IndividualTeamScore<ChallengeProgressResponse>;
+    (await response.json()) as IndividualTeamScore<SolvedChallengeResponse>;
   return {
     ...rawScore,
     solvedChallenges: rawScore.solvedChallenges.map((challenge) => {
       return {
-        key: challenge.key,
+        ...challenge,
         solvedAt: new Date(challenge.solvedAt),
       };
     }),
@@ -45,7 +49,7 @@ export function IndividualScorePage() {
   }
 
   const [score, setScore] =
-    useState<IndividualTeamScore<ChallengeProgress> | null>(null);
+    useState<IndividualTeamScore<SolvedChallenge> | null>(null);
   useEffect(() => {
     fetchScore(team).then(setScore);
 
@@ -79,7 +83,13 @@ export function IndividualScorePage() {
               </th>
               <th
                 scope="col"
-                className="p-3 text-gray-500 text-xs font-medium uppercase"
+                className="p-3 text-gray-500 text-xs text-right font-medium uppercase"
+              >
+                Difficulty
+              </th>
+              <th
+                scope="col"
+                className="p-3 text-gray-500 text-xs text-right font-medium uppercase"
               >
                 Solved At
               </th>
@@ -94,8 +104,9 @@ export function IndividualScorePage() {
             {score.solvedChallenges.map((challenge) => {
               return (
                 <tr className="border-t border-gray-600" key={challenge.key}>
-                  <td className="p-2">{challenge.key}</td>
-                  <td className="p-2">
+                  <td className="p-2">{challenge.name}</td>
+                  <td className="p-2 text-right">{challenge.difficulty}</td>
+                  <td className="p-2 text-right">
                     <ReadableTimestamp date={challenge.solvedAt} />
                   </td>
                 </tr>
