@@ -55,16 +55,25 @@ func TestScoreBoardHandler(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, []TeamScore{
 			{
-				Name:       "foobar",
-				Score:      50,
-				Position:   1,
-				Challenges: []string{"scoreBoardChallenge", "nullByteChallenge"},
+				Name:     "foobar",
+				Score:    50,
+				Position: 1,
+				Challenges: []ChallengeProgress{
+					{
+						Key:      "scoreBoardChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+					{
+						Key:      "nullByteChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+				},
 			},
 			{
 				Name:       "barfoo",
 				Score:      0,
 				Position:   2,
-				Challenges: []string{},
+				Challenges: []ChallengeProgress{},
 			},
 		}, scores)
 	})
@@ -92,28 +101,47 @@ func TestScoreBoardHandler(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, []TeamScore{
 			{
-				Name:       "foobar",
-				Score:      50,
-				Position:   1,
-				Challenges: []string{"scoreBoardChallenge", "nullByteChallenge"},
+				Name:     "foobar",
+				Score:    50,
+				Position: 1,
+				Challenges: []ChallengeProgress{
+					{
+						Key:      "scoreBoardChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+					{
+						Key:      "nullByteChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+				},
 			},
 			{
-				Name:       "barfoo-1",
-				Score:      10,
-				Position:   2,
-				Challenges: []string{"scoreBoardChallenge"},
+				Name:     "barfoo-1",
+				Score:    10,
+				Position: 2,
+				Challenges: []ChallengeProgress{
+					{
+						Key:      "scoreBoardChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+				},
 			},
 			{
-				Name:       "barfoo-2",
-				Score:      10,
-				Position:   2,
-				Challenges: []string{"scoreBoardChallenge"},
+				Name:     "barfoo-2",
+				Score:    10,
+				Position: 2,
+				Challenges: []ChallengeProgress{
+					{
+						Key:      "scoreBoardChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+				},
 			},
 			{
 				Name:       "last",
 				Score:      0,
 				Position:   4, // should be 4 not 3 as there are two teams with the same score on position 2
-				Challenges: []string{},
+				Challenges: []ChallengeProgress{},
 			},
 		}, scores)
 	})
@@ -135,16 +163,21 @@ func TestScoreBoardHandler(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, []TeamScore{
 			{
-				Name:       "foobar",
-				Score:      40,
-				Position:   1,
-				Challenges: []string{"nullByteChallenge"},
+				Name:     "foobar",
+				Score:    40,
+				Position: 1,
+				Challenges: []ChallengeProgress{
+					{
+						Key:      "nullByteChallenge",
+						SolvedAt: "2024-11-01T19:55:48.211Z",
+					},
+				},
 			},
 			{
 				Name:       "barfoo",
 				Score:      0,
 				Position:   2,
-				Challenges: []string{},
+				Challenges: []ChallengeProgress{},
 			},
 		}, scores)
 	})

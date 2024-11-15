@@ -1,18 +1,40 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Spinner } from "../components/Spinner";
+import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
-interface IndividualTeamScore {
+interface IndividualTeamScore<T> {
   name: string;
   score: string;
   position: number;
   totalTeams: number;
-  solvedChallenges: string[];
+  solvedChallenges: T[];
 }
 
-async function fetchScore(team: string): Promise<IndividualTeamScore> {
+interface ChallengeProgressResponse {
+  key: string;
+  solvedAt: string;
+}
+interface ChallengeProgress {
+  key: string;
+  solvedAt: Date;
+}
+
+async function fetchScore(
+  team: string
+): Promise<IndividualTeamScore<ChallengeProgress>> {
   const response = await fetch(`/balancer/api/score-board/teams/${team}/score`);
-  return await response.json();
+  const rawScore =
+    (await response.json()) as IndividualTeamScore<ChallengeProgressResponse>;
+  return {
+    ...rawScore,
+    solvedChallenges: rawScore.solvedChallenges.map((challenge) => {
+      return {
+        key: challenge.key,
+        solvedAt: new Date(challenge.solvedAt),
+      };
+    }),
+  };
 }
 
 export function IndividualScorePage() {
@@ -22,7 +44,8 @@ export function IndividualScorePage() {
     return <div>Team not found</div>;
   }
 
-  const [score, setScore] = useState<IndividualTeamScore | null>(null);
+  const [score, setScore] =
+    useState<IndividualTeamScore<ChallengeProgress> | null>(null);
   useEffect(() => {
     fetchScore(team).then(setScore);
 
@@ -54,6 +77,12 @@ export function IndividualScorePage() {
               >
                 Name
               </th>
+              <th
+                scope="col"
+                className="p-3 text-gray-500 text-xs font-medium uppercase"
+              >
+                Solved At
+              </th>
             </tr>
           </thead>
           <tbody className="w-full dark:bg-gray-800">
@@ -64,8 +93,11 @@ export function IndividualScorePage() {
             )}
             {score.solvedChallenges.map((challenge) => {
               return (
-                <tr className="border-t border-gray-600" key={challenge}>
-                  <td className="p-2">{challenge}</td>
+                <tr className="border-t border-gray-600" key={challenge.key}>
+                  <td className="p-2">{challenge.key}</td>
+                  <td className="p-2">
+                    <ReadableTimestamp date={challenge.solvedAt} />
+                  </td>
                 </tr>
               );
             })}

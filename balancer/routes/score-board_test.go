@@ -74,16 +74,19 @@ func TestScoreBoardHandler(t *testing.T) {
 
 		assert.Equal(t, []scoring.TeamScore{
 			{
-				Name:       "foobar",
-				Score:      50,
-				Position:   1,
-				Challenges: []string{"scoreBoardChallenge", "nullByteChallenge"},
+				Name:     "foobar",
+				Score:    50,
+				Position: 1,
+				Challenges: []scoring.ChallengeProgress{
+					{Key: "scoreBoardChallenge", SolvedAt: "2024-11-01T19:55:48.211Z"},
+					{Key: "nullByteChallenge", SolvedAt: "2024-11-01T19:55:48.211Z"},
+				},
 			},
 			{
 				Name:       "barfoo",
 				Score:      0,
 				Position:   2,
-				Challenges: []string{},
+				Challenges: []scoring.ChallengeProgress{},
 			},
 		}, response.TopTeams)
 	})

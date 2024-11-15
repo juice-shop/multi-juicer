@@ -15,14 +15,14 @@ import (
 const updateInterval = 5 * time.Second
 
 type TeamScore struct {
-	Name       string   `json:"name"`
-	Score      int      `json:"score"`
-	Position   int      `json:"position"`
-	Challenges []string `json:"challenges"`
+	Name       string              `json:"name"`
+	Score      int                 `json:"score"`
+	Position   int                 `json:"position"`
+	Challenges []ChallengeProgress `json:"challenges"`
 }
 
 // PersistedChallengeProgress is stored as a json array on the JuiceShop deployments, saving which challenges have been solved and when
-type PersistedChallengeProgress struct {
+type ChallengeProgress struct {
 	Key      string `json:"key"`
 	SolvedAt string `json:"solvedAt"`
 }
@@ -115,11 +115,11 @@ func calculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment, challen
 		return TeamScore{
 			Name:       team,
 			Score:      0,
-			Challenges: []string{},
+			Challenges: []ChallengeProgress{},
 		}
 	}
 
-	solvedChallenges := []PersistedChallengeProgress{}
+	solvedChallenges := []ChallengeProgress{}
 	err := json.Unmarshal([]byte(solvedChallengesString), &solvedChallenges)
 
 	if err != nil {
@@ -127,12 +127,12 @@ func calculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment, challen
 		return TeamScore{
 			Name:       team,
 			Score:      0,
-			Challenges: []string{},
+			Challenges: []ChallengeProgress{},
 		}
 	}
 
 	score := 0
-	solvedChallengeNames := []string{}
+	solvedChallengeNames := []ChallengeProgress{}
 	for _, challengeSolved := range solvedChallenges {
 		challenge, ok := challengesMap[challengeSolved.Key]
 		if !ok {
@@ -140,7 +140,7 @@ func calculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment, challen
 			continue
 		}
 		score += challenge.Difficulty * 10
-		solvedChallengeNames = append(solvedChallengeNames, challengeSolved.Key)
+		solvedChallengeNames = append(solvedChallengeNames, challengeSolved)
 	}
 
 	return TeamScore{
