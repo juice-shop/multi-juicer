@@ -193,9 +193,9 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: juice-balancer
+            name: balancer
             port:
-              number: 3000
+              number: 8080
 ```
 
 Edit the host so that it corresponds to the host associated with your public ip. You find the hostname of your public ip by executing this command.
