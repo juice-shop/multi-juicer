@@ -176,7 +176,7 @@ Save the following content as `ingress.yaml`
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: MY_EXTERNAL_DOMAIN
+  name: multi-juicer
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
