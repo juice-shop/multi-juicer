@@ -1,5 +1,7 @@
 ![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
 
+> ⚠ WARN: The main branch currently contains the upcoming v8 release. v8 contains some breaking changes. When you are still using v7 (which is still recommended) make sure that you are looking at the latest v7 tag when recefencing docs.
+
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
