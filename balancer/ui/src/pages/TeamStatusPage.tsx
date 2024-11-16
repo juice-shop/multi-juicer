@@ -132,6 +132,7 @@ export const TeamStatusPage = ({
     try {
       const status = await fetchTeamStatusData();
       setInstanceStatus(status);
+      setActiveTeam(status.name);
     } catch (err) {
       console.error("Failed to fetch current teams!", err);
     }
