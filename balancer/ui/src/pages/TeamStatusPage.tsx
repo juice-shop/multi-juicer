@@ -220,7 +220,7 @@ function ScoreDisplay({
     );
   }
   return (
-    <div className="grid grid-cols-2 items-center">
+    <div className="grid md:grid-cols-[auto_max-content] grid-cols-1 items-center">
       <div className="flex flex-row items-center p-4">
         <div className="h-12 w-12 mr-3 flex shrink-0 items-center justify-center">
           <PositionDisplay place={instanceStatus?.position || -1} />
