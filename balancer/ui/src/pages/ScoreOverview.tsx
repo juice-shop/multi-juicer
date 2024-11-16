@@ -44,7 +44,11 @@ async function fetchTeams(): Promise<Team[]> {
   return teams;
 }
 
-export function ScoreBoard({ activeTeam }: { activeTeam: string | null }) {
+export function ScoreOverviewPage({
+  activeTeam,
+}: {
+  activeTeam: string | null;
+}) {
   const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     fetchTeams().then(setTeams);
@@ -95,7 +99,7 @@ export function ScoreBoard({ activeTeam }: { activeTeam: string | null }) {
                     <PositionDisplay place={team.position} />
                   </td>
                   <td className="p-2">
-                    <Link to={`/score-board/teams/${team.name}`}>
+                    <Link to={`/score-overview/teams/${team.name}`}>
                       {team.name === activeTeam ? (
                         <strong className="text-greay-800">{team.name}</strong>
                       ) : (

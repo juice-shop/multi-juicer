@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/Card";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PositionDisplay } from "./ScoreBoard";
+import { PositionDisplay } from "./ScoreOverview";
 import { PasscodeDisplayCard } from "../cards/PassCodeDisplayCard";
 import { Button } from "../components/Button";
 import toast from "react-hot-toast";
@@ -239,7 +239,7 @@ function ScoreDisplay({
       </div>
       <div className="flex flex-row-reverse items-center p-4">
         <Link
-          to="/score-board"
+          to="/score-overview"
           className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
           Score Overview →

@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
 import { JoinPage } from "./pages/JoinPage";
-import { ScoreBoard } from "./pages/ScoreBoard";
+import { ScoreOverviewPage } from "./pages/ScoreOverview";
 import { JoiningPage } from "./pages/JoiningPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
 import { IndividualScorePage } from "./pages/IndividualScorePage";
@@ -76,11 +76,11 @@ function App() {
                       element={<JoiningPage setActiveTeam={setActiveTeam} />}
                     />
                     <Route
-                      path="/score-board/"
-                      element={<ScoreBoard activeTeam={activeTeam} />}
+                      path="/score-overview/"
+                      element={<ScoreOverviewPage activeTeam={activeTeam} />}
                     />
                     <Route
-                      path="/score-board/teams/:team"
+                      path="/score-overview/teams/:team"
                       element={<IndividualScorePage />}
                     />
                   </Routes>
