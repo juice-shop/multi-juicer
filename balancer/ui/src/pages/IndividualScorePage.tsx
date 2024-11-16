@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Spinner } from "../components/Spinner";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 interface IndividualTeamScore<T> {
   name: string;
@@ -16,13 +16,13 @@ interface SolvedChallengeResponse {
   key: string;
   solvedAt: string;
   name: string;
-  difficulty: string;
+  difficulty: number;
 }
 interface SolvedChallenge {
   key: string;
   solvedAt: Date;
   name: string;
-  difficulty: string;
+  difficulty: number;
 }
 
 async function fetchScore(
@@ -44,6 +44,7 @@ async function fetchScore(
 
 export function IndividualScorePage() {
   const { team } = useParams();
+  const intl = useIntl();
 
   if (!team) {
     return <div>Team not found</div>;
@@ -112,9 +113,30 @@ export function IndividualScorePage() {
             {score.solvedChallenges.map((challenge) => {
               return (
                 <tr className="border-t border-gray-600" key={challenge.key}>
-                  <td className="p-2">{challenge.name}</td>
-                  <td className="p-2 text-right">{challenge.difficulty}</td>
-                  <td className="p-2 text-right">
+                  <td className="p-2 px-4">{challenge.name}</td>
+                  <td
+                    className="p-2 px-4"
+                    title={intl.formatMessage(
+                      {
+                        id: "difficulty",
+                        defaultMessage: "Difficulty: {difficulty}/6",
+                      },
+                      { difficulty: challenge.difficulty }
+                    )}
+                  >
+                    <div className="h-full flex justify-end items-center">
+                      {Array.from({ length: challenge.difficulty }, (_, i) => (
+                        <img
+                          src="/balancer/icons/star.svg"
+                          alt="Star"
+                          key={i}
+                          height={12}
+                          width={12}
+                        />
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-2 px-4 text-right">
                     <ReadableTimestamp date={challenge.solvedAt} />
                   </td>
                 </tr>

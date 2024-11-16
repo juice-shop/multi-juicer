@@ -95,10 +95,10 @@ export function ScoreOverviewPage({
             {teams.map((team) => {
               return (
                 <tr className="border-t border-gray-600" key={team.name}>
-                  <td className="text-center p-2">
+                  <td className="text-center p-2 px-3">
                     <PositionDisplay place={team.position} />
                   </td>
-                  <td className="p-2">
+                  <td className="p-2 px-4">
                     <Link to={`/score-overview/teams/${team.name}`}>
                       {team.name === activeTeam ? (
                         <strong className="text-greay-800">{team.name}</strong>
@@ -107,7 +107,7 @@ export function ScoreOverviewPage({
                       )}
                     </Link>
                   </td>
-                  <td className="text-right p-2">
+                  <td className="text-right text-s p-2 px-4">
                     {team.score} points
                     <p className="text-gray-500 m-1">
                       {team.challenges.length} solved challenges
