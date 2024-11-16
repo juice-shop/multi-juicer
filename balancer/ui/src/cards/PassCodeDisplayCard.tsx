@@ -1,27 +1,15 @@
-import { FormattedMessage } from "react-intl";
+import { useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { classNames } from "../util/classNames";
+import toast from "react-hot-toast";
 
-const CharDisplay = ({ children, addOffset }: { children: React.ReactNode, addOffset: boolean }) => (
-  <span
-    className={`font-mono p-3 rounded ${
-      addOffset ? "ml-2" : "ml-0"
-    } inline-block`}
-    style={{ backgroundColor: "var(--background)" }}
-  >
-    {children}
-  </span>
-);
-
-const PasscodeDisplayWrapper = ({ children }:  { children: React.ReactNode }) => <div>{children}</div>;
-
-const FakePasscodeDisplay = ({ children }:  { children: React.ReactNode }) => (
-  <span className="hover:hidden">{children}</span>
-);
-
-const PasscodeDisplay = ({ children }:  { children: React.ReactNode }) => (
-  <span className="hidden hover:block">{children}</span>
-);
+const PLACEHOLDER = "●●●●●●●●";
 
 export const PasscodeDisplayCard = ({ passcode = "" }) => {
+  const intl = useIntl();
+  const [activlyDisplayedPasscode, setActivlyDisplayedPasscode] =
+    useState<string>(PLACEHOLDER);
+
   return (
     <>
       <p className="text-sm mb-2">
@@ -30,27 +18,35 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
           defaultMessage="You can join the same team using this passcode, on another device or with another teammate."
         />
       </p>
-      <div className="flex justify-center">
-        <PasscodeDisplayWrapper aria-label={`Passcode is: ${passcode}`}>
-          <FakePasscodeDisplay>
-            {"●●●●●●●●".split("").map((char, index) => (
-              <CharDisplay
-                addOffset={index === 4}
-                key={index}
-                aria-hidden="true"
-              >
-                {char}
-              </CharDisplay>
-            ))}
-          </FakePasscodeDisplay>
-          <PasscodeDisplay data-test-id="passcode-display">
-            {passcode.split("").map((char, index) => (
-              <CharDisplay addOffset={index === 4} key={index}>
-                {char}
-              </CharDisplay>
-            ))}
-          </PasscodeDisplay>
-        </PasscodeDisplayWrapper>
+      <div
+        className="flex justify-center cursor-copy"
+        aria-label={`Passcode is: ${passcode}`}
+        onMouseEnter={() => setActivlyDisplayedPasscode(passcode)}
+        onMouseLeave={() => setActivlyDisplayedPasscode(PLACEHOLDER)}
+        title="Click to copy"
+        onClick={() => {
+          navigator.clipboard.writeText(passcode);
+          toast.success(
+            intl.formatMessage({
+              id: "passcode_copied",
+              defaultMessage: "Passcode copied to clipboard",
+            })
+          );
+        }}
+      >
+        <div className="flex gap-1">
+          {activlyDisplayedPasscode.split("").map((char, index) => (
+            <span
+              key={index}
+              className={classNames(
+                "font-mono p-3 rounded inline-block dark:bg-gray-900 bg-gray-200",
+                index === 3 ? "mr-3" : ""
+              )}
+            >
+              {char}
+            </span>
+          ))}
+        </div>
       </div>
     </>
   );

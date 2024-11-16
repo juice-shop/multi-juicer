@@ -12,6 +12,7 @@ import { IndividualScorePage } from "./pages/IndividualScorePage";
 import { Layout } from "./Layout";
 import { Spinner } from "./components/Spinner";
 import { MessageLoader } from "./translations/index";
+import { Toaster } from "react-hot-toast";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 
@@ -86,6 +87,7 @@ function App() {
           ></Route>
         </Routes>
       </BrowserRouter>
+      <Toaster />
     </IntlProvider>
   );
 }

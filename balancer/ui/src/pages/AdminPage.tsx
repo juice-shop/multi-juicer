@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  defineMessages,
-  FormattedMessage,
-  injectIntl,
-  IntlShape,
-} from "react-intl";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
 
 import { Card } from "../components/Card";
@@ -25,83 +20,81 @@ const messages = defineMessages({
   },
 });
 
-const RestartInstanceButton = injectIntl(
-  ({ intl, team }: { intl: IntlShape; team: string }) => {
-    const [restarting, setRestarting] = useState(false);
+function RestartInstanceButton({ team }: { team: string }) {
+  const intl = useIntl();
+  const [restarting, setRestarting] = useState(false);
 
-    const restart = async (event: React.MouseEvent) => {
-      event.preventDefault();
-      const confirmed = confirm(
-        intl.formatMessage(messages.admin_restart_team_confirmation, { team })
-      );
-      if (!confirmed) {
-        return;
-      }
-      setRestarting(true);
-      try {
-        await Promise.all([
-          sleep(10000), // wait at least 3 seconds to signal to the user that the restart is happening, restart takes longer than the delete
-          fetch(`/balancer/api/admin/teams/${team}/restart`, {
-            method: "POST",
-          }),
-        ]);
-      } finally {
-        setRestarting(false);
-      }
-    };
-    return (
-      <button className={buttonClasses} disabled={restarting} onClick={restart}>
-        {restarting ? (
-          <FormattedMessage
-            id="admin_table.restarting"
-            defaultMessage="restarting..."
-          />
-        ) : (
-          <FormattedMessage id="admin_table.restart" defaultMessage="restart" />
-        )}
-      </button>
+  const restart = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    const confirmed = confirm(
+      intl.formatMessage(messages.admin_restart_team_confirmation, { team })
     );
-  }
-);
+    if (!confirmed) {
+      return;
+    }
+    setRestarting(true);
+    try {
+      await Promise.all([
+        sleep(10000), // wait at least 3 seconds to signal to the user that the restart is happening, restart takes longer than the delete
+        fetch(`/balancer/api/admin/teams/${team}/restart`, {
+          method: "POST",
+        }),
+      ]);
+    } finally {
+      setRestarting(false);
+    }
+  };
+  return (
+    <button className={buttonClasses} disabled={restarting} onClick={restart}>
+      {restarting ? (
+        <FormattedMessage
+          id="admin_table.restarting"
+          defaultMessage="restarting..."
+        />
+      ) : (
+        <FormattedMessage id="admin_table.restart" defaultMessage="restart" />
+      )}
+    </button>
+  );
+}
 
-const DeleteInstanceButton = injectIntl(
-  ({ intl, team }: { intl: IntlShape; team: string }) => {
-    const [deleting, setDeleting] = useState(false);
+function DeleteInstanceButton({ team }: { team: string }) {
+  const intl = useIntl();
+  const [deleting, setDeleting] = useState(false);
 
-    const remove = async (event: React.MouseEvent) => {
-      event.preventDefault();
-      const confirmed = confirm(
-        intl.formatMessage(messages.admin_delete_team_confirmation, { team })
-      );
-      if (!confirmed) {
-        return;
-      }
-      setDeleting(true);
-      try {
-        await Promise.all([
-          sleep(3000), // wait at least 3 seconds to signal to the user that the delete is happening
-          fetch(`/balancer/api/admin/teams/${team}/delete`, {
-            method: "DELETE",
-          }),
-        ]);
-      } finally {
-        setDeleting(false);
-      }
-    };
-    return (
-      <button className={buttonClasses} disabled={deleting} onClick={remove}>
-        {deleting ? (
-          <FormattedMessage
-            id="admin_table.deleting"
-            defaultMessage="deleting..."
-          />
-        ) : (
-          <FormattedMessage id="admin_table.delete" defaultMessage="delete" />
-        )}
-      </button>
+  const remove = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    const confirmed = confirm(
+      intl.formatMessage(messages.admin_delete_team_confirmation, { team })
     );
-  }
-);
+    if (!confirmed) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await Promise.all([
+        sleep(3000), // wait at least 3 seconds to signal to the user that the delete is happening
+        fetch(`/balancer/api/admin/teams/${team}/delete`, {
+          method: "DELETE",
+        }),
+      ]);
+    } finally {
+      setDeleting(false);
+    }
+  };
+  return (
+    <button className={buttonClasses} disabled={deleting} onClick={remove}>
+      {deleting ? (
+        <FormattedMessage
+          id="admin_table.deleting"
+          defaultMessage="deleting..."
+        />
+      ) : (
+        <FormattedMessage id="admin_table.delete" defaultMessage="delete" />
+      )}
+    </button>
+  );
+}
 
 interface Team {
   team: string;

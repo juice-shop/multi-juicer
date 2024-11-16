@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Card } from "../components/Card";
-import {
-  defineMessages,
-  FormattedMessage,
-  injectIntl,
-  IntlShape,
-} from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { PositionDisplay } from "./ScoreBoard";
 import { PasscodeDisplayCard } from "../cards/PassCodeDisplayCard";
 import { Button } from "../components/Button";
+import toast from "react-hot-toast";
 
 interface TeamStatusResponse {
   name: string;
@@ -20,58 +16,59 @@ interface TeamStatusResponse {
   readiness: boolean;
 }
 
-const messages = defineMessages({
-  teamnameValidationConstraints: {
-    id: "logout_confirmation",
-    defaultMessage:
-      "Are you sure you want to logout? If you don't have the passcode saved, you won't be able to rejoin.",
-  },
-});
+function LogoutButton({
+  setActiveTeam,
+}: {
+  setActiveTeam: (team: string | null) => void;
+}) {
+  const navigate = useNavigate();
+  const intl = useIntl();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-const LogoutButton = injectIntl(
-  ({
-    intl,
-    setActiveTeam,
-  }: {
-    intl: IntlShape;
-    setActiveTeam: (team: string | null) => void;
-  }) => {
-    const navigate = useNavigate();
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-    async function logout() {
-      const confirmed = confirm(
-        intl.formatMessage(messages.teamnameValidationConstraints)
-      );
-      if (!confirmed) {
-        return;
-      }
-      try {
-        setActiveTeam(null);
-        setIsLoggingOut(true);
-        await fetch("/balancer/api/teams/logout", {
-          method: "POST",
-        });
-        navigate("/");
-      } catch (error) {
-        console.error("Failed to log out", error);
-      }
-    }
-
-    return (
-      <button
-        disabled={isLoggingOut}
-        onClick={logout}
-        className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
-      >
-        <FormattedMessage id="log_out" defaultMessage="Log Out" />
-      </button>
+  async function logout() {
+    const confirmed = confirm(
+      intl.formatMessage({
+        id: "logout_confirmation",
+        defaultMessage:
+          "Are you sure you want to logout? If you don't have the passcode saved, you won't be able to rejoin.",
+      })
     );
+    if (!confirmed) {
+      return;
+    }
+    try {
+      setActiveTeam(null);
+      setIsLoggingOut(true);
+      await fetch("/balancer/api/teams/logout", {
+        method: "POST",
+      });
+      setIsLoggingOut(false);
+      toast.success(
+        intl.formatMessage({
+          id: "logout_success",
+          defaultMessage: "Logged out successfully",
+        })
+      );
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to log out", error);
+    }
   }
-);
+
+  return (
+    <button
+      disabled={isLoggingOut}
+      onClick={logout}
+      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+    >
+      <FormattedMessage id="log_out" defaultMessage="Log Out" />
+    </button>
+  );
+}
 
 const PasscodeResetButton = ({ team }: { team: string }) => {
   const navigate = useNavigate();
+  const intl = useIntl();
   const [isResetting, setIsResetting] = useState(false);
 
   async function resetPasscode() {
@@ -84,6 +81,12 @@ const PasscodeResetButton = ({ team }: { team: string }) => {
       navigate(`/teams/${team}/status/`, {
         state: { passcode: data.passcode, reset: true },
       });
+      toast.success(
+        intl.formatMessage({
+          id: "passcode_reset_success",
+          defaultMessage: "Passcode reset successfully",
+        })
+      );
     } catch (error) {
       console.error("Failed to reset passcode", error);
     } finally {
@@ -120,6 +123,10 @@ export const TeamStatusPage = ({
 
   const [instanceStatus, setInstanceStatus] =
     useState<TeamStatusResponse | null>(null);
+
+  const { state } = useLocation();
+
+  const passcode: string | null = state?.passcode || null;
 
   async function updateStatusData() {
     try {
@@ -176,11 +183,15 @@ export const TeamStatusPage = ({
 
       <ScoreDisplay instanceStatus={instanceStatus} />
       <hr className="border-gray-500" />
-      <div className="flex flex-col justify-start p-4">
-        <PasscodeDisplayCard passcode="12345678" />
-      </div>
 
-      <hr className="border-gray-500" />
+      {passcode && (
+        <>
+          <div className="flex flex-col justify-start p-4">
+            <PasscodeDisplayCard passcode={passcode} />
+          </div>
+          <hr className="border-gray-500" />
+        </>
+      )}
 
       <StatusDisplay instanceStatus={instanceStatus} />
     </Card>
