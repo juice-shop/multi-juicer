@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Spinner } from "../components/Spinner";
 import { ReadableTimestamp } from "../components/ReadableTimestamp";
+import { FormattedMessage } from "react-intl";
 
 interface IndividualTeamScore<T> {
   name: string;
@@ -77,19 +78,19 @@ export function IndividualScorePage() {
             <tr className="w-full">
               <th
                 scope="col"
-                className="p-3 text-gray-500 text-xs font-medium uppercase"
+                className="p-4 text-gray-500 text-xs font-medium uppercase"
               >
                 Name
               </th>
               <th
                 scope="col"
-                className="p-3 text-gray-500 text-xs text-right font-medium uppercase"
+                className="p-4 text-gray-500 text-xs text-right font-medium uppercase"
               >
                 Difficulty
               </th>
               <th
                 scope="col"
-                className="p-3 text-gray-500 text-xs text-right font-medium uppercase"
+                className="p-4 text-gray-500 text-xs text-right font-medium uppercase"
               >
                 Solved At
               </th>
@@ -98,7 +99,14 @@ export function IndividualScorePage() {
           <tbody className="w-full dark:bg-gray-800">
             {score.solvedChallenges.length === 0 && (
               <tr className="border-t border-gray-600">
-                <td className="p-2">No challenges solved yet</td>
+                <td className="p-2">
+                  <FormattedMessage
+                    id="no_challenges_solved"
+                    defaultMessage="No challenges solved yet"
+                  />
+                </td>
+                <td className="p-2 text-right"></td>
+                <td className="p-2 text-right"></td>
               </tr>
             )}
             {score.solvedChallenges.map((challenge) => {

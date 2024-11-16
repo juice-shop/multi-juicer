@@ -73,19 +73,19 @@ export function ScoreOverviewPage({
             <tr className="w-full">
               <th
                 scope="col"
-                className="text-center w-12 p-3 text-gray-500 text-xs font-medium uppercase"
+                className="w-12 p-4 text-gray-500 text-xs font-medium uppercase"
               >
                 #
               </th>
               <th
                 scope="col"
-                className="p-3 text-gray-500 text-xs font-medium uppercase"
+                className="p-4 text-gray-500 text-xs font-medium uppercase"
               >
                 Name
               </th>
               <th
                 scope="col"
-                className="text-right p-3 text-gray-500 text-xs font-medium uppercase"
+                className="text-right p-4 text-gray-500 text-xs font-medium uppercase"
               >
                 Score
               </th>
