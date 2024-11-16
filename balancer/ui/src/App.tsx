@@ -75,7 +75,10 @@ function App() {
                       path="/teams/:team/joining/"
                       element={<JoiningPage setActiveTeam={setActiveTeam} />}
                     />
-                    <Route path="/score-board/" element={<ScoreBoard />} />
+                    <Route
+                      path="/score-board/"
+                      element={<ScoreBoard activeTeam={activeTeam} />}
+                    />
                     <Route
                       path="/score-board/teams/:team"
                       element={<IndividualScorePage />}

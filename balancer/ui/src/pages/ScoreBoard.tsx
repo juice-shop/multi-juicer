@@ -44,7 +44,7 @@ async function fetchTeams(): Promise<Team[]> {
   return teams;
 }
 
-export function ScoreBoard() {
+export function ScoreBoard({ activeTeam }: { activeTeam: string | null }) {
   const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     fetchTeams().then(setTeams);
@@ -96,7 +96,11 @@ export function ScoreBoard() {
                   </td>
                   <td className="p-2">
                     <Link to={`/score-board/teams/${team.name}`}>
-                      {team.name}
+                      {team.name === activeTeam ? (
+                        <strong className="text-greay-800">{team.name}</strong>
+                      ) : (
+                        team.name
+                      )}
                     </Link>
                   </td>
                   <td className="text-right p-2">
