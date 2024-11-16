@@ -14,7 +14,7 @@ const messages = defineMessages({
 });
 
 const ErrorBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="border border-red-500 rounded p-4 bg-red-100 flex flex-col items-center gap-2">
+  <div className="border border-red-500 text-gray-900 mt-2 rounded p-4 bg-red-100 flex flex-col items-center gap-2">
     {children}
   </div>
 );
@@ -128,7 +128,7 @@ export function JoinPage({
           </ErrorBox>
         ) : null}
 
-        <form className="mt-8" onSubmit={onSubmit}>
+        <form className="mt-4" onSubmit={onSubmit}>
           <label className="font-light block mb-1" htmlFor="teamname">
             <FormattedMessage id="teamname" defaultMessage="Teamname" />
           </label>
