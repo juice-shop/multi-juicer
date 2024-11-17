@@ -41,6 +41,14 @@ tasks:
       - npm run build
     dir: balancer/ui/
 
+  balancer:ui:bundle-analyzer:
+    preconditions:
+      - sh: test -d node_modules/
+        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+    cmds:
+      - npx vite-bundle-visualizer
+    dir: balancer/ui/
+
   balancer:ui:test:
     preconditions:
       - sh: test -d node_modules/
