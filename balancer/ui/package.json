@@ -4,17 +4,14 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
     "promise-retry": "^2.0.1",
-    "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-intl": "^6.8.8",
     "react-router-dom": "^6.28.0",
+    "react": "^18.3.1",
     "reactjs-popup": "^2.0.6",
-    "tailwindcss": "^3.4.15",
-    "typescript": "^5.6.3"
+    "tailwindcss": "^3.4.15"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -22,7 +19,10 @@
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
     "jsdom": "^25.0.1",
+    "postcss": "^8.4.49",
+    "typescript": "^5.6.3",
     "vite": "^5.4.11",
     "vitest": "^2.1.5"
   },
