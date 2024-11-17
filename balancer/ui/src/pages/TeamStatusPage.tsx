@@ -128,11 +128,14 @@ export const TeamStatusPage = ({
 
   const passcode: string | null = state?.passcode || null;
 
+  let timeout: number | null = null;
   async function updateStatusData() {
     try {
       const status = await fetchTeamStatusData();
       setInstanceStatus(status);
       setActiveTeam(status.name);
+      const waitTime = status.readiness ? 5000 : 1000; // poll faster when not ready, as the instance is starting and we want to show the user the status as soon as possible
+      timeout = window.setTimeout(() => updateStatusData(), waitTime);
     } catch (err) {
       console.error("Failed to fetch current teams!", err);
     }
@@ -140,11 +143,10 @@ export const TeamStatusPage = ({
 
   useEffect(() => {
     updateStatusData();
-
-    const interval = setInterval(updateStatusData, 5000);
-
     return () => {
-      clearInterval(interval);
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
     };
   }, [team]);
 
