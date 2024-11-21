@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { MagicMotion } from "react-magic-motion";
 
 function FirstPlace({ ...props }) {
   return <img src="/balancer/icons/first-place.svg" {...props} />;
@@ -92,30 +93,36 @@ export function ScoreOverviewPage({
             </tr>
           </thead>
           <tbody className="w-full dark:bg-gray-800">
-            {teams.map((team) => {
-              return (
-                <tr className="border-t border-gray-600" key={team.name}>
-                  <td className="text-center p-2 px-3">
-                    <PositionDisplay place={team.position} />
-                  </td>
-                  <td className="p-2 px-4">
-                    <Link to={`/score-overview/teams/${team.name}`}>
-                      {team.name === activeTeam ? (
-                        <strong className="text-greay-800">{team.name}</strong>
-                      ) : (
-                        team.name
-                      )}
-                    </Link>
-                  </td>
-                  <td className="text-right text-s p-2 px-4">
-                    {team.score} points
-                    <p className="text-gray-500 m-1">
-                      {team.challenges.length} solved challenges
-                    </p>
-                  </td>
-                </tr>
-              );
-            })}
+            <MagicMotion>
+              <>
+                {teams.map((team) => {
+                  return (
+                    <tr className="border-t border-gray-600" key={team.name}>
+                      <td className="text-center p-2 px-3">
+                        <PositionDisplay place={team.position} />
+                      </td>
+                      <td className="p-2 px-4">
+                        <Link to={`/score-overview/teams/${team.name}`}>
+                          {team.name === activeTeam ? (
+                            <strong className="text-gray-800">
+                              {team.name}
+                            </strong>
+                          ) : (
+                            team.name
+                          )}
+                        </Link>
+                      </td>
+                      <td className="text-right text-s p-2 px-4">
+                        {team.score} points
+                        <p className="text-gray-500 m-1">
+                          {team.challenges.length} solved challenges
+                        </p>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </>
+            </MagicMotion>
           </tbody>
         </table>
       </div>
