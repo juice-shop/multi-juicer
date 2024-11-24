@@ -40,7 +40,9 @@ interface Team {
 }
 
 async function fetchTeams(): Promise<Team[]> {
-  const response = await fetch("/balancer/api/score-board/top");
+  const response = await fetch(
+    `/balancer/api/score-board/top?wait-for-update-after=${new Date().toISOString()}`
+  );
   const { teams } = await response.json();
   return teams;
 }
@@ -60,6 +62,38 @@ export function ScoreOverviewPage({
 
     return () => {
       clearInterval(timer);
+    };
+  }, []);
+  const [lastUpdateStarted, setLastUpdateStarted] = useState(Date.now());
+
+  let timeout: number | null = null;
+  async function updateScoreData() {
+    try {
+      setLastUpdateStarted(Date.now());
+      const status = await fetchTeams();
+      setTeams(status);
+
+      // the request is using a http long polling mechanism to get the updates as soon as possible
+      // in case the request returns immediatly we wait for at least 3 seconds to ensure we aren't spamming the server
+      const waitTime = Math.max(3000, 5000 - (Date.now() - lastUpdateStarted));
+      console.log(
+        "Waited for",
+        Date.now() - lastUpdateStarted,
+        "ms for status update"
+      );
+      console.log("Waiting for", waitTime, "ms until starting next request");
+      timeout = window.setTimeout(() => updateScoreData(), waitTime);
+    } catch (err) {
+      console.error("Failed to fetch current teams!", err);
+    }
+  }
+
+  useEffect(() => {
+    updateScoreData();
+    return () => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
     };
   }, []);
 

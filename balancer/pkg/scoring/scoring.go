@@ -35,6 +35,9 @@ type ScoringService struct {
 	currentScoresSorted []*TeamScore
 	currentScoresMutex  *sync.Mutex
 
+	lastSeenUpdate time.Time
+	newUpdate      sync.Cond
+
 	challengesMap map[string](bundle.JuiceShopChallenge)
 }
 
@@ -55,6 +58,9 @@ func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[stri
 		currentScoresSorted: sortTeamsByScoreAndCalculatePositions(initialScores),
 		currentScoresMutex:  &sync.Mutex{},
 
+		lastSeenUpdate: time.Now(),
+		newUpdate:      *sync.NewCond(&sync.Mutex{}),
+
 		challengesMap: cachedChallengesMap,
 	}
 }
@@ -65,6 +71,33 @@ func (s *ScoringService) GetScores() map[string]*TeamScore {
 
 func (s *ScoringService) GetTopScores() []*TeamScore {
 	return s.currentScoresSorted
+}
+
+func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore {
+	if s.lastSeenUpdate.After(lastSeenUpdate) {
+		// the last update was after the last seen update, so we can return the current scores without waiting
+		return s.currentScoresSorted
+	}
+
+	const maxWaitTime = 25 * time.Second
+	done := make(chan struct{})
+	go func() {
+		s.newUpdate.Wait()
+		close(done)
+	}()
+
+	select {
+	// check for update by subscribing to the newUpdate condition
+	case <-done:
+		// new update was received
+		return s.currentScoresSorted
+	case <-time.After(maxWaitTime):
+		// timeout was reached
+		return nil
+	case <-ctx.Done():
+		// request was aborted
+		return nil
+	}
 }
 
 // StartingScoringWorker starts a worker that listens for changes in JuiceShop deployments and updates the scores accordingly
@@ -101,6 +134,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				s.currentScores[score.Name] = score
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
+				s.newUpdate.Broadcast()
 				s.currentScoresMutex.Unlock()
 			case watch.Deleted:
 				deployment := event.Object.(*appsv1.Deployment)
@@ -108,6 +142,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				delete(s.currentScores, team)
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
+				s.newUpdate.Broadcast()
 				s.currentScoresMutex.Unlock()
 			default:
 				s.bundle.Log.Printf("Unknown event type: %v", event.Type)

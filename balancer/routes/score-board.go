@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
@@ -16,7 +17,22 @@ type ScoreBoardResponse struct {
 func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			totalTeams := scoringService.GetTopScores()
+			var totalTeams []*scoring.TeamScore
+
+			if req.URL.Query().Get("wait-for-update-after") != "" {
+				lastSeenUpdate, err := time.Parse(time.RFC3339, req.URL.Query().Get("wait-for-update-after"))
+				if err != nil {
+					http.Error(responseWriter, "Invalid time format", http.StatusBadRequest)
+					return
+				}
+				totalTeams = scoringService.WaitForUpdatesNewerThan(req.Context(), lastSeenUpdate)
+				if totalTeams == nil {
+					responseWriter.WriteHeader(http.StatusNoContent)
+					return
+				}
+			} else {
+				totalTeams = scoringService.GetTopScores()
+			}
 
 			var topTeams []*scoring.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
