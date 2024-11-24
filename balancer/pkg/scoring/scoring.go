@@ -3,6 +3,7 @@ package scoring
 import (
 	"context"
 	"encoding/json"
+	"reflect"
 	"sort"
 	"sync"
 	"time"
@@ -89,14 +90,24 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 			case watch.Added, watch.Modified:
 				deployment := event.Object.(*appsv1.Deployment)
 				score := calculateScore(s.bundle, deployment, cachedChallengesMap)
+
+				if currentTeamScore, ok := s.currentScores[score.Name]; ok {
+					if reflect.DeepEqual(currentTeamScore.Score, score.Score) {
+						// No need to update, if the score hasn't changed
+						continue
+					}
+				}
+
 				s.currentScoresMutex.Lock()
 				s.currentScores[score.Name] = score
+				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
 				s.currentScoresMutex.Unlock()
 			case watch.Deleted:
 				deployment := event.Object.(*appsv1.Deployment)
 				team := deployment.Labels["team"]
 				s.currentScoresMutex.Lock()
 				delete(s.currentScores, team)
+				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
 				s.currentScoresMutex.Unlock()
 			default:
 				s.bundle.Log.Printf("Unknown event type: %v", event.Type)
