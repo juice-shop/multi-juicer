@@ -66,9 +66,9 @@ func (s *ScoringService) GetTopScores() []*TeamScore {
 	return s.currentScoresSorted
 }
 
-// TrackScoresWorker is a worker that runs in the background and cheks the scores of all JuiceShop instances every 5 seconds
-func (s *ScoringService) StartingScoringWorker() {
-	watcher, err := s.bundle.ClientSet.AppsV1().Deployments(s.bundle.RuntimeEnvironment.Namespace).Watch(context.Background(), metav1.ListOptions{
+// StartingScoringWorker starts a worker that listens for changes in JuiceShop deployments and updates the scores accordingly
+func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
+	watcher, err := s.bundle.ClientSet.AppsV1().Deployments(s.bundle.RuntimeEnvironment.Namespace).Watch(ctx, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 	})
 
@@ -78,25 +78,34 @@ func (s *ScoringService) StartingScoringWorker() {
 	}
 	defer watcher.Stop()
 
-	for event := range watcher.ResultChan() {
-		switch event.Type {
-		case watch.Added, watch.Modified:
-			deployment := event.Object.(*appsv1.Deployment)
-			score := calculateScore(s.bundle, deployment, cachedChallengesMap)
-			s.currentScoresMutex.Lock()
-			s.currentScores[score.Name] = score
-			s.currentScoresMutex.Unlock()
-		case watch.Deleted:
-			deployment := event.Object.(*appsv1.Deployment)
-			team := deployment.Labels["team"]
-			s.currentScoresMutex.Lock()
-			delete(s.currentScores, team)
-			s.currentScoresMutex.Unlock()
-		default:
-			s.bundle.Log.Printf("Unknown event type: %v", event.Type)
+	for {
+		select {
+		case event, ok := <-watcher.ResultChan():
+			if !ok {
+				s.bundle.Log.Printf("Watcher for JuiceShop deployments has been closed. Exiting the watcher.")
+				return
+			}
+			switch event.Type {
+			case watch.Added, watch.Modified:
+				deployment := event.Object.(*appsv1.Deployment)
+				score := calculateScore(s.bundle, deployment, cachedChallengesMap)
+				s.currentScoresMutex.Lock()
+				s.currentScores[score.Name] = score
+				s.currentScoresMutex.Unlock()
+			case watch.Deleted:
+				deployment := event.Object.(*appsv1.Deployment)
+				team := deployment.Labels["team"]
+				s.currentScoresMutex.Lock()
+				delete(s.currentScores, team)
+				s.currentScoresMutex.Unlock()
+			default:
+				s.bundle.Log.Printf("Unknown event type: %v", event.Type)
+			}
+		case <-ctx.Done():
+			s.bundle.Log.Printf("Context canceled. Exiting the watcher.")
+			return
 		}
 	}
-	s.bundle.Log.Printf("Watcher for JuiceShop deployments has been closed. Exiting the watcher.")
 }
 
 func (s *ScoringService) CalculateAndCacheScoreBoard(context context.Context) error {

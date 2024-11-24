@@ -10,7 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/fake"
+	testcore "k8s.io/client-go/testing"
 )
 
 func TestScoreingService(t *testing.T) {
@@ -75,7 +77,6 @@ func TestScoreingService(t *testing.T) {
 	})
 
 	t.Run("teams with the same score get the same position assigned", func(t *testing.T) {
-
 		clientset := fake.NewSimpleClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo-1", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
@@ -171,6 +172,30 @@ func TestScoreingService(t *testing.T) {
 				Challenges: []ChallengeProgress{},
 			},
 		}, scores)
+	})
+
+	t.Run("watcher properly updates scores", func(t *testing.T) {
+		clientset := fake.NewClientset(
+			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := NewScoringService(bundle)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		err := scoringService.CalculateAndCacheScoreBoard(ctx)
+		assert.Nil(t, err)
+		go scoringService.StartingScoringWorker(ctx)
+		assert.Equal(t, 10, scoringService.GetScores()["foobar"].Score)
+
+		watcher := watch.NewFake()
+		clientset.PrependWatchReactor("deployments", testcore.DefaultWatchReactor(watcher, nil))
+		watcher.Modify(createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"))
+
+		assert.Eventually(t, func() bool {
+			return scoringService.GetScores()["foobar"].Score == 50
+		}, 1*time.Second, 10*time.Millisecond)
 	})
 }
 

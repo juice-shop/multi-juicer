@@ -15,9 +15,11 @@ func main() {
 	bundle := bundle.New()
 	scoringService := scoring.NewScoringService(bundle)
 
+	ctx := context.Background()
+
 	go StartMetricsServer()
-	scoringService.CalculateAndCacheScoreBoard(context.Background())
-	go scoringService.StartingScoringWorker()
+	scoringService.CalculateAndCacheScoreBoard(ctx)
+	go scoringService.StartingScoringWorker(ctx)
 	StartBalancerServer(bundle, scoringService)
 }
 
