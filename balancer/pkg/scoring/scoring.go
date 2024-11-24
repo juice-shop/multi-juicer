@@ -36,7 +36,6 @@ type ScoringService struct {
 	currentScoresMutex  *sync.Mutex
 
 	lastSeenUpdate time.Time
-	newUpdate      sync.Cond
 
 	challengesMap map[string](bundle.JuiceShopChallenge)
 }
@@ -59,7 +58,6 @@ func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[stri
 		currentScoresMutex:  &sync.Mutex{},
 
 		lastSeenUpdate: time.Now(),
-		newUpdate:      *sync.NewCond(&sync.Mutex{}),
 
 		challengesMap: cachedChallengesMap,
 	}
@@ -80,23 +78,24 @@ func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUp
 	}
 
 	const maxWaitTime = 25 * time.Second
-	done := make(chan struct{})
-	go func() {
-		s.newUpdate.Wait()
-		close(done)
-	}()
+	timeout := time.NewTimer(maxWaitTime)
+	ticker := time.NewTicker(50 * time.Millisecond)
+	defer timeout.Stop()
+	defer ticker.Stop()
 
-	select {
-	// check for update by subscribing to the newUpdate condition
-	case <-done:
-		// new update was received
-		return s.currentScoresSorted
-	case <-time.After(maxWaitTime):
-		// timeout was reached
-		return nil
-	case <-ctx.Done():
-		// request was aborted
-		return nil
+	for {
+		select {
+		case <-ticker.C:
+			if s.lastSeenUpdate.After(lastSeenUpdate) {
+				return s.currentScoresSorted
+			}
+		case <-timeout.C:
+			// Timeout was reached
+			return nil
+		case <-ctx.Done():
+			// Context was canceled
+			return nil
+		}
 	}
 }
 
@@ -134,7 +133,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				s.currentScores[score.Name] = score
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-				s.newUpdate.Broadcast()
+				s.lastSeenUpdate = time.Now()
 				s.currentScoresMutex.Unlock()
 			case watch.Deleted:
 				deployment := event.Object.(*appsv1.Deployment)
@@ -142,7 +141,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				delete(s.currentScores, team)
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-				s.newUpdate.Broadcast()
+				s.lastSeenUpdate = time.Now()
 				s.currentScoresMutex.Unlock()
 			default:
 				s.bundle.Log.Printf("Unknown event type: %v", event.Type)

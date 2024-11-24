@@ -39,10 +39,16 @@ interface Team {
   challenges: string[];
 }
 
-async function fetchTeams(): Promise<Team[]> {
-  const response = await fetch(
-    `/balancer/api/score-board/top?wait-for-update-after=${new Date().toISOString()}`
-  );
+async function fetchTeams(lastSeen: Date | null): Promise<null | Team[]> {
+  const url = lastSeen
+    ? `/balancer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
+    : "/balancer/api/score-board/top";
+  const response = await fetch(url);
+
+  if (response.status === 204) {
+    return null;
+  }
+
   const { teams } = await response.json();
   return teams;
 }
@@ -53,43 +59,36 @@ export function ScoreOverviewPage({
   activeTeam: string | null;
 }) {
   const [teams, setTeams] = useState<Team[]>([]);
-  useEffect(() => {
-    fetchTeams().then(setTeams);
-
-    const timer = setInterval(() => {
-      fetchTeams().then(setTeams);
-    }, 5000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-  const [lastUpdateStarted, setLastUpdateStarted] = useState(Date.now());
 
   let timeout: number | null = null;
-  async function updateScoreData() {
+  const updateScoreData = async (lastSuccessfulUpdate: Date | null) => {
     try {
-      setLastUpdateStarted(Date.now());
-      const status = await fetchTeams();
-      setTeams(status);
+      const lastUpdateStarted = new Date();
+      const status = await fetchTeams(lastSuccessfulUpdate);
+      if (status !== null) {
+        setTeams(status);
+      }
 
       // the request is using a http long polling mechanism to get the updates as soon as possible
       // in case the request returns immediatly we wait for at least 3 seconds to ensure we aren't spamming the server
-      const waitTime = Math.max(3000, 5000 - (Date.now() - lastUpdateStarted));
+      const waitTime = Math.max(
+        3000,
+        5000 - (Date.now() - lastUpdateStarted.getTime())
+      );
       console.log(
         "Waited for",
-        Date.now() - lastUpdateStarted,
+        Date.now() - lastUpdateStarted.getTime(),
         "ms for status update"
       );
       console.log("Waiting for", waitTime, "ms until starting next request");
-      timeout = window.setTimeout(() => updateScoreData(), waitTime);
+      timeout = window.setTimeout(() => updateScoreData(new Date()), waitTime);
     } catch (err) {
       console.error("Failed to fetch current teams!", err);
     }
-  }
+  };
 
   useEffect(() => {
-    updateScoreData();
+    updateScoreData(null);
     return () => {
       if (timeout !== null) {
         clearTimeout(timeout);
