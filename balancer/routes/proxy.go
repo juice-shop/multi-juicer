@@ -121,7 +121,7 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 }
 
 func updateLastRequestTimestamp(context context.Context, bundle *bundle.Bundle, team string) error {
-	bundle.Log.Printf("Updating saved ContinueCode of team '%s'", team)
+	bundle.Log.Printf("Updating last request timestamp for team '%s'", team)
 
 	diff := UpdateProgressDeploymentDiff{
 		Metadata: UpdateProgressDeploymentMetadata{
