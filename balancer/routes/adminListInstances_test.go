@@ -52,7 +52,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -72,7 +72,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 			createTeam("test-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 0),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)

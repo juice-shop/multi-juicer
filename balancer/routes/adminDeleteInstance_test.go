@@ -70,7 +70,7 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset(createDeploymentForTeam("foobar"), createServiceForTeam("foobar"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -87,7 +87,7 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset(createDeploymentForTeam("foobar"), createServiceForTeam("foobar"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -108,7 +108,7 @@ func TestAdminDeleteInstanceHandler(t *testing.T) {
 			createServiceForTeam("other-team"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 

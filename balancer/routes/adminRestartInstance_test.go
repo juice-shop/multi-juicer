@@ -40,7 +40,7 @@ func TestAdminRestartInstanceHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset(createPodForTeam("foobar"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -57,7 +57,7 @@ func TestAdminRestartInstanceHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset(createPodForTeam("foobar"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -73,7 +73,7 @@ func TestAdminRestartInstanceHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset(createPodForTeam("foobar"), createPodForTeam("other-team"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,78 +27,80 @@ type ChallengeProgress struct {
 	SolvedAt string `json:"solvedAt"`
 }
 
-var cachedChallengesMap map[string](b.JuiceShopChallenge)
+var cachedChallengesMap map[string](bundle.JuiceShopChallenge)
 
-var (
-	currentScores      = []TeamScore{}
-	currentScoresMutex = &sync.Mutex{}
-)
+type ScoringService struct {
+	bundle              *bundle.Bundle
+	currentScores       map[string]*TeamScore
+	currentScoresSorted []*TeamScore
+	currentScoresMutex  *sync.Mutex
 
-func GetScores() []TeamScore {
-	return currentScores
+	challengesMap map[string](bundle.JuiceShopChallenge)
+}
+
+func NewScoringService(bundle *bundle.Bundle) *ScoringService {
+	return NewScoringServiceWithInitialScores(bundle, make(map[string]*TeamScore))
+}
+
+func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[string]*TeamScore) *ScoringService {
+	// create a map of challenges for easy lookup by challenge key
+	cachedChallengesMap = make(map[string](bundle.JuiceShopChallenge))
+	for _, challenge := range b.JuiceShopChallenges {
+		cachedChallengesMap[challenge.Key] = challenge
+	}
+
+	return &ScoringService{
+		bundle:              b,
+		currentScores:       initialScores,
+		currentScoresSorted: sortTeamsByScoreAndCalculatePositions(initialScores),
+		currentScoresMutex:  &sync.Mutex{},
+
+		challengesMap: cachedChallengesMap,
+	}
+}
+
+func (s *ScoringService) GetScores() map[string]*TeamScore {
+	return s.currentScores
+}
+
+func (s *ScoringService) GetTopScores() []*TeamScore {
+	return s.currentScoresSorted
 }
 
 // TrackScoresWorker is a worker that runs in the background and cheks the scores of all JuiceShop instances every 5 seconds
-func StartingScoringWorker(bundle *b.Bundle) {
-	// create a map of challenges for easy lookup by challenge key
-	cachedChallengesMap = make(map[string](b.JuiceShopChallenge))
-	for _, challenge := range bundle.JuiceShopChallenges {
-		cachedChallengesMap[challenge.Key] = challenge
-	}
+func (s *ScoringService) StartingScoringWorker() {
 	for {
 		context := context.Background()
 		time.Sleep(updateInterval)
 
-		err := CalculateAndCacheScoreBoard(context, bundle, cachedChallengesMap)
+		err := s.CalculateAndCacheScoreBoard(context)
 		if err != nil {
-			bundle.Log.Printf("Failed to calculate the score board. Claculation will be automatically retried in %ds : %v", updateInterval, err)
+			s.bundle.Log.Printf("Failed to calculate the score board. Claculation will be automatically retried in %ds : %v", updateInterval, err)
 			continue
 		}
 	}
 }
 
-func CalculateAndCacheScoreBoard(context context.Context, bundle *b.Bundle, challengesMap map[string](b.JuiceShopChallenge)) error {
-	teamScores, err := CalculateScoreBoard(context, bundle, challengesMap)
+func (s *ScoringService) CalculateAndCacheScoreBoard(context context.Context) error {
+	// Get all JuiceShop instances
+	juiceShops, err := getDeployments(context, s.bundle)
 	if err != nil {
 		return err
 	}
 
-	currentScoresMutex.Lock()
-	defer currentScoresMutex.Unlock()
-	currentScores = teamScores
+	// Calculate the new scores
+	s.currentScoresMutex.Lock()
+	for _, juiceShop := range juiceShops.Items {
+		score := calculateScore(s.bundle, &juiceShop, s.challengesMap)
+		s.currentScores[score.Name] = score
+	}
+	s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
+	s.currentScoresMutex.Unlock()
 
 	return nil
 }
 
-func CalculateScoreBoard(context context.Context, bundle *b.Bundle, challengesMap map[string](b.JuiceShopChallenge)) ([]TeamScore, error) {
-	// Get all JuiceShop instances
-	juiceShops, err := getDeployments(context, bundle)
-	if err != nil {
-		return nil, err
-	}
-
-	// Calculate the new scores
-	teamScores := []TeamScore{}
-	for _, juiceShop := range juiceShops.Items {
-		teamScores = append(teamScores, calculateScore(bundle, &juiceShop, challengesMap))
-	}
-
-	sort.Slice(teamScores, func(i, j int) bool {
-		return teamScores[i].Score > teamScores[j].Score
-	})
-
-	// set the position of each team, teams with the same score have the same position
-	position := 1
-	for i := 0; i < len(teamScores); i++ {
-		if i > 0 && teamScores[i].Score < teamScores[i-1].Score {
-			position = i + 1
-		}
-		teamScores[i].Position = position
-	}
-	return teamScores, nil
-}
-
-func getDeployments(context context.Context, bundle *b.Bundle) (*appsv1.DeploymentList, error) {
+func getDeployments(context context.Context, bundle *bundle.Bundle) (*appsv1.DeploymentList, error) {
 	deployments, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).List(context, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 	})
@@ -108,11 +110,11 @@ func getDeployments(context context.Context, bundle *b.Bundle) (*appsv1.Deployme
 	return deployments, nil
 }
 
-func calculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment, challengesMap map[string](b.JuiceShopChallenge)) TeamScore {
+func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, challengesMap map[string](bundle.JuiceShopChallenge)) *TeamScore {
 	solvedChallengesString := teamDeployment.Annotations["multi-juicer.owasp-juice.shop/challenges"]
 	team := teamDeployment.Labels["team"]
 	if solvedChallengesString == "" {
-		return TeamScore{
+		return &TeamScore{
 			Name:       team,
 			Score:      0,
 			Challenges: []ChallengeProgress{},
@@ -124,7 +126,7 @@ func calculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment, challen
 
 	if err != nil {
 		bundle.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
-		return TeamScore{
+		return &TeamScore{
 			Name:       team,
 			Score:      0,
 			Challenges: []ChallengeProgress{},
@@ -143,9 +145,34 @@ func calculateScore(bundle *b.Bundle, teamDeployment *appsv1.Deployment, challen
 		solvedChallengeNames = append(solvedChallengeNames, challengeSolved)
 	}
 
-	return TeamScore{
+	return &TeamScore{
 		Name:       team,
 		Score:      score,
 		Challenges: solvedChallengeNames,
 	}
+}
+
+func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*TeamScore) []*TeamScore {
+	sortedTeamScores := make([]*TeamScore, len(teamScores))
+
+	i := 0
+	for _, teamScore := range teamScores {
+		sortedTeamScores[i] = teamScore
+		i++
+	}
+
+	sort.Slice(sortedTeamScores, func(i, j int) bool {
+		return sortedTeamScores[i].Score > sortedTeamScores[j].Score
+	})
+
+	// set the position of each team, teams with the same score have the same position
+	position := 1
+	for i := 0; i < len(sortedTeamScores); i++ {
+		if i > 0 && sortedTeamScores[i].Score < sortedTeamScores[i-1].Score {
+			position = i + 1
+		}
+		sortedTeamScores[i].Position = position
+	}
+
+	return sortedTeamScores
 }

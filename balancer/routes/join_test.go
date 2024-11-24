@@ -62,7 +62,7 @@ func TestJoinHandler(t *testing.T) {
 		clientset := fake.NewSimpleClientset(balancerDeployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -137,7 +137,7 @@ func TestJoinHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		bundle.Config.CookieConfig.Secure = true
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -160,7 +160,7 @@ func TestJoinHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		bundle.Config.MaxInstances = 3
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -173,7 +173,7 @@ func TestJoinHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		invalidTeamnames := []string{
 			"foo bar",
@@ -197,7 +197,7 @@ func TestJoinHandler(t *testing.T) {
 		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -215,7 +215,7 @@ func TestJoinHandler(t *testing.T) {
 		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -233,7 +233,7 @@ func TestJoinHandler(t *testing.T) {
 		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -249,7 +249,7 @@ func TestJoinHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -264,7 +264,7 @@ func TestJoinHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -280,7 +280,7 @@ func TestJoinHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -297,7 +297,7 @@ func TestJoinHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset(balancerDeployment)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 

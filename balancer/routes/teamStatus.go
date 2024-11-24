@@ -20,7 +20,7 @@ type TeamStatus struct {
 	Readiness        bool   `json:"readiness"`
 }
 
-func handleTeamStatus(bundle *bundle.Bundle) http.Handler {
+func handleTeamStatus(bundle *bundle.Bundle, scoringSerivce *scoring.ScoringService) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team, err := teamcookie.GetTeamFromRequest(bundle, req)
@@ -35,19 +35,16 @@ func handleTeamStatus(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			currentScores := scoring.GetScores()
-			var teamScore scoring.TeamScore
-			for _, score := range currentScores {
-				if score.Name == team {
-					teamScore = score
-					break
-				}
-			}
+			currentScores := scoringSerivce.GetScores()
+			teamScore, ok := currentScores[team]
 			teamCount := len(currentScores)
-			if teamScore.Name == "" {
-				// the team is not in the score board, it should be there the next time the score-board worker finishes
-				teamScore.Score = -1
-				teamScore.Position = -1
+			if !ok {
+				teamScore = &scoring.TeamScore{
+					Name:       team,
+					Score:      -1,
+					Position:   -1,
+					Challenges: []scoring.ChallengeProgress{},
+				}
 				// increment the total count by one as we know that this teams hasn't been counted yet
 				teamCount++
 			}

@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
@@ -51,13 +50,9 @@ func TestTeamStatusHandler(t *testing.T) {
 			createTeam("barfoo", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		scoring.CalculateAndCacheScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
-			"scoreBoardChallenge": {
-				Key:        "scoreBoardChallenge",
-				Difficulty: 1,
-			},
-		})
-		AddRoutes(server, bundle)
+		scoringService := scoring.NewScoringService(bundle)
+		scoringService.CalculateAndCacheScoreBoard(context.Background())
+		AddRoutes(server, bundle, scoringService)
 
 		server.ServeHTTP(rr, req)
 
@@ -72,13 +67,9 @@ func TestTeamStatusHandler(t *testing.T) {
 		server := http.NewServeMux()
 		clientset := fake.NewSimpleClientset(createTeam("other-team", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
-		scoring.CalculateAndCacheScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
-			"scoreBoardChallenge": {
-				Key:        "scoreBoardChallenge",
-				Difficulty: 1,
-			},
-		})
+		scoringService := scoring.NewScoringService(bundle)
+		scoringService.CalculateAndCacheScoreBoard(context.Background())
+		AddRoutes(server, bundle, scoringService)
 		clientset.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"), metav1.CreateOptions{})
 
 		server.ServeHTTP(rr, req)
@@ -94,7 +85,7 @@ func TestTeamStatusHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -109,7 +100,7 @@ func TestTeamStatusHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 

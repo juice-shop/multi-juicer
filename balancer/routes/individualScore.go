@@ -23,7 +23,7 @@ type IndividualScore struct {
 	TotalTeams       int               `json:"totalTeams"`
 }
 
-func handleIndividualScore(bundle *b.Bundle) http.Handler {
+func handleIndividualScore(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
 
 	challengesByKeys := make(map[string]b.JuiceShopChallenge)
 	for _, challenge := range bundle.JuiceShopChallenges {
@@ -39,19 +39,13 @@ func handleIndividualScore(bundle *b.Bundle) http.Handler {
 				return
 			}
 
-			currentScores := scoring.GetScores()
-			var teamScore scoring.TeamScore
-			for _, score := range currentScores {
-				if score.Name == team {
-					teamScore = score
-					break
-				}
-			}
-			teamCount := len(currentScores)
-			if teamScore.Name == "" {
+			currentScores := scoringService.GetScores()
+			teamScore, ok := currentScores[team]
+			if !ok {
 				http.Error(responseWriter, "team not found", http.StatusNotFound)
 				return
 			}
+			teamCount := len(currentScores)
 
 			solvedChallenges := make([]SolvedChallenge, len(teamScore.Challenges))
 			for i, challenge := range teamScore.Challenges {

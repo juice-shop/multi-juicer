@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
@@ -41,19 +40,14 @@ func TestScoreBoardHandler(t *testing.T) {
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
-		scores, err := CalculateScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
-			"scoreBoardChallenge": {
-				Key:        "scoreBoardChallenge",
-				Difficulty: 1,
-			},
-			"nullByteChallenge": {
-				Key:        "nullByteChallenge",
-				Difficulty: 4,
-			},
-		})
+		scoringService := NewScoringService(bundle)
+		err := scoringService.CalculateAndCacheScoreBoard(context.Background())
+		assert.Nil(t, err)
+
+		scores := scoringService.GetTopScores()
 
 		assert.Nil(t, err)
-		assert.Equal(t, []TeamScore{
+		assert.Equal(t, []*TeamScore{
 			{
 				Name:     "foobar",
 				Score:    50,
@@ -87,19 +81,14 @@ func TestScoreBoardHandler(t *testing.T) {
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
-		scores, err := CalculateScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
-			"scoreBoardChallenge": {
-				Key:        "scoreBoardChallenge",
-				Difficulty: 1,
-			},
-			"nullByteChallenge": {
-				Key:        "nullByteChallenge",
-				Difficulty: 4,
-			},
-		})
+		scoringService := NewScoringService(bundle)
+		err := scoringService.CalculateAndCacheScoreBoard(context.Background())
+		assert.Nil(t, err)
+
+		scores := scoringService.GetTopScores()
 
 		assert.Nil(t, err)
-		assert.Equal(t, []TeamScore{
+		assert.Equal(t, []*TeamScore{
 			{
 				Name:     "foobar",
 				Score:    50,
@@ -148,20 +137,19 @@ func TestScoreBoardHandler(t *testing.T) {
 
 	t.Run("calculates score for known challenges only and skip unknown challenges", func(t *testing.T) {
 		clientset := fake.NewSimpleClientset(
-			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
+			createTeam("foobar", `[{"key":"unkown-challenge-key","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
-		scores, err := CalculateScoreBoard(context.Background(), bundle, map[string]b.JuiceShopChallenge{
-			"nullByteChallenge": {
-				Key:        "nullByteChallenge",
-				Difficulty: 4,
-			},
-		})
+		scoringService := NewScoringService(bundle)
+		err := scoringService.CalculateAndCacheScoreBoard(context.Background())
+		assert.Nil(t, err)
+
+		scores := scoringService.GetTopScores()
 
 		assert.Nil(t, err)
-		assert.Equal(t, []TeamScore{
+		assert.Equal(t, []*TeamScore{
 			{
 				Name:     "foobar",
 				Score:    40,

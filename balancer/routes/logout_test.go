@@ -17,7 +17,7 @@ func TestLogoutHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, rr.Code, http.StatusOK)

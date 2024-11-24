@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -23,6 +24,7 @@ func init() {
 func AddRoutes(
 	router *http.ServeMux,
 	bundle *bundle.Bundle,
+	scoringService *scoring.ScoringService,
 ) {
 	router.Handle("/", trackRequestMetrics(handleProxy(bundle)))
 	router.Handle("GET /balancer", redirectLoggedInTeamsToStatus(bundle, handleStaticFiles(bundle)))
@@ -30,9 +32,9 @@ func AddRoutes(
 	router.Handle("POST /balancer/api/teams/{team}/join", handleTeamJoin(bundle))
 	router.Handle("POST /balancer/api/teams/logout", handleLogout(bundle))
 	router.Handle("POST /balancer/api/teams/reset-passcode", handleResetPasscode(bundle))
-	router.Handle("GET /balancer/api/score-board/top", handleScoreBoard(bundle))
-	router.Handle("GET /balancer/api/score-board/teams/{team}/score", handleIndividualScore(bundle))
-	router.Handle("GET /balancer/api/teams/status", handleTeamStatus(bundle))
+	router.Handle("GET /balancer/api/score-board/top", handleScoreBoard(bundle, scoringService))
+	router.Handle("GET /balancer/api/score-board/teams/{team}/score", handleIndividualScore(bundle, scoringService))
+	router.Handle("GET /balancer/api/teams/status", handleTeamStatus(bundle, scoringService))
 
 	router.Handle("GET /balancer/api/admin/all", handleAdminListInstances(bundle))
 	router.Handle("DELETE /balancer/api/admin/teams/{team}/delete", handleAdminDeleteInstance(bundle))

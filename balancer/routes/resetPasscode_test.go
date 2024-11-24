@@ -49,7 +49,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 			},
 		})
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -77,7 +77,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 
 		clientset := fake.NewSimpleClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle)
+		AddRoutes(server, bundle, nil)
 
 		server.ServeHTTP(rr, req)
 

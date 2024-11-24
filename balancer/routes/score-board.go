@@ -9,16 +9,16 @@ import (
 )
 
 type ScoreBoardResponse struct {
-	TotalTeams int                 `json:"totalTeams"`
-	TopTeams   []scoring.TeamScore `json:"teams"`
+	TotalTeams int                  `json:"totalTeams"`
+	TopTeams   []*scoring.TeamScore `json:"teams"`
 }
 
-func handleScoreBoard(bundle *b.Bundle) http.Handler {
+func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			totalTeams := scoring.GetScores()
+			totalTeams := scoringService.GetTopScores()
 
-			var topTeams []scoring.TeamScore
+			var topTeams []*scoring.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
 			if len(totalTeams) > 24 {
 				topTeams = totalTeams[:24]

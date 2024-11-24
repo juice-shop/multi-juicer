@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -12,15 +13,17 @@ import (
 
 func main() {
 	bundle := bundle.New()
+	scoringService := scoring.NewScoringService(bundle)
 
 	go StartMetricsServer()
-	go scoring.StartingScoringWorker(bundle)
-	StartBalancerServer(bundle)
+	scoringService.CalculateAndCacheScoreBoard(context.Background())
+	go scoringService.StartingScoringWorker()
+	StartBalancerServer(bundle, scoringService)
 }
 
-func StartBalancerServer(bundle *bundle.Bundle) {
+func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService) {
 	router := http.NewServeMux()
-	routes.AddRoutes(router, bundle)
+	routes.AddRoutes(router, bundle, scoringService)
 
 	bundle.Log.Println("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{
