@@ -104,9 +104,7 @@ export function ScoreOverviewPage({
                       <td className="p-2 px-4">
                         <Link to={`/score-overview/teams/${team.name}`}>
                           {team.name === activeTeam ? (
-                            <strong className="text-gray-800">
-                              {team.name}
-                            </strong>
+                            <strong>{team.name}</strong>
                           ) : (
                             team.name
                           )}
