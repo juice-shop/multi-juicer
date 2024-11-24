@@ -23,8 +23,8 @@ type TeamScore struct {
 
 // PersistedChallengeProgress is stored as a json array on the JuiceShop deployments, saving which challenges have been solved and when
 type ChallengeProgress struct {
-	Key      string `json:"key"`
-	SolvedAt string `json:"solvedAt"`
+	Key      string    `json:"key"`
+	SolvedAt time.Time `json:"solvedAt"`
 }
 
 var cachedChallengesMap map[string](bundle.JuiceShopChallenge)
@@ -152,6 +152,16 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 	}
 }
 
+func getLatestChallengeSolve(challenges []ChallengeProgress) time.Time {
+	var maxTime time.Time
+	for _, challenge := range challenges {
+		if challenge.SolvedAt.After(maxTime) {
+			maxTime = challenge.SolvedAt
+		}
+	}
+	return maxTime
+}
+
 func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*TeamScore) []*TeamScore {
 	sortedTeamScores := make([]*TeamScore, len(teamScores))
 
@@ -162,6 +172,14 @@ func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*TeamScore) []*
 	}
 
 	sort.Slice(sortedTeamScores, func(i, j int) bool {
+		if sortedTeamScores[i].Score == sortedTeamScores[j].Score {
+			iTime := getLatestChallengeSolve(sortedTeamScores[i].Challenges)
+			jTime := getLatestChallengeSolve(sortedTeamScores[j].Challenges)
+			if iTime == jTime {
+				return sortedTeamScores[i].Name < sortedTeamScores[j].Name
+			}
+			return iTime.Before(jTime)
+		}
 		return sortedTeamScores[i].Score > sortedTeamScores[j].Score
 	})
 

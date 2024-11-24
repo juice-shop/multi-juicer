@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
@@ -53,7 +54,7 @@ func handleIndividualScore(bundle *b.Bundle, scoringService *scoring.ScoringServ
 					Key:        challenge.Key,
 					Name:       challengesByKeys[challenge.Key].Name,
 					Difficulty: challengesByKeys[challenge.Key].Difficulty,
-					SolvedAt:   challenge.SolvedAt,
+					SolvedAt:   challenge.SolvedAt.Format(time.RFC3339),
 				}
 			}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func TestScoreBoardHandler(t *testing.T) {
+func TestScoreingService(t *testing.T) {
 	createTeam := func(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
@@ -33,6 +34,7 @@ func TestScoreBoardHandler(t *testing.T) {
 			},
 		}
 	}
+	novemberFirst := time.Date(2024, 11, 1, 19, 55, 48, 211000000, time.UTC)
 	t.Run("correctly calculates team scores", func(t *testing.T) {
 		clientset := fake.NewSimpleClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
@@ -55,11 +57,11 @@ func TestScoreBoardHandler(t *testing.T) {
 				Challenges: []ChallengeProgress{
 					{
 						Key:      "scoreBoardChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 					{
 						Key:      "nullByteChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 				},
 			},
@@ -73,6 +75,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("teams with the same score get the same position assigned", func(t *testing.T) {
+
 		clientset := fake.NewSimpleClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo-1", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
@@ -96,11 +99,11 @@ func TestScoreBoardHandler(t *testing.T) {
 				Challenges: []ChallengeProgress{
 					{
 						Key:      "scoreBoardChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 					{
 						Key:      "nullByteChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 				},
 			},
@@ -111,7 +114,7 @@ func TestScoreBoardHandler(t *testing.T) {
 				Challenges: []ChallengeProgress{
 					{
 						Key:      "scoreBoardChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 				},
 			},
@@ -122,7 +125,7 @@ func TestScoreBoardHandler(t *testing.T) {
 				Challenges: []ChallengeProgress{
 					{
 						Key:      "scoreBoardChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 				},
 			},
@@ -157,7 +160,7 @@ func TestScoreBoardHandler(t *testing.T) {
 				Challenges: []ChallengeProgress{
 					{
 						Key:      "nullByteChallenge",
-						SolvedAt: "2024-11-01T19:55:48.211Z",
+						SolvedAt: novemberFirst,
 					},
 				},
 			},
@@ -168,5 +171,73 @@ func TestScoreBoardHandler(t *testing.T) {
 				Challenges: []ChallengeProgress{},
 			},
 		}, scores)
+	})
+}
+
+func TestScoreingSorting(t *testing.T) {
+	createTeamScore := func(team string, score int, challenges ...ChallengeProgress) *TeamScore {
+		return &TeamScore{
+			Name:       team,
+			Score:      score,
+			Challenges: challenges,
+		}
+	}
+
+	now := time.Now()
+
+	t.Run("sorts score in this order: score -> 'time to reach score' -> team name", func(t *testing.T) {
+		scores := map[string]*TeamScore{
+			"0-last-place": createTeamScore("0-last-place", 0),
+			// last place is shared by two teams with the same score and same time to reach the score, they should be sorted by team name for consistency.
+			"1-actual-last-place": createTeamScore("1-second-last-place", 0),
+			"0-winning-team": createTeamScore("0-winning-team", 100,
+				ChallengeProgress{Key: "scoreBoardChallenge", SolvedAt: now},
+				ChallengeProgress{Key: "nullByteChallenge", SolvedAt: now},
+				ChallengeProgress{Key: "anotherChallenge", SolvedAt: now},
+			),
+			"1-second-place": createTeamScore("1-second-place", 50,
+				ChallengeProgress{Key: "scoreBoardChallenge", SolvedAt: now.Add(-10 * time.Second)},
+				ChallengeProgress{Key: "nullByteChallenge", SolvedAt: now.Add(-30 * time.Second)},
+			),
+			// same score as 1-second-place but it solved the challenges later, so it should be placed after 1-second-place
+			"0-second-place": createTeamScore("0-second-place", 50,
+				ChallengeProgress{Key: "scoreBoardChallenge", SolvedAt: now},
+				ChallengeProgress{Key: "nullByteChallenge", SolvedAt: now},
+			),
+			// forth place is shared by two teams with the same score and same time to reach the score, they should be sorted by team name for consistency.
+			// the likelyhood of two teams having the same score and solving the challenges at the same time is nearly zero so we ignore the unfairness of sorting by team name
+			// there is no 3rd place because 1-second-place and 0-second-place share the same position
+			"1-forth-place": createTeamScore("1-forth-place", 40,
+				ChallengeProgress{Key: "nullByteChallenge", SolvedAt: now},
+			),
+			"0-forth-place": createTeamScore("0-forth-place", 40,
+				ChallengeProgress{Key: "nullByteChallenge", SolvedAt: now},
+			),
+		}
+
+		sortedTeams := sortTeamsByScoreAndCalculatePositions(scores)
+
+		type TeamNameWithPosition struct {
+			Name     string
+			Position int
+		}
+
+		sortedTeamWithPositions := make([]TeamNameWithPosition, len(sortedTeams))
+		for i, team := range sortedTeams {
+			sortedTeamWithPositions[i] = TeamNameWithPosition{
+				Name:     team.Name,
+				Position: team.Position,
+			}
+		}
+
+		assert.Equal(t, []TeamNameWithPosition{
+			{Name: "0-winning-team", Position: 1},
+			{Name: "1-second-place", Position: 2},
+			{Name: "0-second-place", Position: 2},
+			{Name: "0-forth-place", Position: 4},
+			{Name: "1-forth-place", Position: 4},
+			{Name: "0-last-place", Position: 6},
+			{Name: "1-second-last-place", Position: 6},
+		}, sortedTeamWithPositions)
 	})
 }
