@@ -10,9 +10,8 @@ import (
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/watch"
 )
-
-const updateInterval = 5 * time.Second
 
 type TeamScore struct {
 	Name       string              `json:"name"`
@@ -69,16 +68,35 @@ func (s *ScoringService) GetTopScores() []*TeamScore {
 
 // TrackScoresWorker is a worker that runs in the background and cheks the scores of all JuiceShop instances every 5 seconds
 func (s *ScoringService) StartingScoringWorker() {
-	for {
-		context := context.Background()
-		time.Sleep(updateInterval)
+	watcher, err := s.bundle.ClientSet.AppsV1().Deployments(s.bundle.RuntimeEnvironment.Namespace).Watch(context.Background(), metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
+	})
 
-		err := s.CalculateAndCacheScoreBoard(context)
-		if err != nil {
-			s.bundle.Log.Printf("Failed to calculate the score board. Claculation will be automatically retried in %ds : %v", updateInterval, err)
-			continue
+	if err != nil {
+		s.bundle.Log.Printf("Failed to start the watcher for JuiceShop deployments: %v", err)
+		panic(err)
+	}
+	defer watcher.Stop()
+
+	for event := range watcher.ResultChan() {
+		switch event.Type {
+		case watch.Added, watch.Modified:
+			deployment := event.Object.(*appsv1.Deployment)
+			score := calculateScore(s.bundle, deployment, cachedChallengesMap)
+			s.currentScoresMutex.Lock()
+			s.currentScores[score.Name] = score
+			s.currentScoresMutex.Unlock()
+		case watch.Deleted:
+			deployment := event.Object.(*appsv1.Deployment)
+			team := deployment.Labels["team"]
+			s.currentScoresMutex.Lock()
+			delete(s.currentScores, team)
+			s.currentScoresMutex.Unlock()
+		default:
+			s.bundle.Log.Printf("Unknown event type: %v", event.Type)
 		}
 	}
+	s.bundle.Log.Printf("Watcher for JuiceShop deployments has been closed. Exiting the watcher.")
 }
 
 func (s *ScoringService) CalculateAndCacheScoreBoard(context context.Context) error {

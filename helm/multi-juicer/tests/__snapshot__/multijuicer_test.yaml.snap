@@ -190,6 +190,7 @@ default values render correctly:
           - list
           - delete
           - patch
+          - watch
       - apiGroups:
           - ""
         resources:
@@ -773,6 +774,7 @@ full values render out correctly:
           - list
           - delete
           - patch
+          - watch
       - apiGroups:
           - ""
         resources:
@@ -3404,6 +3406,7 @@ production notes work correctly:
           - list
           - delete
           - patch
+          - watch
       - apiGroups:
           - ""
         resources:
