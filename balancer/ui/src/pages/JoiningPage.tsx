@@ -37,7 +37,7 @@ export const JoiningPage = ({
         navigate(`/admin`);
         return;
       }
-      navigate(`/teams/${team}/joined/`);
+      navigate(`/teams/${team}/status/`);
     } catch (error) {
       console.error("Unknown error while trying to join a team!");
       console.error(error);
