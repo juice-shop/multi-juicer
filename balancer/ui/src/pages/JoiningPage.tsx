@@ -12,11 +12,14 @@ export const JoiningPage = ({
 }) => {
   const [passcode, setPasscode] = useState("");
   const [failed, setFailed] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
   const navigate = useNavigate();
   const { team } = useParams();
 
   async function sendJoinRequest() {
     try {
+      setFailed(false);
+      setIsJoining(true);
       const response = await fetch(`/balancer/api/teams/${team}/join`, {
         method: "POST",
         headers: {
@@ -24,6 +27,7 @@ export const JoiningPage = ({
         },
         body: JSON.stringify({ passcode }),
       });
+      setIsJoining(false);
 
       if (!response.ok) {
         throw new Error("Failed to join the team");
@@ -51,9 +55,9 @@ export const JoiningPage = ({
   }
 
   return (
-    <div className="max-w-3xl md:min-w-[400px]">
-      <Card className="p-8">
-        <h2 className="text-2xl font-medium m-0">
+    <div className="max-w-3xl md:min-w-[400px] lg:min-w-[600px]">
+      <Card className="p-8 flex flex-col gap-3">
+        <h2 className="text-2xl font-medium">
           <FormattedMessage
             id="joining_team"
             defaultMessage="Joining team {team}"
@@ -62,7 +66,7 @@ export const JoiningPage = ({
         </h2>
 
         {failed ? (
-          <strong>
+          <strong className="text-red-400">
             <FormattedMessage
               id="joining_failed"
               defaultMessage="Failed to join the team. Are you sure the passcode is correct?"
@@ -70,7 +74,7 @@ export const JoiningPage = ({
           </strong>
         ) : null}
 
-        <form className="mt-8" onSubmit={onSubmit}>
+        <form onSubmit={onSubmit}>
           <input
             type="hidden"
             name="teamname"
@@ -92,10 +96,11 @@ export const JoiningPage = ({
             minLength={8}
             maxLength={8}
             autoComplete="current-password"
+            disabled={isJoining}
             value={passcode}
             onChange={({ target }) => setPasscode(target.value)}
           />
-          <Button type="submit">
+          <Button type="submit" disabled={isJoining}>
             <FormattedMessage id="join_team" defaultMessage="Join Team" />
           </Button>
         </form>
