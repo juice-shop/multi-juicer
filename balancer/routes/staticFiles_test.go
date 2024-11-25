@@ -32,7 +32,7 @@ func TestStaticFileHandler(t *testing.T) {
 			"/balancer/admin",
 			"/balancer/teams/abc/status/",
 			"/balancer/teams/foo-bar-123/status/",
-			"/balancer/teams/abc/joined/",
+			"/balancer/teams/abc/joining/",
 			"/balancer/score-overview/",
 			"/balancer/score-overview/teams/abc/score/",
 		}
