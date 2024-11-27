@@ -178,7 +178,7 @@ export default function AdminPage() {
           >
             <div>
               <h4 className="font-semibold">{team.team}</h4>
-              <p className="text-sm text-gray-200">
+              <p className="text-sm text-gray-800 dark:text-gray-200">
                 <FormattedMessage
                   id="admin_table.created"
                   defaultMessage="created"
@@ -187,10 +187,10 @@ export default function AdminPage() {
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-200">
+              <p className="text-sm text-gray-800 dark:text-gray-200">
                 {team.ready ? "up and running 🟢" : "down ⚠️"}
               </p>
-              <p className="text-sm text-gray-200">
+              <p className="text-sm text-gray-800 dark:text-gray-200">
                 {" "}
                 <FormattedMessage
                   id="admin_table.latUsed"
