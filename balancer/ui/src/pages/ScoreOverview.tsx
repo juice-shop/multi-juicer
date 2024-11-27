@@ -98,34 +98,31 @@ export function ScoreOverviewPage({
 
   return (
     <>
-      <div className="p-0 overflow-hidden w-full max-w-2xl rounded-lg bg-gradient-to-b from-gray-100 via-gray-100 to-gray-500">
-        <h1 className="text-gray-500 px-4 pt-4 font-bold tracking-wide">
+      <div className="p-0 overflow-hidden w-full max-w-2xl rounded-lg bg-gradient-to-b from-gray-700 via-gray-700 to-gray-200 dark:from-gray-100 dark:via-gray-100 dark:to-gray-500 shadow">
+        <h1 className="px-4 pt-4 font-bold tracking-wide text-gray-100 dark:text-gray-800 ">
           ScoreBoard
         </h1>
         <table className="w-full text-left border-collapse">
-          <thead className="w-full border-none bg-gray-100 text-gray-800">
+          <thead className="w-full border-none bg-gray-700 dark:bg-gray-100 text-gray-100 dark:text-gray-800 ">
             <tr className="w-full">
               <th
                 scope="col"
-                className="w-12 p-4 text-gray-500 text-xs font-medium uppercase"
+                className="w-12 p-4 text-xs font-medium uppercase"
               >
                 #
               </th>
-              <th
-                scope="col"
-                className="p-4 text-gray-500 text-xs font-medium uppercase"
-              >
+              <th scope="col" className="p-4 text-xs font-medium uppercase">
                 Name
               </th>
               <th
                 scope="col"
-                className="text-right p-4 text-gray-500 text-xs font-medium uppercase"
+                className="text-right p-4 text-xs font-medium uppercase"
               >
                 Score
               </th>
             </tr>
           </thead>
-          <tbody className="w-full dark:bg-gray-800">
+          <tbody className="w-full dark:bg-gray-800 bg-gray-100">
             <MagicMotion>
               <>
                 {teams.map((team) => {
