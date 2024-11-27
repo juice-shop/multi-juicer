@@ -88,7 +88,7 @@ export const JoiningPage = ({
             />
           </label>
           <input
-            className="bg-gray-300 mb-2 border-none rounded p-3 text-sm block w-full text-gray-800 invalid:outline-red-500 invalid:bg-red-100 outline"
+            className="bg-gray-300 mb-2 border-none rounded p-3 text-sm block w-full text-gray-800 invalid:outline-red-500 invalid:bg-red-100 invalid:outline"
             type="password"
             id="passcode"
             name="passcode"
