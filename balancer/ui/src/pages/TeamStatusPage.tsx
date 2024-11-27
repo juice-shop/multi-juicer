@@ -155,49 +155,55 @@ export const TeamStatusPage = ({
   }
 
   return (
-    <Card className="w-full max-w-2xl">
-      <div className="grid grid-cols-2 items-center">
-        <div className="flex flex-row items-center p-4">
-          <img
-            src="/balancer/icons/astronaut.svg"
-            alt="Astronaut"
-            className="h-12 w-12 shrink-0 mr-3"
-          />
+    <>
+      <link rel="preload" href="/balancer/icons/first-place.svg" as="image" />
+      <link rel="preload" href="/balancer/icons/second-place.svg" as="image" />
+      <link rel="preload" href="/balancer/icons/third-place.svg" as="image" />
 
-          <div className="text-sm font-light">
-            <p>
-              <FormattedMessage
-                id="logged_in_as"
-                defaultMessage="Logged in as"
-              />
-            </p>
-            <p>
-              <strong className="font-medium">{team}</strong>
-            </p>
+      <Card className="w-full max-w-2xl">
+        <div className="grid grid-cols-2 items-center">
+          <div className="flex flex-row items-center p-4">
+            <img
+              src="/balancer/icons/astronaut.svg"
+              alt="Astronaut"
+              className="h-12 w-12 shrink-0 mr-3"
+            />
+
+            <div className="text-sm font-light">
+              <p>
+                <FormattedMessage
+                  id="logged_in_as"
+                  defaultMessage="Logged in as"
+                />
+              </p>
+              <p>
+                <strong className="font-medium">{team}</strong>
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-row-reverse items-center p-4 gap-3">
+            <LogoutButton setActiveTeam={setActiveTeam} />
+            <PasscodeResetButton team={team} />
           </div>
         </div>
-        <div className="flex flex-row-reverse items-center p-4 gap-3">
-          <LogoutButton setActiveTeam={setActiveTeam} />
-          <PasscodeResetButton team={team} />
-        </div>
-      </div>
 
-      <hr className="border-gray-500" />
+        <hr className="border-gray-500" />
 
-      <ScoreDisplay instanceStatus={instanceStatus} />
-      <hr className="border-gray-500" />
+        <ScoreDisplay instanceStatus={instanceStatus} />
+        <hr className="border-gray-500" />
 
-      {passcode && (
-        <>
-          <div className="flex flex-col justify-start p-4">
-            <PasscodeDisplayCard passcode={passcode} />
-          </div>
-          <hr className="border-gray-500" />
-        </>
-      )}
+        {passcode && (
+          <>
+            <div className="flex flex-col justify-start p-4">
+              <PasscodeDisplayCard passcode={passcode} />
+            </div>
+            <hr className="border-gray-500" />
+          </>
+        )}
 
-      <StatusDisplay instanceStatus={instanceStatus} />
-    </Card>
+        <StatusDisplay instanceStatus={instanceStatus} />
+      </Card>
+    </>
   );
 };
 
