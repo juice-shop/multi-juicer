@@ -42,7 +42,7 @@ async function fetchScore(
   };
 }
 
-export function IndividualScorePage() {
+export default function IndividualScorePage() {
   const { team } = useParams();
   const intl = useIntl();
 

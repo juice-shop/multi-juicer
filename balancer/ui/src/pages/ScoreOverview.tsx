@@ -1,36 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MagicMotion } from "react-magic-motion";
-
-function FirstPlace({ ...props }) {
-  return <img src="/balancer/icons/first-place.svg" {...props} />;
-}
-
-function SecondPlace({ ...props }) {
-  return <img src="/balancer/icons/second-place.svg" {...props} />;
-}
-
-function ThirdPlace({ ...props }) {
-  return <img src="/balancer/icons/third-place.svg" {...props} />;
-}
-
-export function PositionDisplay({ place }: { place: number }) {
-  switch (place) {
-    case 1:
-      return <FirstPlace className="h-10" />;
-    case 2:
-      return <SecondPlace className="h-10" />;
-    case 3:
-      return <ThirdPlace className="h-10" />;
-    default:
-      return (
-        <>
-          <small>#</small>
-          {place}
-        </>
-      );
-  }
-}
+import { PositionDisplay } from "../components/PositionDisplay";
 
 interface Team {
   name: string;
@@ -53,7 +24,7 @@ async function fetchTeams(lastSeen: Date | null): Promise<null | Team[]> {
   return teams;
 }
 
-export function ScoreOverviewPage({
+export default function ScoreOverviewPage({
   activeTeam,
 }: {
   activeTeam: string | null;

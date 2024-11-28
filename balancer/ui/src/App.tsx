@@ -4,10 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 
 import { JoinPage } from "./pages/JoinPage";
-import { ScoreOverviewPage } from "./pages/ScoreOverview";
 import { JoiningPage } from "./pages/JoiningPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
-import { IndividualScorePage } from "./pages/IndividualScorePage";
 
 import { Layout } from "./Layout";
 import { Spinner } from "./components/Spinner";
@@ -15,6 +13,8 @@ import { MessageLoader } from "./translations/index";
 import { Toaster } from "react-hot-toast";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverview"));
+const IndividualScorePage = lazy(() => import("./pages/IndividualScorePage"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
