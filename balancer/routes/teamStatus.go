@@ -20,12 +20,30 @@ type TeamStatus struct {
 	Readiness        bool   `json:"readiness"`
 }
 
+type AdminTeamStatus struct {
+	Name string `json:"name"`
+}
+
 func handleTeamStatus(bundle *bundle.Bundle, scoringSerivce *scoring.ScoringService) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team, err := teamcookie.GetTeamFromRequest(bundle, req)
 			if err != nil {
 				http.Error(responseWriter, "", http.StatusUnauthorized)
+				return
+			}
+
+			if team == "admin" {
+				responseBytes, err := json.Marshal(AdminTeamStatus{Name: "admin"})
+				if err != nil {
+					bundle.Log.Printf("Failed to marshal response: %s", err)
+					http.Error(responseWriter, "", http.StatusInternalServerError)
+					return
+				}
+
+				responseWriter.Header().Set("Content-Type", "application/json")
+				responseWriter.WriteHeader(http.StatusOK)
+				responseWriter.Write(responseBytes)
 				return
 			}
 

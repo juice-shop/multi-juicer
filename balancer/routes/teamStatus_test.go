@@ -107,4 +107,19 @@ func TestTeamStatusHandler(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 		assert.Equal(t, "", strings.TrimSpace(rr.Body.String()))
 	})
+
+	t.Run("returns a a simplified response when the logged in team is the admin", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		rr := httptest.NewRecorder()
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.JSONEq(t, `{"name":"admin"}`, rr.Body.String())
+	})
 }
