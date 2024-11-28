@@ -16,6 +16,19 @@ import { Toaster } from "react-hot-toast";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 
+interface SimplifiedTeamStatusResponse {
+  name: string;
+}
+
+async function fetchTeamStatusData(): Promise<SimplifiedTeamStatusResponse | null> {
+  const response = await fetch(`/balancer/api/teams/status`);
+  if (!response.ok) {
+    return null;
+  }
+  const status = (await response.json()) as SimplifiedTeamStatusResponse;
+  return status;
+}
+
 function App() {
   const [locale, setLocale] = useState("en");
   const [messages, setMessages] = useState({});
@@ -29,6 +42,17 @@ function App() {
     }
     setLocale(locale);
   }, [navigatorLocale]);
+
+  useEffect(() => {
+    async function updateStatusData() {
+      const status = await fetchTeamStatusData();
+      if (!status) {
+        return;
+      }
+      setActiveTeam(status.name);
+    }
+    updateStatusData();
+  }, []);
 
   const switchLanguage = async ({
     key,
