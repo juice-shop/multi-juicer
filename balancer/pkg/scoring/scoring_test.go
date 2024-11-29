@@ -16,7 +16,11 @@ import (
 )
 
 func TestScoreingService(t *testing.T) {
-	createTeam := func(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
+	createTeamWithInstanceReadiness := func(team string, challenges string, solvedChallenges string, instanceReadiness bool) *appsv1.Deployment {
+		var replicas int32 = 1
+		if !instanceReadiness {
+			replicas = 0
+		}
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
@@ -32,10 +36,14 @@ func TestScoreingService(t *testing.T) {
 				},
 			},
 			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
+				ReadyReplicas: replicas,
 			},
 		}
 	}
+	createTeam := func(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
+		return createTeamWithInstanceReadiness(team, challenges, solvedChallenges, true)
+	}
+
 	novemberFirst := time.Date(2024, 11, 1, 19, 55, 48, 211000000, time.UTC)
 	t.Run("correctly calculates team scores", func(t *testing.T) {
 		clientset := fake.NewSimpleClientset(
@@ -66,12 +74,14 @@ func TestScoreingService(t *testing.T) {
 						SolvedAt: novemberFirst,
 					},
 				},
+				InstanceReadiness: true,
 			},
 			{
-				Name:       "barfoo",
-				Score:      0,
-				Position:   2,
-				Challenges: []ChallengeProgress{},
+				Name:              "barfoo",
+				Score:             0,
+				Position:          2,
+				Challenges:        []ChallengeProgress{},
+				InstanceReadiness: true,
 			},
 		}, scores)
 	})
@@ -107,6 +117,7 @@ func TestScoreingService(t *testing.T) {
 						SolvedAt: novemberFirst,
 					},
 				},
+				InstanceReadiness: true,
 			},
 			{
 				Name:     "barfoo-1",
@@ -118,6 +129,7 @@ func TestScoreingService(t *testing.T) {
 						SolvedAt: novemberFirst,
 					},
 				},
+				InstanceReadiness: true,
 			},
 			{
 				Name:     "barfoo-2",
@@ -129,12 +141,14 @@ func TestScoreingService(t *testing.T) {
 						SolvedAt: novemberFirst,
 					},
 				},
+				InstanceReadiness: true,
 			},
 			{
-				Name:       "last",
-				Score:      0,
-				Position:   4, // should be 4 not 3 as there are two teams with the same score on position 2
-				Challenges: []ChallengeProgress{},
+				Name:              "last",
+				Score:             0,
+				Position:          4, // should be 4 not 3 as there are two teams with the same score on position 2
+				Challenges:        []ChallengeProgress{},
+				InstanceReadiness: true,
 			},
 		}, scores)
 	})
@@ -164,12 +178,38 @@ func TestScoreingService(t *testing.T) {
 						SolvedAt: novemberFirst,
 					},
 				},
+				InstanceReadiness: true,
 			},
 			{
-				Name:       "barfoo",
-				Score:      0,
-				Position:   2,
-				Challenges: []ChallengeProgress{},
+				Name:              "barfoo",
+				Score:             0,
+				Position:          2,
+				Challenges:        []ChallengeProgress{},
+				InstanceReadiness: true,
+			},
+		}, scores)
+	})
+
+	t.Run("properly sets readiness", func(t *testing.T) {
+		clientset := fake.NewSimpleClientset(
+			createTeamWithInstanceReadiness("foobar", `[]`, "0", false),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+
+		scoringService := NewScoringService(bundle)
+		err := scoringService.CalculateAndCacheScoreBoard(context.Background())
+		assert.Nil(t, err)
+
+		scores := scoringService.GetTopScores()
+
+		assert.Nil(t, err)
+		assert.Equal(t, []*TeamScore{
+			{
+				Name:              "foobar",
+				Score:             0,
+				Position:          1,
+				Challenges:        []ChallengeProgress{},
+				InstanceReadiness: false,
 			},
 		}, scores)
 	})

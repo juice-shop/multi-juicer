@@ -15,10 +15,11 @@ import (
 )
 
 type TeamScore struct {
-	Name       string              `json:"name"`
-	Score      int                 `json:"score"`
-	Position   int                 `json:"position"`
-	Challenges []ChallengeProgress `json:"challenges"`
+	Name              string              `json:"name"`
+	Score             int                 `json:"score"`
+	Position          int                 `json:"position"`
+	Challenges        []ChallengeProgress `json:"challenges"`
+	InstanceReadiness bool                `json:"readiness"`
 }
 
 // PersistedChallengeProgress is stored as a json array on the JuiceShop deployments, saving which challenges have been solved and when
@@ -187,9 +188,10 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 	team := teamDeployment.Labels["team"]
 	if solvedChallengesString == "" {
 		return &TeamScore{
-			Name:       team,
-			Score:      0,
-			Challenges: []ChallengeProgress{},
+			Name:              team,
+			Score:             0,
+			Challenges:        []ChallengeProgress{},
+			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
 		}
 	}
 
@@ -199,9 +201,10 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 	if err != nil {
 		bundle.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
 		return &TeamScore{
-			Name:       team,
-			Score:      0,
-			Challenges: []ChallengeProgress{},
+			Name:              team,
+			Score:             0,
+			Challenges:        []ChallengeProgress{},
+			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
 		}
 	}
 
@@ -218,9 +221,10 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 	}
 
 	return &TeamScore{
-		Name:       team,
-		Score:      score,
-		Challenges: solvedChallengeNames,
+		Name:              team,
+		Score:             score,
+		Challenges:        solvedChallengeNames,
+		InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
 	}
 }
 
