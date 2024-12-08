@@ -8,24 +8,24 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
-    "react-intl": "^7.0.1",
+    "react-intl": "^7.0.2",
     "react-magic-motion": "^1.1.2",
-    "react-router-dom": "^7.0.1",
+    "react-router-dom": "^7.0.2",
     "reactjs-popup": "^2.0.6",
-    "tailwindcss": "^3.4.15"
+    "tailwindcss": "^3.4.16"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.0.1",
+    "@testing-library/react": "^16.1.0",
     "@types/promise-retry": "^1.1.6",
-    "@types/react-dom": "^18.3.1",
+    "@types/react-dom": "^18.3.2",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "jsdom": "^25.0.1",
     "postcss": "^8.4.49",
     "typescript": "^5.7.2",
-    "vite": "^6.0.1",
-    "vitest": "^2.1.6"
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
   },
   "scripts": {
     "start": "vite",
