@@ -36,7 +36,7 @@ type ScoringService struct {
 	currentScoresSorted []*TeamScore
 	currentScoresMutex  *sync.Mutex
 
-	lastSeenUpdate time.Time
+	lastUpdate time.Time
 
 	challengesMap map[string](bundle.JuiceShopChallenge)
 }
@@ -58,7 +58,7 @@ func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[stri
 		currentScoresSorted: sortTeamsByScoreAndCalculatePositions(initialScores),
 		currentScoresMutex:  &sync.Mutex{},
 
-		lastSeenUpdate: time.Now(),
+		lastUpdate: time.Now(),
 
 		challengesMap: cachedChallengesMap,
 	}
@@ -73,7 +73,7 @@ func (s *ScoringService) GetTopScores() []*TeamScore {
 }
 
 func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore {
-	if s.lastSeenUpdate.After(lastSeenUpdate) {
+	if s.lastUpdate.After(lastSeenUpdate) {
 		// the last update was after the last seen update, so we can return the current scores without waiting
 		return s.currentScoresSorted
 	}
@@ -87,7 +87,7 @@ func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUp
 	for {
 		select {
 		case <-ticker.C:
-			if s.lastSeenUpdate.After(lastSeenUpdate) {
+			if s.lastUpdate.After(lastSeenUpdate) {
 				return s.currentScoresSorted
 			}
 		case <-timeout.C:
@@ -134,7 +134,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				s.currentScores[score.Name] = score
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-				s.lastSeenUpdate = time.Now()
+				s.lastUpdate = time.Now()
 				s.currentScoresMutex.Unlock()
 			case watch.Deleted:
 				deployment := event.Object.(*appsv1.Deployment)
@@ -142,7 +142,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				delete(s.currentScores, team)
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-				s.lastSeenUpdate = time.Now()
+				s.lastUpdate = time.Now()
 				s.currentScoresMutex.Unlock()
 			default:
 				s.bundle.Log.Printf("Unknown event type: %v", event.Type)
