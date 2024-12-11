@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
@@ -39,7 +38,6 @@ func TestScoreBoardHandler(t *testing.T) {
 			},
 		}
 	}
-	novemberFirst := time.Date(2024, 11, 1, 19, 55, 48, 211000000, time.UTC)
 	t.Run("lists teams and calculates the score", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
 		rr := httptest.NewRecorder()
@@ -62,21 +60,18 @@ func TestScoreBoardHandler(t *testing.T) {
 		err := json.Unmarshal(rr.Body.Bytes(), &response)
 		assert.Nil(t, err)
 
-		assert.Equal(t, []*scoring.TeamScore{
+		assert.Equal(t, []*TeamScore{
 			{
-				Name:     "foobar",
-				Score:    50,
-				Position: 1,
-				Challenges: []scoring.ChallengeProgress{
-					{Key: "scoreBoardChallenge", SolvedAt: novemberFirst},
-					{Key: "nullByteChallenge", SolvedAt: novemberFirst},
-				},
+				Name:                 "foobar",
+				Score:                50,
+				Position:             1,
+				SolvedChallengeCount: 2,
 			},
 			{
-				Name:       "barfoo",
-				Score:      0,
-				Position:   2,
-				Challenges: []scoring.ChallengeProgress{},
+				Name:                 "barfoo",
+				Score:                0,
+				Position:             2,
+				SolvedChallengeCount: 0,
 			},
 		}, response.TopTeams)
 	})
