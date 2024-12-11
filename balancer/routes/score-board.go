@@ -10,8 +10,15 @@ import (
 )
 
 type ScoreBoardResponse struct {
-	TotalTeams int                  `json:"totalTeams"`
-	TopTeams   []*scoring.TeamScore `json:"teams"`
+	TotalTeams int          `json:"totalTeams"`
+	TopTeams   []*TeamScore `json:"teams"`
+}
+
+type TeamScore struct {
+	Name                 string `json:"name"`
+	Score                int    `json:"score"`
+	Position             int    `json:"position"`
+	SolvedChallengeCount int    `json:"solvedChallengeCount"`
 }
 
 func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
@@ -47,9 +54,19 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 				topTeams = totalTeams
 			}
 
+			convertedTopScores := make([]*TeamScore, len(topTeams))
+			for i, topTeam := range topTeams {
+				convertedTopScores[i] = &TeamScore{
+					Name:                 topTeam.Name,
+					Score:                topTeam.Score,
+					Position:             topTeam.Position,
+					SolvedChallengeCount: len(topTeam.Challenges),
+				}
+			}
+
 			response := ScoreBoardResponse{
 				TotalTeams: len(totalTeams),
-				TopTeams:   topTeams,
+				TopTeams:   convertedTopScores,
 			}
 
 			responseBytes, err := json.Marshal(response)

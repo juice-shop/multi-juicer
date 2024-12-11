@@ -7,7 +7,7 @@ interface Team {
   name: string;
   score: number;
   position: number;
-  challenges: string[];
+  solvedChallengeCount: number;
 }
 
 async function fetchTeams(lastSeen: Date | null): Promise<null | Team[]> {
@@ -117,7 +117,7 @@ export default function ScoreOverviewPage({
                       <td className="text-right text-s p-2 px-4">
                         {team.score} points
                         <p className="text-gray-500 m-1">
-                          {team.challenges.length} solved challenges
+                          {team.solvedChallengeCount} solved challenges
                         </p>
                       </td>
                     </tr>
