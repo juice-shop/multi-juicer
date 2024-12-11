@@ -105,10 +105,15 @@ const PasscodeResetButton = ({ team }: { team: string }) => {
   );
 };
 
-async function fetchTeamStatusData(): Promise<TeamStatusResponse> {
-  const response = await fetch(`/balancer/api/teams/status`);
+async function fetchTeamStatusData(): Promise<TeamStatusResponse | null> {
+  const response = await fetch(
+    `/balancer/api/teams/status?wait-for-update-after=${new Date().toISOString()}`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch current teams");
+  }
+  if (response.status === 204) {
+    return null;
   }
   const status = (await response.json()) as TeamStatusResponse;
   return status;
@@ -132,6 +137,11 @@ export const TeamStatusPage = ({
   async function updateStatusData() {
     try {
       const status = await fetchTeamStatusData();
+      if (status === null) {
+        // no update available restarting polling with slight delay to not accidentally dos the server
+        timeout = window.setTimeout(() => updateStatusData(), 1000);
+        return;
+      }
       setInstanceStatus(status);
       setActiveTeam(status.name);
       const waitTime = status.readiness ? 5000 : 1000; // poll faster when not ready, as the instance is starting and we want to show the user the status as soon as possible

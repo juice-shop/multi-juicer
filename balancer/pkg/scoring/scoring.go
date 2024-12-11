@@ -3,7 +3,6 @@ package scoring
 import (
 	"context"
 	"encoding/json"
-	"reflect"
 	"sort"
 	"sync"
 	"time"
@@ -19,7 +18,29 @@ type TeamScore struct {
 	Score             int                 `json:"score"`
 	Position          int                 `json:"position"`
 	Challenges        []ChallengeProgress `json:"challenges"`
+	LastUpdate        time.Time           `json:"lastUpdate"`
 	InstanceReadiness bool                `json:"readiness"`
+}
+
+func (t *TeamScore) EqualsIgnoringLastUpdate(other *TeamScore) bool {
+	if t.Name != other.Name {
+		return false
+	}
+	if t.Score != other.Score {
+		return false
+	}
+	if t.Position != other.Position {
+		return false
+	}
+	if len(t.Challenges) != len(other.Challenges) {
+		return false
+	}
+	for i := range t.Challenges {
+		if t.Challenges[i].Key != other.Challenges[i].Key {
+			return false
+		}
+	}
+	return t.InstanceReadiness == other.InstanceReadiness
 }
 
 // PersistedChallengeProgress is stored as a json array on the JuiceShop deployments, saving which challenges have been solved and when
@@ -68,6 +89,11 @@ func (s *ScoringService) GetScores() map[string]*TeamScore {
 	return s.currentScores
 }
 
+func (s *ScoringService) GetScoreForTeam(team string) (*TeamScore, bool) {
+	score, ok := s.currentScores[team]
+	return score, ok
+}
+
 func (s *ScoringService) GetTopScores() []*TeamScore {
 	return s.currentScoresSorted
 }
@@ -89,6 +115,39 @@ func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUp
 		case <-ticker.C:
 			if s.lastUpdate.After(lastSeenUpdate) {
 				return s.currentScoresSorted
+			}
+		case <-timeout.C:
+			// Timeout was reached
+			return nil
+		case <-ctx.Done():
+			// Context was canceled
+			return nil
+		}
+	}
+}
+
+func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team string, lastSeenUpdate time.Time) *TeamScore {
+	if score, ok := s.currentScores[team]; ok {
+		if score.LastUpdate.After(lastSeenUpdate) {
+			// the last update was after the last seen update, so we can return the current scores without waiting
+			return score
+		}
+	}
+
+	const maxWaitTime = 25 * time.Second
+	timeout := time.NewTimer(maxWaitTime)
+	ticker := time.NewTicker(50 * time.Millisecond)
+	defer timeout.Stop()
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			if score, ok := s.currentScores[team]; ok {
+				if score.LastUpdate.After(lastSeenUpdate) {
+					// the last update was after the last seen update, so we can return the current scores without waiting
+					return score
+				}
 			}
 		case <-timeout.C:
 			// Timeout was reached
@@ -125,7 +184,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				score := calculateScore(s.bundle, deployment, cachedChallengesMap)
 
 				if currentTeamScore, ok := s.currentScores[score.Name]; ok {
-					if reflect.DeepEqual(currentTeamScore, score) {
+					if currentTeamScore.EqualsIgnoringLastUpdate(score) {
 						// No need to update, if the score hasn't changed
 						continue
 					}
@@ -192,6 +251,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 			Score:             0,
 			Challenges:        []ChallengeProgress{},
 			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
+			LastUpdate:        time.Now(),
 		}
 	}
 
@@ -205,6 +265,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 			Score:             0,
 			Challenges:        []ChallengeProgress{},
 			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
+			LastUpdate:        time.Now(),
 		}
 	}
 
@@ -225,6 +286,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 		Score:             score,
 		Challenges:        solvedChallengeNames,
 		InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
+		LastUpdate:        time.Now(),
 	}
 }
 
