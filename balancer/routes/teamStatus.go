@@ -22,7 +22,7 @@ type AdminTeamStatus struct {
 	Name string `json:"name"`
 }
 
-func handleTeamStatus(bundle *bundle.Bundle, scoringSerivce *scoring.ScoringService) http.Handler {
+func handleTeamStatus(bundle *bundle.Bundle, scoringService *scoring.ScoringService) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team, err := teamcookie.GetTeamFromRequest(bundle, req)
@@ -45,7 +45,7 @@ func handleTeamStatus(bundle *bundle.Bundle, scoringSerivce *scoring.ScoringServ
 				return
 			}
 
-			currentScores := scoringSerivce.GetScores()
+			currentScores := scoringService.GetScores()
 			teamScore, ok := currentScores[team]
 			teamCount := len(currentScores)
 			if !ok {
