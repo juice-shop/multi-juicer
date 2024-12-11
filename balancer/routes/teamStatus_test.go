@@ -7,19 +7,22 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/fake"
+	testcore "k8s.io/client-go/testing"
 )
 
 func TestTeamStatusHandler(t *testing.T) {
 	team := "foobar"
 
-	createTeam := func(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
+	createTeamNumberOfReadyReplicas := func(team string, challenges string, solvedChallenges string, readyReplicas int32) *appsv1.Deployment {
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
@@ -35,9 +38,12 @@ func TestTeamStatusHandler(t *testing.T) {
 				},
 			},
 			Status: appsv1.DeploymentStatus{
-				ReadyReplicas: 1,
+				ReadyReplicas: readyReplicas,
 			},
 		}
+	}
+	createTeam := func(team string, challenges string, solvedChallenges string) *appsv1.Deployment {
+		return createTeamNumberOfReadyReplicas(team, challenges, solvedChallenges, 1)
 	}
 
 	t.Run("returns the instance status", func(t *testing.T) {
@@ -70,12 +76,47 @@ func TestTeamStatusHandler(t *testing.T) {
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
 		AddRoutes(server, bundle, scoringService)
-		clientset.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context.Background(), createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"), metav1.CreateOptions{})
 
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"name":"foobar","score":-1,"position":-1,"solvedChallenges":0,"totalTeams":2,"readiness":true}`, rr.Body.String())
+		assert.JSONEq(t, `{"name":"foobar","score":-1,"position":-1,"solvedChallenges":0,"totalTeams":2,"readiness":false}`, rr.Body.String())
+	})
+
+	t.Run("returns ready when instance gets update by the scoring watcher", func(t *testing.T) {
+		server := http.NewServeMux()
+		clientset := fake.NewSimpleClientset(createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 0))
+		watcher := watch.NewFake()
+		clientset.PrependWatchReactor("deployments", testcore.DefaultWatchReactor(watcher, nil))
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := scoring.NewScoringService(bundle)
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+		scoringService.CalculateAndCacheScoreBoard(ctx)
+		go scoringService.StartingScoringWorker(ctx)
+
+		AddRoutes(server, bundle, scoringService)
+
+		{
+			req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+			rr := httptest.NewRecorder()
+			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
+			server.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":false}`, rr.Body.String())
+		}
+
+		watcher.Modify(createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 1))
+
+		// the watcher might not have updated the readiness yet
+		assert.Eventually(t, func() bool {
+			req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+			rr := httptest.NewRecorder()
+			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
+			server.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			return assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":true}`, rr.Body.String())
+		}, 1*time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("returns a 404 if the team doesn't have a deployment", func(t *testing.T) {

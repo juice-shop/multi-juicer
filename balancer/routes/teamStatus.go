@@ -2,13 +2,11 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type TeamStatus struct {
@@ -47,21 +45,16 @@ func handleTeamStatus(bundle *bundle.Bundle, scoringSerivce *scoring.ScoringServ
 				return
 			}
 
-			deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(req.Context(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
-			if err != nil {
-				http.Error(responseWriter, "team not found", http.StatusNotFound)
-				return
-			}
-
 			currentScores := scoringSerivce.GetScores()
 			teamScore, ok := currentScores[team]
 			teamCount := len(currentScores)
 			if !ok {
 				teamScore = &scoring.TeamScore{
-					Name:       team,
-					Score:      -1,
-					Position:   -1,
-					Challenges: []scoring.ChallengeProgress{},
+					Name:              team,
+					Score:             -1,
+					Position:          -1,
+					Challenges:        []scoring.ChallengeProgress{},
+					InstanceReadiness: false,
 				}
 				// increment the total count by one as we know that this teams hasn't been counted yet
 				teamCount++
@@ -73,7 +66,7 @@ func handleTeamStatus(bundle *bundle.Bundle, scoringSerivce *scoring.ScoringServ
 				Position:         teamScore.Position,
 				TotalTeams:       teamCount,
 				SolvedChallenges: len(teamScore.Challenges),
-				Readiness:        deployment.Status.ReadyReplicas == 1,
+				Readiness:        teamScore.InstanceReadiness,
 			}
 
 			responseBytes, err := json.Marshal(response)

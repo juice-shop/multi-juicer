@@ -125,7 +125,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				score := calculateScore(s.bundle, deployment, cachedChallengesMap)
 
 				if currentTeamScore, ok := s.currentScores[score.Name]; ok {
-					if reflect.DeepEqual(currentTeamScore.Score, score.Score) {
+					if reflect.DeepEqual(currentTeamScore, score) {
 						// No need to update, if the score hasn't changed
 						continue
 					}
