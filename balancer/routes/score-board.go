@@ -26,11 +26,9 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			var totalTeams []*scoring.TeamScore
 
-			bundle.Log.Printf("handling score board request")
 			if req.URL.Query().Get("wait-for-update-after") != "" {
 				lastSeenUpdate, err := time.Parse(time.RFC3339, req.URL.Query().Get("wait-for-update-after"))
 				if err != nil {
-					bundle.Log.Printf("Invalid time format")
 					http.Error(responseWriter, "Invalid time format", http.StatusBadRequest)
 					return
 				}
@@ -44,8 +42,6 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 			} else {
 				totalTeams = scoringService.GetTopScores()
 			}
-			bundle.Log.Printf("Got %d teams", len(totalTeams))
-
 			var topTeams []*scoring.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
 			if len(totalTeams) > 24 {
