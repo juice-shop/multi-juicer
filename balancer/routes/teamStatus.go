@@ -56,7 +56,6 @@ func handleTeamStatus(bundle *bundle.Bundle, scoringService *scoring.ScoringServ
 				}
 				teamScore = scoringService.WaitForTeamUpdatesNewerThan(req.Context(), team, lastSeenUpdate)
 				if teamScore == nil {
-					bundle.Log.Printf("Got nothing from waiting for updates")
 					responseWriter.WriteHeader(http.StatusNoContent)
 					responseWriter.Write([]byte{})
 					return

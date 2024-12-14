@@ -34,7 +34,6 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 				}
 				totalTeams = scoringService.WaitForUpdatesNewerThan(req.Context(), lastSeenUpdate)
 				if totalTeams == nil {
-					bundle.Log.Printf("Got nothing from waiting for updates")
 					responseWriter.WriteHeader(http.StatusNoContent)
 					responseWriter.Write([]byte{})
 					return

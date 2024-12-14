@@ -65,7 +65,7 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 			}
 
 			target := bundle.GetJuiceShopUrlForTeam(team, bundle)
-			bundle.Log.Printf("Proxying request for team (%s): %s %s to %s", team, req.Method, req.URL, target)
+			bundle.Log.Printf("Proxy for team (%s): %s %s", team, req.Method, req.URL)
 			// Rewrite the request to the target server
 			newReverseProxy(target).ServeHTTP(responseWriter, req)
 		},
