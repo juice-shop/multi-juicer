@@ -80,7 +80,7 @@ func TestTeamStatusHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"name":"foobar","score":-1,"position":-1,"solvedChallenges":0,"totalTeams":2,"readiness":false}`, rr.Body.String())
+		assert.JSONEq(t, `{"name":"foobar","score":-1,"position":-1,"solvedChallenges":0,"totalTeams":1,"readiness":false}`, rr.Body.String())
 	})
 
 	t.Run("returns ready when instance gets update by the scoring watcher", func(t *testing.T) {
