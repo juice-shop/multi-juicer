@@ -143,7 +143,6 @@ export const TeamStatusPage = ({
   let timeout: number | null = null;
   async function updateStatusData(lastSuccessfulUpdate: Date | null) {
     try {
-      console.log("Updating status data", { lastSuccessfulUpdate });
       const status = await fetchTeamStatusData(lastSuccessfulUpdate);
       if (status === null) {
         // no update available restarting polling with slight delay to not accidentally dos the server
