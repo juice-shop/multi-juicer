@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MagicMotion } from "react-magic-motion";
 import { PositionDisplay } from "../components/PositionDisplay";
+import { FormattedMessage } from "react-intl";
 
 interface Team {
   name: string;
@@ -68,7 +68,10 @@ export default function ScoreOverviewPage({
       <link rel="preload" href="/balancer/icons/third-place.svg" as="image" />
       <div className="p-0 overflow-hidden w-full max-w-2xl rounded-lg bg-gradient-to-b from-gray-700 via-gray-700 to-gray-200 dark:from-gray-100 dark:via-gray-100 dark:to-gray-500 shadow">
         <h1 className="px-4 pt-4 font-bold tracking-wide text-gray-100 dark:text-gray-800 ">
-          ScoreBoard
+          <FormattedMessage
+            id="score_overview"
+            defaultMessage="Score Overview"
+          />
         </h1>
         <table className="w-full text-left border-collapse">
           <thead className="w-full border-none bg-gray-700 dark:bg-gray-100 text-gray-100 dark:text-gray-800 ">
@@ -80,45 +83,53 @@ export default function ScoreOverviewPage({
                 #
               </th>
               <th scope="col" className="p-4 text-xs font-medium uppercase">
-                Name
+                <FormattedMessage id="name" defaultMessage="Name" />
               </th>
               <th
                 scope="col"
                 className="text-right p-4 text-xs font-medium uppercase"
               >
-                Score
+                <FormattedMessage id="score" defaultMessage="Score" />
               </th>
             </tr>
           </thead>
           <tbody className="w-full dark:bg-gray-800 bg-gray-100">
-            <MagicMotion>
-              <>
-                {teams.map((team) => {
-                  return (
-                    <tr className="border-t border-gray-600" key={team.name}>
-                      <td className="text-center p-2 px-3">
-                        <PositionDisplay place={team.position} />
-                      </td>
-                      <td className="p-2 px-4">
-                        <Link to={`/score-overview/teams/${team.name}`}>
-                          {team.name === activeTeam ? (
-                            <strong>{team.name}</strong>
-                          ) : (
-                            team.name
-                          )}
-                        </Link>
-                      </td>
-                      <td className="text-right text-s p-2 px-4">
-                        {team.score} points
-                        <p className="text-gray-500 m-1">
-                          {team.solvedChallengeCount} solved challenges
-                        </p>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </>
-            </MagicMotion>
+            {teams.map((team) => {
+              return (
+                <tr className="border-t border-gray-600" key={team.name}>
+                  <td className="text-center p-2 px-3">
+                    <PositionDisplay place={team.position} />
+                  </td>
+                  <td className="p-2 px-4">
+                    <Link to={`/score-overview/teams/${team.name}`}>
+                      {team.name === activeTeam ? (
+                        <strong>{team.name}</strong>
+                      ) : (
+                        team.name
+                      )}
+                    </Link>
+                  </td>
+                  <td className="text-right text-s p-2 px-4">
+                    <FormattedMessage
+                      id="score_display"
+                      defaultMessage="{score} points"
+                      values={{
+                        score: team.score,
+                      }}
+                    />
+                    <p className="text-gray-500 m-1">
+                      <FormattedMessage
+                        id="solved_challenges_display"
+                        defaultMessage="{solved_challenge_count} solved challenges"
+                        values={{
+                          solved_challenge_count: team.solvedChallengeCount,
+                        }}
+                      />
+                    </p>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

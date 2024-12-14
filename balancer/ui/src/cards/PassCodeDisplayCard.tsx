@@ -15,7 +15,7 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
       <p className="text-sm mb-2">
         <FormattedMessage
           id="passcode_explanation"
-          defaultMessage="You can join the same team using this passcode, on another device or with another teammate."
+          defaultMessage="Use this passcode to join the same team on another device or with a teammate."
         />
       </p>
       <div

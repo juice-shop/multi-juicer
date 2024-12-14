@@ -238,11 +238,6 @@ function ScoreDisplay({
         <FormattedMessage
           id="updating_score"
           defaultMessage="Your score is getting calculated..."
-          values={{
-            position: instanceStatus?.position,
-            totalTeams: instanceStatus?.totalTeams,
-            solvedChallengeCount: instanceStatus?.solvedChallenges,
-          }}
         />
       </div>
     );
@@ -255,7 +250,7 @@ function ScoreDisplay({
         </div>
         <span className="text-sm font-light">
           <FormattedMessage
-            id="joining_team"
+            id="team_score"
             defaultMessage="You're in the {position}/{totalTeams} place with {solvedChallengeCount} solved challenges"
             values={{
               position: instanceStatus?.position,
@@ -270,7 +265,11 @@ function ScoreDisplay({
           to="/score-overview"
           className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Score Overview →
+          <FormattedMessage
+            id="score_overview"
+            defaultMessage="Score Overview"
+          />{" "}
+          →
         </Link>
       </div>
     </div>
