@@ -15,6 +15,13 @@ import (
 	testcore "k8s.io/client-go/testing"
 )
 
+func withoutTimestamps(challenges []*TeamScore) []*TeamScore {
+	for i := range challenges {
+		challenges[i].LastUpdate = time.Time{}
+	}
+	return challenges
+}
+
 func TestScoreingService(t *testing.T) {
 	createTeamWithInstanceReadiness := func(team string, challenges string, solvedChallenges string, instanceReadiness bool) *appsv1.Deployment {
 		var replicas int32 = 1
@@ -83,7 +90,7 @@ func TestScoreingService(t *testing.T) {
 				Challenges:        []ChallengeProgress{},
 				InstanceReadiness: true,
 			},
-		}, scores)
+		}, withoutTimestamps(scores))
 	})
 
 	t.Run("teams with the same score get the same position assigned", func(t *testing.T) {
@@ -150,7 +157,7 @@ func TestScoreingService(t *testing.T) {
 				Challenges:        []ChallengeProgress{},
 				InstanceReadiness: true,
 			},
-		}, scores)
+		}, withoutTimestamps(scores))
 	})
 
 	t.Run("calculates score for known challenges only and skip unknown challenges", func(t *testing.T) {
@@ -187,7 +194,7 @@ func TestScoreingService(t *testing.T) {
 				Challenges:        []ChallengeProgress{},
 				InstanceReadiness: true,
 			},
-		}, scores)
+		}, withoutTimestamps(scores))
 	})
 
 	t.Run("properly sets readiness", func(t *testing.T) {
@@ -211,7 +218,7 @@ func TestScoreingService(t *testing.T) {
 				Challenges:        []ChallengeProgress{},
 				InstanceReadiness: false,
 			},
-		}, scores)
+		}, withoutTimestamps(scores))
 	})
 
 	t.Run("watcher properly updates scores", func(t *testing.T) {
