@@ -181,7 +181,7 @@ export const TeamStatusPage = ({
       <link rel="preload" href="/balancer/icons/third-place.svg" as="image" />
 
       <Card className="w-full max-w-2xl">
-        <div className="grid grid-cols-2 items-center">
+        <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row items-center p-4">
             <img
               src="/balancer/icons/astronaut.svg"
