@@ -105,10 +105,17 @@ const PasscodeResetButton = ({ team }: { team: string }) => {
   );
 };
 
-async function fetchTeamStatusData(): Promise<TeamStatusResponse | null> {
-  const response = await fetch(
-    `/balancer/api/teams/status?wait-for-update-after=${new Date().toISOString()}`
-  );
+async function fetchTeamStatusData(
+  lastSeen: Date | null
+): Promise<TeamStatusResponse | null> {
+  let response: Response;
+  if (lastSeen) {
+    response = await fetch(
+      `/balancer/api/teams/status?wait-for-update-after=${lastSeen.toISOString()}`
+    );
+  } else {
+    response = await fetch("/balancer/api/teams/status");
+  }
   if (!response.ok) {
     throw new Error("Failed to fetch current teams");
   }
@@ -134,25 +141,29 @@ export const TeamStatusPage = ({
   const passcode: string | null = state?.passcode || null;
 
   let timeout: number | null = null;
-  async function updateStatusData() {
+  async function updateStatusData(lastSuccessfulUpdate: Date | null) {
     try {
-      const status = await fetchTeamStatusData();
+      console.log("Updating status data", { lastSuccessfulUpdate });
+      const status = await fetchTeamStatusData(lastSuccessfulUpdate);
       if (status === null) {
         // no update available restarting polling with slight delay to not accidentally dos the server
-        timeout = window.setTimeout(() => updateStatusData(), 1000);
+        timeout = window.setTimeout(
+          () => updateStatusData(lastSuccessfulUpdate),
+          1000
+        );
         return;
       }
       setInstanceStatus(status);
       setActiveTeam(status.name);
       const waitTime = status.readiness ? 5000 : 1000; // poll faster when not ready, as the instance is starting and we want to show the user the status as soon as possible
-      timeout = window.setTimeout(() => updateStatusData(), waitTime);
+      timeout = window.setTimeout(() => updateStatusData(new Date()), waitTime);
     } catch (err) {
       console.error("Failed to fetch current teams!", err);
     }
   }
 
   useEffect(() => {
-    updateStatusData();
+    updateStatusData(null);
     return () => {
       if (timeout !== null) {
         clearTimeout(timeout);

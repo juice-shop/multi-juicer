@@ -46,12 +46,6 @@ export default function ScoreOverviewPage({
         3000,
         5000 - (Date.now() - lastUpdateStarted.getTime())
       );
-      console.log(
-        "Waited for",
-        Date.now() - lastUpdateStarted.getTime(),
-        "ms for status update"
-      );
-      console.log("Waiting for", waitTime, "ms until starting next request");
       timeout = window.setTimeout(() => updateScoreData(new Date()), waitTime);
     } catch (err) {
       console.error("Failed to fetch current teams!", err);
