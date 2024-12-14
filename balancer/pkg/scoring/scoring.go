@@ -204,10 +204,9 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 				s.lastUpdate = time.Now()
 				s.currentScoresMutex.Unlock()
 			default:
-				s.bundle.Log.Printf("Unknown event type: %v", event.Type)
 			}
 		case <-ctx.Done():
-			s.bundle.Log.Printf("Context canceled. Exiting the watcher.")
+			s.bundle.Log.Printf("MultiJuicer context canceled. Exiting the scoring watcher.")
 			return
 		}
 	}
