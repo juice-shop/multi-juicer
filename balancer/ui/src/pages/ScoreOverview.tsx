@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PositionDisplay } from "../components/PositionDisplay";
 import { FormattedMessage } from "react-intl";
+import { motion, domMax, LazyMotion, LayoutGroup } from "motion/react";
 
 interface Team {
   name: string;
@@ -94,42 +95,53 @@ export default function ScoreOverviewPage({
             </tr>
           </thead>
           <tbody className="w-full dark:bg-gray-800 bg-gray-100">
-            {teams.map((team) => {
-              return (
-                <tr className="border-t border-gray-600" key={team.name}>
-                  <td className="text-center p-2 px-3">
-                    <PositionDisplay place={team.position} />
-                  </td>
-                  <td className="p-2 px-4">
-                    <Link to={`/score-overview/teams/${team.name}`}>
-                      {team.name === activeTeam ? (
-                        <strong>{team.name}</strong>
-                      ) : (
-                        team.name
-                      )}
-                    </Link>
-                  </td>
-                  <td className="text-right text-s p-2 px-4">
-                    <FormattedMessage
-                      id="score_display"
-                      defaultMessage="{score} points"
-                      values={{
-                        score: team.score,
-                      }}
-                    />
-                    <p className="text-gray-500 m-1">
+            <LayoutGroup>
+              <LazyMotion features={domMax}>
+                {teams.map((team) => (
+                  <motion.tr
+                    key={team.name}
+                    layout
+                    transition={{
+                      type: "tween",
+                      duration: 0.3,
+                      ease: "easeInOut",
+                    }}
+                    className="border-t border-gray-600"
+                  >
+                    <td className="text-center p-2 px-3">
+                      <PositionDisplay place={team.position} />
+                    </td>
+                    <td className="p-2 px-4">
+                      <Link to={`/score-overview/teams/${team.name}`}>
+                        {team.name === activeTeam ? (
+                          <strong>{team.name}</strong>
+                        ) : (
+                          team.name
+                        )}
+                      </Link>
+                    </td>
+                    <td className="text-right text-s p-2 px-4">
                       <FormattedMessage
-                        id="solved_challenges_display"
-                        defaultMessage="{solved_challenge_count} solved challenges"
+                        id="score_display"
+                        defaultMessage="{score} points"
                         values={{
-                          solved_challenge_count: team.solvedChallengeCount,
+                          score: team.score,
                         }}
                       />
-                    </p>
-                  </td>
-                </tr>
-              );
-            })}
+                      <p className="text-gray-500 m-1">
+                        <FormattedMessage
+                          id="solved_challenges_display"
+                          defaultMessage="{solved_challenge_count} solved challenges"
+                          values={{
+                            solved_challenge_count: team.solvedChallengeCount,
+                          }}
+                        />
+                      </p>
+                    </td>
+                  </motion.tr>
+                ))}
+              </LazyMotion>
+            </LayoutGroup>
           </tbody>
         </table>
       </div>
