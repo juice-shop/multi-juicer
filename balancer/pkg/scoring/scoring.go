@@ -159,8 +159,19 @@ func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team s
 	}
 }
 
-// StartingScoringWorker starts a worker that listens for changes in JuiceShop deployments and updates the scores accordingly
 func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			s.bundle.Log.Printf("MultiJuicer context canceled. Exiting the scoring watcher.")
+			return
+		default:
+			s.startScoringWatcher(ctx)
+		}
+	}
+}
+
+func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 	watcher, err := s.bundle.ClientSet.AppsV1().Deployments(s.bundle.RuntimeEnvironment.Namespace).Watch(ctx, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 	})
@@ -175,7 +186,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 		select {
 		case event, ok := <-watcher.ResultChan():
 			if !ok {
-				s.bundle.Log.Printf("Watcher for JuiceShop deployments has been closed. Exiting the watcher.")
+				s.bundle.Log.Printf("Watcher for JuiceShop deployments has been closed. Restarting the watcher.")
 				return
 			}
 			switch event.Type {
