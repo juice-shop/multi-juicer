@@ -53,6 +53,14 @@ spec:
               containerPort: 8080
             - name: metrics
               containerPort: 8081
+          livenessProbe:
+            httpGet:
+              path: /balancer/api/health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /balancer/api/readiness
+              port: http
           volumeMounts:
             - name: config-volume
               mountPath: /config/config.json
