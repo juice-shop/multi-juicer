@@ -115,12 +115,20 @@ default values render correctly:
                       name: balancer-secret
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /balancer/api/health
+                  port: http
               name: multi-juicer
               ports:
                 - containerPort: 8080
                   name: http
                 - containerPort: 8081
                   name: metrics
+              readinessProbe:
+                httpGet:
+                  path: /balancer/api/readiness
+                  port: http
               resources:
                 limits:
                   cpu: 400m
@@ -646,12 +654,20 @@ full values render out correctly:
                       name: balancer-secret
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /balancer/api/health
+                  port: http
               name: multi-juicer
               ports:
                 - containerPort: 8080
                   name: http
                 - containerPort: 8081
                   name: metrics
+              readinessProbe:
+                httpGet:
+                  path: /balancer/api/readiness
+                  port: http
               resources:
                 limits:
                   cpu: 400m
@@ -3331,12 +3347,20 @@ production notes work correctly:
                       name: balancer-secret
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /balancer/api/health
+                  port: http
               name: multi-juicer
               ports:
                 - containerPort: 8080
                   name: http
                 - containerPort: 8081
                   name: metrics
+              readinessProbe:
+                httpGet:
+                  path: /balancer/api/readiness
+                  port: http
               resources:
                 limits:
                   cpu: 400m
