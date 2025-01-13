@@ -21,13 +21,11 @@ that has permissions to read packages in order to sign in to the registry using 
 helm registry login ghcr.io --username <GITHUB_USERNAME> --password <GITHUB_TOKEN>
 ```
 
-
 ## Step 1. Setting up the cluster
 
 ```sh
 # First we'll need a cluster, you can create one using the eksctl cli.
 # This will take a couple of minutes
-
 eksctl create cluster \
 --name multi-juicer \
 --nodegroup-name standard-workers \
