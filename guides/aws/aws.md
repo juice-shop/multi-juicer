@@ -13,16 +13,29 @@ This example expects you to have the following cli tools setup.
 3. [helm](https://helm.sh)
 4. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos)
 
+You will also need a GitHub account with a 
+[personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) 
+that has permissions to read packages in order to sign in to the registry using helm.
+
+```sh
+helm registry login ghcr.io --username <GITHUB_USERNAME> --password <GITHUB_TOKEN>
+```
+
+
+## Step 1. Setting up the cluster
+
 ```sh
 # First we'll need a cluster, you can create one using the eksctl cli.
 # This will take a couple of minutes
+
 eksctl create cluster \
 --name multi-juicer \
 --nodegroup-name standard-workers \
 --node-type t3.medium \
 --nodes 2 \
 --nodes-min 1 \
---nodes-max 4
+--nodes-max 4 \
+--region <AWS_REGION>
 
 # After completion verify that your kubectl context has been updated:
 # Should print something like: Administrator@multi-juicer.eu-central-1.eksctl.io
