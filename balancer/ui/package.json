@@ -25,7 +25,7 @@
     "postcss": "^8.4.49",
     "typescript": "^5.7.2",
     "vite": "^6.0.3",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.9"
   },
   "scripts": {
     "start": "vite",
