@@ -33,7 +33,7 @@ export const Footer = ({
         color: prefersDarkScheme ? "#2d3848" : "#fff",
       }}
       trigger={
-        <button className="border-none text-font-color text-sm cursor-pointer flex gap-1 items-baseline p-1 rounded">
+        <button className="border-none text-font-color text-sm cursor-pointer flex gap-1 items-baseline p-1 rounded-sm">
           <span role="img" aria-label="globe">
             🌍
           </span>
@@ -53,7 +53,7 @@ export const Footer = ({
             <button
               key={`translation-${language.key}`}
               className={classNames(
-                "border-none bg-background-highlight text-font-color text-base mb-2 p-1 rounded",
+                "border-none bg-background-highlight text-font-color text-base mb-2 p-1 rounded-sm",
                 selectedLocale === language.key ? "font-semibold" : ""
               )}
               onClick={() => switchLanguage(language)}

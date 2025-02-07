@@ -59,7 +59,7 @@ function LogoutButton({
     <button
       disabled={isLoggingOut}
       onClick={logout}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
     >
       <FormattedMessage id="log_out" defaultMessage="Log Out" />
     </button>
@@ -98,7 +98,7 @@ const PasscodeResetButton = ({ team }: { team: string }) => {
     <button
       onClick={resetPasscode}
       disabled={isResetting}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
     >
       <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
     </button>
@@ -263,7 +263,7 @@ function ScoreDisplay({
       <div className="flex flex-row-reverse items-center p-4">
         <Link
           to="/score-overview"
-          className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+          className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
         >
           <FormattedMessage
             id="score_overview"

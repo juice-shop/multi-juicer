@@ -5,7 +5,7 @@ import { ReadableTimestamp } from "../components/ReadableTimestamp";
 import { Card } from "../components/Card";
 
 const buttonClasses =
-  "inline m-0 bg-gray-700 text-white p-2 px-3 text-sm rounded disabled:cursor-wait disabled:opacity-50";
+  "inline m-0 bg-gray-700 text-white p-2 px-3 text-sm rounded-sm disabled:cursor-wait disabled:opacity-50";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

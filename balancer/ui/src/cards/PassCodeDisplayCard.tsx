@@ -39,7 +39,7 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
             <span
               key={index}
               className={classNames(
-                "font-mono p-3 rounded inline-block dark:bg-gray-900 bg-gray-200",
+                "font-mono p-3 rounded-sm inline-block dark:bg-gray-900 bg-gray-200",
                 index === 3 ? "mr-3" : ""
               )}
             >

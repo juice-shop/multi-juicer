@@ -67,7 +67,7 @@ export default function ScoreOverviewPage({
       <link rel="preload" href="/balancer/icons/first-place.svg" as="image" />
       <link rel="preload" href="/balancer/icons/second-place.svg" as="image" />
       <link rel="preload" href="/balancer/icons/third-place.svg" as="image" />
-      <div className="p-0 overflow-hidden w-full max-w-2xl rounded-lg bg-gradient-to-b from-gray-700 via-gray-700 to-gray-200 dark:from-gray-100 dark:via-gray-100 dark:to-gray-500 shadow">
+      <div className="p-0 overflow-hidden w-full max-w-2xl rounded-lg bg-linear-to-b from-gray-700 via-gray-700 to-gray-200 dark:from-gray-100 dark:via-gray-100 dark:to-gray-500 shadow-sm">
         <h1 className="px-4 pt-4 font-bold tracking-wide text-gray-100 dark:text-gray-800 ">
           <FormattedMessage
             id="score_overview"

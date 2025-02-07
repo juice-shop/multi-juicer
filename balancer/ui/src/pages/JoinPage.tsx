@@ -14,7 +14,7 @@ const messages = defineMessages({
 });
 
 const ErrorBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="border border-red-500 text-gray-900 mt-2 rounded p-4 bg-red-100 flex flex-col items-center gap-2">
+  <div className="border border-red-500 text-gray-900 mt-2 rounded-sm p-4 bg-red-100 flex flex-col items-center gap-2">
     {children}
   </div>
 );
@@ -133,7 +133,7 @@ export function JoinPage({
             <FormattedMessage id="teamname" defaultMessage="Teamname" />
           </label>
           <input
-            className="bg-gray-300 mb-2 border-none rounded p-3 text-sm block w-full text-gray-800 invalid:outline invalid:outline-red-500 invalid:bg-red-100"
+            className="bg-gray-300 mb-2 border-none rounded-sm p-3 text-sm block w-full text-gray-800 invalid:outline invalid:outline-red-500 invalid:bg-red-100"
             type="text"
             id="teamname"
             data-test-id="teamname-input"
