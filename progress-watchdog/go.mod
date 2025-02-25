@@ -1,8 +1,6 @@
 module github.com/juice-shop/multi-juicer/progress-watchdog
 
-go 1.23.0
-
-toolchain go1.23.3
+go 1.24.0
 
 require (
 	github.com/speps/go-hashids/v2 v2.0.1

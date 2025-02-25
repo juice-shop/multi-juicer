@@ -1,8 +1,6 @@
 module github.com/juice-shop/multi-juicer/balancer
 
-go 1.23.0
-
-toolchain go1.23.3
+go 1.24.0
 
 require (
 	github.com/prometheus/client_golang v1.20.5
