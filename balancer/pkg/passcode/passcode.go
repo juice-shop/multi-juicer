@@ -2,20 +2,23 @@ package passcode
 
 import (
 	"crypto/rand"
-	"fmt"
 	"math/big"
 )
 
-func GeneratePasscode() string {
-	// Define the upper limit for an 8-digit number
-	max := big.NewInt(100000000) // 10^8 = 100000000
+const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	// Generate a cryptographically secure random number
-	n, err := rand.Int(rand.Reader, max)
-	if err != nil {
-		panic(err)
+func GeneratePasscode() string {
+	passcodeLength := 8
+	passcode := make([]byte, passcodeLength)
+	charsetLength := big.NewInt(int64(len(charset)))
+
+	for i := range passcode {
+		randomIndex, err := rand.Int(rand.Reader, charsetLength)
+		if err != nil {
+			panic(err)
+		}
+		passcode[i] = charset[randomIndex.Int64()]
 	}
 
-	// Format the number as an 8-digit string with leading zeros if necessary
-	return fmt.Sprintf("%08d", n.Int64())
+	return string(passcode)
 }
