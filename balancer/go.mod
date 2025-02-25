@@ -3,12 +3,12 @@ module github.com/juice-shop/multi-juicer/balancer
 go 1.24.0
 
 require (
-	github.com/prometheus/client_golang v1.20.5
+	github.com/prometheus/client_golang v1.21.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/crypto v0.32.0
-	k8s.io/api v0.32.1
-	k8s.io/apimachinery v0.32.1
-	k8s.io/client-go v0.32.1
+	golang.org/x/crypto v0.35.0
+	k8s.io/api v0.32.2
+	k8s.io/apimachinery v0.32.2
+	k8s.io/client-go v0.32.2
 )
 
 require (
