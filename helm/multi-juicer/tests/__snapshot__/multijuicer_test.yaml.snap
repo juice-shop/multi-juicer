@@ -78,7 +78,12 @@ default values render correctly:
     kind: Deployment
     metadata:
       labels:
-        foo: bar
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
       name: balancer
     spec:
       replicas: 1
@@ -617,7 +622,12 @@ full values render out correctly:
     kind: Deployment
     metadata:
       labels:
-        foo: bar
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
       name: balancer
     spec:
       replicas: 3
@@ -3310,7 +3320,12 @@ production notes work correctly:
     kind: Deployment
     metadata:
       labels:
-        foo: bar
+        app.kubernetes.io/component: load-balancer
+        app.kubernetes.io/instance: balancer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: balancer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
       name: balancer
     spec:
       replicas: 3
