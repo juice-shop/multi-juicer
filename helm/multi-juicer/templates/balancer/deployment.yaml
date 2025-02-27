@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: balancer
   labels:
-    foo: bar
+    {{ include "multi-juicer.balancer.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.balancer.replicas }}
   selector:
