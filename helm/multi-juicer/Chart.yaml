@@ -26,12 +26,8 @@ keywords:
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
 
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-version: 8.0.1
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application.
-appVersion: 8.0.1
+# both chart and app version are automatically set by the release workflow, these are just placeholders
+version: 8.0.0-local-unreleased
+appVersion: 8.0.0-local-unreleased
 
 dependencies: []
