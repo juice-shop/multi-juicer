@@ -10,7 +10,7 @@ export const InstanceNotFoundCard = () => {
         alt="Warning"
         className="h-12 w-auto mr-3"
       />
-      <span data-test-id="instance-not-found" className="text-gray-100">
+      <span data-test-id="instance-not-found">
         <FormattedMessage
           id="instance_status_not_found"
           defaultMessage="Could not find the instance for the team. You can recreate it by logging back in."
