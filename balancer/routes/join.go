@@ -351,6 +351,7 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 							Name:            "juice-shop",
 							Image:           fmt.Sprintf("%s:%s", bundle.Config.JuiceShopConfig.Image, bundle.Config.JuiceShopConfig.Tag),
 							SecurityContext: &bundle.Config.JuiceShopConfig.ContainerSecurityContext,
+							Resources:       bundle.Config.JuiceShopConfig.Resources,
 							Ports: []corev1.ContainerPort{
 								{
 									ContainerPort: 3000,
