@@ -1020,35 +1020,9 @@ full values render out correctly:
           "editable": true,
           "fiscalYearStartMonth": 0,
           "graphTooltip": 0,
-          "id": 1,
+          "id": 29,
           "links": [],
           "panels": [
-            {
-              "collapsed": false,
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "gridPos": {
-                "h": 1,
-                "w": 24,
-                "x": 0,
-                "y": 0
-              },
-              "id": 25,
-              "panels": [],
-              "targets": [
-                {
-                  "datasource": {
-                    "type": "prometheus",
-                    "uid": "prometheus"
-                  },
-                  "refId": "A"
-                }
-              ],
-              "title": "Challenge Progress",
-              "type": "row"
-            },
             {
               "datasource": {
                 "type": "prometheus",
@@ -1095,9 +1069,9 @@ full values render out correctly:
               },
               "gridPos": {
                 "h": 4,
-                "w": 6,
+                "w": 24,
                 "x": 0,
-                "y": 1
+                "y": 0
               },
               "id": 2,
               "maxDataPoints": 100,
@@ -1106,6 +1080,7 @@ full values render out correctly:
                 "graphMode": "area",
                 "justifyMode": "auto",
                 "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
@@ -1117,7 +1092,7 @@ full values render out correctly:
                 "textMode": "auto",
                 "wideLayout": true
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "repeat": "difficulties",
               "repeatDirection": "h",
               "targets": [
@@ -1132,6 +1107,87 @@ full values render out correctly:
                 }
               ],
               "title": "Solved $difficulties Star Challenges",
+              "type": "stat"
+            },
+            {
+              "collapsed": false,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 8
+              },
+              "id": 25,
+              "panels": [],
+              "title": "Challenge Progress",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [],
+                  "max": 100,
+                  "min": 1,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 19,
+                "x": 0,
+                "y": 9
+              },
+              "id": 78,
+              "maxPerRow": 4,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "vertical",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "sum by (category)(juiceshop_challenges_solved{team=\"$team\"}) / sum by (category)(juiceshop_challenges_total{team=\"$team\"}) * 100 != 0",
+                  "interval": "",
+                  "legendFormat": "{{category}} ",
+                  "refId": "A"
+                }
+              ],
+              "title": "Solved Challenges by Category",
               "type": "stat"
             },
             {
@@ -1176,7 +1232,7 @@ full values render out correctly:
                 "h": 4,
                 "w": 5,
                 "x": 19,
-                "y": 5
+                "y": 9
               },
               "id": 85,
               "options": {
@@ -1184,6 +1240,7 @@ full values render out correctly:
                 "graphMode": "area",
                 "justifyMode": "center",
                 "orientation": "auto",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "last"
@@ -1195,7 +1252,7 @@ full values render out correctly:
                 "textMode": "auto",
                 "wideLayout": true
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -1212,79 +1269,7 @@ full values render out correctly:
               "type": "stat"
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "fieldConfig": {
-                "defaults": {
-                  "mappings": [],
-                  "max": 100,
-                  "min": 1,
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "gridPos": {
-                "h": 4,
-                "w": 19,
-                "x": 0,
-                "y": 9
-              },
-              "id": 78,
-              "maxPerRow": 4,
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "center",
-                "orientation": "vertical",
-                "reduceOptions": {
-                  "calcs": [
-                    "max"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              },
-              "pluginVersion": "10.4.1",
-              "repeatDirection": "h",
-              "targets": [
-                {
-                  "datasource": {
-                    "type": "prometheus",
-                    "uid": "prometheus"
-                  },
-                  "expr": "sum by (category)(juiceshop_challenges_solved{team=\"$team\"}) / sum by (category)(juiceshop_challenges_total{team=\"$team\"}) * 100 != 0",
-                  "interval": "",
-                  "legendFormat": "{{category}} ",
-                  "refId": "A"
-                }
-              ],
-              "title": "Solved Challenges by Category",
-              "type": "stat"
-            },
-            {
               "collapsed": false,
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
               "gridPos": {
                 "h": 1,
                 "w": 24,
@@ -1293,15 +1278,6 @@ full values render out correctly:
               },
               "id": 32,
               "panels": [],
-              "targets": [
-                {
-                  "datasource": {
-                    "type": "prometheus",
-                    "uid": "prometheus"
-                  },
-                  "refId": "A"
-                }
-              ],
               "title": "Business Metrics",
               "type": "row"
             },
@@ -1322,6 +1298,7 @@ full values render out correctly:
                     "axisLabel": "Orders per Minute",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "gradientMode": "none",
@@ -1385,11 +1362,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -1422,6 +1400,7 @@ full values render out correctly:
                     "axisLabel": "",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "bars",
                     "fillOpacity": 100,
                     "gradientMode": "none",
@@ -1483,11 +1462,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -1555,6 +1535,7 @@ full values render out correctly:
                 "graphMode": "area",
                 "justifyMode": "auto",
                 "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
@@ -1566,17 +1547,21 @@ full values render out correctly:
                 "textMode": "auto",
                 "wideLayout": true
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
                     "type": "prometheus",
                     "uid": "prometheus"
                   },
+                  "editorMode": "code",
                   "expr": "juiceshop_users_registered{type=\"standard\", team=\"$team\"}",
+                  "legendFormat": "Standard Users",
+                  "range": true,
                   "refId": "A"
                 }
               ],
+              "title": "",
               "type": "stat"
             },
             {
@@ -1632,6 +1617,7 @@ full values render out correctly:
                 "graphMode": "area",
                 "justifyMode": "auto",
                 "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
@@ -1643,25 +1629,25 @@ full values render out correctly:
                 "textMode": "auto",
                 "wideLayout": true
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
                     "type": "prometheus",
                     "uid": "prometheus"
                   },
+                  "editorMode": "code",
                   "expr": "juiceshop_users_registered{type=\"deluxe\", team=\"$team\"}",
+                  "legendFormat": "Deluxe Users",
+                  "range": true,
                   "refId": "A"
                 }
               ],
+              "title": "",
               "type": "stat"
             },
             {
               "collapsed": false,
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
               "gridPos": {
                 "h": 1,
                 "w": 24,
@@ -1670,15 +1656,6 @@ full values render out correctly:
               },
               "id": 39,
               "panels": [],
-              "targets": [
-                {
-                  "datasource": {
-                    "type": "prometheus",
-                    "uid": "prometheus"
-                  },
-                  "refId": "A"
-                }
-              ],
               "title": "Technical",
               "type": "row"
             },
@@ -1699,6 +1676,7 @@ full values render out correctly:
                     "axisLabel": "Requests per Minute",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "bars",
                     "fillOpacity": 100,
                     "gradientMode": "none",
@@ -1819,11 +1797,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -1858,6 +1837,7 @@ full values render out correctly:
                     "axisLabel": "",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "gradientMode": "none",
@@ -1922,11 +1902,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -1971,6 +1952,7 @@ full values render out correctly:
                     "axisLabel": "",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "gradientMode": "none",
@@ -2035,11 +2017,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -2108,6 +2091,7 @@ full values render out correctly:
                 "graphMode": "area",
                 "justifyMode": "auto",
                 "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
@@ -2119,7 +2103,7 @@ full values render out correctly:
                 "textMode": "auto",
                 "wideLayout": true
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -2181,13 +2165,13 @@ full values render out correctly:
                 "y": 36
               },
               "id": 50,
-              "interval": "",
               "maxDataPoints": 100,
               "options": {
                 "colorMode": "none",
                 "graphMode": "none",
                 "justifyMode": "auto",
                 "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
                     "mean"
@@ -2199,7 +2183,7 @@ full values render out correctly:
                 "textMode": "name",
                 "wideLayout": true
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -2235,6 +2219,7 @@ full values render out correctly:
                     "axisLabel": "",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "gradientMode": "none",
@@ -2299,11 +2284,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -2370,6 +2356,7 @@ full values render out correctly:
                     "axisLabel": "",
                     "axisPlacement": "auto",
                     "barAlignment": 0,
+                    "barWidthFactor": 0.6,
                     "drawStyle": "line",
                     "fillOpacity": 10,
                     "gradientMode": "none",
@@ -2434,11 +2421,12 @@ full values render out correctly:
                   "showLegend": true
                 },
                 "tooltip": {
+                  "hideZeros": false,
                   "mode": "multi",
                   "sort": "none"
                 }
               },
-              "pluginVersion": "10.4.1",
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -2471,6 +2459,10 @@ full values render out correctly:
                 "type": "loki",
                 "uid": "P8E80F9AEF21F6940"
               },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
               "gridPos": {
                 "h": 8,
                 "w": 24,
@@ -2480,6 +2472,7 @@ full values render out correctly:
               "id": 23,
               "options": {
                 "dedupStrategy": "none",
+                "enableInfiniteScrolling": false,
                 "enableLogDetails": true,
                 "prettifyLogMessage": false,
                 "showCommonLabels": false,
@@ -2488,6 +2481,7 @@ full values render out correctly:
                 "sortOrder": "Ascending",
                 "wrapLogMessage": true
               },
+              "pluginVersion": "11.5.2",
               "targets": [
                 {
                   "datasource": {
@@ -2504,14 +2498,14 @@ full values render out correctly:
               "type": "logs"
             }
           ],
+          "preload": false,
           "refresh": "10s",
-          "schemaVersion": 39,
+          "schemaVersion": 40,
           "tags": [],
           "templating": {
             "list": [
               {
                 "current": {
-                  "selected": true,
                   "text": [
                     "1",
                     "2",
@@ -2572,12 +2566,10 @@ full values render out correctly:
                   }
                 ],
                 "query": "1,2,3,4,5,6",
-                "skipUrlSync": false,
                 "type": "custom"
               },
               {
                 "current": {
-                  "selected": false,
                   "text": "test",
                   "value": "test"
                 },
@@ -2586,21 +2578,14 @@ full values render out correctly:
                   "uid": "prometheus"
                 },
                 "definition": "label_values(juiceshop_challenges_total, team)",
-                "hide": 0,
                 "includeAll": false,
                 "label": "Team",
-                "multi": false,
                 "name": "team",
                 "options": [],
                 "query": "label_values(juiceshop_challenges_total, team)",
                 "refresh": 2,
                 "regex": "",
-                "skipUrlSync": false,
-                "sort": 0,
-                "tagValuesQuery": "",
-                "tagsQuery": "",
-                "type": "query",
-                "useTags": false
+                "type": "query"
               }
             ]
           },
@@ -2608,20 +2593,7 @@ full values render out correctly:
             "from": "now-6h",
             "to": "now"
           },
-          "timepicker": {
-            "refresh_intervals": [
-              "5s",
-              "10s",
-              "30s",
-              "1m",
-              "5m",
-              "15m",
-              "30m",
-              "1h",
-              "2h",
-              "1d"
-            ]
-          },
+          "timepicker": {},
           "timezone": "",
           "title": "MultiJuicer - Instance Dashboard",
           "uid": "Sj-cIdwZk",
