@@ -28,7 +28,7 @@ jobs:
       - name: "Package Helm Chart"
         working-directory: helm/multi-juicer/
         run: |
-          helm package --version "${{ steps.release-version.outputs.version }}" .
+          helm package --version "${{ steps.release-version.outputs.version }}" --app-version "${{ steps.release-version.outputs.version }}" .
 
       - name: "Push Helm Chart"
         working-directory: helm/multi-juicer/
