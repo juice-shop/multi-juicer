@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/balancer"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+  - package-ecosystem: "gomod"
+    directory: "/cleaner"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+  - package-ecosystem: "gomod"
+    directory: "/progress-watchdog"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+  - package-ecosystem: "npm"
+    directory: "/balancer/ui"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
