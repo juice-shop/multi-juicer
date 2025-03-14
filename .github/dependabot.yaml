@@ -43,3 +43,18 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      npm-dev-dependencies:
+        patterns:
+          - "*"
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
