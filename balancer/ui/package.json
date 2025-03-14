@@ -24,7 +24,7 @@
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
     "typescript": "^5.8.2",
-    "vite": "^6.2.1",
+    "vite": "^6.2.2",
     "vitest": "^3.0.8"
   },
   "scripts": {
