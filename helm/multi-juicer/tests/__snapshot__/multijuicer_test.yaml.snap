@@ -56,7 +56,7 @@ default values render correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v17.1.1",
+            "tag": "v17.2.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -95,7 +95,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 50b9ab19cbc21a1393498e200005788832a98905bd9295649d9f61a5ac32f986
+            checksum/config: a1a1843dcf451b702f6a73afcc6f3683c62108fd83b44ee6d6bb55d185b7c717
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -600,7 +600,7 @@ full values render out correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v17.1.1",
+            "tag": "v17.2.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -639,7 +639,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 5c7bd49972c0c54c262f91740bd53ed72995ee598d5ad18ae6fa3ff145f671b6
+            checksum/config: 70ed71021ab65cff4705cfd372a4ca58d77961f9f0cd44ca9438d626d157122a
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -2847,7 +2847,7 @@ production notes work correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v17.1.1",
+            "tag": "v17.2.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -2886,7 +2886,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 5c7bd49972c0c54c262f91740bd53ed72995ee598d5ad18ae6fa3ff145f671b6
+            checksum/config: 70ed71021ab65cff4705cfd372a4ca58d77961f9f0cd44ca9438d626d157122a
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
