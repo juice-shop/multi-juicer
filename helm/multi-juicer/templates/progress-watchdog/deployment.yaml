@@ -14,6 +14,10 @@ spec:
         {{- include "multi-juicer.progress-watchdog.labels" . | nindent 8 }}
     spec:
       serviceAccountName: progress-watchdog
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.progressWatchdog.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
