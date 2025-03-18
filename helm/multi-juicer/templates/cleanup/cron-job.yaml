@@ -17,6 +17,10 @@ spec:
             {{- include "multi-juicer.cleaner.labels" . | nindent 12 }}
         spec:
           serviceAccountName: 'juice-cleaner'
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
           {{- with .Values.juiceShopCleanup.podSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}

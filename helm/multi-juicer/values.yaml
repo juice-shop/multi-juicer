@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 imagePullPolicy: IfNotPresent
+imagePullSecrets: []
 nodeSelector: {}
 
 ingress:

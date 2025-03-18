@@ -21,6 +21,10 @@ spec:
         {{- include "multi-juicer.balancer.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: balancer
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.balancer.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
