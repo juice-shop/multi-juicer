@@ -19,7 +19,7 @@ spec:
           serviceAccountName: 'juice-cleaner'
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
-            {{- toYaml . | nindent 8 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.juiceShopCleanup.podSecurityContext }}
           securityContext:
