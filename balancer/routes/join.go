@@ -427,6 +427,7 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 							},
 						},
 					),
+					ImagePullSecrets: bundle.Config.JuiceShopConfig.ImagePullSecrets,
 					Tolerations:      bundle.Config.JuiceShopConfig.Tolerations,
 					Affinity:         &bundle.Config.JuiceShopConfig.Affinity,
 					RuntimeClassName: bundle.Config.JuiceShopConfig.RuntimeClassName,
