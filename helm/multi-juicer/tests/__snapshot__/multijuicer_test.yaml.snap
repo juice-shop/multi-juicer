@@ -96,8 +96,8 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 289b63e2937d97b51b45b11964ef97346885f5946fb3ee55d3f3195cf990fe67
-            checksum/secret: 1e1dbeb85e39841b0afb47a5c93d071717f4c3c86dc5136be9f8db9dfcdf6ca0
+            checksum/config: 3823a68de731511e54b7d791507cca3f10da34f4308d3bca51e30aa6666f090b
+            checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
             app.kubernetes.io/name: balancer
@@ -543,7 +543,7 @@ default values render correctly:
       type: ClusterIP
 full values render out correctly:
   1: |
-    raw: "MultiJuicer deployed! \U0001F389\U0001F973\r\n\r\nMultiJuicer doesn't come with a default way to expose it to the world.\r\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\r\n\r\nTo test it locally run:\r\n$ kubectl port-forward --namespace=\"NAMESPACE\" service/balancer 8080:8080\r\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:8080\r\n\r\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\r\nUsername: admin\r\nPassword: ${kubectl get secrets balancer-secret --namespace=\"NAMESPACE\" -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
+    raw: "MultiJuicer deployed! \U0001F389\U0001F973\n\nMultiJuicer doesn't come with a default way to expose it to the world.\nYou can find guides for specific cloud providers here: https://github.com/juice-shop/multi-juicer/tree/main/guides\n\nTo test it locally run:\n$ kubectl port-forward --namespace=\"NAMESPACE\" service/balancer 8080:8080\nYou'll then be able to access the JuiceBalancer in your browser under http://localhost:8080\n\nTo administrate the cluster you can log into the JuiceBalancer with the admin account:\nUsername: admin\nPassword: ${kubectl get secrets balancer-secret --namespace=\"NAMESPACE\" -o=jsonpath='{.data.adminPassword}' | base64 --decode}"
   2: |
     apiVersion: v1
     data:
@@ -641,8 +641,8 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 0b51a4e260579c65f5119746c00f2ec82aa032fdb04e501e789ed5eb6c532bef
-            checksum/secret: 1e1dbeb85e39841b0afb47a5c93d071717f4c3c86dc5136be9f8db9dfcdf6ca0
+            checksum/config: 100379ffa5db620200be1c3ed152b2cef0dd0ca179019004328564cd4e74b2d6
+            checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
             app.kubernetes.io/name: balancer
@@ -1001,7 +1001,1607 @@ full values render out correctly:
   16: |
     apiVersion: v1
     data:
-      instances.json: "{\r\n  \"annotations\": {\r\n    \"list\": [\r\n      {\r\n        \"builtIn\": 1,\r\n        \"datasource\": {\r\n          \"type\": \"datasource\",\r\n          \"uid\": \"grafana\"\r\n        },\r\n        \"enable\": true,\r\n        \"hide\": true,\r\n        \"iconColor\": \"rgba(0, 211, 255, 1)\",\r\n        \"name\": \"Annotations & Alerts\",\r\n        \"type\": \"dashboard\"\r\n      }\r\n    ]\r\n  },\r\n  \"editable\": true,\r\n  \"fiscalYearStartMonth\": 0,\r\n  \"graphTooltip\": 0,\r\n  \"id\": 29,\r\n  \"links\": [],\r\n  \"panels\": [\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"description\": \"\",\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"thresholds\"\r\n          },\r\n          \"decimals\": 0,\r\n          \"mappings\": [\r\n            {\r\n              \"options\": {\r\n                \"match\": \"null\",\r\n                \"result\": {\r\n                  \"text\": \"N/A\"\r\n                }\r\n              },\r\n              \"type\": \"special\"\r\n            }\r\n          ],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"#C8F2C2\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"#56A64B\",\r\n                \"value\": 20\r\n              },\r\n              {\r\n                \"color\": \"#37872D\",\r\n                \"value\": 60\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"percent\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 4,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 0\r\n      },\r\n      \"id\": 2,\r\n      \"maxDataPoints\": 100,\r\n      \"options\": {\r\n        \"colorMode\": \"value\",\r\n        \"graphMode\": \"area\",\r\n        \"justifyMode\": \"auto\",\r\n        \"orientation\": \"horizontal\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"lastNotNull\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"auto\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"repeat\": \"difficulties\",\r\n      \"repeatDirection\": \"h\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"sum without (category)(juiceshop_challenges_solved{team=\\\"$team\\\", difficulty=\\\"$difficulties\\\"}) / sum without (category)(juiceshop_challenges_total{team=\\\"$team\\\", difficulty=\\\"$difficulties\\\"}) * 100\",\r\n          \"legendFormat\": \"\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Solved $difficulties Star Challenges\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"collapsed\": false,\r\n      \"gridPos\": {\r\n        \"h\": 1,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 8\r\n      },\r\n      \"id\": 25,\r\n      \"panels\": [],\r\n      \"title\": \"Challenge Progress\",\r\n      \"type\": \"row\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"mappings\": [],\r\n          \"max\": 100,\r\n          \"min\": 1,\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"percent\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 4,\r\n        \"w\": 19,\r\n        \"x\": 0,\r\n        \"y\": 9\r\n      },\r\n      \"id\": 78,\r\n      \"maxPerRow\": 4,\r\n      \"options\": {\r\n        \"colorMode\": \"value\",\r\n        \"graphMode\": \"area\",\r\n        \"justifyMode\": \"center\",\r\n        \"orientation\": \"vertical\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"max\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"auto\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"sum by (category)(juiceshop_challenges_solved{team=\\\"$team\\\"}) / sum by (category)(juiceshop_challenges_total{team=\\\"$team\\\"}) * 100 != 0\",\r\n          \"interval\": \"\",\r\n          \"legendFormat\": \"{{category}} \",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Solved Challenges by Category\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"description\": \"The cheat score show a estimate of how likely it is that a team is cheating. This estimate is based on the time taken between challenges solved. Take this only as a approximation and never as direct prove that a team is in fact cheating.\",\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"decimals\": 0,\r\n          \"mappings\": [],\r\n          \"max\": 1,\r\n          \"min\": 0,\r\n          \"noValue\": \"0\",\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"super-light-yellow\",\r\n                \"value\": 0.5\r\n              },\r\n              {\r\n                \"color\": \"semi-dark-orange\",\r\n                \"value\": 0.65\r\n              },\r\n              {\r\n                \"color\": \"dark-red\",\r\n                \"value\": 0.8\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"percentunit\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 4,\r\n        \"w\": 5,\r\n        \"x\": 19,\r\n        \"y\": 9\r\n      },\r\n      \"id\": 85,\r\n      \"options\": {\r\n        \"colorMode\": \"value\",\r\n        \"graphMode\": \"area\",\r\n        \"justifyMode\": \"center\",\r\n        \"orientation\": \"auto\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"last\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"auto\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"juiceshop_cheat_score{team=\\\"$team\\\"}\",\r\n          \"interval\": \"\",\r\n          \"legendFormat\": \"\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Cheat Score\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"collapsed\": false,\r\n      \"gridPos\": {\r\n        \"h\": 1,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 13\r\n      },\r\n      \"id\": 32,\r\n      \"panels\": [],\r\n      \"title\": \"Business Metrics\",\r\n      \"type\": \"row\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"Orders per Minute\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"line\",\r\n            \"fillOpacity\": 10,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"decimals\": 0,\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"min\": 0,\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"short\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 5,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 14\r\n      },\r\n      \"id\": 11,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [\r\n            \"lastNotNull\"\r\n          ],\r\n          \"displayMode\": \"list\",\r\n          \"placement\": \"bottom\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"juiceshop_user_social_interactions{team=\\\"$team\\\"}\",\r\n          \"interval\": \"1m\",\r\n          \"legendFormat\": \"{{type}}\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Social Interactions\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"bars\",\r\n            \"fillOpacity\": 100,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"decimals\": 0,\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"min\": 0,\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"short\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 6,\r\n        \"w\": 16,\r\n        \"x\": 0,\r\n        \"y\": 19\r\n      },\r\n      \"id\": 64,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [],\r\n          \"displayMode\": \"list\",\r\n          \"placement\": \"bottom\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"increase(juiceshop_users_registered{team=\\\"$team\\\"}[1m])\",\r\n          \"legendFormat\": \"{{type}}\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"User Signups\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"fixedColor\": \"rgb(31, 120, 193)\",\r\n            \"mode\": \"fixed\"\r\n          },\r\n          \"decimals\": 0,\r\n          \"mappings\": [\r\n            {\r\n              \"options\": {\r\n                \"match\": \"null\",\r\n                \"result\": {\r\n                  \"text\": \"N/A\"\r\n                }\r\n              },\r\n              \"type\": \"special\"\r\n            }\r\n          ],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"none\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 3,\r\n        \"w\": 8,\r\n        \"x\": 16,\r\n        \"y\": 19\r\n      },\r\n      \"id\": 13,\r\n      \"maxDataPoints\": 100,\r\n      \"options\": {\r\n        \"colorMode\": \"none\",\r\n        \"graphMode\": \"area\",\r\n        \"justifyMode\": \"auto\",\r\n        \"orientation\": \"horizontal\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"lastNotNull\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"auto\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"editorMode\": \"code\",\r\n          \"expr\": \"juiceshop_users_registered{type=\\\"standard\\\", team=\\\"$team\\\"}\",\r\n          \"legendFormat\": \"Standard Users\",\r\n          \"range\": true,\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"fixedColor\": \"rgb(31, 120, 193)\",\r\n            \"mode\": \"fixed\"\r\n          },\r\n          \"decimals\": 0,\r\n          \"mappings\": [\r\n            {\r\n              \"options\": {\r\n                \"match\": \"null\",\r\n                \"result\": {\r\n                  \"text\": \"N/A\"\r\n                }\r\n              },\r\n              \"type\": \"special\"\r\n            }\r\n          ],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"none\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 3,\r\n        \"w\": 8,\r\n        \"x\": 16,\r\n        \"y\": 22\r\n      },\r\n      \"id\": 14,\r\n      \"maxDataPoints\": 100,\r\n      \"options\": {\r\n        \"colorMode\": \"none\",\r\n        \"graphMode\": \"area\",\r\n        \"justifyMode\": \"auto\",\r\n        \"orientation\": \"horizontal\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"lastNotNull\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"auto\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"editorMode\": \"code\",\r\n          \"expr\": \"juiceshop_users_registered{type=\\\"deluxe\\\", team=\\\"$team\\\"}\",\r\n          \"legendFormat\": \"Deluxe Users\",\r\n          \"range\": true,\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"collapsed\": false,\r\n      \"gridPos\": {\r\n        \"h\": 1,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 25\r\n      },\r\n      \"id\": 39,\r\n      \"panels\": [],\r\n      \"title\": \"Technical\",\r\n      \"type\": \"row\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"Requests per Minute\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"bars\",\r\n            \"fillOpacity\": 100,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"short\"\r\n        },\r\n        \"overrides\": [\r\n          {\r\n            \"matcher\": {\r\n              \"id\": \"byName\",\r\n              \"options\": \"2XX\"\r\n            },\r\n            \"properties\": [\r\n              {\r\n                \"id\": \"color\",\r\n                \"value\": {\r\n                  \"fixedColor\": \"#37872D\",\r\n                  \"mode\": \"fixed\"\r\n                }\r\n              }\r\n            ]\r\n          },\r\n          {\r\n            \"matcher\": {\r\n              \"id\": \"byName\",\r\n              \"options\": \"3XX\"\r\n            },\r\n            \"properties\": [\r\n              {\r\n                \"id\": \"color\",\r\n                \"value\": {\r\n                  \"fixedColor\": \"#96D98D\",\r\n                  \"mode\": \"fixed\"\r\n                }\r\n              }\r\n            ]\r\n          },\r\n          {\r\n            \"matcher\": {\r\n              \"id\": \"byName\",\r\n              \"options\": \"4XX\"\r\n            },\r\n            \"properties\": [\r\n              {\r\n                \"id\": \"color\",\r\n                \"value\": {\r\n                  \"fixedColor\": \"#FF780A\",\r\n                  \"mode\": \"fixed\"\r\n                }\r\n              }\r\n            ]\r\n          },\r\n          {\r\n            \"matcher\": {\r\n              \"id\": \"byName\",\r\n              \"options\": \"5XX\"\r\n            },\r\n            \"properties\": [\r\n              {\r\n                \"id\": \"color\",\r\n                \"value\": {\r\n                  \"fixedColor\": \"#C4162A\",\r\n                  \"mode\": \"fixed\"\r\n                }\r\n              }\r\n            ]\r\n          }\r\n        ]\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 6,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 26\r\n      },\r\n      \"id\": 71,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [],\r\n          \"displayMode\": \"list\",\r\n          \"placement\": \"bottom\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"editorMode\": \"code\",\r\n          \"expr\": \"increase(http_requests_count{app=\\\"juiceshop\\\", team=\\\"$team\\\"}[1m])\",\r\n          \"interval\": \"1m\",\r\n          \"legendFormat\": \"{{status_code}}\",\r\n          \"range\": true,\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"HTTP Requests\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"line\",\r\n            \"fillOpacity\": 10,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"percent\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 7,\r\n        \"w\": 10,\r\n        \"x\": 0,\r\n        \"y\": 32\r\n      },\r\n      \"id\": 46,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [\r\n            \"mean\",\r\n            \"lastNotNull\",\r\n            \"max\",\r\n            \"min\"\r\n          ],\r\n          \"displayMode\": \"table\",\r\n          \"placement\": \"bottom\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"irate(process_cpu_user_seconds_total{team=~\\\"$team\\\"}[2m]) * 100\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"User CPU\",\r\n          \"refId\": \"A\"\r\n        },\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"irate(process_cpu_system_seconds_total{team=~\\\"$team\\\"}[2m]) * 100\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"Sys CPU\",\r\n          \"refId\": \"B\"\r\n        }\r\n      ],\r\n      \"title\": \"Process CPU Usage\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"line\",\r\n            \"fillOpacity\": 10,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"s\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 7,\r\n        \"w\": 9,\r\n        \"x\": 10,\r\n        \"y\": 32\r\n      },\r\n      \"id\": 48,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [\r\n            \"mean\",\r\n            \"lastNotNull\",\r\n            \"max\",\r\n            \"min\"\r\n          ],\r\n          \"displayMode\": \"table\",\r\n          \"placement\": \"bottom\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"nodejs_eventloop_lag_seconds{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"{{team}}\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Event Loop Lag\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"fixedColor\": \"#F2495C\",\r\n            \"mode\": \"fixed\"\r\n          },\r\n          \"mappings\": [\r\n            {\r\n              \"options\": {\r\n                \"match\": \"null\",\r\n                \"result\": {\r\n                  \"text\": \"N/A\"\r\n                }\r\n              },\r\n              \"type\": \"special\"\r\n            }\r\n          ],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"none\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 4,\r\n        \"w\": 5,\r\n        \"x\": 19,\r\n        \"y\": 32\r\n      },\r\n      \"id\": 52,\r\n      \"maxDataPoints\": 100,\r\n      \"options\": {\r\n        \"colorMode\": \"none\",\r\n        \"graphMode\": \"area\",\r\n        \"justifyMode\": \"auto\",\r\n        \"orientation\": \"horizontal\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"lastNotNull\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"auto\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"sum(changes(process_start_time_seconds{team=~\\\"$team\\\"}[1m]))\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"{{instance}}\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Process Restart Times\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"thresholds\"\r\n          },\r\n          \"mappings\": [\r\n            {\r\n              \"options\": {\r\n                \"match\": \"null\",\r\n                \"result\": {\r\n                  \"text\": \"N/A\"\r\n                }\r\n              },\r\n              \"type\": \"special\"\r\n            }\r\n          ],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"none\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 3,\r\n        \"w\": 5,\r\n        \"x\": 19,\r\n        \"y\": 36\r\n      },\r\n      \"id\": 50,\r\n      \"maxDataPoints\": 100,\r\n      \"options\": {\r\n        \"colorMode\": \"none\",\r\n        \"graphMode\": \"none\",\r\n        \"justifyMode\": \"auto\",\r\n        \"orientation\": \"horizontal\",\r\n        \"percentChangeColorMode\": \"standard\",\r\n        \"reduceOptions\": {\r\n          \"calcs\": [\r\n            \"mean\"\r\n          ],\r\n          \"fields\": \"\",\r\n          \"values\": false\r\n        },\r\n        \"showPercentChange\": false,\r\n        \"textMode\": \"name\",\r\n        \"wideLayout\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"sum(nodejs_version_info{team=~\\\"$team\\\"}) by (version)\",\r\n          \"format\": \"time_series\",\r\n          \"instant\": false,\r\n          \"interval\": \"\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"{{version}}\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Node.js Version\",\r\n      \"type\": \"stat\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"line\",\r\n            \"fillOpacity\": 10,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"bytes\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 7,\r\n        \"w\": 16,\r\n        \"x\": 0,\r\n        \"y\": 39\r\n      },\r\n      \"id\": 54,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [\r\n            \"mean\",\r\n            \"lastNotNull\",\r\n            \"max\",\r\n            \"min\"\r\n          ],\r\n          \"displayMode\": \"table\",\r\n          \"placement\": \"right\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"process_resident_memory_bytes{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"Process Memory\",\r\n          \"refId\": \"A\"\r\n        },\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"nodejs_heap_size_total_bytes{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"Heap Total\",\r\n          \"refId\": \"B\"\r\n        },\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"nodejs_heap_size_used_bytes{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"Heap Used\",\r\n          \"refId\": \"C\"\r\n        },\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"nodejs_external_memory_bytes{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"External Memory\",\r\n          \"refId\": \"D\"\r\n        }\r\n      ],\r\n      \"title\": \"Process Memory Usage\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"prometheus\",\r\n        \"uid\": \"prometheus\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {\r\n          \"color\": {\r\n            \"mode\": \"palette-classic\"\r\n          },\r\n          \"custom\": {\r\n            \"axisBorderShow\": false,\r\n            \"axisCenteredZero\": false,\r\n            \"axisColorMode\": \"text\",\r\n            \"axisLabel\": \"\",\r\n            \"axisPlacement\": \"auto\",\r\n            \"barAlignment\": 0,\r\n            \"barWidthFactor\": 0.6,\r\n            \"drawStyle\": \"line\",\r\n            \"fillOpacity\": 10,\r\n            \"gradientMode\": \"none\",\r\n            \"hideFrom\": {\r\n              \"legend\": false,\r\n              \"tooltip\": false,\r\n              \"viz\": false\r\n            },\r\n            \"insertNulls\": false,\r\n            \"lineInterpolation\": \"linear\",\r\n            \"lineWidth\": 1,\r\n            \"pointSize\": 5,\r\n            \"scaleDistribution\": {\r\n              \"type\": \"linear\"\r\n            },\r\n            \"showPoints\": \"never\",\r\n            \"spanNulls\": false,\r\n            \"stacking\": {\r\n              \"group\": \"A\",\r\n              \"mode\": \"none\"\r\n            },\r\n            \"thresholdsStyle\": {\r\n              \"mode\": \"off\"\r\n            }\r\n          },\r\n          \"links\": [],\r\n          \"mappings\": [],\r\n          \"thresholds\": {\r\n            \"mode\": \"absolute\",\r\n            \"steps\": [\r\n              {\r\n                \"color\": \"green\",\r\n                \"value\": null\r\n              },\r\n              {\r\n                \"color\": \"red\",\r\n                \"value\": 80\r\n              }\r\n            ]\r\n          },\r\n          \"unit\": \"short\"\r\n        },\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 7,\r\n        \"w\": 8,\r\n        \"x\": 16,\r\n        \"y\": 39\r\n      },\r\n      \"id\": 56,\r\n      \"options\": {\r\n        \"legend\": {\r\n          \"calcs\": [\r\n            \"mean\",\r\n            \"lastNotNull\",\r\n            \"max\",\r\n            \"min\"\r\n          ],\r\n          \"displayMode\": \"table\",\r\n          \"placement\": \"bottom\",\r\n          \"showLegend\": true\r\n        },\r\n        \"tooltip\": {\r\n          \"hideZeros\": false,\r\n          \"mode\": \"multi\",\r\n          \"sort\": \"none\"\r\n        }\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"nodejs_active_handles_total{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"Active Handler\",\r\n          \"refId\": \"A\"\r\n        },\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"prometheus\",\r\n            \"uid\": \"prometheus\"\r\n          },\r\n          \"expr\": \"nodejs_active_requests_total{team=~\\\"$team\\\"}\",\r\n          \"format\": \"time_series\",\r\n          \"intervalFactor\": 1,\r\n          \"legendFormat\": \"Active Request\",\r\n          \"refId\": \"B\"\r\n        }\r\n      ],\r\n      \"title\": \"Active Handlers/Requests Total\",\r\n      \"type\": \"timeseries\"\r\n    },\r\n    {\r\n      \"datasource\": {\r\n        \"type\": \"loki\",\r\n        \"uid\": \"P8E80F9AEF21F6940\"\r\n      },\r\n      \"fieldConfig\": {\r\n        \"defaults\": {},\r\n        \"overrides\": []\r\n      },\r\n      \"gridPos\": {\r\n        \"h\": 8,\r\n        \"w\": 24,\r\n        \"x\": 0,\r\n        \"y\": 46\r\n      },\r\n      \"id\": 23,\r\n      \"options\": {\r\n        \"dedupStrategy\": \"none\",\r\n        \"enableInfiniteScrolling\": false,\r\n        \"enableLogDetails\": true,\r\n        \"prettifyLogMessage\": false,\r\n        \"showCommonLabels\": false,\r\n        \"showLabels\": false,\r\n        \"showTime\": true,\r\n        \"sortOrder\": \"Ascending\",\r\n        \"wrapLogMessage\": true\r\n      },\r\n      \"pluginVersion\": \"11.5.2\",\r\n      \"targets\": [\r\n        {\r\n          \"datasource\": {\r\n            \"type\": \"loki\",\r\n            \"uid\": \"P8E80F9AEF21F6940\"\r\n          },\r\n          \"editorMode\": \"code\",\r\n          \"expr\": \"{app=\\\"juice-shop\\\", team=\\\"$team\\\"}\",\r\n          \"queryType\": \"range\",\r\n          \"refId\": \"A\"\r\n        }\r\n      ],\r\n      \"title\": \"Logs\",\r\n      \"type\": \"logs\"\r\n    }\r\n  ],\r\n  \"preload\": false,\r\n  \"refresh\": \"10s\",\r\n  \"schemaVersion\": 40,\r\n  \"tags\": [],\r\n  \"templating\": {\r\n    \"list\": [\r\n      {\r\n        \"current\": {\r\n          \"text\": [\r\n            \"1\",\r\n            \"2\",\r\n            \"3\",\r\n            \"4\",\r\n            \"5\",\r\n            \"6\"\r\n          ],\r\n          \"value\": [\r\n            \"1\",\r\n            \"2\",\r\n            \"3\",\r\n            \"4\",\r\n            \"5\",\r\n            \"6\"\r\n          ]\r\n        },\r\n        \"hide\": 2,\r\n        \"includeAll\": true,\r\n        \"label\": \"Difficulty Levels supported by JuiceShop\",\r\n        \"multi\": true,\r\n        \"name\": \"difficulties\",\r\n        \"options\": [\r\n          {\r\n            \"selected\": false,\r\n            \"text\": \"All\",\r\n            \"value\": \"$__all\"\r\n          },\r\n          {\r\n            \"selected\": true,\r\n            \"text\": \"1\",\r\n            \"value\": \"1\"\r\n          },\r\n          {\r\n            \"selected\": true,\r\n            \"text\": \"2\",\r\n            \"value\": \"2\"\r\n          },\r\n          {\r\n            \"selected\": true,\r\n            \"text\": \"3\",\r\n            \"value\": \"3\"\r\n          },\r\n          {\r\n            \"selected\": true,\r\n            \"text\": \"4\",\r\n            \"value\": \"4\"\r\n          },\r\n          {\r\n            \"selected\": true,\r\n            \"text\": \"5\",\r\n            \"value\": \"5\"\r\n          },\r\n          {\r\n            \"selected\": true,\r\n            \"text\": \"6\",\r\n            \"value\": \"6\"\r\n          }\r\n        ],\r\n        \"query\": \"1,2,3,4,5,6\",\r\n        \"type\": \"custom\"\r\n      },\r\n      {\r\n        \"current\": {\r\n          \"text\": \"test\",\r\n          \"value\": \"test\"\r\n        },\r\n        \"datasource\": {\r\n          \"type\": \"prometheus\",\r\n          \"uid\": \"prometheus\"\r\n        },\r\n        \"definition\": \"label_values(juiceshop_challenges_total, team)\",\r\n        \"includeAll\": false,\r\n        \"label\": \"Team\",\r\n        \"name\": \"team\",\r\n        \"options\": [],\r\n        \"query\": \"label_values(juiceshop_challenges_total, team)\",\r\n        \"refresh\": 2,\r\n        \"regex\": \"\",\r\n        \"type\": \"query\"\r\n      }\r\n    ]\r\n  },\r\n  \"time\": {\r\n    \"from\": \"now-6h\",\r\n    \"to\": \"now\"\r\n  },\r\n  \"timepicker\": {},\r\n  \"timezone\": \"\",\r\n  \"title\": \"MultiJuicer - Instance Dashboard\",\r\n  \"uid\": \"Sj-cIdwZk\",\r\n  \"version\": 1,\r\n  \"weekStart\": \"\"\r\n}"
+      instances.json: |-
+        {
+          "annotations": {
+            "list": [
+              {
+                "builtIn": 1,
+                "datasource": {
+                  "type": "datasource",
+                  "uid": "grafana"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+              }
+            ]
+          },
+          "editable": true,
+          "fiscalYearStartMonth": 0,
+          "graphTooltip": 0,
+          "id": 29,
+          "links": [],
+          "panels": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "description": "",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "#C8F2C2",
+                        "value": null
+                      },
+                      {
+                        "color": "#56A64B",
+                        "value": 20
+                      },
+                      {
+                        "color": "#37872D",
+                        "value": 60
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 24,
+                "x": 0,
+                "y": 0
+              },
+              "id": 2,
+              "maxDataPoints": 100,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "repeat": "difficulties",
+              "repeatDirection": "h",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "sum without (category)(juiceshop_challenges_solved{team=\"$team\", difficulty=\"$difficulties\"}) / sum without (category)(juiceshop_challenges_total{team=\"$team\", difficulty=\"$difficulties\"}) * 100",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "title": "Solved $difficulties Star Challenges",
+              "type": "stat"
+            },
+            {
+              "collapsed": false,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 8
+              },
+              "id": 25,
+              "panels": [],
+              "title": "Challenge Progress",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [],
+                  "max": 100,
+                  "min": 1,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 19,
+                "x": 0,
+                "y": 9
+              },
+              "id": 78,
+              "maxPerRow": 4,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "vertical",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "max"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "sum by (category)(juiceshop_challenges_solved{team=\"$team\"}) / sum by (category)(juiceshop_challenges_total{team=\"$team\"}) * 100 != 0",
+                  "interval": "",
+                  "legendFormat": "{{category}} ",
+                  "refId": "A"
+                }
+              ],
+              "title": "Solved Challenges by Category",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "description": "The cheat score show a estimate of how likely it is that a team is cheating. This estimate is based on the time taken between challenges solved. Take this only as a approximation and never as direct prove that a team is in fact cheating.",
+              "fieldConfig": {
+                "defaults": {
+                  "decimals": 0,
+                  "mappings": [],
+                  "max": 1,
+                  "min": 0,
+                  "noValue": "0",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "super-light-yellow",
+                        "value": 0.5
+                      },
+                      {
+                        "color": "semi-dark-orange",
+                        "value": 0.65
+                      },
+                      {
+                        "color": "dark-red",
+                        "value": 0.8
+                      }
+                    ]
+                  },
+                  "unit": "percentunit"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 5,
+                "x": 19,
+                "y": 9
+              },
+              "id": 85,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "last"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "juiceshop_cheat_score{team=\"$team\"}",
+                  "interval": "",
+                  "legendFormat": "",
+                  "refId": "A"
+                }
+              ],
+              "title": "Cheat Score",
+              "type": "stat"
+            },
+            {
+              "collapsed": false,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 13
+              },
+              "id": 32,
+              "panels": [],
+              "title": "Business Metrics",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Orders per Minute",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 0,
+                  "links": [],
+                  "mappings": [],
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 5,
+                "w": 24,
+                "x": 0,
+                "y": 14
+              },
+              "id": 11,
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "juiceshop_user_social_interactions{team=\"$team\"}",
+                  "interval": "1m",
+                  "legendFormat": "{{type}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "Social Interactions",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 0,
+                  "links": [],
+                  "mappings": [],
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 6,
+                "w": 16,
+                "x": 0,
+                "y": 19
+              },
+              "id": 64,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "increase(juiceshop_users_registered{team=\"$team\"}[1m])",
+                  "legendFormat": "{{type}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "User Signups",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "rgb(31, 120, 193)",
+                    "mode": "fixed"
+                  },
+                  "decimals": 0,
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "none"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 3,
+                "w": 8,
+                "x": 16,
+                "y": 19
+              },
+              "id": 13,
+              "maxDataPoints": 100,
+              "options": {
+                "colorMode": "none",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "editorMode": "code",
+                  "expr": "juiceshop_users_registered{type=\"standard\", team=\"$team\"}",
+                  "legendFormat": "Standard Users",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "rgb(31, 120, 193)",
+                    "mode": "fixed"
+                  },
+                  "decimals": 0,
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "none"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 3,
+                "w": 8,
+                "x": 16,
+                "y": 22
+              },
+              "id": 14,
+              "maxDataPoints": 100,
+              "options": {
+                "colorMode": "none",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "editorMode": "code",
+                  "expr": "juiceshop_users_registered{type=\"deluxe\", team=\"$team\"}",
+                  "legendFormat": "Deluxe Users",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "",
+              "type": "stat"
+            },
+            {
+              "collapsed": false,
+              "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 25
+              },
+              "id": 39,
+              "panels": [],
+              "title": "Technical",
+              "type": "row"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Requests per Minute",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "links": [],
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "2XX"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#37872D",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "3XX"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#96D98D",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "4XX"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#FF780A",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "5XX"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#C4162A",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 6,
+                "w": 24,
+                "x": 0,
+                "y": 26
+              },
+              "id": 71,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "editorMode": "code",
+                  "expr": "increase(http_requests_count{app=\"juiceshop\", team=\"$team\"}[1m])",
+                  "interval": "1m",
+                  "legendFormat": "{{status_code}}",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "HTTP Requests",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "links": [],
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 10,
+                "x": 0,
+                "y": 32
+              },
+              "id": 46,
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "lastNotNull",
+                    "max",
+                    "min"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "irate(process_cpu_user_seconds_total{team=~\"$team\"}[2m]) * 100",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "User CPU",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "irate(process_cpu_system_seconds_total{team=~\"$team\"}[2m]) * 100",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Sys CPU",
+                  "refId": "B"
+                }
+              ],
+              "title": "Process CPU Usage",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "links": [],
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "s"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 9,
+                "x": 10,
+                "y": 32
+              },
+              "id": 48,
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "lastNotNull",
+                    "max",
+                    "min"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "nodejs_eventloop_lag_seconds{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "{{team}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "Event Loop Lag",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "#F2495C",
+                    "mode": "fixed"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "none"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 5,
+                "x": 19,
+                "y": 32
+              },
+              "id": 52,
+              "maxDataPoints": 100,
+              "options": {
+                "colorMode": "none",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "sum(changes(process_start_time_seconds{team=~\"$team\"}[1m]))",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "{{instance}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "Process Restart Times",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "N/A"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "none"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 3,
+                "w": 5,
+                "x": 19,
+                "y": 36
+              },
+              "id": 50,
+              "maxDataPoints": 100,
+              "options": {
+                "colorMode": "none",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "mean"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "name",
+                "wideLayout": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "sum(nodejs_version_info{team=~\"$team\"}) by (version)",
+                  "format": "time_series",
+                  "instant": false,
+                  "interval": "",
+                  "intervalFactor": 1,
+                  "legendFormat": "{{version}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "Node.js Version",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "links": [],
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 16,
+                "x": 0,
+                "y": 39
+              },
+              "id": 54,
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "lastNotNull",
+                    "max",
+                    "min"
+                  ],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "process_resident_memory_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Process Memory",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "nodejs_heap_size_total_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Heap Total",
+                  "refId": "B"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "nodejs_heap_size_used_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Heap Used",
+                  "refId": "C"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "nodejs_external_memory_bytes{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "External Memory",
+                  "refId": "D"
+                }
+              ],
+              "title": "Process Memory Usage",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "links": [],
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 8,
+                "x": 16,
+                "y": 39
+              },
+              "id": 56,
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "mean",
+                    "lastNotNull",
+                    "max",
+                    "min"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "nodejs_active_handles_total{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Active Handler",
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus"
+                  },
+                  "expr": "nodejs_active_requests_total{team=~\"$team\"}",
+                  "format": "time_series",
+                  "intervalFactor": 1,
+                  "legendFormat": "Active Request",
+                  "refId": "B"
+                }
+              ],
+              "title": "Active Handlers/Requests Total",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 46
+              },
+              "id": 23,
+              "options": {
+                "dedupStrategy": "none",
+                "enableInfiniteScrolling": false,
+                "enableLogDetails": true,
+                "prettifyLogMessage": false,
+                "showCommonLabels": false,
+                "showLabels": false,
+                "showTime": true,
+                "sortOrder": "Ascending",
+                "wrapLogMessage": true
+              },
+              "pluginVersion": "11.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "loki",
+                    "uid": "P8E80F9AEF21F6940"
+                  },
+                  "editorMode": "code",
+                  "expr": "{app=\"juice-shop\", team=\"$team\"}",
+                  "queryType": "range",
+                  "refId": "A"
+                }
+              ],
+              "title": "Logs",
+              "type": "logs"
+            }
+          ],
+          "preload": false,
+          "refresh": "10s",
+          "schemaVersion": 40,
+          "tags": [],
+          "templating": {
+            "list": [
+              {
+                "current": {
+                  "text": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                  ],
+                  "value": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                  ]
+                },
+                "hide": 2,
+                "includeAll": true,
+                "label": "Difficulty Levels supported by JuiceShop",
+                "multi": true,
+                "name": "difficulties",
+                "options": [
+                  {
+                    "selected": false,
+                    "text": "All",
+                    "value": "$__all"
+                  },
+                  {
+                    "selected": true,
+                    "text": "1",
+                    "value": "1"
+                  },
+                  {
+                    "selected": true,
+                    "text": "2",
+                    "value": "2"
+                  },
+                  {
+                    "selected": true,
+                    "text": "3",
+                    "value": "3"
+                  },
+                  {
+                    "selected": true,
+                    "text": "4",
+                    "value": "4"
+                  },
+                  {
+                    "selected": true,
+                    "text": "5",
+                    "value": "5"
+                  },
+                  {
+                    "selected": true,
+                    "text": "6",
+                    "value": "6"
+                  }
+                ],
+                "query": "1,2,3,4,5,6",
+                "type": "custom"
+              },
+              {
+                "current": {
+                  "text": "test",
+                  "value": "test"
+                },
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "prometheus"
+                },
+                "definition": "label_values(juiceshop_challenges_total, team)",
+                "includeAll": false,
+                "label": "Team",
+                "name": "team",
+                "options": [],
+                "query": "label_values(juiceshop_challenges_total, team)",
+                "refresh": 2,
+                "regex": "",
+                "type": "query"
+              }
+            ]
+          },
+          "time": {
+            "from": "now-6h",
+            "to": "now"
+          },
+          "timepicker": {},
+          "timezone": "",
+          "title": "MultiJuicer - Instance Dashboard",
+          "uid": "Sj-cIdwZk",
+          "version": 1,
+          "weekStart": ""
+        }
     kind: ConfigMap
     metadata:
       labels:
@@ -1289,8 +2889,8 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 0b51a4e260579c65f5119746c00f2ec82aa032fdb04e501e789ed5eb6c532bef
-            checksum/secret: 1e1dbeb85e39841b0afb47a5c93d071717f4c3c86dc5136be9f8db9dfcdf6ca0
+            checksum/config: 100379ffa5db620200be1c3ed152b2cef0dd0ca179019004328564cd4e74b2d6
+            checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
             app.kubernetes.io/name: balancer
