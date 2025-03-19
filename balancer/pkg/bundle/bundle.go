@@ -58,11 +58,12 @@ type CookieConfig struct {
 }
 
 type JuiceShopConfig struct {
-	Image           string            `json:"image"`
-	Tag             string            `json:"tag"`
-	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy"`
-	CtfKey          string            `json:"ctfKey"`
-	NodeEnv         string            `json:"nodeEnv"`
+	Image            string                        `json:"image"`
+	Tag              string                        `json:"tag"`
+	ImagePullPolicy  corev1.PullPolicy             `json:"imagePullPolicy"`
+	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets"`
+	CtfKey           string                        `json:"ctfKey"`
+	NodeEnv          string                        `json:"nodeEnv"`
 
 	PodSecurityContext       corev1.PodSecurityContext   `json:"podSecurityContext"`
 	ContainerSecurityContext corev1.SecurityContext      `json:"containerSecurityContext"`
