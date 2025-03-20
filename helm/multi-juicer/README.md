@@ -50,6 +50,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.envFrom | list | `[]` | Optional mount environment variables from configMaps or secrets (see: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) |
 | config.juiceShop.image | string | `"bkimminich/juice-shop"` | Juice Shop Image to use |
 | config.juiceShop.imagePullPolicy | string | `"IfNotPresent"` |  |
+| config.juiceShop.imagePullSecrets | list | `[]` |  |
 | config.juiceShop.nodeEnv | string | `"multi-juicer"` | Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`. |
 | config.juiceShop.pod.annotations | object | `{}` | Optional Additional annotations for the Juice Shop pods. |
 | config.juiceShop.pod.labels | object | `{}` | Optional Additional labels for the Juice Shop pods. |
@@ -62,6 +63,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.volumes | list | `[]` | Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | config.maxInstances | int | `10` | Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap |
 | imagePullPolicy | string | `"IfNotPresent"` |  |
+| imagePullSecrets | list | `[]` | imagePullSecrets used for balancer, progress-watchdog and cleaner. You'll also need to set `config.juiceShop.imagePullSecrets`` to set the imagePullSecrets if you are using a private registry for all images |
 | ingress.annotations | object | `{}` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts[0].host | string | `"multi-juicer.local"` |  |

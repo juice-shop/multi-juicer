@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 imagePullPolicy: IfNotPresent
+# -- imagePullSecrets used for balancer, progress-watchdog and cleaner. You'll also need to set `config.juiceShop.imagePullSecrets`` to set the imagePullSecrets if you are using a private registry for all images
 imagePullSecrets: []
 nodeSelector: {}
 
