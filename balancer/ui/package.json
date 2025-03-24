@@ -4,14 +4,14 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "@tailwindcss/postcss": "^4.0.14",
+    "@tailwindcss/postcss": "^4.0.15",
     "motion": "^12.5.0",
     "promise-retry": "^2.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
-    "react-intl": "^7.1.6",
-    "react-router-dom": "^7.3.0",
+    "react-intl": "^7.1.9",
+    "react-router-dom": "^7.4.0",
     "reactjs-popup": "^2.0.6",
     "tailwindcss": "^4.0.14"
   },
