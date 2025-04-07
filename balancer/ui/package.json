@@ -17,13 +17,13 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
+    "@testing-library/react": "^16.3.0",
     "@types/promise-retry": "^1.1.6",
-    "@types/react-dom": "^19.0.4",
+    "@types/react-dom": "^19.1.1",
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "vite": "^6.2.5",
     "vitest": "^3.1.1"
   },
