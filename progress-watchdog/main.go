@@ -106,7 +106,7 @@ func main() {
 		challengeStatus = append(challengeStatus, internal.ChallengeStatus{Key: webhook.Solution.Challenge, SolvedAt: webhook.Solution.IssuedOn})
 		sort.Stable(challengeStatus)
 
-		internal.PersistProgress(clientset, team, challengeStatus)
+		internal.PersistProgress(clientset, team, challengeStatus, "", "")
 
 		logger.Printf("Received webhook for team '%s' for challenge '%s'", team, webhook.Solution.Challenge)
 
