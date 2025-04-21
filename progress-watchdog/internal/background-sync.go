@@ -146,17 +146,15 @@ func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clients
 
 		if errStandard != nil {
 			logger.Println(fmt.Errorf("failed to fetch current Standard Challenge Progress for team '%s': %w", team, errStandard))
-			// Decide how to handle partial failure. Maybe skip this cycle?
+			// We can skip this cycle too
 			continue
 		}
 		if errFindIt != nil {
 			logger.Println(fmt.Errorf("failed to fetch current FindIt Code for team '%s': %w", team, errFindIt))
-			// Continue, maybe standard/fixit can still be processed?
-			// Or skip? For now, let's assume fetching might fail temporarily.
+			// For now, let's assume fetching might fail temporarily.
 		}
 		if errFixIt != nil {
 			logger.Println(fmt.Errorf("failed to fetch current FixIt Code for team '%s': %w", team, errFixIt))
-			// Continue?
 		}
 
 		// Compare states
@@ -230,7 +228,7 @@ func compareCodes(currentCode, lastCode string, fetchErr error) UpdateState {
 		return UpdateCache
 	}
 
-	return NoOp // Should not be reached
+	return NoOp // Should not be reached (hopefully)
 }
 
 func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
