@@ -47,17 +47,14 @@ updates:
       npm-dependencies:
         patterns:
           - "*"
-        dependency-type: "development"
         update-types:
           - "minor"
           - "patch"
-      npm-dev-dependencies:
+      npm-breaking-updates-dependencies:
         patterns:
           - "*"
-        dependency-type: "production"
         update-types:
-          - "minor"
-          - "patch"
+          - "major"
 
   - package-ecosystem: "docker"
     directory: "/"
