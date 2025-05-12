@@ -34,35 +34,41 @@ type UpdateProgressDeploymentMetadata struct {
 
 // UpdateProgressDeploymentDiffAnnotations the app specific annotations relevant to the `progress-watchdog`
 type UpdateProgressDeploymentDiffAnnotations struct {
-	Challenges       string `json:"multi-juicer.owasp-juice.shop/challenges"`
-	ChallengesSolved string `json:"multi-juicer.owasp-juice.shop/challengesSolved"`
+	Challenges         string `json:"multi-juicer.owasp-juice.shop/challenges"`
+	ChallengesSolved   string `json:"multi-juicer.owasp-juice.shop/challengesSolved"`
+	ContinueCodeFindIt string `json:"multi-juicer.owasp-juice.shop/continueCodeFindIt,omitempty"`
+	ContinueCodeFixIt  string `json:"multi-juicer.owasp-juice.shop/continueCodeFixIt,omitempty"`
 }
 
-func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus) {
-	logger.Printf("Updating saved ContinueCode of team '%s'", team)
+func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus, continueCodeFindIt string, continueCodeFixIt string) {
+	logger.Printf("Updating saved progress annotations for team '%s'", team)
 
 	encodedSolvedChallenges, err := json.Marshal(solvedChallenges)
 	if err != nil {
-		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
+		logger.Printf("ERROR: Could not encode json for standard challenges for team %s: %v", team, err)
+		return
 	}
 
 	diff := UpdateProgressDeploymentDiff{
 		Metadata: UpdateProgressDeploymentMetadata{
 			Annotations: UpdateProgressDeploymentDiffAnnotations{
-				Challenges:       string(encodedSolvedChallenges),
-				ChallengesSolved: fmt.Sprintf("%d", len(solvedChallenges)),
+				Challenges:         string(encodedSolvedChallenges),
+				ChallengesSolved:   fmt.Sprintf("%d", len(solvedChallenges)),
+				ContinueCodeFindIt: continueCodeFindIt,
+				ContinueCodeFixIt:  continueCodeFixIt,
 			},
 		},
 	}
 
 	jsonBytes, err := json.Marshal(diff)
 	if err != nil {
-		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
+		logger.Printf("ERROR: Could not encode json for deployment patch for team %s: %v", team, err)
+		return
 	}
 
 	namespace := os.Getenv("NAMESPACE")
 	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
 	if err != nil {
-		logger.Println(fmt.Errorf("failed to patch new ContinueCode into deployment for team %s: %w", team, err))
+		logger.Println(fmt.Errorf("failed to patch progress annotations into deployment for team %s: %w", team, err))
 	}
 }
