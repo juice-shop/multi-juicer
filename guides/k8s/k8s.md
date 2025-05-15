@@ -7,7 +7,7 @@
 This example expects you to have the following cli tools setup.
 
 1. [helm](https://helm.sh)
-2. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux)
+2. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-on-linux)
 
 ## Step 1. Starting the cluster
 

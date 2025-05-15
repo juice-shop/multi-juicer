@@ -23,7 +23,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | balancer.cookie.cookieParserSecret | string | `nil` | Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again. |
 | balancer.cookie.name | string | `"balancer"` | Changes the cookies name used to identify teams. |
 | balancer.cookie.secure | bool | `false` | Sets the secure attribute on cookie so that it only be send over https |
-| balancer.metrics.dashboards.enabled | bool | `false` | if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards |
+| balancer.metrics.dashboards.enabled | bool | `false` | if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/master/stable/grafana#sidecar-for-dashboards |
 | balancer.metrics.serviceMonitor.enabled | bool | `false` | If true, creates a Prometheus Operator ServiceMonitor. This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances |
 | balancer.metrics.serviceMonitor.labels | object | `{}` | If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name> |
 | balancer.pod.annotations | object | `{}` | Optional Additional annotations for the balancer pods. |
