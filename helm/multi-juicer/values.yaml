@@ -79,7 +79,7 @@ balancer:
     labels: {}
   metrics:
     dashboards:
-      # -- if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards
+      # -- if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-datasources
       enabled: false
     serviceMonitor:
       # -- If true, creates a Prometheus Operator ServiceMonitor. This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
