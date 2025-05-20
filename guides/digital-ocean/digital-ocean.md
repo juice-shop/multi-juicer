@@ -9,7 +9,7 @@ This example expects you to have the following cli tools setup.
 
 1. [doctl](https://github.com/digitalocean/doctl)
 2. [helm](https://helm.sh)
-3. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos)
+3. [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 ## Step 1. Starting the cluster
 

@@ -11,7 +11,7 @@ This example expects you to have the following cli tools setup.
 1. [awscli](https://aws.amazon.com/cli/)
 2. [eksctl](https://eksctl.io/installation/)
 3. [helm](https://helm.sh)
-4. [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-macos)
+4. [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 ```sh
 # First we'll need a cluster, you can create one using the eksctl cli.
