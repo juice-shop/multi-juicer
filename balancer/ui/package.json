@@ -4,8 +4,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.8",
-    "motion": "^12.16.0",
+    "@tailwindcss/postcss": "^4.1.10",
+    "motion": "^12.18.1",
     "promise-retry": "^2.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -20,12 +20,12 @@
     "@testing-library/react": "^16.3.0",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.5.1",
+    "@vitejs/plugin-react": "^4.5.2",
     "jsdom": "^26.1.0",
-    "postcss": "^8.5.4",
+    "postcss": "^8.5.5",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
-    "vitest": "^3.2.2"
+    "vitest": "^3.2.3"
   },
   "scripts": {
     "start": "vite",
