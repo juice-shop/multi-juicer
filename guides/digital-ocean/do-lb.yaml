@@ -3,13 +3,14 @@ apiVersion: v1
 metadata:
   name: multi-juicer-loadbalancer
   annotations:
-    # availible annotations to configure do loadbalancer: https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/annotations.md
+    # available annotations to configure do loadbalancer: https://github.com/digitalocean/digitalocean-cloud-controller-manager/blob/master/docs/controllers/services/annotations.md
     service.beta.kubernetes.io/do-loadbalancer-protocol: "http2"
     service.beta.kubernetes.io/do-loadbalancer-certificate-id: #'b0d0a68b-25e9-4881-8be9-d4cf8fc6cc4d'
     service.beta.kubernetes.io/do-loadbalancer-redirect-http-to-https: "true"
     service.beta.kubernetes.io/do-loadbalancer-algorithm: "round_robin"
     service.beta.kubernetes.io/do-loadbalancer-healthcheck-protocol: "http"
     service.beta.kubernetes.io/do-loadbalancer-healthcheck-path: "/balancer/"
+    service.beta.kubernetes.io/do-loadbalancer-type: "REGIONAL"
 spec:
   type: LoadBalancer
   selector:
