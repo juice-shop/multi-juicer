@@ -1,6 +1,10 @@
 import { Suspense, lazy, useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import { ScoreboardV2Page } from "./pages/v2/ScoreboardV2Page";
+import { TeamDetailPageV2 } from "./pages/v2/TeamDetailPageV2";
+import { ChallengeDetailPageV2 } from "./pages/v2/ChallengeDetailPageV2";
+
 import { IntlProvider } from "react-intl";
 
 import { JoinPage } from "./pages/JoinPage";
@@ -106,6 +110,18 @@ function App() {
                     <Route
                       path="/score-overview/teams/:team"
                       element={<IndividualScorePage />}
+                    />
+                    <Route 
+                      path="/v2" 
+                      element={<ScoreboardV2Page />} 
+                    />
+                    <Route 
+                      path="/v2/teams/:team" 
+                      element={<TeamDetailPageV2 />} 
+                    />
+                    <Route 
+                      path="/v2/challenges/:challengeKey"
+                      element={<ChallengeDetailPageV2 />} 
                     />
                   </Routes>
                 </Suspense>
