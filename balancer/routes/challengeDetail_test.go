@@ -69,7 +69,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 				{"team":"team-alpha","solvedAt":"%s"},
 				{"team":"team-bravo","solvedAt":"%s"}
 			]
-		}`, teamAlphaSolvedTime.UTC().Format(time.RFC3339), teamBravoSolvedTime.UTC().Format(time.RFC3339Nano))
+		}`, teamAlphaSolvedTime.UTC().Format(time.RFC3339Nano), teamBravoSolvedTime.UTC().Format(time.RFC3339Nano))
 
 		assert.JSONEq(t, expectedJSON, rr.Body.String())
 	})
