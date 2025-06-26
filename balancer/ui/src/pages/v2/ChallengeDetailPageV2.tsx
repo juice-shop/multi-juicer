@@ -1,11 +1,150 @@
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { FormattedMessage } from "react-intl";
+import { Spinner } from "../../components/Spinner";
+import { Card } from "../../components/Card";
+import { ReadableTimestamp } from "../../components/ReadableTimestamp";
 
+// --- Type Definitions ---
+interface ChallengeSolveResponse {
+  team: string;
+  solvedAt: string; // ISO string
+}
+
+interface ChallengeDetailDataResponse {
+  key: string;
+  name: string;
+  category: string;
+  description: string;
+  difficulty: number;
+  solves: ChallengeSolveResponse[];
+}
+
+interface ChallengeSolve extends Omit<ChallengeSolveResponse, "solvedAt"> {
+  solvedAt: Date; // Convert string to Date object
+}
+
+interface ChallengeDetailData extends Omit<ChallengeDetailDataResponse, "solves"> {
+  solves: ChallengeSolve[];
+}
+
+// --- API Fetching Logic ---
+async function fetchChallengeDetails(challengeKey: string): Promise<ChallengeDetailData> {
+  const response = await fetch(`/balancer/api/v2/challenges/${challengeKey}`);
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Challenge not found");
+    }
+    throw new Error("Failed to fetch challenge details");
+  }
+  const rawData = (await response.json()) as ChallengeDetailDataResponse;
+
+  // Process the raw response to convert date strings to Date objects
+  return {
+    ...rawData,
+    solves: rawData.solves.map((solve) => ({
+      ...solve,
+      solvedAt: new Date(solve.solvedAt),
+    })),
+  };
+}
+
+// --- Main Component ---
 export const ChallengeDetailPageV2 = () => {
-  const { challengeKey } = useParams();
+  const { challengeKey } = useParams<{ challengeKey: string }>();
+  const [challengeData, setChallengeData] = useState<ChallengeDetailData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!challengeKey) return;
+
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await fetchChallengeDetails(challengeKey);
+        setChallengeData(data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [challengeKey]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <Spinner />
+        <p>Loading Challenge Details...</p>
+      </div>
+    );
+  }
+
+  if (error || !challengeData) {
+    return <p className="text-red-500">{error || "Could not load challenge data."}</p>;
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Challenge Detail: {challengeKey}</h1>
-      <p>Details for this challenge will be shown here.</p>
+    <div className="w-full max-w-4xl flex flex-col gap-6">
+      <Card className="p-6">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center">
+            {Array.from({ length: challengeData.difficulty }).map((_, i) => (
+              <img key={i} src="/balancer/icons/star.svg" alt="Star" className="h-6 w-6" />
+            ))}
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">{challengeData.name}</h1>
+            <p className="text-lg text-gray-500 dark:text-gray-400">{challengeData.category}</p>
+          </div>
+        </div>
+        <p className="text-base">{challengeData.description}</p>
+      </Card>
+
+      <Card>
+        <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
+          <FormattedMessage id="v2.challenge_detail.solves_title" defaultMessage="Solves" />
+        </h2>
+        {challengeData.solves.length === 0 ? (
+          <p className="p-4 text-gray-500">
+            <FormattedMessage id="v2.challenge_detail.no_one_solved" defaultMessage="No one has solved this challenge yet." />
+          </p>
+        ) : (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-700">
+                <th className="p-3 text-center">#</th>
+                <th className="p-3">Team</th>
+                <th className="p-3 text-right">Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {challengeData.solves.map((solve, index) => (
+                <tr key={solve.team} className="border-t border-gray-200 dark:border-gray-700">
+                  <td className="p-3 text-center font-mono">
+                    {index + 1}
+                    {index === 0 && (
+                      <span className="ml-2 text-red-500" title="First Blood">🩸</span>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    <Link to={`/v2/teams/${solve.team}`} className="text-blue-500 hover:underline">
+                      {solve.team}
+                    </Link>
+                  </td>
+                  <td className="p-3 text-right">
+                    <ReadableTimestamp date={solve.solvedAt} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Card>
     </div>
   );
 };
