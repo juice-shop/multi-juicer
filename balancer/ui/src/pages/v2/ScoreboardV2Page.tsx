@@ -38,14 +38,16 @@ async function fetchTeams(lastSeen: Date | null): Promise<TeamScore[] | null> {
 // A card component for the top 3 teams
 const TopTeamCard = ({ team, rank }: { team: TeamScore; rank: number }) => (
   <motion.div layoutId={team.name} className="w-full">
-    <Card className="flex flex-col items-center p-4 bg-gray-700 dark:bg-gray-100 text-white dark:text-gray-800 shadow-lg">
-      <div className="text-3xl mb-2">
-        <PositionDisplay place={rank} />
-      </div>
-      <h3 className="text-xl font-bold">{team.name}</h3>
-      <p className="text-lg">{team.score} pts</p>
-      <p className="text-sm opacity-80">{team.solvedChallengeCount} challenges</p>
-    </Card>
+    <Link to={`/v2/teams/${team.name}`} className="block hover:scale-105 transition-transform duration-200">
+      <Card className="flex flex-col items-center p-4 bg-gray-700 dark:bg-gray-100 text-white shadow-lg">
+        <div className="text-3xl mb-2">
+          <PositionDisplay place={rank} />
+        </div>
+        <h3 className="text-xl font-bold">{team.name}</h3>
+        <p className="text-lg">{team.score} pts</p>
+        <p className="text-sm opacity-80">{team.solvedChallengeCount} challenges</p>
+      </Card>
+    </Link>
   </motion.div>
 );
 
