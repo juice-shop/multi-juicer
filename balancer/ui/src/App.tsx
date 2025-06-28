@@ -15,6 +15,10 @@ import { Toaster } from "react-hot-toast";
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverview"));
 const IndividualScorePage = lazy(() => import("./pages/IndividualScorePage"));
+const ScoreboardV2Page = lazy(() => import("./pages/v2/ScoreboardV2Page"));
+const TeamDetailPageV2 = lazy(() => import("./pages/v2/TeamDetailPageV2"));
+const ChallengeDetailPageV2 = lazy(() => import("./pages/v2/ChallengeDetailPageV2"));
+
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -106,6 +110,18 @@ function App() {
                     <Route
                       path="/score-overview/teams/:team"
                       element={<IndividualScorePage />}
+                    />
+                    <Route 
+                      path="/v2" 
+                      element={<ScoreboardV2Page />} 
+                    />
+                    <Route 
+                      path="/v2/teams/:team" 
+                      element={<TeamDetailPageV2 />} 
+                    />
+                    <Route 
+                      path="/v2/challenges/:challengeKey"
+                      element={<ChallengeDetailPageV2 />} 
                     />
                   </Routes>
                 </Suspense>
