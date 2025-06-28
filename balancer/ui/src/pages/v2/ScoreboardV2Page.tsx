@@ -115,7 +115,7 @@ export const ScoreboardV2Page = () => {
     return (
       <div className="flex flex-col items-center justify-center">
         <Spinner />
-        <p>Loading Scoreboard...</p>
+        <p><FormattedMessage id="v2.scoreboard.loading" defaultMessage="Loading Scoreboard..." /></p>
       </div>
     );
   }
@@ -149,9 +149,9 @@ export const ScoreboardV2Page = () => {
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
                 <th className="p-3 text-center">#</th>
-                <th className="p-3">Team</th>
-                <th className="p-3 text-right">Score</th>
-                <th className="p-3 text-right">Challenges</th>
+                <th className="p-3"><FormattedMessage id="v2.scoreboard.header.team" defaultMessage="Team" /></th>
+                <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.score" defaultMessage="Score" /></th>
+                <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.challenges" defaultMessage="Challenges" /></th>
               </tr>
             </thead>
             <tbody>
@@ -167,3 +167,5 @@ export const ScoreboardV2Page = () => {
     </div>
   );
 };
+
+export default ScoreboardV2Page;
