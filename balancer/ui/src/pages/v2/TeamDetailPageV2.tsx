@@ -81,7 +81,7 @@ export const TeamDetailPageV2 = () => {
     return (
       <div className="flex flex-col items-center justify-center">
         <Spinner />
-        <p>Loading Team Details...</p>
+        <p><FormattedMessage id="v2.team_detail.loading" defaultMessage="Loading Team Details..." /></p>
       </div>
     );
   }
@@ -122,9 +122,9 @@ export const TeamDetailPageV2 = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-700">
-                <th className="p-3">Challenge</th>
-                <th className="p-3 text-center">Difficulty</th>
-                <th className="p-3 text-right">Solved</th>
+                <th className="p-3"><FormattedMessage id="v2.team_detail.header.challenge" defaultMessage="Challenge" /></th>
+                <th className="p-3 text-center"><FormattedMessage id="v2.team_detail.header.difficulty" defaultMessage="Difficulty" /></th>
+                <th className="p-3 text-right"><FormattedMessage id="v2.team_detail.header.solved" defaultMessage="Solved" /></th>
               </tr>
             </thead>
             <tbody>
@@ -157,3 +157,5 @@ export const TeamDetailPageV2 = () => {
     </div>
   );
 };
+
+export default TeamDetailPageV2;

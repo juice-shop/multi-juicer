@@ -79,13 +79,14 @@ export const ChallengeDetailPageV2 = () => {
     return (
       <div className="flex flex-col items-center justify-center">
         <Spinner />
-        <p>Loading Challenge Details...</p>
+        <p><FormattedMessage id="v2.challenge_detail.loading" defaultMessage="Loading Challenge Details..." /></p>
       </div>
     );
   }
 
   if (error || !challengeData) {
-    return <p className="text-red-500">{error || "Could not load challenge data."}</p>;
+    const defaultMessage = error === "Challenge not found" ? "Challenge not found." : "Could not load challenge data.";
+    return <p className="text-red-500">{error ? <FormattedMessage id={`v2.challenge_detail.error.${error}`} defaultMessage={defaultMessage} /> : "Could not load challenge data."}</p>;
   }
 
   return (
@@ -118,8 +119,8 @@ export const ChallengeDetailPageV2 = () => {
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-700">
                 <th className="p-3 text-center">#</th>
-                <th className="p-3">Team</th>
-                <th className="p-3 text-right">Solved</th>
+                <th className="p-3"><FormattedMessage id="v2.challenge_detail.header.team" defaultMessage="Team" /></th>
+                <th className="p-3 text-right"><FormattedMessage id="v2.challenge_detail.header.solved" defaultMessage="Solved" /></th>
               </tr>
             </thead>
             <tbody>
@@ -148,3 +149,5 @@ export const ChallengeDetailPageV2 = () => {
     </div>
   );
 };
+
+export default ChallengeDetailPageV2;
