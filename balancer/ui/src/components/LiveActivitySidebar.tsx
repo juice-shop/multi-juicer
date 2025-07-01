@@ -27,7 +27,6 @@ async function fetchActivityFeed(): Promise<ActivityEvent[]> {
 // Event Item Component 
 const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean }) => {
   const eventColor = event.isFirstBlood ? "border-red-500" : "border-orange-500";
-  const textColor = event.isFirstBlood ? "text-red-500" : "";
 
   return (
     <div className="relative pl-6">
@@ -36,7 +35,7 @@ const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean })
       {/* Timeline Vertical Line */}
       {!isLast && <div className="absolute left-[5px] top-[18px] h-full w-px bg-orange-500"></div>}
 
-      <p className={classNames("text-sm", textColor)}>
+      <p className="text-sm">
         <Link to={`/v2/teams/${event.team}`} className="font-bold hover:underline">{event.team}</Link>
         {' '}
         <FormattedMessage id="activity.solved" defaultMessage="solved" />
