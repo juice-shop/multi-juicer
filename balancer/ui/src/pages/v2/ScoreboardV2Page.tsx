@@ -5,6 +5,7 @@ import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Spinner } from "../../components/Spinner";
 import { PositionDisplay } from "../../components/PositionDisplay";
 import { Card } from "../../components/Card";
+import { LiveActivitySidebar } from "../../components/LiveActivitySidebar";
 
 // Define the structure of a team's score data
 interface TeamScore {
@@ -20,7 +21,7 @@ async function fetchTeams(lastSeen: Date | null): Promise<TeamScore[] | null> {
   const url = lastSeen
     ? `/balancer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
     : "/balancer/api/score-board/top";
-  
+
   const response = await fetch(url);
 
   // Status 204 No Content means the long-poll timed out without new data
@@ -76,7 +77,7 @@ export const ScoreboardV2Page = () => {
   const [teams, setTeams] = useState<TeamScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Use a ref to keep the timeout ID stable across re-renders
   const timeoutRef = useRef<number | null>(null);
 
@@ -121,19 +122,20 @@ export const ScoreboardV2Page = () => {
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <p className="text-red-500"><FormattedMessage id="v2.scoreboard.error" defaultMessage="Could not load scoreboard. Retrying..." /></p>;
   }
 
   const topThree = teams.slice(0, 3);
   const otherTeams = teams.slice(3);
 
   return (
-    <div className="w-full max-w-4xl">
+  <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
+    {/* Main scoreboard content */}
+    <div className="lg:col-span-2">
       <h1 className="text-3xl font-bold text-center mb-6">
         <FormattedMessage id="v2.scoreboard.title" defaultMessage="Live Scoreboard" />
       </h1>
 
-      {/* Top 3 Teams Cards */}
       <LayoutGroup>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <AnimatePresence>
@@ -143,7 +145,6 @@ export const ScoreboardV2Page = () => {
           </AnimatePresence>
         </div>
 
-        {/* Other Teams Table */}
         <Card>
           <table className="w-full text-left">
             <thead className="bg-gray-100 dark:bg-gray-700">
@@ -164,6 +165,12 @@ export const ScoreboardV2Page = () => {
           </table>
         </Card>
       </LayoutGroup>
+    </div>
+
+    {/* Sidebar */}
+    <div className="lg:col-span-1">
+      <LiveActivitySidebar />
+    </div>
     </div>
   );
 };
