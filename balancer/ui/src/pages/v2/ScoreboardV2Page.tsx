@@ -133,7 +133,7 @@ export const ScoreboardV2Page = () => {
     {/* Main scoreboard content */}
     <div className="lg:col-span-2">
       <h1 className="text-3xl font-bold text-center mb-6">
-        <FormattedMessage id="v2.scoreboard.title" defaultMessage="Live Scoreboard" />
+        <FormattedMessage id="v2.scoreboard.title" defaultMessage="Scoreboard" />
       </h1>
 
       <LayoutGroup>
