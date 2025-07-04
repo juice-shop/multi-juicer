@@ -40,13 +40,32 @@ func handleIndividualScore(bundle *b.Bundle, scoringService *scoring.ScoringServ
 				return
 			}
 
-			currentScores := scoringService.GetScores()
-			teamScore, ok := currentScores[team]
-			if !ok {
-				http.Error(responseWriter, "team not found", http.StatusNotFound)
-				return
+			var teamScore *scoring.TeamScore
+
+			if req.URL.Query().Get("wait-for-update-after") != "" {
+				lastSeenUpdate, err := time.Parse(time.RFC3339, req.URL.Query().Get("wait-for-update-after"))
+				if err != nil {
+					http.Error(responseWriter, "Invalid time format", http.StatusBadRequest)
+					return
+				}
+				// Use the existing long-polling method for a single team
+				teamScore = scoringService.WaitForTeamUpdatesNewerThan(req.Context(), team, lastSeenUpdate)
+				if teamScore == nil {
+					// This means the poll timed out or the context was cancelled.
+					// A 204 No Content is the correct response here.
+					responseWriter.WriteHeader(http.StatusNoContent)
+					return
+				}
+			} else {
+				var ok bool
+				teamScore, ok = scoringService.GetScoreForTeam(team)
+				if !ok {
+					http.Error(responseWriter, "team not found", http.StatusNotFound)
+					return
+				}
 			}
-			teamCount := len(currentScores)
+
+			teamCount := len(scoringService.GetScores())
 
 			solvedChallenges := make([]SolvedChallenge, len(teamScore.Challenges))
 			for i, challenge := range teamScore.Challenges {

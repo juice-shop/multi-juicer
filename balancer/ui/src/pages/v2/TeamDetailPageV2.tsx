@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Spinner } from "../../components/Spinner";
@@ -6,11 +6,12 @@ import { Card } from "../../components/Card";
 import { ReadableTimestamp } from "../../components/ReadableTimestamp";
 import { PositionDisplay } from "../../components/PositionDisplay";
 
+// --- Type Definitions ---
 interface SolvedChallengeResponse {
   key: string;
   name: string;
   difficulty: number;
-  solvedAt: string;
+  solvedAt: string; // ISO string
 }
 
 interface IndividualTeamScoreResponse {
@@ -22,16 +23,25 @@ interface IndividualTeamScoreResponse {
 }
 
 interface SolvedChallenge extends Omit<SolvedChallengeResponse, "solvedAt"> {
-  solvedAt: Date;
+  solvedAt: Date; // Convert string to Date object
 }
 
 interface IndividualTeamScore extends Omit<IndividualTeamScoreResponse, "solvedChallenges"> {
   solvedChallenges: SolvedChallenge[];
 }
 
-// API Fetching Logic
-async function fetchTeamScore(team: string): Promise<IndividualTeamScore> {
-  const response = await fetch(`/balancer/api/score-board/teams/${team}/score`);
+// --- API Fetching Logic ---
+async function fetchTeamScore(team: string, lastSeen: Date | null): Promise<IndividualTeamScore | null> {
+  const url = lastSeen
+    ? `/balancer/api/score-board/teams/${team}/score?wait-for-update-after=${lastSeen.toISOString()}`
+    : `/balancer/api/score-board/teams/${team}/score`;
+
+  const response = await fetch(url);
+
+  if (response.status === 204) {
+    return null;
+  }
+
   if (!response.ok) {
     if (response.status === 404) {
       throw new Error("Team not found");
@@ -57,24 +67,39 @@ export const TeamDetailPageV2 = () => {
   const [teamScore, setTeamScore] = useState<IndividualTeamScore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!team) return;
 
-    const loadData = async () => {
-      setIsLoading(true);
-      setError(null);
+    let lastUpdate: Date | null = null;
+
+    const pollData = async () => {
       try {
-        const data = await fetchTeamScore(team);
-        setTeamScore(data);
+        const data = await fetchTeamScore(team, lastUpdate);
+        if (data) {
+          setTeamScore(data);
+          lastUpdate = new Date(); // Update the timestamp only when we get new data
+        }
+        setIsLoading(false);
+        setError(null);
+        // Schedule the next poll
+        timeoutRef.current = window.setTimeout(pollData, 1000);
       } catch (err) {
         setError((err as Error).message);
-      } finally {
-        setIsLoading(false);
+        // Retry after a delay on error
+        timeoutRef.current = window.setTimeout(pollData, 5000);
       }
     };
 
-    loadData();
+    pollData(); // Start the polling
+
+    // Cleanup function
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [team]);
 
   if (isLoading) {
@@ -87,7 +112,8 @@ export const TeamDetailPageV2 = () => {
   }
 
   if (error || !teamScore) {
-    return <p className="text-red-500">{error || "Could not load team data."}</p>;
+    const defaultMessage = error === "Team not found" ? "Team not found." : "Could not load team data.";
+    return <p className="text-red-500">{error ? <FormattedMessage id={`v2.team_detail.error.${error}`} defaultMessage={defaultMessage} /> : "Could not load team data."}</p>;
   }
 
   return (
