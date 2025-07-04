@@ -6,16 +6,17 @@ import { ReadableTimestamp } from "./ReadableTimestamp";
 import { Spinner } from "./Spinner";
 import { classNames } from "../util/classNames";
 
-// Type Definitions 
+// --- Type Definitions ---
 interface ActivityEvent {
   team: string;
+  challengeKey: string; // Added challengeKey to use in links
   challengeName: string;
   points: number;
   solvedAt: string; // ISO String
   isFirstBlood: boolean;
 }
 
-// API Fetching 
+// --- API Fetching ---
 async function fetchActivityFeed(): Promise<ActivityEvent[]> {
   const response = await fetch("/balancer/api/v2/activity-feed");
   if (!response.ok) {
@@ -24,7 +25,7 @@ async function fetchActivityFeed(): Promise<ActivityEvent[]> {
   return response.json();
 }
 
-// Event Item Component 
+// --- Event Item Component ---
 const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean }) => {
   const eventColor = event.isFirstBlood ? "border-red-500" : "border-orange-500";
 
@@ -40,9 +41,17 @@ const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean })
         {' '}
         <FormattedMessage id="activity.solved" defaultMessage="solved" />
         {' '}
-        <span className="font-bold">{event.challengeName}</span>
+        <Link to={`/v2/challenges/${event.challengeKey}`} className="font-bold hover:underline">{event.challengeName}</Link>
         {' '}
-        <span className="text-green-500 font-semibold">(+{event.points} pts)</span>
+        <FormattedMessage
+          id="activity.points_earned"
+          defaultMessage="(+{points} pts)"
+          values={{
+            points: event.points,
+            // eslint-disable-next-line react/display-name
+            b: (chunks) => <span className="text-green-500 font-semibold">{chunks}</span>
+          }}
+        />
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
         <ReadableTimestamp date={new Date(event.solvedAt)} />
@@ -51,7 +60,7 @@ const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean })
   );
 };
 
-// Main Sidebar Component 
+// --- Main Sidebar Component ---
 export const LiveActivitySidebar = () => {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +102,7 @@ export const LiveActivitySidebar = () => {
         ) : (
           <div className="flex flex-col gap-4">
             {events.map((event, index) => (
-              <EventItem key={`${event.solvedAt}-${event.team}`} event={event} isLast={index === events.length - 1} />
+              <EventItem key={`${event.challengeKey}-${event.team}`} event={event} isLast={index === events.length - 1} />
             ))}
           </div>
         )}
