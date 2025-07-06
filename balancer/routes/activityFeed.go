@@ -17,7 +17,7 @@ type ActivityEvent struct {
 	ChallengeName string    `json:"challengeName"`
 	Points        int       `json:"points"`
 	SolvedAt      time.Time `json:"solvedAt"`
-	IsFirstBlood  bool      `json:"isFirstBlood"`
+	IsFirstSolve  bool      `json:"IsFirstSolve"`
 }
 
 // BySolvedAt sorts events by their timestamp, newest first.
@@ -66,7 +66,7 @@ func handleActivityFeed(bundle *b.Bundle, scoringService *scoring.ScoringService
 		for i := range allEvents {
 			event := &allEvents[i]
 			if firstSolveTime, ok := firstSolves[event.ChallengeKey]; ok && event.SolvedAt.Equal(firstSolveTime) {
-				event.IsFirstBlood = true
+				event.IsFirstSolve = true
 			}
 		}
 

@@ -98,9 +98,9 @@ func TestActivityFeedHandler(t *testing.T) {
 				teamBravoC2Event = event
 			}
 		}
-		assert.False(t, teamAlphaEvent.IsFirstBlood, "Team Alpha's solve should not be First Blood")
-		assert.True(t, teamBravoC1Event.IsFirstBlood, "Team Bravo's solve of challenge 1 should be First Blood")
-		assert.True(t, teamBravoC2Event.IsFirstBlood, "Team Bravo's solve of challenge 2 should be First Blood (as they are the only solver)")
+		assert.False(t, teamAlphaEvent.IsFirstSolve, "Team Alpha's solve should not be First Blood")
+		assert.True(t, teamBravoC1Event.IsFirstSolve, "Team Bravo's solve of challenge 1 should be First Blood")
+		assert.True(t, teamBravoC2Event.IsFirstSolve, "Team Bravo's solve of challenge 2 should be First Blood (as they are the only solver)")
 
 		// 3. Verify event details
 		assert.Equal(t, "Score Board", teamBravoC1Event.ChallengeName)
