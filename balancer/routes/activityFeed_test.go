@@ -36,7 +36,7 @@ func createTeamWithSolvedChallenges(team string, challengesJSON string) *appsv1.
 
 func TestActivityFeedHandler(t *testing.T) {
 
-	t.Run("with multiple solves, should return sorted events with correct first blood", func(t *testing.T) {
+	t.Run("with multiple solves, should return sorted events with correct first solve", func(t *testing.T) {
 		// --- Test Data Setup ---
 		challenge1 := "scoreBoardChallenge" // 10 points
 		challenge2 := "nullByteChallenge"   // 40 points
@@ -48,7 +48,7 @@ func TestActivityFeedHandler(t *testing.T) {
 
 		// team-alpha: Solved challenge 1 at time 2
 		teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challenge1, time2.Format(time.RFC3339))
-		// team-bravo: Solved challenge 1 at time 1 (First Blood) and challenge 2 at time 3
+		// team-bravo: Solved challenge 1 at time 1 (First solve) and challenge 2 at time 3
 		teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"},{"key":"%s","solvedAt":"%s"}]`,
 			challenge1, time1.Format(time.RFC3339), challenge2, time3.Format(time.RFC3339))
 
@@ -87,7 +87,7 @@ func TestActivityFeedHandler(t *testing.T) {
 		assert.Equal(t, challenge1, feed[1].ChallengeKey)
 		assert.Equal(t, "team-alpha", feed[1].Team)
 
-		// 2. Verify First Blood detection
+		// 2. Verify First solve detection
 		var teamAlphaEvent, teamBravoC1Event, teamBravoC2Event ActivityEvent
 		for _, event := range feed {
 			if event.Team == "team-alpha" {
@@ -98,9 +98,9 @@ func TestActivityFeedHandler(t *testing.T) {
 				teamBravoC2Event = event
 			}
 		}
-		assert.False(t, teamAlphaEvent.IsFirstSolve, "Team Alpha's solve should not be First Blood")
-		assert.True(t, teamBravoC1Event.IsFirstSolve, "Team Bravo's solve of challenge 1 should be First Blood")
-		assert.True(t, teamBravoC2Event.IsFirstSolve, "Team Bravo's solve of challenge 2 should be First Blood (as they are the only solver)")
+		assert.False(t, teamAlphaEvent.IsFirstSolve, "Team Alpha's solve should not be First Solve")
+		assert.True(t, teamBravoC1Event.IsFirstSolve, "Team Bravo's solve of challenge 1 should be First Solve")
+		assert.True(t, teamBravoC2Event.IsFirstSolve, "Team Bravo's solve of challenge 2 should be First Solve (as they are the only solver)")
 
 		// 3. Verify event details
 		assert.Equal(t, "Score Board", teamBravoC1Event.ChallengeName)

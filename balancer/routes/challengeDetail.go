@@ -67,7 +67,7 @@ func handleChallengeDetail(bundle *b.Bundle, scoringService *scoring.ScoringServ
 			}
 		}
 
-		// 3. Sort the solves by time to show "First Blood" first.
+		// 3. Sort the solves by time to show "First Solve" first.
 		sort.Sort(solves)
 
 		// 4. Construct and send the response.

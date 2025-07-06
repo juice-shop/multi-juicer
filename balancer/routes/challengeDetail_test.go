@@ -38,12 +38,12 @@ func TestChallengeDetailHandler(t *testing.T) {
 	const solvedChallengeKey = "scoreBoardChallenge"
 	const anotherChallengeKey = "nullByteChallenge" // This challenge exists but will have no solvers in our setup
 
-	firstBloodTime := time.Now().Add(-20 * time.Minute)
-	secondBloodTime := time.Now().Add(-10 * time.Minute)
+	firstSolveTime := time.Now().Add(-20 * time.Minute)
+	secondSolveTime := time.Now().Add(-10 * time.Minute)
 
 	// Setup: team-alpha and team-bravo solve one challenge. No one solves the other.
-	teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, secondBloodTime.Format(time.RFC3339))
-	teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, firstBloodTime.Format(time.RFC3339))
+	teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, secondSolveTime.Format(time.RFC3339))
+	teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, firstSolveTime.Format(time.RFC3339))
 
 	clientset := fake.NewSimpleClientset(
 		createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
@@ -60,7 +60,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 
 	// --- Test Cases ---
 
-	t.Run("should return solvers in chronological order (First Blood first)", func(t *testing.T) {
+	t.Run("should return solvers in chronological order (First Solve first)", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/v2/challenges/%s", solvedChallengeKey), nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
@@ -75,7 +75,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 		require.Len(t, response.Solves, 2, "Expected exactly two teams to have solved this challenge")
 
 		// Verify the order and names
-		assert.Equal(t, "team-bravo", response.Solves[0].Team, "Team Bravo should be first (First Blood)")
+		assert.Equal(t, "team-bravo", response.Solves[0].Team, "Team Bravo should be first (First Solve)")
 		assert.Equal(t, "team-alpha", response.Solves[1].Team, "Team Alpha should be second")
 	})
 
