@@ -13,7 +13,7 @@ interface ActivityEvent {
   challengeName: string;
   points: number;
   solvedAt: string; // ISO String
-  isFirstBlood: boolean;
+  isFirstSolve: boolean;
 }
 
 // --- API Fetching ---
@@ -27,7 +27,7 @@ async function fetchActivityFeed(): Promise<ActivityEvent[]> {
 
 // --- Event Item Component ---
 const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean }) => {
-  const eventColor = event.isFirstBlood ? "border-red-500" : "border-orange-500";
+  const eventColor = event.isFirstSolve ? "border-red-500" : "border-orange-500";
 
   return (
     <div className="relative pl-6">
