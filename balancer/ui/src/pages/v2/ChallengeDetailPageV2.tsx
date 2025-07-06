@@ -129,7 +129,7 @@ export const ChallengeDetailPageV2 = () => {
                   <td className="p-3 text-center font-mono">
                     {index + 1}
                     {index === 0 && (
-                      <span className="ml-2 text-red-500" title="First Blood">🩸</span>
+                      <span className="ml-2 text-red-500" title="First Solve">🎉</span>
                     )}
                   </td>
                   <td className="p-3">

@@ -62,7 +62,7 @@ func handleActivityFeed(bundle *b.Bundle, scoringService *scoring.ScoringService
 			}
 		}
 
-		// 2. Add "First Blood" information
+		// 2. Add "First Solve" information
 		for i := range allEvents {
 			event := &allEvents[i]
 			if firstSolveTime, ok := firstSolves[event.ChallengeKey]; ok && event.SolvedAt.Equal(firstSolveTime) {
