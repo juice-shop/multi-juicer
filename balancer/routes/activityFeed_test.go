@@ -48,7 +48,7 @@ func TestActivityFeedHandler(t *testing.T) {
 
 		// team-alpha: Solved challenge 1 at time 2
 		teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challenge1, time2.Format(time.RFC3339))
-		// team-bravo: Solved challenge 1 at time 1 (First solve) and challenge 2 at time 3
+		// team-bravo: Solved challenge 1 at time 1 (First Solve) and challenge 2 at time 3
 		teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"},{"key":"%s","solvedAt":"%s"}]`,
 			challenge1, time1.Format(time.RFC3339), challenge2, time3.Format(time.RFC3339))
 
@@ -82,12 +82,13 @@ func TestActivityFeedHandler(t *testing.T) {
 		// 1. Verify sorting (newest first)
 		assert.Equal(t, challenge2, feed[0].ChallengeKey, "The newest event should be at the top of the feed")
 		assert.Equal(t, "team-bravo", feed[0].Team)
-		assert.Equal(t, time3.UTC().Format(time.RFC3339Nano), feed[0].SolvedAt.UTC().Format(time.RFC3339Nano))
+		// THE FIX: Truncate the original time to seconds to match the precision of the deserialized time.
+		assert.Equal(t, time3.UTC().Truncate(time.Second), feed[0].SolvedAt.UTC().Truncate(time.Second))
 
 		assert.Equal(t, challenge1, feed[1].ChallengeKey)
 		assert.Equal(t, "team-alpha", feed[1].Team)
 
-		// 2. Verify First solve detection
+		// 2. Verify First Solve detection
 		var teamAlphaEvent, teamBravoC1Event, teamBravoC2Event ActivityEvent
 		for _, event := range feed {
 			if event.Team == "team-alpha" {
@@ -157,7 +158,7 @@ func TestActivityFeedHandler(t *testing.T) {
 
 		// Assert that the feed is limited to 15 items
 		assert.Len(t, feed, 15, "Feed should be limited to 15 events")
-		// Assert that the first item in the feed is the newest one we created
-		assert.Equal(t, newestSolveTime.UTC().Format(time.RFC3339Nano), feed[0].SolvedAt.UTC().Format(time.RFC3339Nano))
+		// THE FIX: Truncate the original time to seconds before comparing.
+		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].SolvedAt.UTC().Truncate(time.Second))
 	})
 }
