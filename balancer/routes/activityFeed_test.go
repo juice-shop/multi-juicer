@@ -82,7 +82,6 @@ func TestActivityFeedHandler(t *testing.T) {
 		// 1. Verify sorting (newest first)
 		assert.Equal(t, challenge2, feed[0].ChallengeKey, "The newest event should be at the top of the feed")
 		assert.Equal(t, "team-bravo", feed[0].Team)
-		// THE FIX: Truncate the original time to seconds to match the precision of the deserialized time.
 		assert.Equal(t, time3.UTC().Truncate(time.Second), feed[0].SolvedAt.UTC().Truncate(time.Second))
 
 		assert.Equal(t, challenge1, feed[1].ChallengeKey)
@@ -158,7 +157,6 @@ func TestActivityFeedHandler(t *testing.T) {
 
 		// Assert that the feed is limited to 15 items
 		assert.Len(t, feed, 15, "Feed should be limited to 15 events")
-		// THE FIX: Truncate the original time to seconds before comparing.
 		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].SolvedAt.UTC().Truncate(time.Second))
 	})
 }
