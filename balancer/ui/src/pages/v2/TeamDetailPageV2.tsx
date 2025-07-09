@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Spinner } from "../../components/Spinner";
@@ -6,11 +6,12 @@ import { Card } from "../../components/Card";
 import { ReadableTimestamp } from "../../components/ReadableTimestamp";
 import { PositionDisplay } from "../../components/PositionDisplay";
 
+// --- Type Definitions ---
 interface SolvedChallengeResponse {
   key: string;
   name: string;
   difficulty: number;
-  solvedAt: string;
+  solvedAt: string; // ISO string
 }
 
 interface IndividualTeamScoreResponse {
@@ -22,16 +23,24 @@ interface IndividualTeamScoreResponse {
 }
 
 interface SolvedChallenge extends Omit<SolvedChallengeResponse, "solvedAt"> {
-  solvedAt: Date;
+  solvedAt: Date; // Convert string to Date object
 }
 
 interface IndividualTeamScore extends Omit<IndividualTeamScoreResponse, "solvedChallenges"> {
   solvedChallenges: SolvedChallenge[];
 }
 
-// API Fetching Logic
-async function fetchTeamScore(team: string): Promise<IndividualTeamScore> {
-  const response = await fetch(`/balancer/api/score-board/teams/${team}/score`);
+// --- API Fetching Logic ---
+async function fetchTeamScore(team: string, lastSeen: Date | null): Promise<IndividualTeamScore | null> {
+  const url = lastSeen
+    ? `/balancer/api/score-board/teams/${team}/score?wait-for-update-after=${lastSeen.toISOString()}`
+    : `/balancer/api/score-board/teams/${team}/score`;
+  
+  const response = await fetch(url);
+
+  if (response.status === 204) { // No new data from long-poll
+    return null;
+  }
   if (!response.ok) {
     if (response.status === 404) {
       throw new Error("Team not found");
@@ -40,7 +49,7 @@ async function fetchTeamScore(team: string): Promise<IndividualTeamScore> {
   }
   const rawScore = (await response.json()) as IndividualTeamScoreResponse;
 
-  // Process the raw response to convert date strings to Date objects
+  // Process the raw response to convert date strings to Date objects and sort
   return {
     ...rawScore,
     solvedChallenges: rawScore.solvedChallenges.map((challenge) => ({
@@ -57,25 +66,40 @@ export const TeamDetailPageV2 = () => {
   const [teamScore, setTeamScore] = useState<IndividualTeamScore | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const timeoutRef = useRef<number | null>(null); // To manage polling timeout
 
   useEffect(() => {
     if (!team) return;
 
-    const loadData = async () => {
-      setIsLoading(true);
-      setError(null);
+    // Recursive polling function
+    const updateAndPoll = async (lastSuccessfulUpdate: Date | null) => {
       try {
-        const data = await fetchTeamScore(team);
-        setTeamScore(data);
+        const data = await fetchTeamScore(team, lastSuccessfulUpdate);
+        if (data !== null) {
+          // Only update state if we received new data
+          setTeamScore(data);
+        }
+        if (isLoading) setIsLoading(false);
+        setError(null);
+        // Schedule the next poll with the current time as the new "last seen"
+        timeoutRef.current = window.setTimeout(() => updateAndPoll(new Date()), 1000);
       } catch (err) {
         setError((err as Error).message);
-      } finally {
-        setIsLoading(false);
+        if (isLoading) setIsLoading(false);
+        // Retry after a longer delay on error
+        timeoutRef.current = window.setTimeout(() => updateAndPoll(lastSuccessfulUpdate), 5000);
       }
     };
 
-    loadData();
-  }, [team]);
+    updateAndPoll(null); // Start the initial fetch and polling loop
+
+    // Cleanup function to stop polling when the component unmounts
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [team, isLoading]); // Re-run effect if team changes
 
   if (isLoading) {
     return (
@@ -87,7 +111,8 @@ export const TeamDetailPageV2 = () => {
   }
 
   if (error || !teamScore) {
-    return <p className="text-red-500">{error || "Could not load team data."}</p>;
+    const defaultMessage = error === "Team not found" ? "Team not found." : "Could not load team data.";
+    return <p className="text-red-500">{error ? <FormattedMessage id={`v2.team_detail.error.${error}`} defaultMessage={defaultMessage} /> : "Could not load team data."}</p>;
   }
 
   return (
