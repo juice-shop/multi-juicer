@@ -71,15 +71,13 @@ export const TeamDetailPageV2 = () => {
   useEffect(() => {
     if (!team) return;
 
-    // Recursive polling function
     const updateAndPoll = async (lastSuccessfulUpdate: Date | null) => {
       try {
         const data = await fetchTeamScore(team, lastSuccessfulUpdate);
         if (data !== null) {
-          // Only update state if we received new data
           setTeamScore(data);
         }
-        if (isLoading) setIsLoading(false);
+        if (isLoading) setIsLoading(false); // Only set loading to false on first successful fetch
         setError(null);
         // Schedule the next poll with the current time as the new "last seen"
         timeoutRef.current = window.setTimeout(() => updateAndPoll(new Date()), 1000);
@@ -91,7 +89,8 @@ export const TeamDetailPageV2 = () => {
       }
     };
 
-    updateAndPoll(null); // Start the initial fetch and polling loop
+    // Start the initial fetch and polling loop
+    updateAndPoll(null);
 
     // Cleanup function to stop polling when the component unmounts
     return () => {
@@ -99,7 +98,7 @@ export const TeamDetailPageV2 = () => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [team, isLoading]); // Re-run effect if team changes
+  }, [team]); 
 
   if (isLoading) {
     return (
