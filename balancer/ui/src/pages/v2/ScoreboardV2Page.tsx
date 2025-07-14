@@ -132,10 +132,6 @@ export const ScoreboardV2Page = () => {
   <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
     {/* Main scoreboard content */}
     <div className="lg:col-span-2">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        <FormattedMessage id="v2.scoreboard.title" defaultMessage="Scoreboard" />
-      </h1>
-
       <LayoutGroup>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <AnimatePresence>

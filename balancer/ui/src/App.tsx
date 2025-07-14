@@ -8,6 +8,7 @@ import { JoiningPage } from "./pages/JoiningPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
 
 import { Layout } from "./Layout";
+import { LayoutV2 } from "./LayoutV2"; 
 import { Spinner } from "./components/Spinner";
 import { MessageLoader } from "./translations/index";
 import { Toaster } from "react-hot-toast";
@@ -18,7 +19,7 @@ const IndividualScorePage = lazy(() => import("./pages/IndividualScorePage"));
 const ScoreboardV2Page = lazy(() => import("./pages/v2/ScoreboardV2Page"));
 const TeamDetailPageV2 = lazy(() => import("./pages/v2/TeamDetailPageV2"));
 const ChallengeDetailPageV2 = lazy(() => import("./pages/v2/ChallengeDetailPageV2"));
-
+const StatisticsPageV2 = lazy(() => import("./pages/v2/StatisticsPageV2")); 
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -75,8 +76,26 @@ function App() {
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
       <BrowserRouter basename="/balancer">
         <Routes>
+          {/* --- V2 Routes with the new LayoutV2 --- */}
           <Route
-            path="*"
+            path="/v2/*" // Match all routes starting with /v2
+            element={
+              <LayoutV2>
+                <Suspense fallback={<Spinner />}>
+                  <Routes>
+                    <Route path="/" element={<ScoreboardV2Page />} />
+                    <Route path="/statistics" element={<StatisticsPageV2 />} />
+                    <Route path="/teams/:team" element={<TeamDetailPageV2 />} />
+                    <Route path="/challenges/:challengeKey" element={<ChallengeDetailPageV2 />} />
+                  </Routes>
+                </Suspense>
+              </LayoutV2>
+            }
+          />
+
+          {/* --- V1 (Old) Routes with the old Layout --- */}
+          <Route
+            path="/*"
             element={
               <Layout
                 activeTeam={activeTeam}
@@ -111,23 +130,11 @@ function App() {
                       path="/score-overview/teams/:team"
                       element={<IndividualScorePage />}
                     />
-                    <Route 
-                      path="/v2" 
-                      element={<ScoreboardV2Page />} 
-                    />
-                    <Route 
-                      path="/v2/teams/:team" 
-                      element={<TeamDetailPageV2 />} 
-                    />
-                    <Route 
-                      path="/v2/challenges/:challengeKey"
-                      element={<ChallengeDetailPageV2 />} 
-                    />
                   </Routes>
                 </Suspense>
               </Layout>
             }
-          ></Route>
+          />
         </Routes>
       </BrowserRouter>
       <Toaster />
