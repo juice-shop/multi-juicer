@@ -1,11 +1,34 @@
-import { ReactNode } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { Card } from './components/Card';
-import { classNames } from './util/classNames';
+import { ReactNode } from "react";
+import { NavLink, Link } from "react-router-dom";
+import { Card } from "./components/Card";
+import { classNames } from "./util/classNames";
 
-const navLinkClasses = "px-4 py-2 rounded-md text-sm font-medium transition-colors";
-const activeNavLinkClasses = "bg-orange-500 text-white";
-const inactiveNavLinkClasses = "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700";
+export function NavbarPill({
+  children,
+  to,
+  activeMatchingExact = false,
+}: {
+  children: ReactNode;
+  to: string;
+  activeMatchingExact?: boolean;
+}) {
+  return (
+    <NavLink
+      to={to}
+      end={activeMatchingExact}
+      className={({ isActive }) =>
+        classNames(
+          "px-4 py-2 rounded-md text-sm font-medium transition-colors",
+          isActive
+            ? "bg-orange-500 text-white"
+            : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+        )
+      }
+    >
+      {children}
+    </NavLink>
+  );
+}
 
 export const LayoutV2 = ({ children }: { children: ReactNode }) => {
   return (
@@ -23,19 +46,10 @@ export const LayoutV2 = ({ children }: { children: ReactNode }) => {
 
           {/* Navigation Toggle */}
           <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <NavLink
-              to="/v2"
-              end // 'end' prop ensures this only matches the exact path
-              className={({ isActive }) => classNames(navLinkClasses, isActive ? activeNavLinkClasses : inactiveNavLinkClasses)}
-            >
+            <NavbarPill to="/v2" activeMatchingExact={true}>
               Leaderboard
-            </NavLink>
-            <NavLink
-              to="/v2/statistics"
-              className={({ isActive }) => classNames(navLinkClasses, isActive ? activeNavLinkClasses : inactiveNavLinkClasses)}
-            >
-              Statistics
-            </NavLink>
+            </NavbarPill>
+            <NavbarPill to="/v2/statistics">Statistics</NavbarPill>
           </div>
         </Card>
       </header>
