@@ -40,7 +40,7 @@ export const LayoutV2 = ({ children }: { children: ReactNode }) => {
             <img
               src="/balancer/multi-juicer.svg"
               alt="MultiJuicer Logo"
-              className="h-10" // Smaller logo
+              className="h-12"
             />
           </Link>
 
