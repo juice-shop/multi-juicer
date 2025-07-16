@@ -48,7 +48,7 @@ export const LayoutV2 = ({ children }: { children: ReactNode }) => {
           <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg gap-2">
             <NavbarPill to="/">Team</NavbarPill>
             <NavbarPill to="/v2" activeMatchingExact={true}>
-              Leaderboard
+              ScoreBoard
             </NavbarPill>
             <NavbarPill to="/v2/statistics">Statistics</NavbarPill>
           </div>
