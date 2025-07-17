@@ -1,34 +1,61 @@
 import { useState, useEffect } from "react";
+import { FormattedMessage } from "react-intl";
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  LineChart, Line, Legend
+} from 'recharts';
 import { Card } from "../../components/Card";
 import { Spinner } from "../../components/Spinner";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { FormattedMessage } from "react-intl";
 
 // --- Type Definitions ---
 interface CategoryStat {
   category: string;
   solves: number;
 }
+
 interface ScoreBucket {
   range: string;
   count: number;
 }
+
+interface DataPoint {
+  time: string; // ISO String
+  score: number;
+}
+
+interface TeamSeries {
+  team: string;
+  datapoints: DataPoint[];
+}
+
 interface StatisticsData {
   categoryStats: CategoryStat[];
   scoreDistribution: ScoreBucket[];
+  scoreProgression: TeamSeries[];
 }
 
-// --- API Fetching ---
+// --- API Fetching Logic ---
 async function fetchStatistics(): Promise<StatisticsData> {
-  const response = await fetch("/balancer/api/v2/statistics");
-  if (!response.ok) {
-    throw new Error("Failed to fetch statistics");
+  // Fetch both statistics and progression data in parallel
+  const [statsRes, progressionRes] = await Promise.all([
+    fetch('/balancer/api/v2/statistics'),
+    fetch('/balancer/api/v2/statistics/score-progression')
+  ]);
+
+  if (!statsRes.ok || !progressionRes.ok) {
+    throw new Error("Failed to fetch statistics data");
   }
-  return response.json();
+
+  const statsData = await statsRes.json();
+  const progressionData = await progressionRes.json();
+  
+  return { ...statsData, scoreProgression: progressionData };
 }
 
 // --- Chart Components ---
-const COLORS = ['#FF8042', '#0088FE', '#00C49F', '#FFBB28', '#FF4444', '#A463F2'];
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF1919", "#82ca9d"];
 
 const CategoryPieChart = ({ data }: { data: CategoryStat[] }) => (
   <Card className="p-4 border-t-4 border-orange-500">
@@ -50,35 +77,74 @@ const CategoryPieChart = ({ data }: { data: CategoryStat[] }) => (
   </Card>
 );
 
-const ScoreDistributionChart = ({ data }: { data: ScoreBucket[] }) => (
-  <Card className="p-4 border-t-4 border-orange-500">
-    <h3 className="font-bold mb-4">
-      <FormattedMessage id="v2.stats.score_distribution" defaultMessage="Score Distribution" />
-    </h3>
-    <div style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer>
-        <BarChart data={data} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" />
-          <YAxis type="category" dataKey="range" width={80} />
-          <Tooltip />
-          <Bar dataKey="count" fill="#FF8042" barSize={20} />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  </Card>
-);
+const ScoreDistributionChart = ({ data }: { data: ScoreBucket[] }) => {
+  // Filter out buckets with zero count for a cleaner chart
+  const filteredData = data.filter(bucket => bucket.count > 0);
 
-const PlaceholderChart = () => (
-    <Card className="p-4 border-t-4 border-gray-400">
-        <h3 className="font-bold mb-4 text-gray-500">
-            <FormattedMessage id="v2.stats.score_progression" defaultMessage="Score Progression" />
-        </h3>
-        <div className="h-[300px] flex items-center justify-center text-gray-400">
-            <FormattedMessage id="v2.stats.coming_soon" defaultMessage="Chart coming soon! (Requires backend changes for historical data)" />
-        </div>
+  return (
+    <Card className="p-4 border-t-4 border-orange-500">
+      <h3 className="font-bold mb-4">
+        <FormattedMessage id="v2.stats.score_distribution" defaultMessage="Score Distribution" />
+      </h3>
+      <div style={{ width: '100%', height: 300 }}>
+        <ResponsiveContainer>
+          <BarChart data={filteredData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" allowDecimals={false} />
+            <YAxis type="category" dataKey="range" width={80} />
+            <Tooltip />
+            <Bar dataKey="count" fill="#FF8042" barSize={20} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </Card>
-);
+  );
+};
+
+const ScoreProgressionChart = ({ data }: { data: TeamSeries[] }) => {
+  // 1. Get a sorted list of all unique timestamps from all series
+  const allTimestamps = [...new Set(data.flatMap(series => series.datapoints.map(dp => new Date(dp.time).getTime())))].sort();
+
+  // 2. Transform the data into a format that Recharts LineChart can easily consume.
+  // Each object in the array represents a point in time on the X-axis.
+  const chartData = allTimestamps.map(ts => {
+    const time = new Date(ts);
+    const entry: { [key: string]: string | number } = { 
+      // Format time for display on the axis
+      time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+    };
+
+    // For each team, find their score at this specific timestamp
+    data.forEach(series => {
+      // Find the last score at or before this timestamp for this team
+      const point = [...series.datapoints].reverse().find(dp => new Date(dp.time).getTime() <= ts);
+      entry[series.team] = point ? point.score : 0;
+    });
+    return entry;
+  });
+
+  return (
+    <Card className="p-4 border-t-4 border-orange-500">
+      <h3 className="font-bold mb-4">
+        <FormattedMessage id="v2.stats.score_progression" defaultMessage="Score Progression" />
+      </h3>
+      <div style={{ width: '100%', height: 300 }}>
+        <ResponsiveContainer>
+          <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="time" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {data.map((series, index) => (
+              <Line key={series.team} type="monotone" dataKey={series.team} stroke={COLORS[index % COLORS.length]} dot={false} strokeWidth={2} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+};
 
 
 // --- Main Page Component ---
@@ -88,6 +154,7 @@ export const StatisticsPageV2 = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
       try {
         const data = await fetchStatistics();
         setStats(data);
@@ -105,15 +172,26 @@ export const StatisticsPageV2 = () => {
   }
 
   if (!stats) {
-    return <p>Could not load statistics.</p>;
+    return <p><FormattedMessage id="v2.stats.error" defaultMessage="Could not load statistics." /></p>;
   }
 
   const hasData = stats.categoryStats.length > 0;
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <PlaceholderChart />
+    <div className="w-full flex flex-col gap-6">
+      <div className="w-full">
+        {hasData ? (
+          <ScoreProgressionChart data={stats.scoreProgression} />
+        ) : (
+          <Card className="p-4 border-t-4 border-gray-400">
+              <h3 className="font-bold mb-4 text-gray-500">
+                  <FormattedMessage id="v2.stats.score_progression" defaultMessage="Score Progression" />
+              </h3>
+              <div className="h-[300px] flex items-center justify-center text-gray-400">
+                  <FormattedMessage id="v2.stats.awaiting_data" defaultMessage="Awaiting data to generate chart..." />
+              </div>
+          </Card>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {hasData ? (
