@@ -40,7 +40,8 @@ async function fetchTeams(lastSeen: Date | null): Promise<TeamScore[] | null> {
 const TopTeamCard = ({ team, rank }: { team: TeamScore; rank: number }) => (
   <motion.div layoutId={team.name} className="w-full">
     <Link to={`/v2/teams/${team.name}`} className="block hover:scale-105 transition-transform duration-200">
-      <Card className="flex flex-col items-center p-4 bg-gray-700 dark:bg-gray-100 text-white shadow-lg">
+      {/* FIX 1: Corrected text and background colors for light/dark modes */}
+      <Card className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white shadow-lg">
         <div className="text-3xl mb-2">
           <PositionDisplay place={rank} />
         </div>
@@ -52,7 +53,7 @@ const TopTeamCard = ({ team, rank }: { team: TeamScore; rank: number }) => (
   </motion.div>
 );
 
-// A list item component for the other teams
+// A list item component for all teams in the table
 const TeamListItem = ({ team }: { team: TeamScore }) => (
   <motion.tr
     layoutId={team.name}
@@ -126,47 +127,49 @@ export const ScoreboardV2Page = () => {
   }
 
   const topThree = teams.slice(0, 3);
-  const otherTeams = teams.slice(3);
+  // FIX 3: Removed the 'otherTeams' slice to show all teams in the table
+  // const otherTeams = teams.slice(3);
 
   return (
-  <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
-    {/* Main scoreboard content */}
-    <div className="lg:col-span-2">
-      <LayoutGroup>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <AnimatePresence>
-            {topThree.map((team) => (
-              <TopTeamCard key={team.name} team={team} rank={team.position} />
-            ))}
-          </AnimatePresence>
-        </div>
+    <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main scoreboard content */}
+      <div className="lg:col-span-2">
+        <LayoutGroup>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <AnimatePresence>
+              {topThree.map((team) => (
+                <TopTeamCard key={team.name} team={team} rank={team.position} />
+              ))}
+            </AnimatePresence>
+          </div>
 
-        <Card>
-          <table className="w-full text-left">
-            <thead className="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th className="p-3 text-center">#</th>
-                <th className="p-3"><FormattedMessage id="v2.scoreboard.header.team" defaultMessage="Team" /></th>
-                <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.score" defaultMessage="Score" /></th>
-                <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.challenges" defaultMessage="Challenges" /></th>
-              </tr>
-            </thead>
-            <tbody>
-              <AnimatePresence>
-                {otherTeams.map((team) => (
-                  <TeamListItem key={team.name} team={team} />
-                ))}
-              </AnimatePresence>
-            </tbody>
-          </table>
-        </Card>
-      </LayoutGroup>
-    </div>
+          <Card>
+            <table className="w-full text-left">
+              <thead className="bg-gray-100 dark:bg-gray-700">
+                <tr>
+                  <th className="p-3 text-center">#</th>
+                  <th className="p-3"><FormattedMessage id="v2.scoreboard.header.team" defaultMessage="Team" /></th>
+                  <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.score" defaultMessage="Score" /></th>
+                  <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.challenges" defaultMessage="Challenges" /></th>
+                </tr>
+              </thead>
+              <tbody>
+                <AnimatePresence>
+                  {/* FIX 3: Map over the full `teams` array */}
+                  {teams.map((team) => (
+                    <TeamListItem key={team.name} team={team} />
+                  ))}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </Card>
+        </LayoutGroup>
+      </div>
 
-    {/* Sidebar */}
-    <div className="lg:col-span-1">
-      <LiveActivitySidebar />
-    </div>
+      {/* Sidebar */}
+      <div className="lg:col-span-1">
+        <LiveActivitySidebar />
+      </div>
     </div>
   );
 };

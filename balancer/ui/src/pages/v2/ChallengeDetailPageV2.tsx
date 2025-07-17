@@ -103,7 +103,10 @@ export const ChallengeDetailPageV2 = () => {
             <p className="text-lg text-gray-500 dark:text-gray-400">{challengeData.category}</p>
           </div>
         </div>
-        <p className="text-base">{challengeData.description}</p>
+        <div 
+        className="text-base prose dark:prose-invert" 
+        dangerouslySetInnerHTML={{ __html: challengeData.description }} 
+      />
       </Card>
 
       <Card>
