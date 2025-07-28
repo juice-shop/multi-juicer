@@ -5,26 +5,26 @@
   "type": "module",
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.11",
-    "motion": "^12.23.5",
+    "motion": "^12.23.11",
     "promise-retry": "^2.0.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-hot-toast": "^2.5.2",
     "react-intl": "^7.1.11",
-    "react-router-dom": "^7.6.3",
+    "react-router-dom": "^7.7.1",
     "reactjs-popup": "^2.0.6",
     "tailwindcss": "^4.0.14"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "typescript": "^5.8.3",
-    "vite": "^7.0.4",
+    "vite": "^7.0.6",
     "vitest": "^3.2.4"
   },
   "scripts": {
