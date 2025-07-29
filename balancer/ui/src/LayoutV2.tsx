@@ -50,7 +50,6 @@ export const LayoutV2 = ({ children }: { children: ReactNode }) => {
             <NavbarPill to="/v2" activeMatchingExact={true}>
               ScoreBoard
             </NavbarPill>
-            <NavbarPill to="/v2/statistics">Statistics</NavbarPill>
           </div>
         </Card>
       </header>
