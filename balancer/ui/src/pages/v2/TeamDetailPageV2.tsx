@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FormattedMessage, useIntl } from "react-intl";
-import { Spinner } from "../../components/Spinner";
 import { Card } from "../../components/Card";
-import { ReadableTimestamp } from "../../components/ReadableTimestamp";
 import { PositionDisplay } from "../../components/PositionDisplay";
+import { ReadableTimestamp } from "../../components/ReadableTimestamp";
+import { Spinner } from "../../components/Spinner";
+import { useEffect, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Link, useParams } from "react-router-dom";
 
 // --- Type Definitions ---
 interface SolvedChallengeResponse {
@@ -26,19 +26,24 @@ interface SolvedChallenge extends Omit<SolvedChallengeResponse, "solvedAt"> {
   solvedAt: Date; // Convert string to Date object
 }
 
-interface IndividualTeamScore extends Omit<IndividualTeamScoreResponse, "solvedChallenges"> {
+interface IndividualTeamScore
+  extends Omit<IndividualTeamScoreResponse, "solvedChallenges"> {
   solvedChallenges: SolvedChallenge[];
 }
 
 // --- API Fetching Logic ---
-async function fetchTeamScore(team: string, lastSeen: Date | null): Promise<IndividualTeamScore | null> {
+async function fetchTeamScore(
+  team: string,
+  lastSeen: Date | null
+): Promise<IndividualTeamScore | null> {
   const url = lastSeen
     ? `/balancer/api/score-board/teams/${team}/score?wait-for-update-after=${lastSeen.toISOString()}`
     : `/balancer/api/score-board/teams/${team}/score`;
-  
+
   const response = await fetch(url);
 
-  if (response.status === 204) { // No new data from long-poll
+  if (response.status === 204) {
+    // No new data from long-poll
     return null;
   }
   if (!response.ok) {
@@ -52,10 +57,12 @@ async function fetchTeamScore(team: string, lastSeen: Date | null): Promise<Indi
   // Process the raw response to convert date strings to Date objects and sort
   return {
     ...rawScore,
-    solvedChallenges: rawScore.solvedChallenges.map((challenge) => ({
-      ...challenge,
-      solvedAt: new Date(challenge.solvedAt),
-    })).sort((a, b) => b.solvedAt.getTime() - a.solvedAt.getTime()), // Sort by most recent first
+    solvedChallenges: rawScore.solvedChallenges
+      .map((challenge) => ({
+        ...challenge,
+        solvedAt: new Date(challenge.solvedAt),
+      }))
+      .sort((a, b) => b.solvedAt.getTime() - a.solvedAt.getTime()), // Sort by most recent first
   };
 }
 
@@ -80,12 +87,18 @@ export const TeamDetailPageV2 = () => {
         if (isLoading) setIsLoading(false); // Only set loading to false on first successful fetch
         setError(null);
         // Schedule the next poll with the current time as the new "last seen"
-        timeoutRef.current = window.setTimeout(() => updateAndPoll(new Date()), 1000);
+        timeoutRef.current = window.setTimeout(
+          () => updateAndPoll(new Date()),
+          1000
+        );
       } catch (err) {
         setError((err as Error).message);
         if (isLoading) setIsLoading(false);
         // Retry after a longer delay on error
-        timeoutRef.current = window.setTimeout(() => updateAndPoll(lastSuccessfulUpdate), 5000);
+        timeoutRef.current = window.setTimeout(
+          () => updateAndPoll(lastSuccessfulUpdate),
+          5000
+        );
       }
     };
 
@@ -98,20 +111,39 @@ export const TeamDetailPageV2 = () => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [team]); 
+  }, [team]);
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center">
         <Spinner />
-        <p><FormattedMessage id="v2.team_detail.loading" defaultMessage="Loading Team Details..." /></p>
+        <p>
+          <FormattedMessage
+            id="v2.team_detail.loading"
+            defaultMessage="Loading Team Details..."
+          />
+        </p>
       </div>
     );
   }
 
   if (error || !teamScore) {
-    const defaultMessage = error === "Team not found" ? "Team not found." : "Could not load team data.";
-    return <p className="text-red-500">{error ? <FormattedMessage id={`v2.team_detail.error.${error}`} defaultMessage={defaultMessage} /> : "Could not load team data."}</p>;
+    const defaultMessage =
+      error === "Team not found"
+        ? "Team not found."
+        : "Could not load team data.";
+    return (
+      <p className="text-red-500">
+        {error ? (
+          <FormattedMessage
+            id={`v2.team_detail.error.${error}`}
+            defaultMessage={defaultMessage}
+          />
+        ) : (
+          "Could not load team data."
+        )}
+      </p>
+    );
   }
 
   return (
@@ -127,7 +159,10 @@ export const TeamDetailPageV2 = () => {
               <FormattedMessage
                 id="v2.team_detail.rank"
                 defaultMessage="Rank {position} of {totalTeams}"
-                values={{ position: teamScore.position, totalTeams: teamScore.totalTeams }}
+                values={{
+                  position: teamScore.position,
+                  totalTeams: teamScore.totalTeams,
+                }}
               />
             </p>
           </div>
@@ -136,37 +171,77 @@ export const TeamDetailPageV2 = () => {
 
       <Card>
         <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
-          <FormattedMessage id="v2.team_detail.solved_challenges" defaultMessage="Solved Challenges" />
+          <FormattedMessage
+            id="v2.team_detail.solved_challenges"
+            defaultMessage="Solved Challenges"
+          />
         </h2>
         {teamScore.solvedChallenges.length === 0 ? (
           <p className="p-4 text-gray-500">
-            <FormattedMessage id="v2.team_detail.no_solves" defaultMessage="No challenges solved yet." />
+            <FormattedMessage
+              id="v2.team_detail.no_solves"
+              defaultMessage="No challenges solved yet."
+            />
           </p>
         ) : (
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-700">
-                <th className="p-3"><FormattedMessage id="v2.team_detail.header.challenge" defaultMessage="Challenge" /></th>
-                <th className="p-3 text-center"><FormattedMessage id="v2.team_detail.header.difficulty" defaultMessage="Difficulty" /></th>
-                <th className="p-3 text-right"><FormattedMessage id="v2.team_detail.header.solved" defaultMessage="Solved" /></th>
+                <th className="p-3">
+                  <FormattedMessage
+                    id="v2.team_detail.header.challenge"
+                    defaultMessage="Challenge"
+                  />
+                </th>
+                <th className="p-3 text-center">
+                  <FormattedMessage
+                    id="v2.team_detail.header.difficulty"
+                    defaultMessage="Difficulty"
+                  />
+                </th>
+                <th className="p-3 text-right">
+                  <FormattedMessage
+                    id="v2.team_detail.header.solved"
+                    defaultMessage="Solved"
+                  />
+                </th>
               </tr>
             </thead>
             <tbody>
               {teamScore.solvedChallenges.map((challenge) => (
-                <tr key={challenge.key} className="border-t border-gray-200 dark:border-gray-700">
+                <tr
+                  key={challenge.key}
+                  className="border-t border-gray-200 dark:border-gray-700"
+                >
                   <td className="p-3">
-                    <Link to={`/v2/challenges/${challenge.key}`} className="text-blue-500 hover:underline">
+                    <Link
+                      to={`/v2/challenges/${challenge.key}`}
+                      className="text-blue-500 hover:underline"
+                    >
                       {challenge.name}
                     </Link>
                   </td>
                   <td
                     className="p-3 text-center"
-                    title={intl.formatMessage({ id: "difficulty", defaultMessage: "Difficulty: {difficulty}/6" }, { difficulty: challenge.difficulty })}
+                    title={intl.formatMessage(
+                      {
+                        id: "difficulty",
+                        defaultMessage: "Difficulty: {difficulty}/6",
+                      },
+                      { difficulty: challenge.difficulty }
+                    )}
                   >
                     <div className="flex justify-center items-center">
-                      {Array.from({ length: challenge.difficulty }).map((_, i) => (
-                        <img key={i} src="/balancer/icons/star.svg" alt="Star" className="h-4 w-4" />
-                      ))}
+                      {Array.from({ length: challenge.difficulty }).map(
+                        (_, i) => (
+                          <img
+                            key={i}
+                            src="/balancer/icons/star.svg"
+                            alt="Star"
+                            className="h-4 w-4"
+                          />
+                        )
+                      )}
                     </div>
                   </td>
                   <td className="p-3 text-right">

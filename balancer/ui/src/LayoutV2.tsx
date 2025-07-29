@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
-import { NavLink, Link } from "react-router-dom";
 import { Card } from "./components/Card";
 import { classNames } from "./util/classNames";
+import { ReactNode } from "react";
+import { Link, NavLink } from "react-router-dom";
 
 export function NavbarPill({
   children,

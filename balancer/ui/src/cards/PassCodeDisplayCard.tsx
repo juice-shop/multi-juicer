@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
 import { classNames } from "../util/classNames";
+import { useState } from "react";
 import toast from "react-hot-toast";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const PLACEHOLDER = "●●●●●●●●";
 

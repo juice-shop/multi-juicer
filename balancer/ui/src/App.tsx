@@ -1,25 +1,24 @@
-import { Suspense, lazy, useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import { IntlProvider } from "react-intl";
-
+import { Layout } from "./Layout";
+import { LayoutV2 } from "./LayoutV2";
+import { Spinner } from "./components/Spinner";
 import { JoinPage } from "./pages/JoinPage";
 import { JoiningPage } from "./pages/JoiningPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
-
-import { Layout } from "./Layout";
-import { LayoutV2 } from "./LayoutV2"; 
-import { Spinner } from "./components/Spinner";
 import { MessageLoader } from "./translations/index";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
+import { IntlProvider } from "react-intl";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverview"));
 const IndividualScorePage = lazy(() => import("./pages/IndividualScorePage"));
 const ScoreboardV2Page = lazy(() => import("./pages/v2/ScoreboardV2Page"));
 const TeamDetailPageV2 = lazy(() => import("./pages/v2/TeamDetailPageV2"));
-const ChallengeDetailPageV2 = lazy(() => import("./pages/v2/ChallengeDetailPageV2"));
-const StatisticsPageV2 = lazy(() => import("./pages/v2/StatisticsPageV2")); 
+const ChallengeDetailPageV2 = lazy(
+  () => import("./pages/v2/ChallengeDetailPageV2")
+);
+const StatisticsPageV2 = lazy(() => import("./pages/v2/StatisticsPageV2"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -86,7 +85,10 @@ function App() {
                     <Route path="/" element={<ScoreboardV2Page />} />
                     <Route path="/statistics" element={<StatisticsPageV2 />} />
                     <Route path="/teams/:team" element={<TeamDetailPageV2 />} />
-                    <Route path="/challenges/:challengeKey" element={<ChallengeDetailPageV2 />} />
+                    <Route
+                      path="/challenges/:challengeKey"
+                      element={<ChallengeDetailPageV2 />}
+                    />
                   </Routes>
                 </Suspense>
               </LayoutV2>

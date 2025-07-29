@@ -7,4 +7,4 @@ export const StatisticsPageV2 = () => {
   );
 };
 
-export default StatisticsPageV2
+export default StatisticsPageV2;

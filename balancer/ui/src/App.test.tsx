@@ -1,7 +1,7 @@
-import { test, expect, afterEach, vi, beforeEach } from "vitest";
-import { render, cleanup } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import App from "./App";
+import "@testing-library/jest-dom";
+import { cleanup, render } from "@testing-library/react";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 // Clean up the DOM after each test
 afterEach(() => {

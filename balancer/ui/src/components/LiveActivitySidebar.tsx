@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { FormattedMessage } from "react-intl";
+import { classNames } from "../util/classNames";
 import { Card } from "./Card";
 import { ReadableTimestamp } from "./ReadableTimestamp";
 import { Spinner } from "./Spinner";
-import { classNames } from "../util/classNames";
+import { useEffect, useState } from "react";
+import { FormattedMessage } from "react-intl";
+import { Link } from "react-router-dom";
 
 // --- Type Definitions ---
 interface ActivityEvent {
@@ -26,30 +26,54 @@ async function fetchActivityFeed(): Promise<ActivityEvent[]> {
 }
 
 // --- Event Item Component ---
-const EventItem = ({ event, isLast }: { event: ActivityEvent; isLast: boolean }) => {
-  const eventColor = event.isFirstSolve ? "border-red-500" : "border-orange-500";
+const EventItem = ({
+  event,
+  isLast,
+}: {
+  event: ActivityEvent;
+  isLast: boolean;
+}) => {
+  const eventColor = event.isFirstSolve
+    ? "border-red-500"
+    : "border-orange-500";
 
   return (
     <div className="relative pl-6">
       {/* Timeline Marker */}
-      <div className={classNames("absolute left-0 top-1.5 w-3 h-3 rounded-full bg-white dark:bg-gray-800 border-2", eventColor)}></div>
+      <div
+        className={classNames(
+          "absolute left-0 top-1.5 w-3 h-3 rounded-full bg-white dark:bg-gray-800 border-2",
+          eventColor
+        )}
+      ></div>
       {/* Timeline Vertical Line */}
-      {!isLast && <div className="absolute left-[5px] top-[18px] h-full w-px bg-orange-500"></div>}
+      {!isLast && (
+        <div className="absolute left-[5px] top-[18px] h-full w-px bg-orange-500"></div>
+      )}
 
       <p className="text-sm">
-        <Link to={`/v2/teams/${event.team}`} className="font-bold hover:underline">{event.team}</Link>
-        {' '}
-        <FormattedMessage id="activity.solved" defaultMessage="solved" />
-        {' '}
-        <Link to={`/v2/challenges/${event.challengeKey}`} className="font-bold hover:underline">{event.challengeName}</Link>
-        {' '}
+        <Link
+          to={`/v2/teams/${event.team}`}
+          className="font-bold hover:underline"
+        >
+          {event.team}
+        </Link>{" "}
+        <FormattedMessage id="activity.solved" defaultMessage="solved" />{" "}
+        <Link
+          to={`/v2/challenges/${event.challengeKey}`}
+          className="font-bold hover:underline"
+        >
+          {event.challengeName}
+        </Link>{" "}
         <FormattedMessage
           id="activity.points_earned"
           defaultMessage="(+{points} pts)"
           values={{
             points: event.points,
             // eslint-disable-next-line react/display-name
-            b: (chunks) => <span className="text-green-500 font-semibold">{chunks}</span>
+            b: (chunks) => (
+              <span className="text-green-500 font-semibold">{chunks}</span>
+            ),
           }}
         />
       </p>
@@ -76,7 +100,7 @@ export const LiveActivitySidebar = () => {
         setIsLoading(false);
       }
     };
-    
+
     loadAndPoll(); // Initial load
     const interval = setInterval(loadAndPoll, 5000); // Poll every 5 seconds
 
@@ -91,18 +115,32 @@ export const LiveActivitySidebar = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
           </span>
-          <FormattedMessage id="activity.title" defaultMessage="Live Activity" />
+          <FormattedMessage
+            id="activity.title"
+            defaultMessage="Live Activity"
+          />
         </h2>
       </div>
       <div className="h-[500px] overflow-y-auto p-4 pt-0">
         {isLoading ? (
-          <div className="flex justify-center items-center h-full"><Spinner /></div>
+          <div className="flex justify-center items-center h-full">
+            <Spinner />
+          </div>
         ) : events.length === 0 ? (
-          <p className="text-gray-500"><FormattedMessage id="activity.no_events" defaultMessage="No recent activity." /></p>
+          <p className="text-gray-500">
+            <FormattedMessage
+              id="activity.no_events"
+              defaultMessage="No recent activity."
+            />
+          </p>
         ) : (
           <div className="flex flex-col gap-4">
             {events.map((event, index) => (
-              <EventItem key={`${event.challengeKey}-${event.team}`} event={event} isLast={index === events.length - 1} />
+              <EventItem
+                key={`${event.challengeKey}-${event.team}`}
+                event={event}
+                isLast={index === events.length - 1}
+              />
             ))}
           </div>
         )}

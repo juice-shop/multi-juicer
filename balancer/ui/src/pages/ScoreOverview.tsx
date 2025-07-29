@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { PositionDisplay } from "../components/PositionDisplay";
+import { LayoutGroup, LazyMotion, domMax, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { motion, domMax, LazyMotion, LayoutGroup } from "motion/react";
+import { Link } from "react-router-dom";
 
 interface Team {
   name: string;

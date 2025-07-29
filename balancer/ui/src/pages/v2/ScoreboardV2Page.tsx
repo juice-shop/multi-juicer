@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { FormattedMessage } from "react-intl";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { Spinner } from "../../components/Spinner";
-import { PositionDisplay } from "../../components/PositionDisplay";
 import { Card } from "../../components/Card";
 import { LiveActivitySidebar } from "../../components/LiveActivitySidebar";
+import { PositionDisplay } from "../../components/PositionDisplay";
+import { Spinner } from "../../components/Spinner";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
+import { Link } from "react-router-dom";
 
 // Define the structure of a team's score data
 interface TeamScore {
@@ -39,7 +39,10 @@ async function fetchTeams(lastSeen: Date | null): Promise<TeamScore[] | null> {
 // A card component for the top 3 teams
 const TopTeamCard = ({ team, rank }: { team: TeamScore; rank: number }) => (
   <motion.div layoutId={team.name} className="w-full">
-    <Link to={`/v2/teams/${team.name}`} className="block hover:scale-105 transition-transform duration-200">
+    <Link
+      to={`/v2/teams/${team.name}`}
+      className="block hover:scale-105 transition-transform duration-200"
+    >
       {/* FIX 1: Corrected text and background colors for light/dark modes */}
       <Card className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white shadow-lg">
         <div className="text-3xl mb-2">
@@ -47,7 +50,9 @@ const TopTeamCard = ({ team, rank }: { team: TeamScore; rank: number }) => (
         </div>
         <h3 className="text-xl font-bold">{team.name}</h3>
         <p className="text-lg">{team.score} pts</p>
-        <p className="text-sm opacity-80">{team.solvedChallengeCount} challenges</p>
+        <p className="text-sm opacity-80">
+          {team.solvedChallengeCount} challenges
+        </p>
       </Card>
     </Link>
   </motion.div>
@@ -64,7 +69,10 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
   >
     <td className="p-3 text-center">{team.position}</td>
     <td className="p-3">
-      <Link to={`/v2/teams/${team.name}`} className="text-blue-500 hover:underline">
+      <Link
+        to={`/v2/teams/${team.name}`}
+        className="text-blue-500 hover:underline"
+      >
         {team.name}
       </Link>
     </td>
@@ -92,12 +100,18 @@ export const ScoreboardV2Page = () => {
       setIsLoading(false);
       setError(null);
       // Schedule the next poll
-      timeoutRef.current = window.setTimeout(() => updateScoreData(new Date()), 1000);
+      timeoutRef.current = window.setTimeout(
+        () => updateScoreData(new Date()),
+        1000
+      );
     } catch (err) {
       console.error("Scoreboard fetch error:", err);
       setError("Could not load scoreboard. Retrying...");
       // Retry after a delay on error
-      timeoutRef.current = window.setTimeout(() => updateScoreData(lastSuccessfulUpdate), 5000);
+      timeoutRef.current = window.setTimeout(
+        () => updateScoreData(lastSuccessfulUpdate),
+        5000
+      );
     }
   };
 
@@ -117,13 +131,25 @@ export const ScoreboardV2Page = () => {
     return (
       <div className="flex flex-col items-center justify-center">
         <Spinner />
-        <p><FormattedMessage id="v2.scoreboard.loading" defaultMessage="Loading Scoreboard..." /></p>
+        <p>
+          <FormattedMessage
+            id="v2.scoreboard.loading"
+            defaultMessage="Loading Scoreboard..."
+          />
+        </p>
       </div>
     );
   }
 
   if (error) {
-    return <p className="text-red-500"><FormattedMessage id="v2.scoreboard.error" defaultMessage="Could not load scoreboard. Retrying..." /></p>;
+    return (
+      <p className="text-red-500">
+        <FormattedMessage
+          id="v2.scoreboard.error"
+          defaultMessage="Could not load scoreboard. Retrying..."
+        />
+      </p>
+    );
   }
 
   const topThree = teams.slice(0, 3);
@@ -148,9 +174,24 @@ export const ScoreboardV2Page = () => {
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
                   <th className="p-3 text-center">#</th>
-                  <th className="p-3"><FormattedMessage id="v2.scoreboard.header.team" defaultMessage="Team" /></th>
-                  <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.score" defaultMessage="Score" /></th>
-                  <th className="p-3 text-right"><FormattedMessage id="v2.scoreboard.header.challenges" defaultMessage="Challenges" /></th>
+                  <th className="p-3">
+                    <FormattedMessage
+                      id="v2.scoreboard.header.team"
+                      defaultMessage="Team"
+                    />
+                  </th>
+                  <th className="p-3 text-right">
+                    <FormattedMessage
+                      id="v2.scoreboard.header.score"
+                      defaultMessage="Score"
+                    />
+                  </th>
+                  <th className="p-3 text-right">
+                    <FormattedMessage
+                      id="v2.scoreboard.header.challenges"
+                      defaultMessage="Challenges"
+                    />
+                  </th>
                 </tr>
               </thead>
               <tbody>

@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { FormattedMessage } from "react-intl";
-
-import { Card } from "../components/Card";
 import { Button } from "../components/Button";
+import { Card } from "../components/Card";
+import { useState } from "react";
+import { FormattedMessage } from "react-intl";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const JoiningPage = ({
   setActiveTeam,

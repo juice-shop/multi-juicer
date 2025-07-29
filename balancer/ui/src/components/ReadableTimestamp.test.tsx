@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import { ReadableTimestamp } from "./ReadableTimestamp";
-import { describe, test, expect } from "vitest";
+import "@testing-library/jest-dom";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
 
 describe(`${ReadableTimestamp.name} Component`, () => {
   test.each([

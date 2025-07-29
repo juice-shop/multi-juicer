@@ -1,12 +1,10 @@
+import { Card } from "./components/Card";
+import availableLanguages, { type Language } from "./translations";
+import { classNames } from "./util/classNames";
 import React from "react";
-
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
-
-import availableLanguages, { type Language } from "./translations";
-import { classNames } from "./util/classNames";
-import { Card } from "./components/Card";
 
 const pageMargins = "2xl:mx-80 lg:mx-48 md:mx-24 sm:mx-16 mx-2";
 

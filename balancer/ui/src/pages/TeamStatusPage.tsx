@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Card } from "../components/Card";
-import { FormattedMessage, useIntl } from "react-intl";
 import { PasscodeDisplayCard } from "../cards/PassCodeDisplayCard";
 import { Button } from "../components/Button";
-import toast from "react-hot-toast";
+import { Card } from "../components/Card";
 import { PositionDisplay } from "../components/PositionDisplay";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 interface TeamStatusResponse {
   name: string;
