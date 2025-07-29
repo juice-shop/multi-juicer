@@ -19,6 +19,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.7.0",
