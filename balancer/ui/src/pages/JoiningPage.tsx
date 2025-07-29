@@ -1,8 +1,9 @@
-import { Button } from "../components/Button";
-import { Card } from "../components/Card";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useNavigate, useParams } from "react-router-dom";
+
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
 
 export const JoiningPage = ({
   setActiveTeam,

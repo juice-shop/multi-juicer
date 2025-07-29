@@ -1,14 +1,15 @@
-import { Layout } from "./Layout";
-import { LayoutV2 } from "./LayoutV2";
-import { Spinner } from "./components/Spinner";
-import { JoinPage } from "./pages/JoinPage";
-import { JoiningPage } from "./pages/JoiningPage";
-import { TeamStatusPage } from "./pages/TeamStatusPage";
-import { MessageLoader } from "./translations/index";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { IntlProvider } from "react-intl";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import { Spinner } from "./components/Spinner";
+import { Layout } from "./Layout";
+import { LayoutV2 } from "./LayoutV2";
+import { JoiningPage } from "./pages/JoiningPage";
+import { JoinPage } from "./pages/JoinPage";
+import { TeamStatusPage } from "./pages/TeamStatusPage";
+import { MessageLoader } from "./translations/index";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverview"));

@@ -1,10 +1,11 @@
-import { Card } from "../../components/Card";
-import { PositionDisplay } from "../../components/PositionDisplay";
-import { ReadableTimestamp } from "../../components/ReadableTimestamp";
-import { Spinner } from "../../components/Spinner";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link, useParams } from "react-router-dom";
+
+import { Card } from "@/components/Card";
+import { PositionDisplay } from "@/components/PositionDisplay";
+import { ReadableTimestamp } from "@/components/ReadableTimestamp";
+import { Spinner } from "@/components/Spinner";
 
 // --- Type Definitions ---
 interface SolvedChallengeResponse {

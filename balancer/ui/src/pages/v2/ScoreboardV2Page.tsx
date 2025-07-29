@@ -1,11 +1,12 @@
-import { Card } from "../../components/Card";
-import { LiveActivitySidebar } from "../../components/LiveActivitySidebar";
-import { PositionDisplay } from "../../components/PositionDisplay";
-import { Spinner } from "../../components/Spinner";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
+
+import { Card } from "@/components/Card";
+import { LiveActivitySidebar } from "@/components/LiveActivitySidebar";
+import { PositionDisplay } from "@/components/PositionDisplay";
+import { Spinner } from "@/components/Spinner";
 
 // Define the structure of a team's score data
 interface TeamScore {

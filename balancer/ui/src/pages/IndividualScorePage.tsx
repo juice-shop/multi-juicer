@@ -1,8 +1,9 @@
-import { ReadableTimestamp } from "../components/ReadableTimestamp";
-import { Spinner } from "../components/Spinner";
 import { useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useParams } from "react-router-dom";
+
+import { ReadableTimestamp } from "@/components/ReadableTimestamp";
+import { Spinner } from "@/components/Spinner";
 
 interface IndividualTeamScore<T> {
   name: string;

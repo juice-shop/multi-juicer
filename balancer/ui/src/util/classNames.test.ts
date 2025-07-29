@@ -1,5 +1,6 @@
-import { classNames } from "./classNames";
 import { describe, expect, it } from "vitest";
+
+import { classNames } from "./classNames";
 
 describe("classNames", () => {
   it("should return a single class name", () => {

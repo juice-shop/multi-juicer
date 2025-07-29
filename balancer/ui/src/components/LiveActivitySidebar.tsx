@@ -1,10 +1,12 @@
-import { classNames } from "../util/classNames";
-import { Card } from "./Card";
-import { ReadableTimestamp } from "./ReadableTimestamp";
-import { Spinner } from "./Spinner";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
+
+import { classNames } from "@/util/classNames";
+
+import { Card } from "./Card";
+import { ReadableTimestamp } from "./ReadableTimestamp";
+import { Spinner } from "./Spinner";
 
 // --- Type Definitions ---
 interface ActivityEvent {
@@ -70,7 +72,6 @@ const EventItem = ({
           defaultMessage="(+{points} pts)"
           values={{
             points: event.points,
-            // eslint-disable-next-line react/display-name
             b: (chunks) => (
               <span className="text-green-500 font-semibold">{chunks}</span>
             ),

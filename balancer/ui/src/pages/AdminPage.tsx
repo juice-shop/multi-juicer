@@ -1,7 +1,8 @@
-import { Card } from "../components/Card";
-import { ReadableTimestamp } from "../components/ReadableTimestamp";
 import { useEffect, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+
+import { Card } from "@/components/Card";
+import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 
 const buttonClasses =
   "inline m-0 bg-gray-700 text-white p-2 px-3 text-sm rounded-sm disabled:cursor-wait disabled:opacity-50";

@@ -1,9 +1,10 @@
-import { InstanceNotFoundCard } from "../cards/InstanceNotFoundCard";
-import { Button } from "../components/Button";
-import { Card } from "../components/Card";
 import { useEffect, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { useLocation, useNavigate } from "react-router-dom";
+
+import { InstanceNotFoundCard } from "@/cards/InstanceNotFoundCard";
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
 
 const messages = defineMessages({
   teamnameValidationConstraints: {
@@ -82,7 +83,7 @@ export function JoinPage({
       navigate(`/teams/${team}/status/`, {
         state: { passcode: data.passcode },
       });
-    } catch (error) {
+    } catch {
       setFailureMessage("Unexpected error. Please contact an admin.");
     }
   }

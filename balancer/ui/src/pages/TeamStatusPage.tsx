@@ -1,11 +1,12 @@
-import { PasscodeDisplayCard } from "../cards/PassCodeDisplayCard";
-import { Button } from "../components/Button";
-import { Card } from "../components/Card";
-import { PositionDisplay } from "../components/PositionDisplay";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+
+import { PasscodeDisplayCard } from "@/cards/PassCodeDisplayCard";
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
+import { PositionDisplay } from "@/components/PositionDisplay";
 
 interface TeamStatusResponse {
   name: string;

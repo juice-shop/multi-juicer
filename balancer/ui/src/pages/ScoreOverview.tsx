@@ -1,8 +1,9 @@
-import { PositionDisplay } from "../components/PositionDisplay";
 import { LayoutGroup, LazyMotion, domMax, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
+
+import { PositionDisplay } from "@/components/PositionDisplay";
 
 interface Team {
   name: string;
