@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
@@ -105,7 +106,7 @@ export const ChallengeDetailPageV2 = () => {
         </div>
         <div 
         className="text-base prose dark:prose-invert" 
-        dangerouslySetInnerHTML={{ __html: challengeData.description }} 
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(challengeData.description) }} 
       />
       </Card>
 
