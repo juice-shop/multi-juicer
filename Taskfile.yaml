@@ -23,6 +23,7 @@ tasks:
       - task: cleaner:lint
       - task: balancer:api:lint
       - task: progress-watchdog:lint
+      - task: balancer:ui:lint
 
   test:
     aliases: [t]
@@ -39,6 +40,14 @@ tasks:
         msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
     cmds:
       - npm run build
+    dir: balancer/ui/
+
+  balancer:ui:lint:
+    preconditions:
+      - sh: test -d node_modules/
+        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+    cmds:
+      - npm run lint
     dir: balancer/ui/
 
   balancer:ui:bundle-analyzer:
