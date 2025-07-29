@@ -51,6 +51,24 @@ jobs:
       - name: "Test"
         run: go test -cover ./...
 
+  balancer-ui:
+    name: Balancer UI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: balancer/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts'
+      - name: "Install dependencies"
+        run: npm ci
+      - name: "Lint"
+        run: npm run lint
+      - name: "Test"
+        run: npm run test
+
   progress-watchdog:
     name: ProgressWatchdog
     runs-on: ubuntu-latest
