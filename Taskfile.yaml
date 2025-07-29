@@ -25,6 +25,12 @@ tasks:
       - task: progress-watchdog:lint
       - task: balancer:ui:lint
 
+  lint:fix:
+    desc: Runs the linters which support auto fixing errors
+    aliases: [lf]
+    cmds:
+      - task: balancer:ui:lint:fix
+
   test:
     aliases: [t]
     cmds:
@@ -48,6 +54,14 @@ tasks:
         msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
     cmds:
       - npm run lint
+    dir: balancer/ui/
+
+  balancer:ui:lint:fix:
+    preconditions:
+      - sh: test -d node_modules/
+        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+    cmds:
+      - npm run lint:fix
     dir: balancer/ui/
 
   balancer:ui:bundle-analyzer:
