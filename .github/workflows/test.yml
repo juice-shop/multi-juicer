@@ -103,6 +103,6 @@ jobs:
           helm version
       - name: Install Helm Unit Test Plugin
         run: |
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 0.6.2
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 1.0.0
       - name: Helm-Chart Unit Tests | Operator
         run: helm unittest .
