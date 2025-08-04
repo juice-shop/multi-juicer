@@ -19,7 +19,7 @@ jobs:
           cache-dependency-path: "cleaner/go.sum"
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.3.1
+      - uses: dominikh/staticcheck-action@v1.4.0
         with:
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
           working-directory: cleaner
@@ -44,7 +44,7 @@ jobs:
           cp ui/index.html ui/build/index.html
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.3.1
+      - uses: dominikh/staticcheck-action@v1.4.0
         with:
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
           working-directory: balancer
@@ -83,7 +83,7 @@ jobs:
           cache-dependency-path: "progress-watchdog/go.sum"
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.3.1
+      - uses: dominikh/staticcheck-action@v1.4.0
         with:
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
           working-directory: progress-watchdog
