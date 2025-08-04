@@ -67,3 +67,15 @@ updates:
       docker-dependencies:
         patterns:
           - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
