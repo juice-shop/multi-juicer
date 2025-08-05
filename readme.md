@@ -89,12 +89,9 @@ There are some pretty good reasons for this:
 ### How to manage JuiceShop easily using `kubectl`?
 
 You can list all JuiceShops with relevant information using the custom-columns feature of kubectl.
-You'll need to down load the juiceShop.txt from the repository first:
 
 ```bash
-$ https://raw.githubusercontent.com/juice-shop/multi-juicer/main/juiceShop.txt
-
-$ kubectl get -l app.kubernetes.io/name=juice-shop -o custom-columns-file=juiceShop.txt deployments
+$ kubectl get -l app.kubernetes.io/name=juice-shop -o custom-columns="TEAM:metadata.labels.team,SOLVED-CHALLENGES:metadata.annotations.multi-juicer\.owasp-juice\.shop/challengesSolved,LAST-REQUEST:metadata.annotations.multi-juicer\.owasp-juice\.shop/lastRequestReadable" deployments
 TEAM         SOLVED-CHALLENGES   LAST-REQUEST
 foobar       3                   Wed May 4 2042 18:14:22 GMT+0000 (Coordinated Universal Time)
 team-42      0                   Wed May 4 2042 18:14:30 GMT+0000 (Coordinated Universal Time)

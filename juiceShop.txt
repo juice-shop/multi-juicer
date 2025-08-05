@@ -1,2 +1,0 @@
-TEAM                 SOLVED-CHALLENGES                                                 LAST-REQUEST
-metadata.labels.team metadata.annotations.multi-juicer\.owasp-juice\.shop/challengesSolved metadata.annotations.multi-juicer\.owasp-juice\.shop/lastRequestReadable
