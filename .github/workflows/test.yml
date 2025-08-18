@@ -12,7 +12,7 @@ jobs:
       run:
         working-directory: cleaner
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version-file: "cleaner/go.mod"
@@ -33,7 +33,7 @@ jobs:
       run:
         working-directory: balancer
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version-file: "balancer/go.mod"
@@ -58,7 +58,7 @@ jobs:
       run:
         working-directory: balancer/ui
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -76,7 +76,7 @@ jobs:
       run:
         working-directory: progress-watchdog
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version-file: "progress-watchdog/go.mod"
@@ -97,7 +97,7 @@ jobs:
       run:
         working-directory: helm/multi-juicer/
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Verify tools
         run: |
           helm version

@@ -12,7 +12,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - id: release-version
         name: Parse Release Version
@@ -50,7 +50,7 @@ jobs:
           - balancer
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
