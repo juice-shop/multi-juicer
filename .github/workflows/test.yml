@@ -13,7 +13,7 @@ jobs:
         working-directory: cleaner
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "cleaner/go.mod"
           cache-dependency-path: "cleaner/go.sum"
@@ -34,7 +34,7 @@ jobs:
         working-directory: balancer
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "balancer/go.mod"
           cache-dependency-path: "balancer/go.sum"
@@ -59,7 +59,7 @@ jobs:
         working-directory: balancer/ui
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
       - name: "Install dependencies"
@@ -77,7 +77,7 @@ jobs:
         working-directory: progress-watchdog
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "progress-watchdog/go.mod"
           cache-dependency-path: "progress-watchdog/go.sum"
