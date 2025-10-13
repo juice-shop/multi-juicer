@@ -20,7 +20,7 @@ jobs:
       - name: Update tab_news.md
         run: |
           sed -i 's/<!-- next:multi-juicer -->/<!-- next:multi-juicer -->\n* ${{ github.event.release.published_at }}: multi-juicer [`${{ github.event.release.tag_name }}`](https:\/\/github.com\/juice-shop\/multi-juicer\/releases\/tag\/${{ github.event.release.tag_name }})/' tab_news.md
-      - uses: stefanzweifel/git-auto-commit-action@778341af668090896ca464160c2def5d1d1a3eb0 #v6.0.1
+      - uses: stefanzweifel/git-auto-commit-action@28e16e81777b558cc906c8750092100bbb34c5e3 #v7.0.0
         with:
           commit_message: "Add multi-juicer ${{ github.event.release.tag_name }} release notes to tab_news.md"
           branch: master
