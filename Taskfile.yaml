@@ -153,3 +153,51 @@ tasks:
     cmds:
       - helm unittest . --update-snapshot
     dir: helm/multi-juicer/
+
+  e2e:setup:
+    desc: Create and setup KinD cluster for E2E testing
+    aliases: [e2e:setup-kind]
+    dir: test/e2e
+    cmds:
+      - make setup-kind
+
+  e2e:install:
+    desc: Install MultiJuicer in KinD cluster for E2E testing
+    aliases: [e2e:install-multi-juicer]
+    dir: test/e2e
+    cmds:
+      - make install-multi-juicer
+
+  e2e:port-forward:
+    desc: Setup port forwarding for E2E tests (localhost:8080)
+    dir: test/e2e
+    cmds:
+      - make port-forward
+
+  e2e:test:
+    desc: Run E2E tests against Kubernetes cluster
+    aliases: [e2e]
+    dir: test/e2e
+    cmds:
+      - make run-tests
+
+  e2e:logs:
+    desc: View E2E test environment logs and status
+    dir: test/e2e
+    cmds:
+      - make logs
+
+  e2e:cleanup:
+    desc: Delete KinD cluster and cleanup E2E environment
+    dir: test/e2e
+    cmds:
+      - make cleanup
+
+  e2e:all:
+    desc: Complete E2E test setup and execution (requires port-forward in separate terminal)
+    dir: test/e2e
+    cmds:
+      - make setup-kind
+      - make install-multi-juicer
+      - echo "Port forwarding started in background. Run 'task e2e:test' in another terminal to run tests."
+      - make port-forward

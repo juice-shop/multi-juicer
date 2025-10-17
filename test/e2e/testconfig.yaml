@@ -1,0 +1,41 @@
+# E2E Test Configuration
+tests:
+  # Number of concurrent teams to simulate
+  concurrent_teams: 5
+  
+  # Test timeout in seconds
+  timeout: 600
+  
+  # Challenges to test solving
+  test_challenges:
+    - key: "scoreBoardChallenge"
+      solution: "admin@juice-sh.op"
+    - key: "loginAdminChallenge"
+      solution: "' OR '1'='1"
+
+# Kubernetes cluster settings
+cluster:
+  namespace: "multi-juicer"
+  wait_timeout: "5m"
+  
+# Test scenarios
+scenarios:
+  - name: "Basic functionality"
+    enabled: true
+    tests:
+      - "deployment_ready"
+      - "health_check"
+      - "join_team"
+      - "instance_creation"
+      
+  - name: "Activity and scoring"
+    enabled: true
+    tests:
+      - "activity_feed"
+      - "scoreboard"
+      
+  - name: "Resilience"
+    enabled: true
+    tests:
+      - "progress_persistence"
+      - "cleanup"
