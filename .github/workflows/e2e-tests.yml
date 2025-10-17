@@ -1,0 +1,185 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Test against last 4 Kubernetes versions
+        k8s-version: 
+          - v1.28.0
+          - v1.27.3
+          - v1.26.6
+          - v1.25.11
+      fail-fast: false
+    name: E2E Tests (K8s ${{ matrix.k8s-version }})
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install Task
+      uses: arduino/setup-task@v1
+      with:
+        version: 3.x
+
+    - name: Create KinD cluster
+      uses: helm/kind-action@v1.8.0
+      with:
+        version: v0.20.0
+        node_image: kindest/node:${{ matrix.k8s-version }}
+        cluster_name: kind
+        config: |
+          kind: Cluster
+          apiVersion: kind.x-k8s.io/v1alpha4
+          nodes:
+          - role: control-plane
+            kubeadmConfigPatches:
+            - |
+              kind: InitConfiguration
+              nodeRegistration:
+                kubeletExtraArgs:
+                  node-labels: "ingress-ready=true"
+            extraPortMappings:
+            - containerPort: 80
+              hostPort: 80
+              protocol: TCP
+            - containerPort: 443
+              hostPort: 443
+              protocol: TCP
+            - containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+
+    - name: Install NGINX Ingress Controller
+      run: |
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+        kubectl wait --namespace ingress-nginx \
+          --for=condition=ready pod \
+          --selector=app.kubernetes.io/component=controller \
+          --timeout=90s
+
+    - name: Build balancer Docker image
+      run: |
+        cd balancer
+        docker build -t juice-balancer:local .
+
+    - name: Build cleaner Docker image
+      run: |
+        cd cleaner
+        docker build -t juice-cleaner:local .
+
+    - name: Build progress-watchdog Docker image
+      run: |
+        cd progress-watchdog
+        docker build -t juice-progress-watchdog:local .
+        
+    - name: Load images into KinD
+      run: |
+        kind load docker-image juice-balancer:local --name kind
+        kind load docker-image juice-cleaner:local --name kind
+        kind load docker-image juice-progress-watchdog:local --name kind
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.13.0'
+
+    - name: Deploy MultiJuicer with Helm
+      run: |
+        helm install multi-juicer ./helm/multi-juicer \
+          --create-namespace \
+          --namespace multi-juicer \
+          --set="imagePullPolicy=Never" \
+          --set="balancer.repository=juice-balancer" \
+          --set="balancer.tag=local" \
+          --set="progressWatchdog.repository=juice-progress-watchdog" \
+          --set="progressWatchdog.tag=local" \
+          --set="cleaner.repository=juice-cleaner" \
+          --set="cleaner.tag=local" \
+          --set="nodeEnv=test" \
+          --wait \
+          --timeout 5m
+
+    - name: Wait for deployments to be ready
+      run: |
+        kubectl wait --for=condition=available --timeout=300s \
+          deployment/juice-balancer \
+          -n multi-juicer || true
+        kubectl wait --for=condition=available --timeout=300s \
+          deployment/progress-watchdog \
+          -n multi-juicer || true
+        
+        # Give services time to be fully ready
+        sleep 10
+
+    - name: Port forward for tests
+      run: |
+        kubectl port-forward -n multi-juicer service/juice-balancer 8080:8080 > /tmp/port-forward.log 2>&1 &
+        sleep 5
+        echo "Port forwarding started"
+
+    - name: Run E2E tests
+      env:
+        E2E_NAMESPACE: multi-juicer
+        E2E_BASE_URL: http://localhost:8080
+      run: |
+        cd test/e2e
+        go test -v -timeout 15m -count=1 ./...
+
+    - name: Collect logs on failure
+      if: failure()
+      run: |
+        echo "=== Kubernetes Version ==="
+        kubectl version --short
+        
+        echo "=== Deployment Status ==="
+        kubectl get deployments -n multi-juicer -o wide
+        
+        echo "=== Pod Status ==="
+        kubectl get pods -n multi-juicer -o wide
+        
+        echo "=== Pod Descriptions ==="
+        kubectl describe pods -n multi-juicer
+        
+        echo "=== Balancer Logs ==="
+        kubectl logs -n multi-juicer deployment/juice-balancer --tail=200 || true
+        
+        echo "=== Progress Watchdog Logs ==="
+        kubectl logs -n multi-juicer deployment/progress-watchdog --tail=200 || true
+        
+        echo "=== Cleaner Logs ==="
+        kubectl logs -n multi-juicer -l app.kubernetes.io/name=cleaner --tail=200 || true
+        
+        echo "=== Events ==="
+        kubectl get events -n multi-juicer --sort-by='.lastTimestamp'
+        
+        echo "=== Services ==="
+        kubectl get services -n multi-juicer
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: e2e-test-results-${{ matrix.k8s-version }}
+        path: test/e2e/test-results/
+        retention-days: 30
