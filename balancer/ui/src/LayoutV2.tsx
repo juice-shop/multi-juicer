@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { FormattedMessage } from "react-intl";
 import { Link, NavLink } from "react-router-dom";
 import Popup from "reactjs-popup";
 
@@ -102,7 +103,13 @@ function ContextMenu({
     >
       <div>
         <div className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-          🌐 Switch Language
+          <span role="img" aria-label="globe">
+            🌐
+          </span>{" "}
+          <FormattedMessage
+            id="change_language"
+            defaultMessage="Change Language"
+          />
         </div>
         <div className="py-1">
           {availableLanguages.map((language) => (
@@ -129,9 +136,14 @@ function Navigation({
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg gap-2">
-        <NavbarPill to="/">Team</NavbarPill>
+        <NavbarPill to="/">
+          <FormattedMessage id="navigation.team" defaultMessage="Team" />
+        </NavbarPill>
         <NavbarPill to="/v2" activeMatchingExact={true}>
-          ScoreBoard
+          <FormattedMessage
+            id="navigation.scoreboard"
+            defaultMessage="ScoreBoard"
+          />
         </NavbarPill>
       </div>
       <ContextMenu

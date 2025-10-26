@@ -8,6 +8,8 @@ export default {
     "Teamname muss aus mindestens drei Zeichen bestehen und darf Kleinbuchstaben, Nummern oder '-' enthalten",
   create_or_join_team_label: "Team erstellen / beitreten",
   change_language: "Sprache ändern",
+  "navigation.team": "Team",
+  "navigation.scoreboard": "Bestenliste",
   joining_team: "Team {team} beitreten",
   joining_failed:
     "Konnte Team nicht beitreten. Bist du dir sicher, dass das Passwort richtig ist?",

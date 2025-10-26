@@ -8,6 +8,8 @@ export default {
     "Teamnaam moet uit kleine letters, nummers of '-' bestaan",
   create_or_join_team_label: "Team aanmaken of joinen",
   change_language: "Kies taal",
+  "navigation.team": "Team",
+  "navigation.scoreboard": "Scorebord",
   joining_team: "Team {team} joinen",
   joining_failed:
     "Kan het team niet bereiken. Weet u zeker dat de passcode juist is?",
