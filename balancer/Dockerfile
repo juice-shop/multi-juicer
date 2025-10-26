@@ -1,6 +1,6 @@
 ARG JUICE_SHOP_VERSION=latest
 
-FROM --platform=$BUILDPLATFORM docker.io/golang:1.24 AS builder
+FROM --platform=$BUILDPLATFORM docker.io/golang:1.25 AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
 # cache deps before building and copying source so that we don't need to re-download as much
