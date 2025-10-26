@@ -11,7 +11,7 @@ afterEach(() => {
 
 beforeEach(() => {
   // mock fetch
-  global.fetch = vi.fn(
+  globalThis.fetch = vi.fn(
     () =>
       Promise.resolve({
         json: () => Promise.resolve({}),

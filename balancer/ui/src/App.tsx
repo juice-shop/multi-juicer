@@ -80,7 +80,11 @@ function App() {
           <Route
             path="/v2/*" // Match all routes starting with /v2
             element={
-              <LayoutV2>
+              <LayoutV2
+                activeTeam={activeTeam}
+                switchLanguage={switchLanguage}
+                selectedLocale={locale}
+              >
                 <Suspense fallback={<Spinner />}>
                   <Routes>
                     <Route path="/" element={<ScoreboardV2Page />} />
