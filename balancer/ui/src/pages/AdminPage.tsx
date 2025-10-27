@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 
 import { Card } from "@/components/Card";
@@ -110,8 +110,8 @@ interface TeamRaw {
   lastConnect: string;
 }
 
-async function fetchAdminData(): Promise<Team[]> {
-  const response = await fetch(`/balancer/api/admin/all`);
+async function fetchAdminData(signal?: AbortSignal): Promise<Team[]> {
+  const response = await fetch(`/balancer/api/admin/all`, { signal });
   if (!response.ok) {
     throw new Error("Failed to fetch current teams");
   }
@@ -126,26 +126,42 @@ async function fetchAdminData(): Promise<Team[]> {
 
 export default function AdminPage() {
   const [teams, setTeams] = useState<Team[]>([]);
+  const intervalRef = useRef<number | null>(null);
 
-  async function updateAdminData() {
+  const updateAdminDataRef = useRef<
+    ((signal: AbortSignal) => Promise<void>) | null
+  >(null);
+
+  updateAdminDataRef.current = async (signal: AbortSignal) => {
     try {
-      const response = await fetch(`/balancer/api/admin/all`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch current teams");
-      }
-      setTeams(await fetchAdminData());
+      const data = await fetchAdminData(signal);
+      setTeams(data);
     } catch (err) {
+      // Ignore abort errors - these are expected when component unmounts
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       console.error("Failed to fetch current teams!", err);
     }
-  }
+  };
 
   useEffect(() => {
-    updateAdminData();
+    const abortController = new AbortController();
 
-    const interval = setInterval(updateAdminData, 5000);
+    // Initial fetch
+    updateAdminDataRef.current?.(abortController.signal);
+
+    // Poll every 5 seconds
+    intervalRef.current = window.setInterval(() => {
+      updateAdminDataRef.current?.(abortController.signal);
+    }, 5000);
 
     return () => {
-      clearInterval(interval);
+      abortController.abort();
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
   }, []);
 

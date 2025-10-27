@@ -33,9 +33,12 @@ interface ChallengeDetailData
 
 // --- API Fetching Logic ---
 async function fetchChallengeDetails(
-  challengeKey: string
+  challengeKey: string,
+  signal?: AbortSignal
 ): Promise<ChallengeDetailData> {
-  const response = await fetch(`/balancer/api/v2/challenges/${challengeKey}`);
+  const response = await fetch(`/balancer/api/v2/challenges/${challengeKey}`, {
+    signal,
+  });
   if (!response.ok) {
     if (response.status === 404) {
       throw new Error("Challenge not found");
@@ -65,13 +68,22 @@ export const ChallengeDetailPageV2 = () => {
   useEffect(() => {
     if (!challengeKey) return;
 
+    const abortController = new AbortController();
+
     const loadData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await fetchChallengeDetails(challengeKey);
+        const data = await fetchChallengeDetails(
+          challengeKey,
+          abortController.signal
+        );
         setChallengeData(data);
       } catch (err) {
+        // Ignore abort errors - these are expected when component unmounts
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
         setError((err as Error).message);
       } finally {
         setIsLoading(false);
@@ -79,6 +91,10 @@ export const ChallengeDetailPageV2 = () => {
     };
 
     loadData();
+
+    return () => {
+      abortController.abort();
+    };
   }, [challengeKey]);
 
   if (isLoading) {

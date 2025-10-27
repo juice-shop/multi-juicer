@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 
@@ -19,8 +19,10 @@ interface ActivityEvent {
 }
 
 // --- API Fetching ---
-async function fetchActivityFeed(): Promise<ActivityEvent[]> {
-  const response = await fetch("/balancer/api/v2/activity-feed");
+async function fetchActivityFeed(
+  signal?: AbortSignal
+): Promise<ActivityEvent[]> {
+  const response = await fetch("/balancer/api/v2/activity-feed", { signal });
   if (!response.ok) {
     throw new Error("Failed to fetch activity feed");
   }
@@ -89,23 +91,45 @@ const EventItem = ({
 export const LiveActivitySidebar = () => {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const intervalRef = useRef<number | null>(null);
+
+  const loadAndPollRef = useRef<
+    ((signal: AbortSignal) => Promise<void>) | null
+  >(null);
+
+  loadAndPollRef.current = async (signal: AbortSignal) => {
+    try {
+      const data = await fetchActivityFeed(signal);
+      setEvents(data);
+    } catch (error) {
+      // Ignore abort errors - these are expected when component unmounts
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadAndPoll = async () => {
-      try {
-        const data = await fetchActivityFeed();
-        setEvents(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+    const abortController = new AbortController();
+
+    // Initial load
+    loadAndPollRef.current?.(abortController.signal);
+
+    // Poll every 5 seconds
+    intervalRef.current = window.setInterval(() => {
+      loadAndPollRef.current?.(abortController.signal);
+    }, 5000);
+
+    return () => {
+      abortController.abort();
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-
-    loadAndPoll(); // Initial load
-    const interval = setInterval(loadAndPoll, 5000); // Poll every 5 seconds
-
-    return () => clearInterval(interval);
   }, []);
 
   return (

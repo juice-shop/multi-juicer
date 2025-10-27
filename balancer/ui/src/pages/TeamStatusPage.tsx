@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -107,15 +107,17 @@ const PasscodeResetButton = ({ team }: { team: string }) => {
 };
 
 async function fetchTeamStatusData(
-  lastSeen: Date | null
+  lastSeen: Date | null,
+  signal?: AbortSignal
 ): Promise<TeamStatusResponse | null> {
   let response: Response;
   if (lastSeen) {
     response = await fetch(
-      `/balancer/api/teams/status?wait-for-update-after=${lastSeen.toISOString()}`
+      `/balancer/api/teams/status?wait-for-update-after=${lastSeen.toISOString()}`,
+      { signal }
     );
   } else {
-    response = await fetch("/balancer/api/teams/status");
+    response = await fetch("/balancer/api/teams/status", { signal });
   }
   if (!response.ok) {
     throw new Error("Failed to fetch current teams");
@@ -141,14 +143,26 @@ export const TeamStatusPage = ({
 
   const passcode: string | null = state?.passcode || null;
 
-  let timeout: number | null = null;
-  async function updateStatusData(lastSuccessfulUpdate: Date | null) {
+  const timeoutRef = useRef<number | null>(null);
+
+  const updateStatusDataRef = useRef<
+    | ((
+        lastSuccessfulUpdate: Date | null,
+        signal: AbortSignal
+      ) => Promise<void>)
+    | null
+  >(null);
+
+  updateStatusDataRef.current = async (
+    lastSuccessfulUpdate: Date | null,
+    signal: AbortSignal
+  ) => {
     try {
-      const status = await fetchTeamStatusData(lastSuccessfulUpdate);
+      const status = await fetchTeamStatusData(lastSuccessfulUpdate, signal);
       if (status === null) {
         // no update available restarting polling with slight delay to not accidentally dos the server
-        timeout = window.setTimeout(
-          () => updateStatusData(lastSuccessfulUpdate),
+        timeoutRef.current = window.setTimeout(
+          () => updateStatusDataRef.current?.(lastSuccessfulUpdate, signal),
           1000
         );
         return;
@@ -156,17 +170,29 @@ export const TeamStatusPage = ({
       setInstanceStatus(status);
       setActiveTeam(status.name);
       const waitTime = status.readiness ? 5000 : 1000; // poll faster when not ready, as the instance is starting and we want to show the user the status as soon as possible
-      timeout = window.setTimeout(() => updateStatusData(new Date()), waitTime);
+      timeoutRef.current = window.setTimeout(
+        () => updateStatusDataRef.current?.(new Date(), signal),
+        waitTime
+      );
     } catch (err) {
+      // Ignore abort errors - these are expected when component unmounts
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       console.error("Failed to fetch current teams!", err);
     }
-  }
+  };
 
   useEffect(() => {
-    updateStatusData(null);
+    const abortController = new AbortController();
+
+    updateStatusDataRef.current?.(null, abortController.signal);
+
     return () => {
-      if (timeout !== null) {
-        clearTimeout(timeout);
+      abortController.abort();
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, [team]);
