@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.14",
+    "@tailwindcss/postcss": "^4.1.16",
     "dompurify": "^3.3.0",
     "motion": "^12.23.24",
     "promise-retry": "^2.0.1",
@@ -21,9 +21,9 @@
     "@testing-library/react": "^16.3.0",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.2",
-    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.39.0",
-    "@vitejs/plugin-react": "^5.0.4",
+    "@vitejs/plugin-react": "^5.1.0",
     "eslint": "^9.38.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
@@ -32,7 +32,7 @@
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
-    "vite": "^7.1.11",
+    "vite": "^7.1.12",
     "vitest": "^3.2.4"
   },
   "scripts": {
