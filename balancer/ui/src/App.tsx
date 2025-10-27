@@ -18,7 +18,6 @@ const TeamDetailPageV2 = lazy(() => import("./pages/v2/TeamDetailPageV2"));
 const ChallengeDetailPageV2 = lazy(
   () => import("./pages/v2/ChallengeDetailPageV2")
 );
-const StatisticsPageV2 = lazy(() => import("./pages/v2/StatisticsPageV2"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -86,7 +85,6 @@ function App() {
                 <Suspense fallback={<Spinner />}>
                   <Routes>
                     <Route path="/" element={<ScoreboardV2Page />} />
-                    <Route path="/statistics" element={<StatisticsPageV2 />} />
                     <Route path="/teams/:team" element={<TeamDetailPageV2 />} />
                     <Route
                       path="/challenges/:challengeKey"
