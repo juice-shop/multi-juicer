@@ -7,7 +7,7 @@ COPY go.mod go.sum ./
 # and so that source changes don't invalidate our downloaded layer
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
-COPY . .
+COPY --exclude=ui . .
 ARG TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
