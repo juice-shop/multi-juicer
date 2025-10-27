@@ -127,18 +127,27 @@ function ContextMenu({
 }
 
 function Navigation({
+  activeTeam,
   switchLanguage,
   selectedLocale,
 }: {
+  activeTeam: string | null;
   switchLanguage: (language: Language) => void;
   selectedLocale: string;
 }) {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg gap-2">
-        <NavbarPill to="/">
-          <FormattedMessage id="navigation.team" defaultMessage="Team" />
-        </NavbarPill>
+        {activeTeam && activeTeam !== "admin" && (
+          <NavbarPill to={`/teams/${activeTeam}/status`}>
+            <FormattedMessage id="navigation.team" defaultMessage="Your Team" />
+          </NavbarPill>
+        )}
+        {activeTeam && activeTeam === "admin" && (
+          <NavbarPill to="/admin">
+            <FormattedMessage id="navigation.admin" defaultMessage="Admin" />
+          </NavbarPill>
+        )}
         <NavbarPill to="/v2" activeMatchingExact={true}>
           <FormattedMessage
             id="navigation.scoreboard"
@@ -158,17 +167,20 @@ export function LayoutV2({
   children,
   switchLanguage,
   selectedLocale,
+  activeTeam,
 }: {
   children: React.ReactNode;
   switchLanguage: (language: Language) => void;
   selectedLocale: string;
   activeTeam: string | null;
 }) {
+  const primaryBackLink = activeTeam ? `/teams/${activeTeam}/status` : "/";
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
       <header>
         <Card className="p-4 flex justify-between items-center">
-          <Link to="/v2" className="flex items-center gap-3">
+          <Link to={primaryBackLink} className="flex items-center gap-3">
             <img
               src="/balancer/multi-juicer.svg"
               alt="MultiJuicer Logo"
@@ -177,6 +189,7 @@ export function LayoutV2({
           </Link>
 
           <Navigation
+            activeTeam={activeTeam}
             switchLanguage={switchLanguage}
             selectedLocale={selectedLocale}
           />
