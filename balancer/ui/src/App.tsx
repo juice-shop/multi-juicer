@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Spinner } from "./components/Spinner";
 import { Layout } from "./Layout";
-import { LayoutV2 } from "./LayoutV2";
 import { JoiningPage } from "./pages/JoiningPage";
 import { JoinPage } from "./pages/JoinPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
@@ -76,11 +75,10 @@ function App() {
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
       <BrowserRouter basename="/balancer">
         <Routes>
-          {/* --- V2 Routes with the new LayoutV2 --- */}
           <Route
-            path="/v2/*" // Match all routes starting with /v2
+            path="/v2/*"
             element={
-              <LayoutV2
+              <Layout
                 activeTeam={activeTeam}
                 switchLanguage={switchLanguage}
                 selectedLocale={locale}
@@ -96,11 +94,10 @@ function App() {
                     />
                   </Routes>
                 </Suspense>
-              </LayoutV2>
+              </Layout>
             }
           />
 
-          {/* --- V1 (Old) Routes with the old Layout --- */}
           <Route
             path="/*"
             element={
