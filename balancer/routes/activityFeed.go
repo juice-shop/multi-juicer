@@ -17,7 +17,7 @@ type ActivityEvent struct {
 	ChallengeName string    `json:"challengeName"`
 	Points        int       `json:"points"`
 	SolvedAt      time.Time `json:"solvedAt"`
-	IsFirstSolve  bool      `json:"IsFirstSolve"`
+	IsFirstSolve  bool      `json:"isFirstSolve"`
 }
 
 // BySolvedAt sorts events by their timestamp, newest first.
