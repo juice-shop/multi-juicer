@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 import { Card } from "@/components/Card";
 import { LiveActivitySidebar } from "@/components/LiveActivitySidebar";
-import { PositionDisplay } from "@/components/PositionDisplay";
 import { Spinner } from "@/components/Spinner";
 
 // Define the structure of a team's score data
@@ -37,27 +36,6 @@ async function fetchTeams(lastSeen: Date | null): Promise<TeamScore[] | null> {
   return teams;
 }
 
-// A card component for the top 3 teams
-const TopTeamCard = ({ team, rank }: { team: TeamScore; rank: number }) => (
-  <motion.div layoutId={team.name} className="w-full">
-    <Link
-      to={`/v2/teams/${team.name}`}
-      className="block hover:scale-105 transition-transform duration-200"
-    >
-      <Card className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white shadow-lg">
-        <div className="text-3xl mb-2">
-          <PositionDisplay place={rank} />
-        </div>
-        <h3 className="text-xl font-bold">{team.name}</h3>
-        <p className="text-lg">{team.score} pts</p>
-        <p className="text-sm opacity-80">
-          {team.solvedChallengeCount} challenges
-        </p>
-      </Card>
-    </Link>
-  </motion.div>
-);
-
 // A list item component for all teams in the table
 const TeamListItem = ({ team }: { team: TeamScore }) => (
   <motion.tr
@@ -65,7 +43,7 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
-    className="border-b border-gray-200 dark:border-gray-700"
+    className="border-t border-gray-600"
   >
     <td className="p-3 text-center">{team.position}</td>
     <td className="p-3">
@@ -152,40 +130,31 @@ export const ScoreboardV2Page = () => {
     );
   }
 
-  const topThree = teams.slice(0, 3);
-  // const otherTeams = teams.slice(3);
-
   return (
     <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main scoreboard content */}
       <div className="lg:col-span-2">
         <LayoutGroup>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <AnimatePresence>
-              {topThree.map((team) => (
-                <TopTeamCard key={team.name} team={team} rank={team.position} />
-              ))}
-            </AnimatePresence>
-          </div>
-
-          <Card>
-            <table className="w-full text-left">
-              <thead className="bg-gray-100 dark:bg-gray-700">
+          <Card className="overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-gray-700 dark:bg-gray-100 text-gray-100 dark:text-gray-800">
                 <tr>
-                  <th className="p-3 text-center">#</th>
-                  <th className="p-3">
+                  <th className="w-12 p-4 text-xs font-medium uppercase text-center">
+                    #
+                  </th>
+                  <th className="p-4 text-xs font-medium uppercase">
                     <FormattedMessage
                       id="v2.scoreboard.header.team"
                       defaultMessage="Team"
                     />
                   </th>
-                  <th className="p-3 text-right">
+                  <th className="p-4 text-xs font-medium uppercase text-right">
                     <FormattedMessage
                       id="v2.scoreboard.header.score"
                       defaultMessage="Score"
                     />
                   </th>
-                  <th className="p-3 text-right">
+                  <th className="p-4 text-xs font-medium uppercase text-right">
                     <FormattedMessage
                       id="v2.scoreboard.header.challenges"
                       defaultMessage="Challenges"
