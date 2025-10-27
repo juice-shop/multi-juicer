@@ -35,13 +35,14 @@ interface IndividualTeamScore
 // --- API Fetching Logic ---
 async function fetchTeamScore(
   team: string,
-  lastSeen: Date | null
+  lastSeen: Date | null,
+  signal?: AbortSignal
 ): Promise<IndividualTeamScore | null> {
   const url = lastSeen
     ? `/balancer/api/score-board/teams/${team}/score?wait-for-update-after=${lastSeen.toISOString()}`
     : `/balancer/api/score-board/teams/${team}/score`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, { signal });
 
   if (response.status === 204) {
     // No new data from long-poll
@@ -76,40 +77,69 @@ export const TeamDetailPageV2 = () => {
   const [error, setError] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null); // To manage polling timeout
 
+  // The core data fetching and polling logic
+  // Using useRef to make this function stable across re-renders
+  const updateAndPollRef = useRef<
+    | ((
+        lastSuccessfulUpdate: Date | null,
+        signal: AbortSignal
+      ) => Promise<void>)
+    | null
+  >(null);
+
+  updateAndPollRef.current = async (
+    lastSuccessfulUpdate: Date | null,
+    signal: AbortSignal
+  ) => {
+    try {
+      const lastUpdateStarted = new Date();
+      const data = await fetchTeamScore(team!, lastSuccessfulUpdate, signal);
+
+      if (data !== null) {
+        setTeamScore(data);
+      }
+      if (isLoading) setIsLoading(false); // Only set loading to false on first successful fetch
+      setError(null);
+
+      // the request is using a http long polling mechanism to get the updates as soon as possible
+      // in case the request returns immediately we wait for at least 3 seconds to ensure we aren't spamming the server
+      const waitTime = Math.max(
+        3000,
+        5000 - (Date.now() - lastUpdateStarted.getTime())
+      );
+      timeoutRef.current = window.setTimeout(() => {
+        updateAndPollRef.current?.(new Date(), signal);
+      }, waitTime);
+    } catch (err) {
+      // Ignore abort errors - these are expected when component unmounts
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
+
+      setError((err as Error).message);
+      if (isLoading) setIsLoading(false);
+
+      // Retry after a longer delay on error
+      timeoutRef.current = window.setTimeout(() => {
+        updateAndPollRef.current?.(lastSuccessfulUpdate, signal);
+      }, 5000);
+    }
+  };
+
   useEffect(() => {
     if (!team) return;
 
-    const updateAndPoll = async (lastSuccessfulUpdate: Date | null) => {
-      try {
-        const data = await fetchTeamScore(team, lastSuccessfulUpdate);
-        if (data !== null) {
-          setTeamScore(data);
-        }
-        if (isLoading) setIsLoading(false); // Only set loading to false on first successful fetch
-        setError(null);
-        // Schedule the next poll with the current time as the new "last seen"
-        timeoutRef.current = window.setTimeout(
-          () => updateAndPoll(new Date()),
-          1000
-        );
-      } catch (err) {
-        setError((err as Error).message);
-        if (isLoading) setIsLoading(false);
-        // Retry after a longer delay on error
-        timeoutRef.current = window.setTimeout(
-          () => updateAndPoll(lastSuccessfulUpdate),
-          5000
-        );
-      }
-    };
+    const abortController = new AbortController();
 
     // Start the initial fetch and polling loop
-    updateAndPoll(null);
+    updateAndPollRef.current?.(null, abortController.signal);
 
     // Cleanup function to stop polling when the component unmounts
     return () => {
-      if (timeoutRef.current) {
+      abortController.abort();
+      if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, [team]);

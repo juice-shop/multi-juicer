@@ -16,13 +16,16 @@ interface TeamScore {
 }
 
 // Function to fetch the scoreboard data from the backend
-async function fetchTeams(lastSeen: Date | null): Promise<TeamScore[] | null> {
+async function fetchTeams(
+  lastSeen: Date | null,
+  signal?: AbortSignal
+): Promise<TeamScore[] | null> {
   // Use the long-polling endpoint if we have a last-seen date
   const url = lastSeen
     ? `/balancer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
     : "/balancer/api/score-board/top";
 
-  const response = await fetch(url);
+  const response = await fetch(url, { signal });
 
   // Status 204 No Content means the long-poll timed out without new data
   if (response.status === 204) {
@@ -71,13 +74,21 @@ export const ScoreboardV2Page = () => {
   // The core data fetching and polling logic
   // Using useRef to make this function stable across re-renders
   const updateScoreDataRef = useRef<
-    ((lastSuccessfulUpdate: Date | null) => Promise<void>) | null
+    | ((
+        lastSuccessfulUpdate: Date | null,
+        signal: AbortSignal
+      ) => Promise<void>)
+    | null
   >(null);
 
-  updateScoreDataRef.current = async (lastSuccessfulUpdate: Date | null) => {
+  updateScoreDataRef.current = async (
+    lastSuccessfulUpdate: Date | null,
+    signal: AbortSignal
+  ) => {
     try {
       const lastUpdateStarted = new Date();
-      const newTeams = await fetchTeams(lastSuccessfulUpdate);
+      const newTeams = await fetchTeams(lastSuccessfulUpdate, signal);
+
       if (newTeams !== null) {
         setTeams(newTeams);
       }
@@ -91,27 +102,38 @@ export const ScoreboardV2Page = () => {
         5000 - (Date.now() - lastUpdateStarted.getTime())
       );
       timeoutRef.current = window.setTimeout(() => {
-        updateScoreDataRef.current?.(new Date());
+        updateScoreDataRef.current?.(new Date(), signal);
       }, waitTime);
     } catch (err) {
+      // Ignore abort errors - these are expected when component unmounts
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
+
       console.error("Scoreboard fetch error:", err);
+
       setIsLoading(false);
       setError("Could not load scoreboard. Retrying...");
+
       // Retry after a delay on error
       timeoutRef.current = window.setTimeout(() => {
-        updateScoreDataRef.current?.(lastSuccessfulUpdate);
+        updateScoreDataRef.current?.(lastSuccessfulUpdate, signal);
       }, 5000);
     }
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     // Start the polling when the component mounts
-    updateScoreDataRef.current?.(null);
+    updateScoreDataRef.current?.(null, abortController.signal);
 
     // Cleanup function to stop polling when the component unmounts
     return () => {
+      abortController.abort();
       if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, []); // Empty dependency array ensures this runs only once on mount

@@ -27,9 +27,13 @@ interface SolvedChallenge {
 }
 
 async function fetchScore(
-  team: string
+  team: string,
+  signal?: AbortSignal
 ): Promise<IndividualTeamScore<SolvedChallenge>> {
-  const response = await fetch(`/balancer/api/score-board/teams/${team}/score`);
+  const response = await fetch(
+    `/balancer/api/score-board/teams/${team}/score`,
+    { signal }
+  );
   const rawScore =
     (await response.json()) as IndividualTeamScore<SolvedChallengeResponse>;
   return {
@@ -53,17 +57,41 @@ export default function IndividualScorePage() {
 
   const [score, setScore] =
     useState<IndividualTeamScore<SolvedChallenge> | null>(null);
+
   useEffect(() => {
-    fetchScore(team).then(setScore);
+    const abortController = new AbortController();
+
+    fetchScore(team, abortController.signal)
+      .then((data) => {
+        setScore(data);
+      })
+      .catch((err) => {
+        // Ignore abort errors - these are expected when component unmounts
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to fetch score:", err);
+      });
 
     const timer = setInterval(() => {
-      fetchScore(team).then(setScore);
+      fetchScore(team, abortController.signal)
+        .then((data) => {
+          setScore(data);
+        })
+        .catch((err) => {
+          // Ignore abort errors - these are expected when component unmounts
+          if (err instanceof Error && err.name === "AbortError") {
+            return;
+          }
+          console.error("Failed to fetch score:", err);
+        });
     }, 5000);
 
     return () => {
+      abortController.abort();
       clearInterval(timer);
     };
-  }, []);
+  }, [team]);
 
   if (score === null) {
     return <Spinner />;

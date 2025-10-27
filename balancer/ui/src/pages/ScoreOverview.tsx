@@ -1,5 +1,5 @@
 import { LayoutGroup, LazyMotion, domMax, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 
@@ -12,11 +12,14 @@ interface Team {
   solvedChallengeCount: number;
 }
 
-async function fetchTeams(lastSeen: Date | null): Promise<null | Team[]> {
+async function fetchTeams(
+  lastSeen: Date | null,
+  signal?: AbortSignal
+): Promise<null | Team[]> {
   const url = lastSeen
     ? `/balancer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
     : "/balancer/api/score-board/top";
-  const response = await fetch(url);
+  const response = await fetch(url, { signal });
 
   if (response.status === 204) {
     return null;
@@ -33,11 +36,24 @@ export default function ScoreOverviewPage({
 }) {
   const [teams, setTeams] = useState<Team[]>([]);
 
-  let timeout: number | null = null;
-  const updateScoreData = async (lastSuccessfulUpdate: Date | null) => {
+  const timeoutRef = useRef<number | null>(null);
+
+  const updateScoreDataRef = useRef<
+    | ((
+        lastSuccessfulUpdate: Date | null,
+        signal: AbortSignal
+      ) => Promise<void>)
+    | null
+  >(null);
+
+  updateScoreDataRef.current = async (
+    lastSuccessfulUpdate: Date | null,
+    signal: AbortSignal
+  ) => {
     try {
       const lastUpdateStarted = new Date();
-      const status = await fetchTeams(lastSuccessfulUpdate);
+      const status = await fetchTeams(lastSuccessfulUpdate, signal);
+
       if (status !== null) {
         setTeams(status);
       }
@@ -48,17 +64,34 @@ export default function ScoreOverviewPage({
         3000,
         5000 - (Date.now() - lastUpdateStarted.getTime())
       );
-      timeout = window.setTimeout(() => updateScoreData(new Date()), waitTime);
+      timeoutRef.current = window.setTimeout(() => {
+        updateScoreDataRef.current?.(new Date(), signal);
+      }, waitTime);
     } catch (err) {
+      // Ignore abort errors - these are expected when component unmounts
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
+
       console.error("Failed to fetch current teams!", err);
+
+      // Retry after error
+      timeoutRef.current = window.setTimeout(() => {
+        updateScoreDataRef.current?.(lastSuccessfulUpdate, signal);
+      }, 5000);
     }
   };
 
   useEffect(() => {
-    updateScoreData(null);
+    const abortController = new AbortController();
+
+    updateScoreDataRef.current?.(null, abortController.signal);
+
     return () => {
-      if (timeout !== null) {
-        clearTimeout(timeout);
+      abortController.abort();
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, []);
