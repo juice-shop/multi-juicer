@@ -2,8 +2,7 @@ default values render correctly:
   1: |
     apiVersion: v1
     data:
-      config.json: |2
-
+      config.json: |
         {
           "cookie": {
             "name": "balancer",
@@ -57,7 +56,7 @@ default values render correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v18.0.0",
+            "tag": "v19.0.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -96,7 +95,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: ae6c75780bdd2f4e11c6d0bcd271d447d2516833e48799ff75ec8ef5a9b94625
+            checksum/config: 67e788af8d986a264e6f35e575250e5637ae32bc8fdaec7981828be3598681d8
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -381,7 +380,7 @@ default values render correctly:
   12: |
     apiVersion: v1
     data:
-      multi-juicer.yaml: |2-
+      multi-juicer.yaml: |-
         application:
           favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
@@ -547,8 +546,7 @@ full values render out correctly:
   2: |
     apiVersion: v1
     data:
-      config.json: |2
-
+      config.json: |
         {
           "cookie": {
             "name": "balancer",
@@ -602,7 +600,7 @@ full values render out correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v18.0.0",
+            "tag": "v19.0.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -641,7 +639,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 9c025260c19e256edb35f36f0a33493d168ea96bc7d4df62c3ad21683f0a52e2
+            checksum/config: d5a5e42e7ac769e0422e881ff2bc5dfa49dcbd182bc266fa2f88307a64383202
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -2610,7 +2608,7 @@ full values render out correctly:
   17: |
     apiVersion: v1
     data:
-      multi-juicer.yaml: |2-
+      multi-juicer.yaml: |-
         application:
           favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
@@ -2795,8 +2793,7 @@ production notes work correctly:
   1: |
     apiVersion: v1
     data:
-      config.json: |2
-
+      config.json: |
         {
           "cookie": {
             "name": "balancer",
@@ -2850,7 +2847,7 @@ production notes work correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v18.0.0",
+            "tag": "v19.0.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -2889,7 +2886,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 9c025260c19e256edb35f36f0a33493d168ea96bc7d4df62c3ad21683f0a52e2
+            checksum/config: d5a5e42e7ac769e0422e881ff2bc5dfa49dcbd182bc266fa2f88307a64383202
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -3174,7 +3171,7 @@ production notes work correctly:
   12: |
     apiVersion: v1
     data:
-      multi-juicer.yaml: |2-
+      multi-juicer.yaml: |-
         application:
           favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
