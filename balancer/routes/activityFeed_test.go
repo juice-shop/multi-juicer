@@ -66,7 +66,7 @@ func TestActivityFeedHandler(t *testing.T) {
 		AddRoutes(server, bundle, scoringService)
 
 		// --- Test Execution ---
-		req, _ := http.NewRequest("GET", "/balancer/api/v2/activity-feed", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/activity-feed", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -118,7 +118,7 @@ func TestActivityFeedHandler(t *testing.T) {
 		server := http.NewServeMux()
 		AddRoutes(server, bundle, scoringService)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/v2/activity-feed", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/activity-feed", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -146,7 +146,7 @@ func TestActivityFeedHandler(t *testing.T) {
 		server := http.NewServeMux()
 		AddRoutes(server, bundle, scoringService)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/v2/activity-feed", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/activity-feed", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 

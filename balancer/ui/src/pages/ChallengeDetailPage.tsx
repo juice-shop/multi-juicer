@@ -36,7 +36,7 @@ async function fetchChallengeDetails(
   challengeKey: string,
   signal?: AbortSignal
 ): Promise<ChallengeDetailData> {
-  const response = await fetch(`/balancer/api/v2/challenges/${challengeKey}`, {
+  const response = await fetch(`/balancer/api/challenges/${challengeKey}`, {
     signal,
   });
   if (!response.ok) {
@@ -58,7 +58,7 @@ async function fetchChallengeDetails(
 }
 
 // --- Main Component ---
-export const ChallengeDetailPageV2 = () => {
+export const ChallengeDetailPage = () => {
   const { challengeKey } = useParams<{ challengeKey: string }>();
   const [challengeData, setChallengeData] =
     useState<ChallengeDetailData | null>(null);
@@ -103,7 +103,7 @@ export const ChallengeDetailPageV2 = () => {
         <Spinner />
         <p>
           <FormattedMessage
-            id="v2.challenge_detail.loading"
+            id="challenge_detail.loading"
             defaultMessage="Loading Challenge Details..."
           />
         </p>
@@ -120,7 +120,7 @@ export const ChallengeDetailPageV2 = () => {
       <p className="text-red-500">
         {error ? (
           <FormattedMessage
-            id={`v2.challenge_detail.error.${error}`}
+            id={`challenge_detail.error.${error}`}
             defaultMessage={defaultMessage}
           />
         ) : (
@@ -162,14 +162,14 @@ export const ChallengeDetailPageV2 = () => {
       <Card>
         <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
           <FormattedMessage
-            id="v2.challenge_detail.solves_title"
+            id="challenge_detail.solves_title"
             defaultMessage="Solves"
           />
         </h2>
         {challengeData.solves.length === 0 ? (
           <p className="p-4 text-gray-500">
             <FormattedMessage
-              id="v2.challenge_detail.no_one_solved"
+              id="challenge_detail.no_one_solved"
               defaultMessage="No one has solved this challenge yet."
             />
           </p>
@@ -180,13 +180,13 @@ export const ChallengeDetailPageV2 = () => {
                 <th className="p-3 text-center">#</th>
                 <th className="p-3">
                   <FormattedMessage
-                    id="v2.challenge_detail.header.team"
+                    id="challenge_detail.header.team"
                     defaultMessage="Team"
                   />
                 </th>
                 <th className="p-3 text-right">
                   <FormattedMessage
-                    id="v2.challenge_detail.header.solved"
+                    id="challenge_detail.header.solved"
                     defaultMessage="Solved"
                   />
                 </th>
@@ -208,7 +208,7 @@ export const ChallengeDetailPageV2 = () => {
                   </td>
                   <td className="p-3">
                     <Link
-                      to={`/v2/teams/${solve.team}`}
+                      to={`/score-overview/teams/${solve.team}`}
                       className="text-blue-500 hover:underline"
                     >
                       {solve.team}
@@ -227,4 +227,4 @@ export const ChallengeDetailPageV2 = () => {
   );
 };
 
-export default ChallengeDetailPageV2;
+export default ChallengeDetailPage;

@@ -11,13 +11,9 @@ import { TeamStatusPage } from "./pages/TeamStatusPage";
 import { MessageLoader } from "./translations/index";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverview"));
-const IndividualScorePage = lazy(() => import("./pages/IndividualScorePage"));
-const ScoreboardV2Page = lazy(() => import("./pages/v2/ScoreboardV2Page"));
-const TeamDetailPageV2 = lazy(() => import("./pages/v2/TeamDetailPageV2"));
-const ChallengeDetailPageV2 = lazy(
-  () => import("./pages/v2/ChallengeDetailPageV2")
-);
+const ScoreboardPage = lazy(() => import("./pages/ScoreboardPage"));
+const TeamDetailPage = lazy(() => import("./pages/TeamDetailPage"));
+const ChallengeDetailPage = lazy(() => import("./pages/ChallengeDetailPage"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -75,28 +71,6 @@ function App() {
       <BrowserRouter basename="/balancer">
         <Routes>
           <Route
-            path="/v2/*"
-            element={
-              <Layout
-                activeTeam={activeTeam}
-                switchLanguage={switchLanguage}
-                selectedLocale={locale}
-              >
-                <Suspense fallback={<Spinner />}>
-                  <Routes>
-                    <Route path="/" element={<ScoreboardV2Page />} />
-                    <Route path="/teams/:team" element={<TeamDetailPageV2 />} />
-                    <Route
-                      path="/challenges/:challengeKey"
-                      element={<ChallengeDetailPageV2 />}
-                    />
-                  </Routes>
-                </Suspense>
-              </Layout>
-            }
-          />
-
-          <Route
             path="/*"
             element={
               <Layout
@@ -125,12 +99,16 @@ function App() {
                       element={<JoiningPage setActiveTeam={setActiveTeam} />}
                     />
                     <Route
-                      path="/score-overview/"
-                      element={<ScoreOverviewPage activeTeam={activeTeam} />}
+                      path="/score-overview"
+                      element={<ScoreboardPage />}
                     />
                     <Route
                       path="/score-overview/teams/:team"
-                      element={<IndividualScorePage />}
+                      element={<TeamDetailPage />}
+                    />
+                    <Route
+                      path="/score-overview/challenges/:challengeKey"
+                      element={<ChallengeDetailPage />}
                     />
                   </Routes>
                 </Suspense>

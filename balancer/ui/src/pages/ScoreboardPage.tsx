@@ -51,7 +51,7 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
     <td className="p-3 text-center">{team.position}</td>
     <td className="p-3">
       <Link
-        to={`/v2/teams/${team.name}`}
+        to={`/score-overview/teams/${team.name}`}
         className="text-blue-500 hover:underline"
       >
         {team.name}
@@ -63,7 +63,7 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
 );
 
 // The main scoreboard page component
-export const ScoreboardV2Page = () => {
+export const ScoreboardPage = () => {
   const [teams, setTeams] = useState<TeamScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -144,7 +144,7 @@ export const ScoreboardV2Page = () => {
         <Spinner />
         <p>
           <FormattedMessage
-            id="v2.scoreboard.loading"
+            id="scoreboard.loading"
             defaultMessage="Loading Scoreboard..."
           />
         </p>
@@ -156,7 +156,7 @@ export const ScoreboardV2Page = () => {
     return (
       <p className="text-red-500">
         <FormattedMessage
-          id="v2.scoreboard.error"
+          id="scoreboard.error"
           defaultMessage="Could not load scoreboard. Retrying..."
         />
       </p>
@@ -177,19 +177,19 @@ export const ScoreboardV2Page = () => {
                   </th>
                   <th className="p-4 text-xs font-medium uppercase">
                     <FormattedMessage
-                      id="v2.scoreboard.header.team"
+                      id="scoreboard.header.team"
                       defaultMessage="Team"
                     />
                   </th>
                   <th className="p-4 text-xs font-medium uppercase text-right">
                     <FormattedMessage
-                      id="v2.scoreboard.header.score"
+                      id="scoreboard.header.score"
                       defaultMessage="Score"
                     />
                   </th>
                   <th className="p-4 text-xs font-medium uppercase text-right">
                     <FormattedMessage
-                      id="v2.scoreboard.header.challenges"
+                      id="scoreboard.header.challenges"
                       defaultMessage="Challenges"
                     />
                   </th>
@@ -215,4 +215,4 @@ export const ScoreboardV2Page = () => {
   );
 };
 
-export default ScoreboardV2Page;
+export default ScoreboardPage;

@@ -148,10 +148,10 @@ function Navigation({
             <FormattedMessage id="navigation.admin" defaultMessage="Admin" />
           </NavbarPill>
         )}
-        <NavbarPill to="/v2" activeMatchingExact={true}>
+        <NavbarPill to="/score-overview" activeMatchingExact={true}>
           <FormattedMessage
             id="navigation.scoreboard"
-            defaultMessage="ScoreBoard"
+            defaultMessage="Score Overview"
           />
         </NavbarPill>
       </div>

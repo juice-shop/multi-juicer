@@ -69,7 +69,7 @@ async function fetchTeamScore(
 }
 
 // --- Main Component ---
-export const TeamDetailPageV2 = () => {
+export const TeamDetailPage = () => {
   const { team } = useParams<{ team: string }>();
   const intl = useIntl();
   const [teamScore, setTeamScore] = useState<IndividualTeamScore | null>(null);
@@ -150,7 +150,7 @@ export const TeamDetailPageV2 = () => {
         <Spinner />
         <p>
           <FormattedMessage
-            id="v2.team_detail.loading"
+            id="team_detail.loading"
             defaultMessage="Loading Team Details..."
           />
         </p>
@@ -167,7 +167,7 @@ export const TeamDetailPageV2 = () => {
       <p className="text-red-500">
         {error ? (
           <FormattedMessage
-            id={`v2.team_detail.error.${error}`}
+            id={`team_detail.error.${error}`}
             defaultMessage={defaultMessage}
           />
         ) : (
@@ -188,7 +188,7 @@ export const TeamDetailPageV2 = () => {
             <h1 className="text-3xl font-bold">{teamScore.name}</h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               <FormattedMessage
-                id="v2.team_detail.rank"
+                id="team_detail.rank"
                 defaultMessage="Rank {position} of {totalTeams}"
                 values={{
                   position: teamScore.position,
@@ -203,14 +203,14 @@ export const TeamDetailPageV2 = () => {
       <Card>
         <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
           <FormattedMessage
-            id="v2.team_detail.solved_challenges"
+            id="team_detail.solved_challenges"
             defaultMessage="Solved Challenges"
           />
         </h2>
         {teamScore.solvedChallenges.length === 0 ? (
           <p className="p-4 text-gray-500">
             <FormattedMessage
-              id="v2.team_detail.no_solves"
+              id="team_detail.no_solves"
               defaultMessage="No challenges solved yet."
             />
           </p>
@@ -220,19 +220,19 @@ export const TeamDetailPageV2 = () => {
               <tr className="bg-gray-50 dark:bg-gray-700">
                 <th className="p-3">
                   <FormattedMessage
-                    id="v2.team_detail.header.challenge"
+                    id="team_detail.header.challenge"
                     defaultMessage="Challenge"
                   />
                 </th>
                 <th className="p-3 text-center">
                   <FormattedMessage
-                    id="v2.team_detail.header.difficulty"
+                    id="team_detail.header.difficulty"
                     defaultMessage="Difficulty"
                   />
                 </th>
                 <th className="p-3 text-right">
                   <FormattedMessage
-                    id="v2.team_detail.header.solved"
+                    id="team_detail.header.solved"
                     defaultMessage="Solved"
                   />
                 </th>
@@ -246,7 +246,7 @@ export const TeamDetailPageV2 = () => {
                 >
                   <td className="p-3">
                     <Link
-                      to={`/v2/challenges/${challenge.key}`}
+                      to={`/score-overview/challenges/${challenge.key}`}
                       className="text-blue-500 hover:underline"
                     >
                       {challenge.name}
@@ -288,4 +288,4 @@ export const TeamDetailPageV2 = () => {
   );
 };
 
-export default TeamDetailPageV2;
+export default TeamDetailPage;

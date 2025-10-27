@@ -61,7 +61,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 	// --- Test Cases ---
 
 	t.Run("should return solvers in chronological order (First Solve first)", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/v2/challenges/%s", solvedChallengeKey), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/challenges/%s", solvedChallengeKey), nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -81,7 +81,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 
 	t.Run("should return an empty solves array for a challenge with no solves", func(t *testing.T) {
 		// We query for `anotherChallengeKey` which exists in the test bundle but no team has solved it.
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/v2/challenges/%s", anotherChallengeKey), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/challenges/%s", anotherChallengeKey), nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -96,7 +96,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 	})
 
 	t.Run("should return 404 for a non-existent challenge", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/v2/challenges/this-challenge-does-not-exist", nil)
+		req, _ := http.NewRequest("GET", "/balancer/api/challenges/this-challenge-does-not-exist", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 

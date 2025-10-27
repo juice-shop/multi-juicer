@@ -22,7 +22,7 @@ interface ActivityEvent {
 async function fetchActivityFeed(
   signal?: AbortSignal
 ): Promise<ActivityEvent[]> {
-  const response = await fetch("/balancer/api/v2/activity-feed", { signal });
+  const response = await fetch("/balancer/api/activity-feed", { signal });
   if (!response.ok) {
     throw new Error("Failed to fetch activity feed");
   }
@@ -57,14 +57,14 @@ const EventItem = ({
 
       <p className="text-sm">
         <Link
-          to={`/v2/teams/${event.team}`}
+          to={`/score-overview/teams/${event.team}`}
           className="font-bold hover:underline"
         >
           {event.team}
         </Link>{" "}
         <FormattedMessage id="activity.solved" defaultMessage="solved" />{" "}
         <Link
-          to={`/v2/challenges/${event.challengeKey}`}
+          to={`/score-overview/challenges/${event.challengeKey}`}
           className="font-bold hover:underline"
         >
           {event.challengeName}
