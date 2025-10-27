@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 import { Card } from "@/components/Card";
 import { LiveActivitySidebar } from "@/components/LiveActivitySidebar";
+import { PositionDisplay } from "@/components/PositionDisplay";
 import { Spinner } from "@/components/Spinner";
 
 // Define the structure of a team's score data
@@ -48,7 +49,9 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
     exit={{ opacity: 0 }}
     className="border-t border-gray-600"
   >
-    <td className="p-3 text-center">{team.position}</td>
+    <td className="p-3 text-center">
+      <PositionDisplay place={team.position} />
+    </td>
     <td className="p-3">
       <Link
         to={`/score-overview/teams/${team.name}`}
