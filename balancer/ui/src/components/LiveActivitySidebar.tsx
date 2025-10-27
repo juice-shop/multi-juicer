@@ -50,7 +50,7 @@ const EventItem = ({
       ></div>
       {/* Timeline Vertical Line */}
       {!isLast && (
-        <div className="absolute left-[5px] top-[18px] h-full w-px bg-orange-500"></div>
+        <div className="absolute left-[6px] top-[18px] h-full w-px bg-orange-500"></div>
       )}
 
       <p className="text-sm">
