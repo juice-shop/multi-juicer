@@ -69,37 +69,48 @@ export const ScoreboardV2Page = () => {
   const timeoutRef = useRef<number | null>(null);
 
   // The core data fetching and polling logic
-  const updateScoreData = async (lastSuccessfulUpdate: Date | null) => {
+  // Using useRef to make this function stable across re-renders
+  const updateScoreDataRef = useRef<
+    ((lastSuccessfulUpdate: Date | null) => Promise<void>) | null
+  >(null);
+
+  updateScoreDataRef.current = async (lastSuccessfulUpdate: Date | null) => {
     try {
+      const lastUpdateStarted = new Date();
       const newTeams = await fetchTeams(lastSuccessfulUpdate);
       if (newTeams !== null) {
         setTeams(newTeams);
       }
       setIsLoading(false);
       setError(null);
-      // Schedule the next poll
-      timeoutRef.current = window.setTimeout(
-        () => updateScoreData(new Date()),
-        1000
+
+      // the request is using a http long polling mechanism to get the updates as soon as possible
+      // in case the request returns immediately we wait for at least 3 seconds to ensure we aren't spamming the server
+      const waitTime = Math.max(
+        3000,
+        5000 - (Date.now() - lastUpdateStarted.getTime())
       );
+      timeoutRef.current = window.setTimeout(() => {
+        updateScoreDataRef.current?.(new Date());
+      }, waitTime);
     } catch (err) {
       console.error("Scoreboard fetch error:", err);
+      setIsLoading(false);
       setError("Could not load scoreboard. Retrying...");
       // Retry after a delay on error
-      timeoutRef.current = window.setTimeout(
-        () => updateScoreData(lastSuccessfulUpdate),
-        5000
-      );
+      timeoutRef.current = window.setTimeout(() => {
+        updateScoreDataRef.current?.(lastSuccessfulUpdate);
+      }, 5000);
     }
   };
 
   useEffect(() => {
     // Start the polling when the component mounts
-    updateScoreData(null);
+    updateScoreDataRef.current?.(null);
 
     // Cleanup function to stop polling when the component unmounts
     return () => {
-      if (timeoutRef.current) {
+      if (timeoutRef.current !== null) {
         clearTimeout(timeoutRef.current);
       }
     };

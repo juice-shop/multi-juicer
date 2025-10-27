@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/juice-shop/multi-juicer/progress-watchdog/internal"
 
@@ -103,7 +104,16 @@ func main() {
 			}
 		}
 
-		challengeStatus = append(challengeStatus, internal.ChallengeStatus{Key: webhook.Solution.Challenge, SolvedAt: webhook.Solution.IssuedOn})
+		// Parse and normalize the timestamp to UTC to ensure consistency
+		solvedAtTime, err := time.Parse(time.RFC3339, webhook.Solution.IssuedOn)
+		if err != nil {
+			logger.Printf("Warning: Failed to parse timestamp '%s', using current time in UTC: %v", webhook.Solution.IssuedOn, err)
+			solvedAtTime = time.Now().UTC()
+		}
+		// Always store timestamps in UTC with RFC3339 format
+		solvedAtUTC := solvedAtTime.UTC().Format(time.RFC3339)
+
+		challengeStatus = append(challengeStatus, internal.ChallengeStatus{Key: webhook.Solution.Challenge, SolvedAt: solvedAtUTC})
 		sort.Stable(challengeStatus)
 
 		internal.PersistProgress(clientset, team, challengeStatus)

@@ -98,10 +98,19 @@ func (s *ScoringService) GetTopScores() []*TeamScore {
 	return s.currentScoresSorted
 }
 
+func (s *ScoringService) GetTopScoresWithTimestamp() ([]*TeamScore, time.Time) {
+	return s.currentScoresSorted, s.lastUpdate
+}
+
 func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore {
+	scores, _ := s.WaitForUpdatesNewerThanWithTimestamp(ctx, lastSeenUpdate)
+	return scores
+}
+
+func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Context, lastSeenUpdate time.Time) ([]*TeamScore, time.Time) {
 	if s.lastUpdate.After(lastSeenUpdate) {
 		// the last update was after the last seen update, so we can return the current scores without waiting
-		return s.currentScoresSorted
+		return s.currentScoresSorted, s.lastUpdate
 	}
 
 	const maxWaitTime = 25 * time.Second
@@ -114,14 +123,14 @@ func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUp
 		select {
 		case <-ticker.C:
 			if s.lastUpdate.After(lastSeenUpdate) {
-				return s.currentScoresSorted
+				return s.currentScoresSorted, s.lastUpdate
 			}
 		case <-timeout.C:
 			// Timeout was reached
-			return nil
+			return nil, time.Time{}
 		case <-ctx.Done():
 			// Context was canceled
-			return nil
+			return nil, time.Time{}
 		}
 	}
 }

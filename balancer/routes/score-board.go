@@ -25,6 +25,7 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			var totalTeams []*scoring.TeamScore
+			var lastUpdateTime time.Time
 
 			if req.URL.Query().Get("wait-for-update-after") != "" {
 				lastSeenUpdate, err := time.Parse(time.RFC3339, req.URL.Query().Get("wait-for-update-after"))
@@ -32,14 +33,14 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 					http.Error(responseWriter, "Invalid time format", http.StatusBadRequest)
 					return
 				}
-				totalTeams = scoringService.WaitForUpdatesNewerThan(req.Context(), lastSeenUpdate)
+				totalTeams, lastUpdateTime = scoringService.WaitForUpdatesNewerThanWithTimestamp(req.Context(), lastSeenUpdate)
 				if totalTeams == nil {
 					responseWriter.WriteHeader(http.StatusNoContent)
 					responseWriter.Write([]byte{})
 					return
 				}
 			} else {
-				totalTeams = scoringService.GetTopScores()
+				totalTeams, lastUpdateTime = scoringService.GetTopScoresWithTimestamp()
 			}
 			var topTeams []*scoring.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
@@ -72,6 +73,8 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 			}
 
 			responseWriter.Header().Set("Content-Type", "application/json")
+			responseWriter.Header().Set("Last-Modified", lastUpdateTime.UTC().Format(time.RFC1123))
+			responseWriter.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339))
 			responseWriter.WriteHeader(http.StatusOK)
 			responseWriter.Write(responseBytes)
 		},
