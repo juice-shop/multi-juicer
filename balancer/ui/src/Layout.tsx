@@ -190,6 +190,57 @@ function LogoutMenuItem({
   );
 }
 
+function ContextMenuContent({
+  switchLanguage,
+  selectedLocale,
+  setActiveTeam,
+  activeTeam,
+  close,
+}: {
+  switchLanguage: (language: Language) => void;
+  selectedLocale: string;
+  setActiveTeam: (team: string | null) => void;
+  activeTeam: string | null;
+  close: () => void;
+}) {
+  return (
+    <div>
+      <div className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+        <span role="img" aria-label="globe">
+          🌐
+        </span>{" "}
+        <FormattedMessage
+          id="change_language"
+          defaultMessage="Change Language"
+        />
+      </div>
+      <div className="py-1">
+        {availableLanguages.map((language) => (
+          <LanguageMenuItem
+            key={language.key}
+            language={language}
+            isSelected={selectedLocale === language.key}
+            onSelect={switchLanguage}
+          />
+        ))}
+      </div>
+      {activeTeam && activeTeam !== "admin" && (
+        <>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+          <div className="py-1">
+            <PasscodeResetMenuItem activeTeam={activeTeam} closeMenu={close} />
+            <LogoutMenuItem
+              setActiveTeam={setActiveTeam}
+              activeTeam={activeTeam}
+              closeMenu={close}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function ContextMenu({
   switchLanguage,
   selectedLocale,
@@ -234,45 +285,15 @@ function ContextMenu({
       position="bottom right"
       closeOnDocumentClick
     >
-      {((close: () => void) => (
-        <div>
-          <div className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-            <span role="img" aria-label="globe">
-              🌐
-            </span>{" "}
-            <FormattedMessage
-              id="change_language"
-              defaultMessage="Change Language"
-            />
-          </div>
-          <div className="py-1">
-            {availableLanguages.map((language) => (
-              <LanguageMenuItem
-                key={language.key}
-                language={language}
-                isSelected={selectedLocale === language.key}
-                onSelect={switchLanguage}
-              />
-            ))}
-          </div>
-          {activeTeam && activeTeam !== "admin" && (
-            <>
-              <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-              <div className="py-1">
-                <PasscodeResetMenuItem
-                  activeTeam={activeTeam}
-                  closeMenu={close}
-                />
-                <LogoutMenuItem
-                  setActiveTeam={setActiveTeam}
-                  activeTeam={activeTeam}
-                  closeMenu={close}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      )) as any}
+      {(close: () => void) => (
+        <ContextMenuContent
+          switchLanguage={switchLanguage}
+          selectedLocale={selectedLocale}
+          setActiveTeam={setActiveTeam}
+          activeTeam={activeTeam}
+          close={close}
+        />
+      )}
     </Popup>
   );
 }
