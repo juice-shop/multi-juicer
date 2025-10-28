@@ -101,7 +101,7 @@ function App() {
                     />
                     <Route
                       path="/score-overview"
-                      element={<ScoreOverviewPage />}
+                      element={<ScoreOverviewPage activeTeam={activeTeam} />}
                     />
                     <Route
                       path="/score-overview/teams/:team"

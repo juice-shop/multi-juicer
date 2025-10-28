@@ -41,7 +41,13 @@ async function fetchTeams(
 }
 
 // A list item component for all teams in the table
-const TeamListItem = ({ team }: { team: TeamScore }) => (
+const TeamListItem = ({
+  team,
+  isActiveTeam,
+}: {
+  team: TeamScore;
+  isActiveTeam: boolean;
+}) => (
   <motion.tr
     layoutId={team.name}
     initial={{ opacity: 0 }}
@@ -52,7 +58,7 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
     <td className="p-3 text-center">
       <PositionDisplay place={team.position} />
     </td>
-    <td className="p-3">
+    <td className={`p-3 ${isActiveTeam ? "font-bold" : ""}`}>
       <Link
         to={`/score-overview/teams/${team.name}`}
         className="text-blue-500 hover:underline"
@@ -60,12 +66,20 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
         {team.name}
       </Link>
     </td>
-    <td className="p-3 text-right">{team.score}</td>
-    <td className="p-3 text-right">{team.solvedChallengeCount}</td>
+    <td className={`p-3 text-right ${isActiveTeam ? "font-bold" : ""}`}>
+      {team.score}
+    </td>
+    <td className={`p-3 text-right ${isActiveTeam ? "font-bold" : ""}`}>
+      {team.solvedChallengeCount}
+    </td>
   </motion.tr>
 );
 
-export const ScoreOverviewPage = () => {
+export const ScoreOverviewPage = ({
+  activeTeam,
+}: {
+  activeTeam: string | null;
+}) => {
   const [teams, setTeams] = useState<TeamScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -199,7 +213,11 @@ export const ScoreOverviewPage = () => {
               <tbody>
                 <AnimatePresence>
                   {teams.map((team) => (
-                    <TeamListItem key={team.name} team={team} />
+                    <TeamListItem
+                      key={team.name}
+                      team={team}
+                      isActiveTeam={team.name === activeTeam}
+                    />
                   ))}
                 </AnimatePresence>
               </tbody>
