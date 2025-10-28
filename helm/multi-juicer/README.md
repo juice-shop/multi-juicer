@@ -20,10 +20,11 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 |-----|------|---------|-------------|
 | balancer.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | balancer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
+| balancer.contentSecurityPolicy | string | `"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"` | Content Security Policy header configuration for index.html responses. Set to empty string to disable CSP header. |
 | balancer.cookie.cookieParserSecret | string | `nil` | Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again. |
 | balancer.cookie.name | string | `"balancer"` | Changes the cookies name used to identify teams. |
 | balancer.cookie.secure | bool | `false` | Sets the secure attribute on cookie so that it only be send over https |
-| balancer.metrics.dashboards.enabled | bool | `false` | if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/helm/charts/tree/main/stable/grafana#sidecar-for-dashboards |
+| balancer.metrics.dashboards.enabled | bool | `false` | if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-datasources |
 | balancer.metrics.serviceMonitor.enabled | bool | `false` | If true, creates a Prometheus Operator ServiceMonitor. This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances |
 | balancer.metrics.serviceMonitor.labels | object | `{}` | If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name> |
 | balancer.pod.annotations | object | `{}` | Optional Additional annotations for the balancer pods. |
@@ -57,7 +58,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | config.juiceShop.resources | object | `{"requests":{"cpu":"150m","memory":"300Mi"}}` | Optional resources definitions to set for each JuiceShop instance |
 | config.juiceShop.runtimeClassName | string | `nil` | Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/) |
-| config.juiceShop.tag | string | `"v17.2.0"` |  |
+| config.juiceShop.tag | string | `"v19.0.0"` |  |
 | config.juiceShop.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | config.juiceShop.volumeMounts | list | `[]` | Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | config.juiceShop.volumes | list | `[]` | Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
