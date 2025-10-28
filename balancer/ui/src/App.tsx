@@ -11,7 +11,7 @@ import { TeamStatusPage } from "./pages/TeamStatusPage";
 import { MessageLoader } from "./translations/index";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-const ScoreboardPage = lazy(() => import("./pages/ScoreboardPage"));
+const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverviewPage"));
 const TeamDetailPage = lazy(() => import("./pages/TeamDetailPage"));
 const ChallengeDetailPage = lazy(() => import("./pages/ChallengeDetailPage"));
 
@@ -100,7 +100,7 @@ function App() {
                     />
                     <Route
                       path="/score-overview"
-                      element={<ScoreboardPage />}
+                      element={<ScoreOverviewPage />}
                     />
                     <Route
                       path="/score-overview/teams/:team"

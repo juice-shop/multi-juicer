@@ -65,8 +65,7 @@ const TeamListItem = ({ team }: { team: TeamScore }) => (
   </motion.tr>
 );
 
-// The main scoreboard page component
-export const ScoreboardPage = () => {
+export const ScoreOverviewPage = () => {
   const [teams, setTeams] = useState<TeamScore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -168,7 +167,6 @@ export const ScoreboardPage = () => {
 
   return (
     <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Main scoreboard content */}
       <div className="lg:col-span-2">
         <LayoutGroup>
           <Card className="overflow-hidden">
@@ -210,7 +208,6 @@ export const ScoreboardPage = () => {
         </LayoutGroup>
       </div>
 
-      {/* Sidebar */}
       <div className="lg:col-span-1">
         <LiveActivitySidebar />
       </div>
@@ -218,4 +215,4 @@ export const ScoreboardPage = () => {
   );
 };
 
-export default ScoreboardPage;
+export default ScoreOverviewPage;
