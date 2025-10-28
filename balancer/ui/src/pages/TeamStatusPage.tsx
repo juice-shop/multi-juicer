@@ -17,56 +17,6 @@ interface TeamStatusResponse {
   readiness: boolean;
 }
 
-function LogoutButton({
-  setActiveTeam,
-}: {
-  setActiveTeam: (team: string | null) => void;
-}) {
-  const navigate = useNavigate();
-  const intl = useIntl();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  async function logout() {
-    const confirmed = confirm(
-      intl.formatMessage({
-        id: "logout_confirmation",
-        defaultMessage:
-          "Are you sure you want to logout? If you don't have the passcode saved, you won't be able to rejoin.",
-      })
-    );
-    if (!confirmed) {
-      return;
-    }
-    try {
-      setActiveTeam(null);
-      setIsLoggingOut(true);
-      await fetch("/balancer/api/teams/logout", {
-        method: "POST",
-      });
-      setIsLoggingOut(false);
-      toast.success(
-        intl.formatMessage({
-          id: "logout_success",
-          defaultMessage: "Logged out successfully",
-        })
-      );
-      navigate("/");
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  }
-
-  return (
-    <button
-      disabled={isLoggingOut}
-      onClick={logout}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
-    >
-      <FormattedMessage id="log_out" defaultMessage="Log Out" />
-    </button>
-  );
-}
-
 const PasscodeResetButton = ({ team }: { team: string }) => {
   const navigate = useNavigate();
   const intl = useIntl();
@@ -228,8 +178,7 @@ export const TeamStatusPage = ({
               </p>
             </div>
           </div>
-          <div className="flex flex-row-reverse items-center p-4 gap-3">
-            <LogoutButton setActiveTeam={setActiveTeam} />
+          <div className="flex flex-row-reverse items-center p-4">
             <PasscodeResetButton team={team} />
           </div>
         </div>

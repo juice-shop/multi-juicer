@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
-import { Link, NavLink } from "react-router-dom";
+import { ReactNode, useState } from "react";
+import toast from "react-hot-toast";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import Popup from "reactjs-popup";
 
 import { Card } from "./components/Card";
@@ -61,12 +62,81 @@ function LanguageMenuItem({
   );
 }
 
+function LogoutMenuItem({
+  setActiveTeam,
+  activeTeam,
+  closeMenu,
+}: {
+  setActiveTeam: (team: string | null) => void;
+  activeTeam: string | null;
+  closeMenu: () => void;
+}) {
+  const navigate = useNavigate();
+  const intl = useIntl();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function logout() {
+    const confirmed = confirm(
+      intl.formatMessage({
+        id: "logout_confirmation",
+        defaultMessage:
+          "Are you sure you want to logout? If you don't have the passcode saved, you won't be able to rejoin.",
+      })
+    );
+    if (!confirmed) {
+      return;
+    }
+    try {
+      setActiveTeam(null);
+      setIsLoggingOut(true);
+      await fetch("/balancer/api/teams/logout", {
+        method: "POST",
+      });
+      setIsLoggingOut(false);
+      toast.success(
+        intl.formatMessage({
+          id: "logout_success",
+          defaultMessage: "Logged out successfully",
+        })
+      );
+      closeMenu();
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to log out", error);
+      setIsLoggingOut(false);
+    }
+  }
+
+  if (!activeTeam || activeTeam === "admin") {
+    return null;
+  }
+
+  return (
+    <button
+      disabled={isLoggingOut}
+      onClick={logout}
+      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <span role="img" aria-label="Logout">
+        🚪
+      </span>
+      <span>
+        <FormattedMessage id="log_out" defaultMessage="Log Out" />
+      </span>
+    </button>
+  );
+}
+
 function ContextMenu({
   switchLanguage,
   selectedLocale,
+  setActiveTeam,
+  activeTeam,
 }: {
   switchLanguage: (language: Language) => void;
   selectedLocale: string;
+  setActiveTeam: (team: string | null) => void;
+  activeTeam: string | null;
 }) {
   const prefersDarkScheme =
     window?.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
@@ -101,27 +171,41 @@ function ContextMenu({
       position="bottom right"
       closeOnDocumentClick
     >
-      <div>
-        <div className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-          <span role="img" aria-label="globe">
-            🌐
-          </span>{" "}
-          <FormattedMessage
-            id="change_language"
-            defaultMessage="Change Language"
-          />
-        </div>
-        <div className="py-1">
-          {availableLanguages.map((language) => (
-            <LanguageMenuItem
-              key={language.key}
-              language={language}
-              isSelected={selectedLocale === language.key}
-              onSelect={switchLanguage}
+      {((close: () => void) => (
+        <div>
+          <div className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+            <span role="img" aria-label="globe">
+              🌐
+            </span>{" "}
+            <FormattedMessage
+              id="change_language"
+              defaultMessage="Change Language"
             />
-          ))}
+          </div>
+          <div className="py-1">
+            {availableLanguages.map((language) => (
+              <LanguageMenuItem
+                key={language.key}
+                language={language}
+                isSelected={selectedLocale === language.key}
+                onSelect={switchLanguage}
+              />
+            ))}
+          </div>
+          {activeTeam && activeTeam !== "admin" && (
+            <>
+              <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+              <div className="py-1">
+                <LogoutMenuItem
+                  setActiveTeam={setActiveTeam}
+                  activeTeam={activeTeam}
+                  closeMenu={close}
+                />
+              </div>
+            </>
+          )}
         </div>
-      </div>
+      )) as any}
     </Popup>
   );
 }
@@ -130,10 +214,12 @@ function Navigation({
   activeTeam,
   switchLanguage,
   selectedLocale,
+  setActiveTeam,
 }: {
   activeTeam: string | null;
   switchLanguage: (language: Language) => void;
   selectedLocale: string;
+  setActiveTeam: (team: string | null) => void;
 }) {
   return (
     <div className="flex items-center gap-4">
@@ -158,6 +244,8 @@ function Navigation({
       <ContextMenu
         switchLanguage={switchLanguage}
         selectedLocale={selectedLocale}
+        setActiveTeam={setActiveTeam}
+        activeTeam={activeTeam}
       />
     </div>
   );
@@ -168,11 +256,13 @@ export function Layout({
   switchLanguage,
   selectedLocale,
   activeTeam,
+  setActiveTeam,
 }: {
   children: React.ReactNode;
   switchLanguage: (language: Language) => void;
   selectedLocale: string;
   activeTeam: string | null;
+  setActiveTeam: (team: string | null) => void;
 }) {
   let primaryBackLink = "/";
   if (activeTeam === "admin") {
@@ -197,6 +287,7 @@ export function Layout({
             activeTeam={activeTeam}
             switchLanguage={switchLanguage}
             selectedLocale={selectedLocale}
+            setActiveTeam={setActiveTeam}
           />
         </Card>
       </header>

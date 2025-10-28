@@ -77,6 +77,7 @@ function App() {
                 activeTeam={activeTeam}
                 switchLanguage={switchLanguage}
                 selectedLocale={locale}
+                setActiveTeam={setActiveTeam}
               >
                 <Suspense fallback={<Spinner />}>
                   <Routes>
