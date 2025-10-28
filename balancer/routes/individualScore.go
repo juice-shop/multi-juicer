@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 )
 
@@ -24,6 +26,12 @@ type IndividualScore struct {
 	TotalTeams       int               `json:"totalTeams"`
 }
 
+type teamNotFoundError struct{}
+
+func (e *teamNotFoundError) Error() string {
+	return "team not found"
+}
+
 func handleIndividualScore(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
 
 	challengesByKeys := make(map[string]b.JuiceShopChallenge)
@@ -40,32 +48,36 @@ func handleIndividualScore(bundle *b.Bundle, scoringService *scoring.ScoringServ
 				return
 			}
 
-			// Polling Logic
-			// If the request has a wait-for-update-after query parameter, we will wait for updates
-			var teamScore *scoring.TeamScore
-			waitForUpdate := req.URL.Query().Get("wait-for-update-after")
-
-			if waitForUpdate != "" {
-				lastSeenUpdate, err := time.Parse(time.RFC3339, waitForUpdate)
-				if err != nil {
-					http.Error(responseWriter, "Invalid time format for wait-for-update-after", http.StatusBadRequest)
-					return
+			// Define the fetch function for long polling
+			fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*scoring.TeamScore, time.Time, bool, error) {
+				if waitAfter != nil {
+					teamScore := scoringService.WaitForTeamUpdatesNewerThan(ctx, team, *waitAfter)
+					if teamScore == nil {
+						return nil, time.Time{}, false, nil
+					}
+					return teamScore, time.Now(), true, nil
 				}
-				// Use the WaitForTeamUpdatesNewerThan function from the scoring service
-				teamScore = scoringService.WaitForTeamUpdatesNewerThan(req.Context(), team, lastSeenUpdate)
-				if teamScore == nil {
-					// This means the request timed out or was canceled, with no new updates.
-					// A 204 No Content response is appropriate here.
-					responseWriter.WriteHeader(http.StatusNoContent)
-					return
-				}
-			} else {
-				var ok bool
-				teamScore, ok = scoringService.GetScoreForTeam(team)
+				teamScore, ok := scoringService.GetScoreForTeam(team)
 				if !ok {
+					// Return error to trigger 404
+					return nil, time.Time{}, false, &teamNotFoundError{}
+				}
+				return teamScore, time.Now(), true, nil
+			}
+
+			teamScore, _, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
+			if err != nil {
+				if _, ok := err.(*teamNotFoundError); ok {
 					http.Error(responseWriter, "team not found", http.StatusNotFound)
 					return
 				}
+				bundle.Log.Printf("Long poll error: %s", err)
+				http.Error(responseWriter, "Invalid time format for wait-for-update-after", statusCode)
+				return
+			}
+			if statusCode == http.StatusNoContent {
+				responseWriter.WriteHeader(http.StatusNoContent)
+				return
 			}
 
 			teamCount := len(scoringService.GetScores())

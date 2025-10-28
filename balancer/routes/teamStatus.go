@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 )
@@ -46,23 +48,16 @@ func handleTeamStatus(bundle *bundle.Bundle, scoringService *scoring.ScoringServ
 				return
 			}
 
-			var teamScore *scoring.TeamScore
-
-			if req.URL.Query().Get("wait-for-update-after") != "" {
-				lastSeenUpdate, err := time.Parse(time.RFC3339, req.URL.Query().Get("wait-for-update-after"))
-				if err != nil {
-					http.Error(responseWriter, "Invalid time format", http.StatusBadRequest)
-					return
+			// Define the fetch function for long polling
+			fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*scoring.TeamScore, time.Time, bool, error) {
+				if waitAfter != nil {
+					teamScore := scoringService.WaitForTeamUpdatesNewerThan(ctx, team, *waitAfter)
+					if teamScore == nil {
+						return nil, time.Time{}, false, nil
+					}
+					return teamScore, time.Now(), true, nil
 				}
-				teamScore = scoringService.WaitForTeamUpdatesNewerThan(req.Context(), team, lastSeenUpdate)
-				if teamScore == nil {
-					responseWriter.WriteHeader(http.StatusNoContent)
-					responseWriter.Write([]byte{})
-					return
-				}
-			} else {
-				var ok bool
-				teamScore, ok = scoringService.GetScoreForTeam(team)
+				teamScore, ok := scoringService.GetScoreForTeam(team)
 				if !ok {
 					teamScore = &scoring.TeamScore{
 						Name:              team,
@@ -72,6 +67,19 @@ func handleTeamStatus(bundle *bundle.Bundle, scoringService *scoring.ScoringServ
 						InstanceReadiness: false,
 					}
 				}
+				return teamScore, time.Now(), true, nil
+			}
+
+			teamScore, _, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
+			if err != nil {
+				bundle.Log.Printf("Long poll error: %s", err)
+				http.Error(responseWriter, "Invalid time format", statusCode)
+				return
+			}
+			if statusCode == http.StatusNoContent {
+				responseWriter.WriteHeader(http.StatusNoContent)
+				responseWriter.Write([]byte{})
+				return
 			}
 
 			response := TeamStatus{

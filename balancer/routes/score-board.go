@@ -1,11 +1,13 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 )
 
@@ -24,24 +26,31 @@ type TeamScore struct {
 func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			var totalTeams []*scoring.TeamScore
-			var lastUpdateTime time.Time
-
-			if req.URL.Query().Get("wait-for-update-after") != "" {
-				lastSeenUpdate, err := time.Parse(time.RFC3339, req.URL.Query().Get("wait-for-update-after"))
-				if err != nil {
-					http.Error(responseWriter, "Invalid time format", http.StatusBadRequest)
-					return
+			// Define the fetch function for long polling
+			fetchFunc := func(ctx context.Context, waitAfter *time.Time) ([]*scoring.TeamScore, time.Time, bool, error) {
+				if waitAfter != nil {
+					totalTeams, lastUpdateTime := scoringService.WaitForUpdatesNewerThanWithTimestamp(ctx, *waitAfter)
+					if totalTeams == nil {
+						return nil, time.Time{}, false, nil
+					}
+					return totalTeams, lastUpdateTime, true, nil
 				}
-				totalTeams, lastUpdateTime = scoringService.WaitForUpdatesNewerThanWithTimestamp(req.Context(), lastSeenUpdate)
-				if totalTeams == nil {
-					responseWriter.WriteHeader(http.StatusNoContent)
-					responseWriter.Write([]byte{})
-					return
-				}
-			} else {
-				totalTeams, lastUpdateTime = scoringService.GetTopScoresWithTimestamp()
+				totalTeams, lastUpdateTime := scoringService.GetTopScoresWithTimestamp()
+				return totalTeams, lastUpdateTime, true, nil
 			}
+
+			totalTeams, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
+			if err != nil {
+				bundle.Log.Printf("Long poll error: %s", err)
+				http.Error(responseWriter, "Invalid time format", statusCode)
+				return
+			}
+			if statusCode == http.StatusNoContent {
+				responseWriter.WriteHeader(http.StatusNoContent)
+				responseWriter.Write([]byte{})
+				return
+			}
+
 			var topTeams []*scoring.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
 			if len(totalTeams) > 24 {
@@ -65,9 +74,9 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 				TopTeams:   convertedTopScores,
 			}
 
-			responseBytes, err := json.Marshal(response)
-			if err != nil {
-				bundle.Log.Printf("Failed to marshal response: %s", err)
+			responseBytes, marshalErr := json.Marshal(response)
+			if marshalErr != nil {
+				bundle.Log.Printf("Failed to marshal response: %s", marshalErr)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}
