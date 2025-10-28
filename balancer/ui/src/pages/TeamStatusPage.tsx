@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { FormattedMessage, useIntl } from "react-intl";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { FormattedMessage } from "react-intl";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 import { PasscodeDisplayCard } from "@/cards/PassCodeDisplayCard";
 import { Button } from "@/components/Button";
@@ -16,45 +15,6 @@ interface TeamStatusResponse {
   solvedChallenges: number;
   readiness: boolean;
 }
-
-const PasscodeResetButton = ({ team }: { team: string }) => {
-  const navigate = useNavigate();
-  const intl = useIntl();
-  const [isResetting, setIsResetting] = useState(false);
-
-  async function resetPasscode() {
-    setIsResetting(true);
-    try {
-      const response = await fetch("/balancer/api/teams/reset-passcode", {
-        method: "POST",
-      });
-      const data = await response.json();
-      navigate(`/teams/${team}/status/`, {
-        state: { passcode: data.passcode, reset: true },
-      });
-      toast.success(
-        intl.formatMessage({
-          id: "passcode_reset_success",
-          defaultMessage: "Passcode reset successfully",
-        })
-      );
-    } catch (error) {
-      console.error("Failed to reset passcode", error);
-    } finally {
-      setIsResetting(false);
-    }
-  }
-
-  return (
-    <button
-      onClick={resetPasscode}
-      disabled={isResetting}
-      className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
-    >
-      <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
-    </button>
-  );
-};
 
 async function fetchTeamStatusData(
   lastSeen: Date | null,
@@ -158,28 +118,23 @@ export const TeamStatusPage = ({
       <link rel="preload" href="/balancer/icons/third-place.svg" as="image" />
 
       <Card className="w-full max-w-2xl">
-        <div className="flex flex-row justify-between items-center">
-          <div className="flex flex-row items-center p-4">
-            <img
-              src="/balancer/icons/astronaut.svg"
-              alt="Astronaut"
-              className="h-12 w-12 shrink-0 mr-3"
-            />
+        <div className="flex flex-row items-center p-4">
+          <img
+            src="/balancer/icons/astronaut.svg"
+            alt="Astronaut"
+            className="h-12 w-12 shrink-0 mr-3"
+          />
 
-            <div className="text-sm font-light">
-              <p>
-                <FormattedMessage
-                  id="logged_in_as"
-                  defaultMessage="Logged in as"
-                />
-              </p>
-              <p>
-                <strong className="font-medium">{team}</strong>
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-row-reverse items-center p-4">
-            <PasscodeResetButton team={team} />
+          <div className="text-sm font-light">
+            <p>
+              <FormattedMessage
+                id="logged_in_as"
+                defaultMessage="Logged in as"
+              />
+            </p>
+            <p>
+              <strong className="font-medium">{team}</strong>
+            </p>
           </div>
         </div>
 

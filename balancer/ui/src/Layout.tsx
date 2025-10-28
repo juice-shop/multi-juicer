@@ -62,6 +62,69 @@ function LanguageMenuItem({
   );
 }
 
+function PasscodeResetMenuItem({
+  activeTeam,
+  closeMenu,
+}: {
+  activeTeam: string | null;
+  closeMenu: () => void;
+}) {
+  const navigate = useNavigate();
+  const intl = useIntl();
+  const [isResetting, setIsResetting] = useState(false);
+
+  async function resetPasscode() {
+    if (!activeTeam) return;
+
+    setIsResetting(true);
+    try {
+      const response = await fetch("/balancer/api/teams/reset-passcode", {
+        method: "POST",
+      });
+      const data = await response.json();
+      toast.success(
+        intl.formatMessage({
+          id: "passcode_reset_success",
+          defaultMessage: "Passcode reset successfully",
+        })
+      );
+      closeMenu();
+      navigate(`/teams/${activeTeam}/status/`, {
+        state: { passcode: data.passcode, reset: true },
+      });
+    } catch (error) {
+      console.error("Failed to reset passcode", error);
+      toast.error(
+        intl.formatMessage({
+          id: "passcode_reset_error",
+          defaultMessage: "Failed to reset passcode",
+        })
+      );
+    } finally {
+      setIsResetting(false);
+    }
+  }
+
+  if (!activeTeam || activeTeam === "admin") {
+    return null;
+  }
+
+  return (
+    <button
+      disabled={isResetting}
+      onClick={resetPasscode}
+      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <span role="img" aria-label="Reset Passcode">
+        🔑
+      </span>
+      <span>
+        <FormattedMessage id="reset_passcode" defaultMessage="Reset Passcode" />
+      </span>
+    </button>
+  );
+}
+
 function LogoutMenuItem({
   setActiveTeam,
   activeTeam,
@@ -196,6 +259,10 @@ function ContextMenu({
             <>
               <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
               <div className="py-1">
+                <PasscodeResetMenuItem
+                  activeTeam={activeTeam}
+                  closeMenu={close}
+                />
                 <LogoutMenuItem
                   setActiveTeam={setActiveTeam}
                   activeTeam={activeTeam}
