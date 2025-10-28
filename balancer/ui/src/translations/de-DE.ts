@@ -8,8 +8,8 @@ export default {
     "Teamname muss aus mindestens drei Zeichen bestehen und darf Kleinbuchstaben, Nummern oder '-' enthalten",
   create_or_join_team_label: "Team erstellen / beitreten",
   change_language: "Sprache ändern",
-  "navigation.team": "Team",
-  "navigation.scoreboard": "Bestenliste",
+  "navigation.team": "Dein Team",
+  "navigation.scoreboard": "Punkteübersicht",
   joining_team: "Team {team} beitreten",
   joining_failed:
     "Konnte Team nicht beitreten. Bist du dir sicher, dass das Passwort richtig ist?",
@@ -53,8 +53,9 @@ export default {
     "Niemand hat diese Herausforderung bisher gelöst.",
   "challenge_detail.header.team": "Team",
   "challenge_detail.header.solved": "Gelöst",
-  "scoreboard.loading": "Lade Bestenliste...",
-  "scoreboard.error": "Konnte Bestenliste nicht laden. Versuche es erneut...",
+  "scoreboard.loading": "Punkteübersicht lädt..",
+  "scoreboard.error":
+    "Konnte Punkteübersicht nicht laden. Versuche es erneut...",
   "scoreboard.header.team": "Team",
   "scoreboard.header.score": "Punkte",
   "scoreboard.header.challenges": "Herausforderungen",

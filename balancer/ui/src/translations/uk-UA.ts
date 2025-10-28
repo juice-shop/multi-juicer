@@ -8,8 +8,8 @@ export default {
     "Назва команди має складатися з малих літер, цифр або «-»",
   create_or_join_team_label: "Створити / приєднатися до команди",
   change_language: "Змінити мову",
-  "navigation.team": "Команда",
-  "navigation.scoreboard": "Таблиця результатів",
+  "navigation.team": "Ваша команда",
+  "navigation.scoreboard": "Огляд рахунку",
   joining_team: "Приєднуємся до команди {team}",
   joining_failed:
     "Не вдалося приєднатися до команди. Ви впевнені, що пароль правильний?",
@@ -53,9 +53,9 @@ export default {
   "challenge_detail.no_one_solved": "Ніхто ще не вирішив це завдання.",
   "challenge_detail.header.team": "Команда",
   "challenge_detail.header.solved": "Вирішено",
-  "scoreboard.loading": "Завантаження таблиці результатів...",
+  "scoreboard.loading": "Завантаження огляду рахунку...",
   "scoreboard.error":
-    "Не вдалося завантажити таблицю результатів. Повторна спроба...",
+    "Не вдалося завантажити огляд рахунку. Повторна спроба...",
   "scoreboard.header.team": "Команда",
   "scoreboard.header.score": "Бали",
   "scoreboard.header.challenges": "Завдання",
