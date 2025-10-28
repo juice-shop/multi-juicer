@@ -17,6 +17,15 @@ beforeEach(() => {
         json: () => Promise.resolve({}),
       }) as Promise<Response>
   );
+
+  // mock localStorage
+  const localStorageMock = {
+    getItem: vi.fn(() => null),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+  };
+  globalThis.localStorage = localStorageMock as unknown as Storage;
 });
 
 test("renders without crashing", () => {

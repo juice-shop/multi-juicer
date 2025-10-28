@@ -8,7 +8,7 @@ import { Layout } from "./Layout";
 import { JoiningPage } from "./pages/JoiningPage";
 import { JoinPage } from "./pages/JoinPage";
 import { TeamStatusPage } from "./pages/TeamStatusPage";
-import { MessageLoader } from "./translations/index";
+import availableLanguages, { MessageLoader } from "./translations/index";
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverviewPage"));
@@ -28,19 +28,41 @@ async function fetchTeamStatusData(): Promise<SimplifiedTeamStatusResponse | nul
   return status;
 }
 
+const LOCALE_STORAGE_KEY = "multijuicer:locale";
+
 function App() {
-  const [locale, setLocale] = useState("en");
+  const [locale, setLocale] = useState(() => {
+    // Try to get locale from localStorage first
+    const storedLocale = localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (storedLocale) {
+      return storedLocale;
+    }
+    // Fall back to navigator language
+    const navigatorLocale = navigator.language;
+    if (navigatorLocale.startsWith("en")) {
+      return "en";
+    }
+    return navigatorLocale;
+  });
   const [messages, setMessages] = useState({});
   const [activeTeam, setActiveTeam] = useState<string | null>(null);
 
-  const navigatorLocale = navigator.language;
+  // Load initial messages for the stored locale
   useEffect(() => {
-    let locale = navigatorLocale;
-    if (navigatorLocale.startsWith("en")) {
-      locale = "en";
+    async function loadInitialMessages() {
+      const storedLocale = localStorage.getItem(LOCALE_STORAGE_KEY);
+      if (storedLocale && storedLocale !== "en") {
+        const language = availableLanguages.find(
+          (lang) => lang.key === storedLocale
+        );
+        if (language) {
+          const { default: messages } = await language.messageLoader();
+          setMessages(messages);
+        }
+      }
     }
-    setLocale(locale);
-  }, [navigatorLocale]);
+    loadInitialMessages();
+  }, []);
 
   useEffect(() => {
     async function updateStatusData() {
@@ -64,6 +86,7 @@ function App() {
 
     setMessages(messages);
     setLocale(key);
+    localStorage.setItem(LOCALE_STORAGE_KEY, key);
   };
 
   return (
