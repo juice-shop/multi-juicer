@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link, useLocation, useParams } from "react-router-dom";
 
@@ -6,38 +5,7 @@ import { PasscodeDisplayCard } from "@/cards/PassCodeDisplayCard";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { PositionDisplay } from "@/components/PositionDisplay";
-
-interface TeamStatusResponse {
-  name: string;
-  score: string;
-  position: number;
-  totalTeams: number;
-  solvedChallenges: number;
-  readiness: boolean;
-}
-
-async function fetchTeamStatusData(
-  lastSeen: Date | null,
-  signal?: AbortSignal
-): Promise<TeamStatusResponse | null> {
-  let response: Response;
-  if (lastSeen) {
-    response = await fetch(
-      `/balancer/api/teams/status?wait-for-update-after=${lastSeen.toISOString()}`,
-      { signal }
-    );
-  } else {
-    response = await fetch("/balancer/api/teams/status", { signal });
-  }
-  if (!response.ok) {
-    throw new Error("Failed to fetch current teams");
-  }
-  if (response.status === 204) {
-    return null;
-  }
-  const status = (await response.json()) as TeamStatusResponse;
-  return status;
-}
+import { useTeamStatus, type TeamStatus } from "@/hooks/useTeamStatus";
 
 export const TeamStatusPage = ({
   setActiveTeam,
@@ -45,67 +13,12 @@ export const TeamStatusPage = ({
   setActiveTeam: (team: string | null) => void;
 }) => {
   const { team } = useParams();
-
-  const [instanceStatus, setInstanceStatus] =
-    useState<TeamStatusResponse | null>(null);
-
   const { state } = useLocation();
-
   const passcode: string | null = state?.passcode || null;
 
-  const timeoutRef = useRef<number | null>(null);
-
-  const updateStatusDataRef = useRef<
-    | ((
-        lastSuccessfulUpdate: Date | null,
-        signal: AbortSignal
-      ) => Promise<void>)
-    | null
-  >(null);
-
-  updateStatusDataRef.current = async (
-    lastSuccessfulUpdate: Date | null,
-    signal: AbortSignal
-  ) => {
-    try {
-      const status = await fetchTeamStatusData(lastSuccessfulUpdate, signal);
-      if (status === null) {
-        // no update available restarting polling with slight delay to not accidentally dos the server
-        timeoutRef.current = window.setTimeout(
-          () => updateStatusDataRef.current?.(lastSuccessfulUpdate, signal),
-          1000
-        );
-        return;
-      }
-      setInstanceStatus(status);
-      setActiveTeam(status.name);
-      const waitTime = status.readiness ? 5000 : 1000; // poll faster when not ready, as the instance is starting and we want to show the user the status as soon as possible
-      timeoutRef.current = window.setTimeout(
-        () => updateStatusDataRef.current?.(new Date(), signal),
-        waitTime
-      );
-    } catch (err) {
-      // Ignore abort errors - these are expected when component unmounts
-      if (err instanceof Error && err.name === "AbortError") {
-        return;
-      }
-      console.error("Failed to fetch current teams!", err);
-    }
-  };
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    updateStatusDataRef.current?.(null, abortController.signal);
-
-    return () => {
-      abortController.abort();
-      if (timeoutRef.current !== null) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, [team]);
+  const { data: instanceStatus } = useTeamStatus({
+    onTeamUpdate: setActiveTeam,
+  });
 
   if (!team) {
     return <div>Team not found</div>;
@@ -161,7 +74,7 @@ export const TeamStatusPage = ({
 function ScoreDisplay({
   instanceStatus,
 }: {
-  instanceStatus: TeamStatusResponse | null;
+  instanceStatus: TeamStatus | null;
 }) {
   if (!instanceStatus?.position || instanceStatus?.position === -1) {
     return (
@@ -210,7 +123,7 @@ function ScoreDisplay({
 function StatusDisplay({
   instanceStatus,
 }: {
-  instanceStatus: TeamStatusResponse | null;
+  instanceStatus: TeamStatus | null;
 }) {
   if (!instanceStatus?.readiness) {
     return (

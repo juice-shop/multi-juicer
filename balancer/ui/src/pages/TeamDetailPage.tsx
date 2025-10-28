@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link, useParams } from "react-router-dom";
 
@@ -6,143 +5,13 @@ import { Card } from "@/components/Card";
 import { PositionDisplay } from "@/components/PositionDisplay";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 import { Spinner } from "@/components/Spinner";
-
-// --- Type Definitions ---
-interface SolvedChallengeResponse {
-  key: string;
-  name: string;
-  difficulty: number;
-  solvedAt: string; // ISO string
-}
-
-interface IndividualTeamScoreResponse {
-  name: string;
-  score: number;
-  position: number;
-  totalTeams: number;
-  solvedChallenges: SolvedChallengeResponse[];
-}
-
-interface SolvedChallenge extends Omit<SolvedChallengeResponse, "solvedAt"> {
-  solvedAt: Date; // Convert string to Date object
-}
-
-interface IndividualTeamScore
-  extends Omit<IndividualTeamScoreResponse, "solvedChallenges"> {
-  solvedChallenges: SolvedChallenge[];
-}
-
-// --- API Fetching Logic ---
-async function fetchTeamScore(
-  team: string,
-  lastSeen: Date | null,
-  signal?: AbortSignal
-): Promise<IndividualTeamScore | null> {
-  const url = lastSeen
-    ? `/balancer/api/score-board/teams/${team}/score?wait-for-update-after=${lastSeen.toISOString()}`
-    : `/balancer/api/score-board/teams/${team}/score`;
-
-  const response = await fetch(url, { signal });
-
-  if (response.status === 204) {
-    // No new data from long-poll
-    return null;
-  }
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error("Team not found");
-    }
-    throw new Error("Failed to fetch team score");
-  }
-  const rawScore = (await response.json()) as IndividualTeamScoreResponse;
-
-  // Process the raw response to convert date strings to Date objects and sort
-  return {
-    ...rawScore,
-    solvedChallenges: rawScore.solvedChallenges
-      .map((challenge) => ({
-        ...challenge,
-        solvedAt: new Date(challenge.solvedAt),
-      }))
-      .sort((a, b) => b.solvedAt.getTime() - a.solvedAt.getTime()), // Sort by most recent first
-  };
-}
+import { useTeamScore } from "@/hooks/useTeamScore";
 
 // --- Main Component ---
 export const TeamDetailPage = () => {
   const { team } = useParams<{ team: string }>();
   const intl = useIntl();
-  const [teamScore, setTeamScore] = useState<IndividualTeamScore | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const timeoutRef = useRef<number | null>(null); // To manage polling timeout
-
-  // The core data fetching and polling logic
-  // Using useRef to make this function stable across re-renders
-  const updateAndPollRef = useRef<
-    | ((
-        lastSuccessfulUpdate: Date | null,
-        signal: AbortSignal
-      ) => Promise<void>)
-    | null
-  >(null);
-
-  updateAndPollRef.current = async (
-    lastSuccessfulUpdate: Date | null,
-    signal: AbortSignal
-  ) => {
-    try {
-      const lastUpdateStarted = new Date();
-      const data = await fetchTeamScore(team!, lastSuccessfulUpdate, signal);
-
-      if (data !== null) {
-        setTeamScore(data);
-      }
-      if (isLoading) setIsLoading(false); // Only set loading to false on first successful fetch
-      setError(null);
-
-      // the request is using a http long polling mechanism to get the updates as soon as possible
-      // in case the request returns immediately we wait for at least 3 seconds to ensure we aren't spamming the server
-      const waitTime = Math.max(
-        3000,
-        5000 - (Date.now() - lastUpdateStarted.getTime())
-      );
-      timeoutRef.current = window.setTimeout(() => {
-        updateAndPollRef.current?.(new Date(), signal);
-      }, waitTime);
-    } catch (err) {
-      // Ignore abort errors - these are expected when component unmounts
-      if (err instanceof Error && err.name === "AbortError") {
-        return;
-      }
-
-      setError((err as Error).message);
-      if (isLoading) setIsLoading(false);
-
-      // Retry after a longer delay on error
-      timeoutRef.current = window.setTimeout(() => {
-        updateAndPollRef.current?.(lastSuccessfulUpdate, signal);
-      }, 5000);
-    }
-  };
-
-  useEffect(() => {
-    if (!team) return;
-
-    const abortController = new AbortController();
-
-    // Start the initial fetch and polling loop
-    updateAndPollRef.current?.(null, abortController.signal);
-
-    // Cleanup function to stop polling when the component unmounts
-    return () => {
-      abortController.abort();
-      if (timeoutRef.current !== null) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, [team]);
+  const { data: teamScore, isLoading, error } = useTeamScore(team);
 
   if (isLoading) {
     return (
