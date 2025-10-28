@@ -56,26 +56,30 @@ const EventItem = ({
       )}
 
       <p className="text-sm">
-        <Link
-          to={`/score-overview/teams/${event.team}`}
-          className="font-bold hover:underline"
-        >
-          {event.team}
-        </Link>{" "}
-        <FormattedMessage id="activity.solved" defaultMessage="solved" />{" "}
-        <Link
-          to={`/score-overview/challenges/${event.challengeKey}`}
-          className="font-bold hover:underline"
-        >
-          {event.challengeName}
-        </Link>{" "}
         <FormattedMessage
-          id="activity.points_earned"
-          defaultMessage="(+{points} pts)"
+          id="activity.solved_challenge"
+          defaultMessage="{team} solved {challenge} (+{points} pts)"
           values={{
-            points: event.points,
-            b: (chunks) => (
-              <span className="text-green-500 font-semibold">{chunks}</span>
+            team: (
+              <Link
+                to={`/score-overview/teams/${event.team}`}
+                className="font-bold hover:underline"
+              >
+                {event.team}
+              </Link>
+            ),
+            challenge: (
+              <Link
+                to={`/score-overview/challenges/${event.challengeKey}`}
+                className="font-bold hover:underline"
+              >
+                {event.challengeName}
+              </Link>
+            ),
+            points: (
+              <span className="text-green-500 font-semibold">
+                {event.points}
+              </span>
             ),
           }}
         />
