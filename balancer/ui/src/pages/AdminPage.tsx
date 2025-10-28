@@ -35,7 +35,7 @@ function RestartInstanceButton({ team }: { team: string }) {
     setRestarting(true);
     try {
       await Promise.all([
-        sleep(10000), // wait at least 3 seconds to signal to the user that the restart is happening, restart takes longer than the delete
+        sleep(3000), // wait at least 3 seconds to signal to the user that the restart is happening, restart takes longer than the delete
         fetch(`/balancer/api/admin/teams/${team}/restart`, {
           method: "POST",
         }),
