@@ -15,7 +15,7 @@ const messages = defineMessages({
     defaultMessage: 'Are you sure you want to delete team "{team}"?',
   },
   admin_restart_team_confirmation: {
-    id: "admin_delete_team_confirmation",
+    id: "admin_restart_team_confirmation",
     defaultMessage: 'Are you sure you want to restart team "{team}"?',
   },
 });
