@@ -18,9 +18,12 @@ FROM --platform=$BUILDPLATFORM node:24-alpine AS ui
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 COPY ui/ ./
-RUN npm run build
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/home/app/node_modules/.vite \
+    npm run build
 
 # get the challenges from the juice-shop image
 FROM bkimminich/juice-shop:${JUICE_SHOP_VERSION} AS juice-shop
