@@ -200,37 +200,47 @@ export const TeamDetailPage = () => {
         </div>
       </Card>
 
-      <Card>
-        <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
-          <FormattedMessage
-            id="team_detail.solved_challenges"
-            defaultMessage="Solved Challenges"
-          />
-        </h2>
+      <Card className="overflow-hidden">
         {teamScore.solvedChallenges.length === 0 ? (
-          <p className="p-4 text-gray-500">
-            <FormattedMessage
-              id="team_detail.no_solves"
-              defaultMessage="No challenges solved yet."
-            />
-          </p>
+          <>
+            <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
+              <FormattedMessage
+                id="team_detail.solved_challenges"
+                defaultMessage="Solved Challenges"
+              />
+            </h2>
+            <p className="p-4 text-gray-500">
+              <FormattedMessage
+                id="team_detail.no_solves"
+                defaultMessage="No challenges solved yet."
+              />
+            </p>
+          </>
         ) : (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-700">
-                <th className="p-3">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-700 dark:bg-gray-100 text-gray-100 dark:text-gray-800">
+              <tr>
+                <th colSpan={3} className="p-4 pb-0 text-xl font-semibold">
+                  <FormattedMessage
+                    id="team_detail.solved_challenges"
+                    defaultMessage="Solved Challenges"
+                  />
+                </th>
+              </tr>
+              <tr>
+                <th className="p-4 text-xs font-medium uppercase">
                   <FormattedMessage
                     id="team_detail.header.challenge"
                     defaultMessage="Challenge"
                   />
                 </th>
-                <th className="p-3 text-center">
+                <th className="p-4 text-xs font-medium uppercase text-center">
                   <FormattedMessage
                     id="team_detail.header.difficulty"
                     defaultMessage="Difficulty"
                   />
                 </th>
-                <th className="p-3 text-right">
+                <th className="p-4 text-xs font-medium uppercase text-right">
                   <FormattedMessage
                     id="team_detail.header.solved"
                     defaultMessage="Solved"
