@@ -118,6 +118,8 @@ default values render correctly:
                     secretKeyRef:
                       key: cookieParserSecret
                       name: balancer-secret
+                - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
+                  value: 'default-src ''self''; script-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src ''self''; connect-src ''self''; frame-ancestors ''none''; base-uri ''self''; form-action ''self''; object-src ''none''; upgrade-insecure-requests'
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -662,6 +664,8 @@ full values render out correctly:
                     secretKeyRef:
                       key: cookieParserSecret
                       name: balancer-secret
+                - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
+                  value: 'default-src ''self''; script-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src ''self''; connect-src ''self''; frame-ancestors ''none''; base-uri ''self''; form-action ''self''; object-src ''none''; upgrade-insecure-requests'
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -2909,6 +2913,8 @@ production notes work correctly:
                     secretKeyRef:
                       key: cookieParserSecret
                       name: balancer-secret
+                - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
+                  value: 'default-src ''self''; script-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src ''self''; connect-src ''self''; frame-ancestors ''none''; base-uri ''self''; form-action ''self''; object-src ''none''; upgrade-insecure-requests'
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
