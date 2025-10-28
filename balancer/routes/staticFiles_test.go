@@ -52,4 +52,51 @@ func TestStaticFileHandler(t *testing.T) {
 			assert.Contains(t, rr.Body.String(), "<title>MultiJuicer</title>")
 		}
 	})
+
+	t.Run("should set Content-Security-Policy header for index.html when CSP is configured", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/admin", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		bundle := testutil.NewTestBundle()
+		bundle.StaticAssetsDirectory = "../ui/build/"
+		bundle.Config.ContentSecurityPolicy = "default-src 'self'; script-src 'self'"
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "default-src 'self'; script-src 'self'", rr.Header().Get("Content-Security-Policy"))
+	})
+
+	t.Run("should not set Content-Security-Policy header when CSP is empty", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/admin", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		bundle := testutil.NewTestBundle()
+		bundle.StaticAssetsDirectory = "../ui/build/"
+		bundle.Config.ContentSecurityPolicy = ""
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, rr.Header().Get("Content-Security-Policy"))
+	})
+
+	t.Run("should not set Content-Security-Policy header for non-index.html static files", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/favicon.ico", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		bundle := testutil.NewTestBundle()
+		bundle.StaticAssetsDirectory = "../ui/build/"
+		bundle.Config.ContentSecurityPolicy = "default-src 'self'; script-src 'self'"
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Empty(t, rr.Header().Get("Content-Security-Policy"))
+	})
 }

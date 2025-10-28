@@ -36,10 +36,11 @@ type RuntimeEnvironment struct {
 }
 
 type Config struct {
-	JuiceShopConfig JuiceShopConfig `json:"juiceShop"`
-	MaxInstances    int             `json:"maxInstances"`
-	CookieConfig    CookieConfig    `json:"cookie"`
-	AdminConfig     *AdminConfig
+	JuiceShopConfig        JuiceShopConfig `json:"juiceShop"`
+	MaxInstances           int             `json:"maxInstances"`
+	CookieConfig           CookieConfig    `json:"cookie"`
+	AdminConfig            *AdminConfig
+	ContentSecurityPolicy  string
 }
 
 type AdminConfig struct {
@@ -134,6 +135,7 @@ func New() *Bundle {
 
 	config.CookieConfig.SigningKey = cookieSigningKey
 	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
+	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
 
 	// read /challenges.json file
 	challengesBytes, err := os.ReadFile("/challenges.json")

@@ -21,6 +21,10 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		for _, route := range frontendRoutePatterns {
 			if route.MatchString(r.URL.Path) {
+				// Set Content Security Policy header for index.html if configured
+				if bundle.Config.ContentSecurityPolicy != "" {
+					w.Header().Set("Content-Security-Policy", bundle.Config.ContentSecurityPolicy)
+				}
 				http.ServeFile(w, r, bundle.StaticAssetsDirectory+"/index.html")
 				return
 			}
