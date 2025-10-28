@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
+import { IntlProvider } from "react-intl";
 import { describe, expect, test } from "vitest";
 
 import { ReadableTimestamp } from "./ReadableTimestamp";
@@ -31,7 +32,11 @@ describe(`${ReadableTimestamp.name} Component`, () => {
       expectedRegex: /2 years ago/i,
     },
   ])("renders correct relative time for date", ({ date, expectedRegex }) => {
-    render(<ReadableTimestamp date={date} />);
+    render(
+      <IntlProvider locale="en" defaultLocale="en">
+        <ReadableTimestamp date={date} />
+      </IntlProvider>
+    );
 
     const spanElement = screen.getByText(expectedRegex);
     expect(spanElement).toBeInTheDocument();
