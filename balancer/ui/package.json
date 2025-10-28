@@ -38,7 +38,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "serve": "vite preview",
     "test": "vitest",
     "lint": "tsc --noEmit && eslint src/ --ext .ts,.tsx && prettier --check .",
