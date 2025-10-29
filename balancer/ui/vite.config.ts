@@ -13,7 +13,13 @@ export default defineConfig(() => {
       outDir: "build",
       sourcemap: true, // we are an open source project, we have nothing to hide :D
     },
-    plugins: [react()],
+    plugins: [
+      react({
+        babel: {
+          plugins: [["babel-plugin-react-compiler", {}]],
+        },
+      }),
+    ],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
