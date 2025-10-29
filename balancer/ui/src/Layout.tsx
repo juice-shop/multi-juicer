@@ -170,7 +170,7 @@ function LogoutMenuItem({
     }
   }
 
-  if (!activeTeam || activeTeam === "admin") {
+  if (!activeTeam) {
     return null;
   }
 
@@ -224,7 +224,7 @@ function ContextMenuContent({
           />
         ))}
       </div>
-      {activeTeam && activeTeam !== "admin" && (
+      {activeTeam && (
         <>
           <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
           <div className="py-1">
