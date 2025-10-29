@@ -19,7 +19,7 @@ RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+    npm ci --ignore-scripts
 COPY ui/ ./
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/home/app/node_modules/.vite \
