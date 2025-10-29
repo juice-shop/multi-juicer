@@ -29,9 +29,11 @@ type ProgressUpdateJobs struct {
 }
 
 type JuiceShopWebhookSolution struct {
-	Challenge string  `json:"challenge"`
-	Evidence  *string `json:"evidence"`
-	IssuedOn  string  `json:"issuedOn"`
+	Challenge       string   `json:"challenge"`
+	Evidence        *string  `json:"evidence"`
+	IssuedOn        string   `json:"issuedOn"`
+	CheatScore      *float64 `json:"cheatScore"`
+	TotalCheatScore *float64 `json:"totalCheatScore"`
 }
 
 type JuiceShopWebhookIssuer struct {
@@ -94,6 +96,19 @@ func main() {
 			logger.Print(fmt.Errorf("failed to decode json from juice shop deployment annotation: %w", err))
 		}
 
+		// Read existing cheat scores from the deployment annotation
+		cheatScoresJson := "[]"
+		if json, ok := deployment.Annotations["multi-juicer.owasp-juice.shop/cheatScores"]; ok {
+			cheatScoresJson = json
+		}
+
+		cheatScores := make([]internal.CheatScoreEntry, 0)
+		err = json.Unmarshal([]byte(cheatScoresJson), &cheatScores)
+		if err != nil {
+			logger.Print(fmt.Errorf("failed to decode cheat scores from juice shop deployment annotation: %w", err))
+			cheatScores = make([]internal.CheatScoreEntry, 0)
+		}
+
 		// check if the challenge is already solved
 		for _, status := range challengeStatus {
 			if status.Key == webhook.Solution.Challenge {
@@ -113,10 +128,24 @@ func main() {
 		// Always store timestamps in UTC with RFC3339 format
 		solvedAtUTC := solvedAtTime.UTC().Format(time.RFC3339)
 
-		challengeStatus = append(challengeStatus, internal.ChallengeStatus{Key: webhook.Solution.Challenge, SolvedAt: solvedAtUTC})
+		// Create the new challenge status entry
+		newChallengeStatus := internal.ChallengeStatus{
+			Key:      webhook.Solution.Challenge,
+			SolvedAt: solvedAtUTC,
+		}
+
+		challengeStatus = append(challengeStatus, newChallengeStatus)
 		sort.Stable(challengeStatus)
 
-		internal.PersistProgress(clientset, team, challengeStatus)
+		// If totalCheatScore is present in the webhook, append it to the cheat scores list
+		if webhook.Solution.TotalCheatScore != nil {
+			cheatScores = append(cheatScores, internal.CheatScoreEntry{
+				TotalCheatScore: *webhook.Solution.TotalCheatScore,
+				Timestamp:       solvedAtUTC,
+			})
+		}
+
+		internal.PersistProgress(clientset, team, challengeStatus, cheatScores)
 
 		logger.Printf("Received webhook for team '%s' for challenge '%s'", team, webhook.Solution.Challenge)
 

@@ -33,6 +33,10 @@ export default {
   "admin_table.no_teams": "Keine aktiven Teams",
   "admin_table.instance_status.up_and_running": "läuft 🟢",
   "admin_table.instance_status.down": "ausgefallen ⚠️",
+  "admin_table.cheat_score": "Cheat-Score",
+  "admin_table.cheat_score_tooltip":
+    "Dieser Score zeigt an, ob Herausforderungen schneller gelöst werden als normalerweise erwartet. Er identifiziert möglicherweise nicht genau tatsächliches Cheaten. Klicken Sie hier, um mehr zu erfahren.",
+  "admin_table.no_cheat_score": "Kein Cheat-Score",
   updating_score: "Dein Punktestand wird berechnet...",
   score_overview: "Punkteübersicht",
   team_score:

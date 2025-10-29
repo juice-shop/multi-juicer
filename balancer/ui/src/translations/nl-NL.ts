@@ -32,6 +32,10 @@ export default {
   "admin_table.no_teams": "Geen actieve teams",
   "admin_table.instance_status.up_and_running": "actief 🟢",
   "admin_table.instance_status.down": "inactief ⚠️",
+  "admin_table.cheat_score": "Cheat Score",
+  "admin_table.cheat_score_tooltip":
+    "Deze score geeft aan of uitdagingen sneller worden opgelost dan normaal verwacht. Het kan mogelijk niet nauwkeurig daadwerkelijk valsspelen identificeren. Klik om meer te weten te komen.",
+  "admin_table.no_cheat_score": "Geen cheat score",
   updating_score: "Je score wordt berekend...",
   score_overview: "Scoreoverzicht",
   team_score:

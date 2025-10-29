@@ -130,9 +130,9 @@ func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clients
 				logger.Println(fmt.Errorf("failed to re-fetch challenge progress from Juice Shop for team '%s' to reapply it: %w", job.Team, err))
 				continue
 			}
-			PersistProgress(clientset, job.Team, challengeProgress)
+			PersistProgress(clientset, job.Team, challengeProgress, nil)
 		case UpdateCache:
-			PersistProgress(clientset, job.Team, challengeProgress)
+			PersistProgress(clientset, job.Team, challengeProgress, nil)
 		case NoOp:
 		}
 	}

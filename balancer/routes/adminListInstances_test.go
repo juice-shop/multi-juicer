@@ -16,7 +16,24 @@ import (
 )
 
 func TestAdminListInstanceshandler(t *testing.T) {
+	var createTeamWithCheatScores func(team string, createdAt time.Time, lastRequest time.Time, readyReplicas int32, cheatScores string) *appsv1.Deployment
+
 	createTeam := func(team string, createdAt time.Time, lastRequest time.Time, readyReplicas int32) *appsv1.Deployment {
+		return createTeamWithCheatScores(team, createdAt, lastRequest, readyReplicas, "")
+	}
+
+	createTeamWithCheatScores = func(team string, createdAt time.Time, lastRequest time.Time, readyReplicas int32, cheatScores string) *appsv1.Deployment {
+		annotations := map[string]string{
+			"multi-juicer.owasp-juice.shop/challenges":          "[]",
+			"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
+			"multi-juicer.owasp-juice.shop/lastRequest":         fmt.Sprintf("%d", lastRequest.UnixMilli()),
+			"multi-juicer.owasp-juice.shop/lastRequestReadable": "2024-10-18 13:55:18.08198884+0000 UTC m=+11.556786174",
+			"multi-juicer.owasp-juice.shop/passcode":            "$2a$10$wnxvqClPk/13SbdowdJtu.2thGxrZe4qrsaVdTVUsYIrVVClhPMfS",
+		}
+		if cheatScores != "" {
+			annotations["multi-juicer.owasp-juice.shop/cheatScores"] = cheatScores
+		}
+
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
@@ -24,13 +41,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 				CreationTimestamp: metav1.Time{
 					Time: createdAt,
 				},
-				Annotations: map[string]string{
-					"multi-juicer.owasp-juice.shop/challenges":          "[]",
-					"multi-juicer.owasp-juice.shop/challengesSolved":    "0",
-					"multi-juicer.owasp-juice.shop/lastRequest":         fmt.Sprintf("%d", lastRequest.UnixMilli()),
-					"multi-juicer.owasp-juice.shop/lastRequestReadable": "2024-10-18 13:55:18.08198884+0000 UTC m=+11.556786174",
-					"multi-juicer.owasp-juice.shop/passcode":            "$2a$10$wnxvqClPk/13SbdowdJtu.2thGxrZe4qrsaVdTVUsYIrVVClhPMfS",
-				},
+				Annotations: annotations,
 				Labels: map[string]string{
 					"app.kubernetes.io/name":    "juice-shop",
 					"app.kubernetes.io/part-of": "multi-juicer",
@@ -87,13 +98,127 @@ func TestAdminListInstanceshandler(t *testing.T) {
 				Ready:       true,
 				CreatedAt:   1_700_000_000_000,
 				LastConnect: 1_729_259_666_123,
+				CheatScore:  nil,
 			},
 			{
 				Team:        "test-team",
 				Ready:       false,
 				CreatedAt:   1_600_000_000_000,
 				LastConnect: 1_729_259_333_123,
+				CheatScore:  nil,
 			},
 		}, response.Instances)
+	})
+
+	t.Run("includes cheat scores when available", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		// Create teams with cheat score histories
+		cheatScores1 := `[{"totalCheatScore":0.25,"timestamp":"2024-10-18T13:55:18Z"},{"totalCheatScore":0.42,"timestamp":"2024-10-18T14:30:22Z"}]`
+		cheatScores2 := `[{"totalCheatScore":0.15,"timestamp":"2024-10-18T13:50:10Z"}]`
+
+		clientset := fake.NewSimpleClientset(
+			createTeamWithCheatScores("team-with-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, cheatScores1),
+			createTeamWithCheatScores("another-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 1, cheatScores2),
+			createTeam("team-without-scores", time.UnixMilli(1_650_000_000_000), time.UnixMilli(1_729_259_555_123), 0),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response AdminListInstancesResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Nil(t, err)
+
+		// Find teams in response
+		var teamWithScores, anotherTeam, teamWithoutScores *AdminListJuiceShopInstance
+		for i := range response.Instances {
+			switch response.Instances[i].Team {
+			case "team-with-scores":
+				teamWithScores = &response.Instances[i]
+			case "another-team":
+				anotherTeam = &response.Instances[i]
+			case "team-without-scores":
+				teamWithoutScores = &response.Instances[i]
+			}
+		}
+
+		// Verify team with multiple cheat scores returns the newest one (0.42)
+		assert.NotNil(t, teamWithScores)
+		assert.NotNil(t, teamWithScores.CheatScore)
+		assert.InDelta(t, 0.42, *teamWithScores.CheatScore, 0.001)
+
+		// Verify team with single cheat score returns it (0.15)
+		assert.NotNil(t, anotherTeam)
+		assert.NotNil(t, anotherTeam.CheatScore)
+		assert.InDelta(t, 0.15, *anotherTeam.CheatScore, 0.001)
+
+		// Verify team without cheat scores has nil
+		assert.NotNil(t, teamWithoutScores)
+		assert.Nil(t, teamWithoutScores.CheatScore)
+	})
+
+	t.Run("handles invalid cheat score JSON gracefully", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		// Create team with invalid cheat scores JSON
+		invalidCheatScores := `{invalid json`
+
+		clientset := fake.NewSimpleClientset(
+			createTeamWithCheatScores("team-invalid-json", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, invalidCheatScores),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response AdminListInstancesResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Nil(t, err)
+
+		// Should return the team with nil cheat score when JSON is invalid
+		assert.Len(t, response.Instances, 1)
+		assert.Equal(t, "team-invalid-json", response.Instances[0].Team)
+		assert.Nil(t, response.Instances[0].CheatScore)
+	})
+
+	t.Run("handles empty cheat scores array", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		// Create team with empty cheat scores array
+		emptyCheatScores := `[]`
+
+		clientset := fake.NewSimpleClientset(
+			createTeamWithCheatScores("team-empty-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, emptyCheatScores),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle, nil)
+
+		server.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response AdminListInstancesResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Nil(t, err)
+
+		// Should return the team with nil cheat score when array is empty
+		assert.Len(t, response.Instances, 1)
+		assert.Equal(t, "team-empty-scores", response.Instances[0].Team)
+		assert.Nil(t, response.Instances[0].CheatScore)
 	})
 }

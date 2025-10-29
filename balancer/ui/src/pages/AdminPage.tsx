@@ -101,6 +101,7 @@ interface Team {
   ready: boolean;
   createdAt: Date;
   lastConnect: Date;
+  cheatScore?: number;
 }
 
 interface TeamRaw {
@@ -108,6 +109,7 @@ interface TeamRaw {
   ready: boolean;
   createdAt: string;
   lastConnect: string;
+  cheatScore?: number;
 }
 
 async function fetchAdminData(signal?: AbortSignal): Promise<Team[]> {
@@ -125,6 +127,7 @@ async function fetchAdminData(signal?: AbortSignal): Promise<Team[]> {
 }
 
 export default function AdminPage() {
+  const intl = useIntl();
   const [teams, setTeams] = useState<Team[]>([]);
   const intervalRef = useRef<number | null>(null);
 
@@ -190,7 +193,7 @@ export default function AdminPage() {
         return (
           <Card
             key={team.team}
-            className="grid grid-cols-2 sm:grid-cols-4 items-center gap-8 gap-y-2 p-4"
+            className="grid grid-cols-2 sm:grid-cols-5 items-center gap-8 gap-y-2 p-4"
           >
             <div>
               <h4 className="font-semibold">{team.team}</h4>
@@ -224,6 +227,42 @@ export default function AdminPage() {
                 />{" "}
                 <ReadableTimestamp date={lastConnect} />
               </p>
+            </div>
+
+            <div className="col-span-2 sm:col-span-1">
+              {team.cheatScore !== undefined ? (
+                <div>
+                  <p className="text-sm text-gray-800 dark:text-gray-200 inline-flex items-center gap-1">
+                    <FormattedMessage
+                      id="admin_table.cheat_score"
+                      defaultMessage="Cheat Score"
+                    />
+                    <a
+                      href="https://help.owasp-juice.shop/appendix/cheat-detection.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                      title={intl.formatMessage({
+                        id: "admin_table.cheat_score_tooltip",
+                        defaultMessage:
+                          "This score indicates if challenges are being solved faster than typically expected. It may not accurately identify actual cheating. Click to learn more.",
+                      })}
+                    >
+                      ℹ️
+                    </a>
+                  </p>
+                  <p className="text-sm text-gray-800 dark:text-gray-200">
+                    {(team.cheatScore * 100).toFixed(1)}%
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <FormattedMessage
+                    id="admin_table.no_cheat_score"
+                    defaultMessage="No cheat score"
+                  />
+                </p>
+              )}
             </div>
 
             <DeleteInstanceButton team={team.team} />

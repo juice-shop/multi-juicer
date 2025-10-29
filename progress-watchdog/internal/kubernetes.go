@@ -12,6 +12,11 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+type CheatScoreEntry struct {
+	TotalCheatScore float64 `json:"totalCheatScore"`
+	Timestamp       string  `json:"timestamp"`
+}
+
 type ChallengeStatus struct {
 	Key      string `json:"key"`
 	SolvedAt string `json:"solvedAt"`
@@ -36,9 +41,10 @@ type UpdateProgressDeploymentMetadata struct {
 type UpdateProgressDeploymentDiffAnnotations struct {
 	Challenges       string `json:"multi-juicer.owasp-juice.shop/challenges"`
 	ChallengesSolved string `json:"multi-juicer.owasp-juice.shop/challengesSolved"`
+	CheatScores      string `json:"multi-juicer.owasp-juice.shop/cheatScores,omitempty"`
 }
 
-func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus) {
+func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus, cheatScores []CheatScoreEntry) {
 	logger.Printf("Updating saved ContinueCode of team '%s'", team)
 
 	encodedSolvedChallenges, err := json.Marshal(solvedChallenges)
@@ -46,12 +52,24 @@ func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallen
 		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
 	}
 
+	annotations := UpdateProgressDeploymentDiffAnnotations{
+		Challenges:       string(encodedSolvedChallenges),
+		ChallengesSolved: fmt.Sprintf("%d", len(solvedChallenges)),
+	}
+
+	// If cheat scores are provided, encode and add them to the annotations
+	if len(cheatScores) > 0 {
+		encodedCheatScores, err := json.Marshal(cheatScores)
+		if err != nil {
+			logger.Println(fmt.Errorf("failed to encode cheat scores for team %s: %w", team, err))
+		} else {
+			annotations.CheatScores = string(encodedCheatScores)
+		}
+	}
+
 	diff := UpdateProgressDeploymentDiff{
 		Metadata: UpdateProgressDeploymentMetadata{
-			Annotations: UpdateProgressDeploymentDiffAnnotations{
-				Challenges:       string(encodedSolvedChallenges),
-				ChallengesSolved: fmt.Sprintf("%d", len(solvedChallenges)),
-			},
+			Annotations: annotations,
 		},
 	}
 
