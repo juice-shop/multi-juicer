@@ -2,6 +2,7 @@ import eslint from "@eslint/js";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
+import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 
 export default [
@@ -28,9 +29,12 @@ export default [
     plugins: {
       "@typescript-eslint": tseslint,
       import: importPlugin,
+      "react-hooks": reactHooks,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "import/no-relative-packages": "error",
       "no-undef": "off", // TypeScript handles this
       "react/display-name": "off", // Not needed with modern React
