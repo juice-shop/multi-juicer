@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
       - name: "Install dependencies"
         run: npm ci
       - name: "Lint"
@@ -103,6 +103,6 @@ jobs:
           helm version
       - name: Install Helm Unit Test Plugin
         run: |
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 1.0.0
-      - name: Helm-Chart Unit Tests | Operator
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 1.0.3
+      - name: Helm-Chart Unit Tests
         run: helm unittest .
