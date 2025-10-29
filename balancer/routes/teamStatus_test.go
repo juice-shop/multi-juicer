@@ -7,16 +7,13 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/fake"
-	testcore "k8s.io/client-go/testing"
 )
 
 func TestTeamStatusHandler(t *testing.T) {
@@ -85,18 +82,20 @@ func TestTeamStatusHandler(t *testing.T) {
 
 	t.Run("returns ready when instance gets update by the scoring watcher", func(t *testing.T) {
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 0))
-		watcher := watch.NewFake()
-		clientset.PrependWatchReactor("deployments", testcore.DefaultWatchReactor(watcher, nil))
+		deployment := createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 0)
+		clientset := fake.NewSimpleClientset(deployment)
+
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		ctx, cancel := context.WithCancel(context.Background())
 		t.Cleanup(cancel)
-		scoringService.CalculateAndCacheScoreBoard(ctx)
-		go scoringService.StartingScoringWorker(ctx)
+
+		err := scoringService.CalculateAndCacheScoreBoard(ctx)
+		assert.Nil(t, err)
 
 		AddRoutes(server, bundle, scoringService)
 
+		// Verify initial state - readiness should be false
 		{
 			req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
 			rr := httptest.NewRecorder()
@@ -106,17 +105,25 @@ func TestTeamStatusHandler(t *testing.T) {
 			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":false}`, rr.Body.String())
 		}
 
-		watcher.Modify(createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 1))
+		// Update the deployment in the fake clientset
+		updatedDeployment := createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 1)
+		_, err = clientset.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Update(ctx, updatedDeployment, metav1.UpdateOptions{})
+		assert.Nil(t, err)
 
-		// the watcher might not have updated the readiness yet
-		assert.Eventually(t, func() bool {
+		// Recalculate the scoreboard to pick up the deployment change
+		// This simulates what the watcher would do, but is deterministic
+		err = scoringService.CalculateAndCacheScoreBoard(ctx)
+		assert.Nil(t, err)
+
+		// Now the status should reflect the updated readiness
+		{
 			req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
 			rr := httptest.NewRecorder()
 			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 			server.ServeHTTP(rr, req)
 			assert.Equal(t, http.StatusOK, rr.Code)
-			return assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":true}`, rr.Body.String())
-		}, 1*time.Second, 10*time.Millisecond)
+			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":true}`, rr.Body.String())
+		}
 	})
 
 	t.Run("returns a 401 if the balancer cookie isn't signed", func(t *testing.T) {

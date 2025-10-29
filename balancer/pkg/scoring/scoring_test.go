@@ -234,14 +234,18 @@ func TestScoreingService(t *testing.T) {
 		err := scoringService.CalculateAndCacheScoreBoard(ctx)
 		assert.Nil(t, err)
 		go scoringService.StartingScoringWorker(ctx)
-		assert.Equal(t, 10, scoringService.GetScores()["foobar"].Score)
+
+		score, ok := scoringService.GetScoreForTeam("foobar")
+		assert.True(t, ok)
+		assert.Equal(t, 10, score.Score)
 
 		watcher := watch.NewFake()
 		clientset.PrependWatchReactor("deployments", testcore.DefaultWatchReactor(watcher, nil))
 		watcher.Modify(createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"))
 
 		assert.Eventually(t, func() bool {
-			return scoringService.GetScores()["foobar"].Score == 50
+			score, ok := scoringService.GetScoreForTeam("foobar")
+			return ok && score.Score == 50
 		}, 1*time.Second, 10*time.Millisecond)
 	})
 }

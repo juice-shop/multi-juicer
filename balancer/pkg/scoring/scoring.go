@@ -86,19 +86,27 @@ func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[stri
 }
 
 func (s *ScoringService) GetScores() map[string]*TeamScore {
+	s.currentScoresMutex.Lock()
+	defer s.currentScoresMutex.Unlock()
 	return s.currentScores
 }
 
 func (s *ScoringService) GetScoreForTeam(team string) (*TeamScore, bool) {
+	s.currentScoresMutex.Lock()
+	defer s.currentScoresMutex.Unlock()
 	score, ok := s.currentScores[team]
 	return score, ok
 }
 
 func (s *ScoringService) GetTopScores() []*TeamScore {
+	s.currentScoresMutex.Lock()
+	defer s.currentScoresMutex.Unlock()
 	return s.currentScoresSorted
 }
 
 func (s *ScoringService) GetTopScoresWithTimestamp() ([]*TeamScore, time.Time) {
+	s.currentScoresMutex.Lock()
+	defer s.currentScoresMutex.Unlock()
 	return s.currentScoresSorted, s.lastUpdate
 }
 
@@ -108,10 +116,15 @@ func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUp
 }
 
 func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Context, lastSeenUpdate time.Time) ([]*TeamScore, time.Time) {
+	s.currentScoresMutex.Lock()
 	if s.lastUpdate.After(lastSeenUpdate) {
 		// the last update was after the last seen update, so we can return the current scores without waiting
-		return s.currentScoresSorted, s.lastUpdate
+		scores := s.currentScoresSorted
+		lastUpdate := s.lastUpdate
+		s.currentScoresMutex.Unlock()
+		return scores, lastUpdate
 	}
+	s.currentScoresMutex.Unlock()
 
 	const maxWaitTime = 25 * time.Second
 	timeout := time.NewTimer(maxWaitTime)
@@ -122,9 +135,14 @@ func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Contex
 	for {
 		select {
 		case <-ticker.C:
+			s.currentScoresMutex.Lock()
 			if s.lastUpdate.After(lastSeenUpdate) {
-				return s.currentScoresSorted, s.lastUpdate
+				scores := s.currentScoresSorted
+				lastUpdate := s.lastUpdate
+				s.currentScoresMutex.Unlock()
+				return scores, lastUpdate
 			}
+			s.currentScoresMutex.Unlock()
 		case <-timeout.C:
 			// Timeout was reached
 			return nil, time.Time{}
@@ -136,12 +154,15 @@ func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Contex
 }
 
 func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team string, lastSeenUpdate time.Time) *TeamScore {
+	s.currentScoresMutex.Lock()
 	if score, ok := s.currentScores[team]; ok {
 		if score.LastUpdate.After(lastSeenUpdate) {
 			// the last update was after the last seen update, so we can return the current scores without waiting
+			s.currentScoresMutex.Unlock()
 			return score
 		}
 	}
+	s.currentScoresMutex.Unlock()
 
 	const maxWaitTime = 25 * time.Second
 	timeout := time.NewTimer(maxWaitTime)
@@ -152,12 +173,15 @@ func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team s
 	for {
 		select {
 		case <-ticker.C:
+			s.currentScoresMutex.Lock()
 			if score, ok := s.currentScores[team]; ok {
 				if score.LastUpdate.After(lastSeenUpdate) {
 					// the last update was after the last seen update, so we can return the current scores without waiting
+					s.currentScoresMutex.Unlock()
 					return score
 				}
 			}
+			s.currentScoresMutex.Unlock()
 		case <-timeout.C:
 			// Timeout was reached
 			return nil
