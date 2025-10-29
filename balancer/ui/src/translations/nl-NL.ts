@@ -30,6 +30,8 @@ export default {
   "admin_table.delete": "Verwijderen",
   "admin_table.latUsed": "Laatst gebruikt",
   "admin_table.no_teams": "Geen actieve teams",
+  "admin_table.instance_status.up_and_running": "actief 🟢",
+  "admin_table.instance_status.down": "inactief ⚠️",
   updating_score: "Je score wordt berekend...",
   score_overview: "Scoreoverzicht",
   team_score:

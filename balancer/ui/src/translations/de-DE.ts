@@ -31,6 +31,8 @@ export default {
   "admin_table.delete": "Löschen",
   "admin_table.latUsed": "Zuletzt verwendet",
   "admin_table.no_teams": "Keine aktiven Teams",
+  "admin_table.instance_status.up_and_running": "läuft 🟢",
+  "admin_table.instance_status.down": "ausgefallen ⚠️",
   updating_score: "Dein Punktestand wird berechnet...",
   score_overview: "Punkteübersicht",
   team_score:

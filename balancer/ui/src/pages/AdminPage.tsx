@@ -204,7 +204,17 @@ export default function AdminPage() {
             </div>
             <div>
               <p className="text-sm text-gray-800 dark:text-gray-200">
-                {team.ready ? "up and running 🟢" : "down ⚠️"}
+                {team.ready ? (
+                  <FormattedMessage
+                    id="admin_table.instance_status.up_and_running"
+                    defaultMessage="up and running 🟢"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="admin_table.instance_status.down"
+                    defaultMessage="down ⚠️"
+                  />
+                )}
               </p>
               <p className="text-sm text-gray-800 dark:text-gray-200">
                 {" "}

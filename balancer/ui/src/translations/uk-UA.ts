@@ -32,6 +32,8 @@ export default {
   "admin_table.delete": "Видалити",
   "admin_table.latUsed": "Останнє використання",
   "admin_table.no_teams": "Немає активних команд",
+  "admin_table.instance_status.up_and_running": "працює 🟢",
+  "admin_table.instance_status.down": "не працює ⚠️",
   updating_score: "Ваш рахунок обчислюється...",
   score_overview: "Огляд рахунку",
   team_score:
