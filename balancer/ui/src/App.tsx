@@ -3,17 +3,17 @@ import { Toaster } from "react-hot-toast";
 import { IntlProvider } from "react-intl";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { Spinner } from "./components/Spinner";
-import { Layout } from "./Layout";
-import { JoiningPage } from "./pages/JoiningPage";
-import { JoinPage } from "./pages/JoinPage";
-import { TeamStatusPage } from "./pages/TeamStatusPage";
-import availableLanguages, { MessageLoader } from "./translations/index";
+import { Spinner } from "@/components/Spinner";
+import { Layout } from "@/Layout";
+import { JoiningPage } from "@/pages/JoiningPage";
+import { JoinPage } from "@/pages/JoinPage";
+import { TeamStatusPage } from "@/pages/TeamStatusPage";
+import availableLanguages, { MessageLoader } from "@/translations/index";
 
-const AdminPage = lazy(() => import("./pages/AdminPage"));
-const ScoreOverviewPage = lazy(() => import("./pages/ScoreOverviewPage"));
-const TeamDetailPage = lazy(() => import("./pages/TeamDetailPage"));
-const ChallengeDetailPage = lazy(() => import("./pages/ChallengeDetailPage"));
+const AdminPage = lazy(() => import("@/pages/AdminPage"));
+const ScoreOverviewPage = lazy(() => import("@/pages/ScoreOverviewPage"));
+const TeamDetailPage = lazy(() => import("@/pages/TeamDetailPage"));
+const ChallengeDetailPage = lazy(() => import("@/pages/ChallengeDetailPage"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
