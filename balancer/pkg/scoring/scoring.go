@@ -356,7 +356,7 @@ func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*TeamScore) []*
 		if sortedTeamScores[i].Score == sortedTeamScores[j].Score {
 			iTime := getLatestChallengeSolve(sortedTeamScores[i].Challenges)
 			jTime := getLatestChallengeSolve(sortedTeamScores[j].Challenges)
-			if iTime == jTime {
+			if iTime.Equal(jTime) {
 				return sortedTeamScores[i].Name < sortedTeamScores[j].Name
 			}
 			return iTime.Before(jTime)
@@ -366,7 +366,7 @@ func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*TeamScore) []*
 
 	// set the position of each team, teams with the same score have the same position
 	position := 1
-	for i := 0; i < len(sortedTeamScores); i++ {
+	for i := range len(sortedTeamScores) {
 		if i > 0 && sortedTeamScores[i].Score < sortedTeamScores[i-1].Score {
 			position = i + 1
 		}
