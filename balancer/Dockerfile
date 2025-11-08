@@ -33,7 +33,7 @@ COPY --from=juice-shop /juice-shop/data/static/challenges.yml /workdir/challenge
 RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challenges.json
 
 FROM gcr.io/distroless/static:nonroot
-COPY --from=challenges-json --chown=nonroot:nonroot /workdir/challenges.json /challenges.json
-COPY --from=ui --chown=nonroot:nonroot /home/app/build/ /public/
-COPY --from=builder --chown=nonroot:nonroot /src/balancer /balancer
+COPY --from=challenges-json --chown=root:root /workdir/challenges.json /challenges.json
+COPY --from=ui --chown=root:root /home/app/build/ /public/
+COPY --from=builder --chown=root:root /src/balancer /balancer
 CMD ["/balancer"]
