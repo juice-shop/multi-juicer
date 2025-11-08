@@ -47,7 +47,10 @@ default values render correctly:
               "labels": {}
             },
             "podSecurityContext": {
-              "runAsNonRoot": true
+              "runAsNonRoot": true,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
             },
             "resources": {
               "requests": {
@@ -96,7 +99,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 215ef9ce66459344a921bb689308b4be0c5eb01a151c4c43e7f0a2569faa8e5d
+            checksum/config: 1d777778d9d3961ff2eb8e0d51d1eafcfb0dec516c2e25b0b6e9beaf2f2490e3
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -157,6 +160,8 @@ default values render correctly:
                   subPath: config.json
           securityContext:
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: balancer
           volumes:
             - configMap:
@@ -316,6 +321,8 @@ default values render correctly:
               restartPolicy: Never
               securityContext:
                 runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
@@ -465,6 +472,8 @@ default values render correctly:
                 readOnlyRootFilesystem: true
           securityContext:
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: progress-watchdog
   14: |
     apiVersion: rbac.authorization.k8s.io/v1
@@ -594,7 +603,10 @@ full values render out correctly:
               "labels": {}
             },
             "podSecurityContext": {
-              "runAsNonRoot": true
+              "runAsNonRoot": true,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
             },
             "resources": {
               "requests": {
@@ -643,7 +655,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1fd2a9bf99edf7b688ed6beb8b35997fb18256acf1d2a2e221fb48aa5728af8d
+            checksum/config: 6ebec65f5fdaa3257fe45fb5b7fd12e60008f384ecf1af09cf8e57f644818185
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -704,6 +716,8 @@ full values render out correctly:
                   subPath: config.json
           securityContext:
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: balancer
           volumes:
             - configMap:
@@ -938,6 +952,8 @@ full values render out correctly:
               restartPolicy: Never
               securityContext:
                 runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
@@ -2717,6 +2733,8 @@ full values render out correctly:
                 readOnlyRootFilesystem: true
           securityContext:
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: progress-watchdog
   20: |
     apiVersion: rbac.authorization.k8s.io/v1
@@ -2844,7 +2862,10 @@ production notes work correctly:
               "labels": {}
             },
             "podSecurityContext": {
-              "runAsNonRoot": true
+              "runAsNonRoot": true,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
             },
             "resources": {
               "requests": {
@@ -2893,7 +2914,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1fd2a9bf99edf7b688ed6beb8b35997fb18256acf1d2a2e221fb48aa5728af8d
+            checksum/config: 6ebec65f5fdaa3257fe45fb5b7fd12e60008f384ecf1af09cf8e57f644818185
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -2954,6 +2975,8 @@ production notes work correctly:
                   subPath: config.json
           securityContext:
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: balancer
           volumes:
             - configMap:
@@ -3113,6 +3136,8 @@ production notes work correctly:
               restartPolicy: Never
               securityContext:
                 runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
               serviceAccountName: juice-cleaner
       schedule: 0 * * * *
       successfulJobsHistoryLimit: 1
@@ -3262,6 +3287,8 @@ production notes work correctly:
                 readOnlyRootFilesystem: true
           securityContext:
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           serviceAccountName: progress-watchdog
   14: |
     apiVersion: rbac.authorization.k8s.io/v1
