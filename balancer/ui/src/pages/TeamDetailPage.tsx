@@ -5,13 +5,13 @@ import { Card } from "@/components/Card";
 import { PositionDisplay } from "@/components/PositionDisplay";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 import { Spinner } from "@/components/Spinner";
-import { useTeamScore } from "@/hooks/useTeamScore";
+import { useTeamStatus } from "@/hooks/useTeamStatus";
 
 // --- Main Component ---
 export const TeamDetailPage = () => {
   const { team } = useParams<{ team: string }>();
   const intl = useIntl();
-  const { data: teamScore, isLoading, error } = useTeamScore(team);
+  const { data: teamStatus, isLoading, error } = useTeamStatus(team!);
 
   if (isLoading) {
     return (
@@ -27,7 +27,7 @@ export const TeamDetailPage = () => {
     );
   }
 
-  if (error || !teamScore) {
+  if (error || !teamStatus) {
     const defaultMessage =
       error === "Team not found"
         ? "Team not found."
@@ -51,17 +51,17 @@ export const TeamDetailPage = () => {
       <Card className="p-6">
         <div className="flex items-center gap-4">
           <div className="text-4xl">
-            <PositionDisplay place={teamScore.position} />
+            <PositionDisplay place={teamStatus.position} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">{teamScore.name}</h1>
+            <h1 className="text-3xl font-bold">{teamStatus.name}</h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               <FormattedMessage
                 id="team_detail.rank"
                 defaultMessage="Rank {position} of {totalTeams}"
                 values={{
-                  position: teamScore.position,
-                  totalTeams: teamScore.totalTeams,
+                  position: teamStatus.position,
+                  totalTeams: teamStatus.totalTeams,
                 }}
               />
             </p>
@@ -70,7 +70,7 @@ export const TeamDetailPage = () => {
       </Card>
 
       <Card className="overflow-hidden">
-        {teamScore.solvedChallenges.length === 0 ? (
+        {teamStatus.solvedChallenges.length === 0 ? (
           <>
             <h2 className="text-xl font-semibold p-4 border-b border-gray-200 dark:border-gray-700">
               <FormattedMessage
@@ -118,7 +118,7 @@ export const TeamDetailPage = () => {
               </tr>
             </thead>
             <tbody>
-              {teamScore.solvedChallenges.map((challenge) => (
+              {teamStatus.solvedChallenges.map((challenge) => (
                 <tr
                   key={challenge.key}
                   className="border-t border-gray-200 dark:border-gray-700"

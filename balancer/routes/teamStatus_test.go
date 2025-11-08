@@ -43,7 +43,7 @@ func TestTeamStatusHandler(t *testing.T) {
 		return createTeamNumberOfReadyReplicas(team, challenges, solvedChallenges, 1)
 	}
 
-	t.Run("returns the instance status", func(t *testing.T) {
+	t.Run("returns the instance status for logged in team", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
@@ -60,10 +60,10 @@ func TestTeamStatusHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":2,"readiness":true}`, rr.Body.String())
+		assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"totalTeams":2,"solvedChallenges":[{"key":"scoreBoardChallenge","name":"Score Board","difficulty":1,"solvedAt":"2024-11-01T19:55:48Z"}],"readiness":true}`, rr.Body.String())
 	})
 
-	t.Run("returns -1 for position and score if it hasn't been calculated yet", func(t *testing.T) {
+	t.Run("returns 404 if team doesn't exist in scores", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
@@ -76,8 +76,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `{"name":"foobar","score":-1,"position":-1,"solvedChallenges":0,"totalTeams":1,"readiness":false}`, rr.Body.String())
+		assert.Equal(t, http.StatusNotFound, rr.Code)
 	})
 
 	t.Run("returns ready when instance gets update by the scoring watcher", func(t *testing.T) {
@@ -102,7 +101,7 @@ func TestTeamStatusHandler(t *testing.T) {
 			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 			server.ServeHTTP(rr, req)
 			assert.Equal(t, http.StatusOK, rr.Code)
-			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":false}`, rr.Body.String())
+			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"totalTeams":1,"solvedChallenges":[{"key":"scoreBoardChallenge","name":"Score Board","difficulty":1,"solvedAt":"2024-11-01T19:55:48Z"}],"readiness":false}`, rr.Body.String())
 		}
 
 		// Update the deployment in the fake clientset
@@ -122,11 +121,11 @@ func TestTeamStatusHandler(t *testing.T) {
 			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 			server.ServeHTTP(rr, req)
 			assert.Equal(t, http.StatusOK, rr.Code)
-			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"solvedChallenges":1,"totalTeams":1,"readiness":true}`, rr.Body.String())
+			assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"totalTeams":1,"solvedChallenges":[{"key":"scoreBoardChallenge","name":"Score Board","difficulty":1,"solvedAt":"2024-11-01T19:55:48Z"}],"readiness":true}`, rr.Body.String())
 		}
 	})
 
-	t.Run("returns a 401 if the balancer cookie isn't signed", func(t *testing.T) {
+	t.Run("returns a 404 if the balancer cookie isn't signed for 'me' endpoint", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", team))
 		rr := httptest.NewRecorder()
@@ -138,7 +137,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
 		assert.Equal(t, "", strings.TrimSpace(rr.Body.String()))
 	})
 
@@ -156,5 +155,53 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.JSONEq(t, `{"name":"admin"}`, rr.Body.String())
+	})
+
+	t.Run("returns the status for a specific team by name", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/teams/foobar/status", nil)
+		rr := httptest.NewRecorder()
+		server := http.NewServeMux()
+		clientset := fake.NewSimpleClientset(
+			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
+			createTeam("barfoo", `[]`, "0"),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := scoring.NewScoringService(bundle)
+		scoringService.CalculateAndCacheScoreBoard(context.Background())
+		AddRoutes(server, bundle, scoringService)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.JSONEq(t, `{"name":"foobar","score":10,"position":1,"totalTeams":2,"solvedChallenges":[{"key":"scoreBoardChallenge","name":"Score Board","difficulty":1,"solvedAt":"2024-11-01T19:55:48Z"}],"readiness":true}`, rr.Body.String())
+	})
+
+	t.Run("returns 404 when requesting a non-existent team", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/teams/nonexistent/status", nil)
+		rr := httptest.NewRecorder()
+		server := http.NewServeMux()
+		clientset := fake.NewSimpleClientset()
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := scoring.NewScoringService(bundle)
+		scoringService.CalculateAndCacheScoreBoard(context.Background())
+		AddRoutes(server, bundle, scoringService)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("returns 400 when requesting a team with invalid name", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/balancer/api/teams/invälid/status", nil)
+		rr := httptest.NewRecorder()
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		scoringService := scoring.NewScoringService(bundle)
+		AddRoutes(server, bundle, scoringService)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 }

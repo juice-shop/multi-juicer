@@ -43,7 +43,10 @@ The backend server is responsible for:
 
 **API Endpoints**
 - RESTful API for team management, authentication, and score retrieval
-- Long polling endpoints (`/balancer/api/score-board/top`, `/balancer/api/teams/status`) for efficient real-time updates
+- Long polling endpoints for efficient real-time updates:
+  - `/balancer/api/score-board/top` - Global leaderboard with top teams
+  - `/balancer/api/teams/status` - Current logged-in team's detailed status (requires authentication)
+  - `/balancer/api/teams/{team}/status` - Any team's detailed status including solved challenges, position, and instance readiness
 - Activity feed endpoint for displaying recent challenge solutions across all teams
 - Admin endpoints for instance management (list, delete, restart)
 - Health and readiness probes for Kubernetes orchestration
@@ -79,7 +82,10 @@ The web frontend provides a user-friendly interface for participants and organiz
 **Technical Implementation**
 - Built with React, TypeScript, and Vite for fast development and production builds
 - Uses React Router for client-side routing
-- Custom hooks (`useHttpLongPoll`, `useScoreboard`, `useTeamScore`, `useTeamStatus`) for managing long polling connections
+- Custom hooks for managing long polling connections:
+  - `useHttpLongPoll` - Generic HTTP long polling implementation
+  - `useScoreboard` - Fetches global leaderboard with top teams
+  - `useTeamStatus` - Fetches team status (supports both current user and specific teams)
 - Framer Motion for smooth animations and transitions
 - Tailwind CSS for styling
 - Internationalization support via react-intl

@@ -16,7 +16,7 @@ export const TeamStatusPage = ({
   const { state } = useLocation();
   const passcode: string | null = state?.passcode || null;
 
-  const { data: instanceStatus } = useTeamStatus({
+  const { data: instanceStatus } = useTeamStatus("me", {
     onTeamUpdate: setActiveTeam,
   });
 
@@ -99,7 +99,7 @@ function ScoreDisplay({
             values={{
               position: instanceStatus?.position,
               totalTeams: instanceStatus?.totalTeams,
-              solvedChallengeCount: instanceStatus?.solvedChallenges,
+              solvedChallengeCount: instanceStatus?.solvedChallenges.length,
             }}
           />
         </span>

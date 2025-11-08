@@ -20,7 +20,7 @@ interface SimplifiedTeamStatusResponse {
 }
 
 async function fetchTeamStatusData(): Promise<SimplifiedTeamStatusResponse | null> {
-  const response = await fetch(`/balancer/api/teams/status`);
+  const response = await fetch(`/balancer/api/teams/me/status`);
   if (!response.ok) {
     return null;
   }
