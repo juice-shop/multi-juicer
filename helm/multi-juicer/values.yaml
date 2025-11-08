@@ -62,6 +62,8 @@ balancer:
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
   podSecurityContext:
     runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
   containerSecurityContext:
     allowPrivilegeEscalation: false
@@ -129,6 +131,8 @@ config:
     # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
     podSecurityContext:
       runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
     # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
     containerSecurityContext:
       allowPrivilegeEscalation: false
@@ -187,6 +191,8 @@ progressWatchdog:
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
   podSecurityContext:
     runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
   containerSecurityContext:
     allowPrivilegeEscalation: false
@@ -219,6 +225,8 @@ juiceShopCleanup:
   # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
   podSecurityContext:
     runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
   containerSecurityContext:
     allowPrivilegeEscalation: false
