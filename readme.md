@@ -7,8 +7,10 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 
 **What it does:**
 
-- dynamically create new Juice Shop instances when needed
+- dynamically creates new Juice Shop instances when needed
 - runs on a single domain, comes with a LoadBalancer sending the traffic to the participants Juice Shop instance
+- a neat little leaderboard showing the progress of all participants
+- a handy admin page for managing instances
 - backup and auto apply challenge progress in case of Juice Shop container restarts
 - cleanup old & unused instances automatically
 
