@@ -1,12 +1,13 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Popup from "reactjs-popup";
+import type { PopupActions } from "reactjs-popup/dist/types";
 
-import { Card } from "./components/Card";
-import availableLanguages, { type Language } from "./translations";
-import { classNames } from "./util/classNames";
+import { Card } from "@/components/Card";
+import availableLanguages, { type Language } from "@/translations";
+import { classNames } from "@/util/classNames";
 
 export function NavbarPill({
   children,
@@ -255,8 +256,12 @@ function ContextMenu({
   const prefersDarkScheme =
     window?.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
 
+  const popupRef = useRef<PopupActions>(null);
+  const close = () => popupRef.current?.close();
+
   return (
     <Popup
+      ref={popupRef}
       contentStyle={{
         border: "none",
         borderRadius: "8px",
@@ -285,15 +290,13 @@ function ContextMenu({
       position="bottom right"
       closeOnDocumentClick
     >
-      {(close: () => void) => (
-        <ContextMenuContent
-          switchLanguage={switchLanguage}
-          selectedLocale={selectedLocale}
-          setActiveTeam={setActiveTeam}
-          activeTeam={activeTeam}
-          close={close}
-        />
-      )}
+      <ContextMenuContent
+        switchLanguage={switchLanguage}
+        selectedLocale={selectedLocale}
+        setActiveTeam={setActiveTeam}
+        activeTeam={activeTeam}
+        close={close}
+      />
     </Popup>
   );
 }
