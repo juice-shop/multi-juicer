@@ -69,7 +69,6 @@ const EventItem = ({
   );
 };
 
-// --- Main Sidebar Component ---
 export const LiveActivitySidebar = () => {
   const { data: events, isLoading } = useActivityFeed();
 

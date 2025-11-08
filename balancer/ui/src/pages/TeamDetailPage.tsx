@@ -7,7 +7,6 @@ import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 import { Spinner } from "@/components/Spinner";
 import { useTeamStatus } from "@/hooks/useTeamStatus";
 
-// --- Main Component ---
 export const TeamDetailPage = () => {
   const { team } = useParams<{ team: string }>();
   const intl = useIntl();

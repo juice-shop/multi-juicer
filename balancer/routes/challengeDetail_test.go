@@ -34,7 +34,6 @@ func TestChallengeDetailHandler(t *testing.T) {
 		}
 	}
 
-	// --- Test Data Setup ---
 	const solvedChallengeKey = "scoreBoardChallenge"
 	const anotherChallengeKey = "nullByteChallenge" // This challenge exists but will have no solvers in our setup
 
@@ -57,8 +56,6 @@ func TestChallengeDetailHandler(t *testing.T) {
 
 	server := http.NewServeMux()
 	AddRoutes(server, bundle, scoringService)
-
-	// --- Test Cases ---
 
 	t.Run("should return solvers in chronological order (First Solve first)", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/challenges/%s", solvedChallengeKey), nil)

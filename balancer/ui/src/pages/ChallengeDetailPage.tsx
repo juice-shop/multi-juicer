@@ -7,7 +7,6 @@ import { Card } from "@/components/Card";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 import { Spinner } from "@/components/Spinner";
 
-// --- Type Definitions ---
 interface ChallengeSolveResponse {
   team: string;
   solvedAt: string; // ISO string
@@ -31,7 +30,6 @@ interface ChallengeDetailData
   solves: ChallengeSolve[];
 }
 
-// --- API Fetching Logic ---
 async function fetchChallengeDetails(
   challengeKey: string,
   signal?: AbortSignal
@@ -57,7 +55,6 @@ async function fetchChallengeDetails(
   };
 }
 
-// --- Main Component ---
 export const ChallengeDetailPage = () => {
   const { challengeKey } = useParams<{ challengeKey: string }>();
   const [challengeData, setChallengeData] =
