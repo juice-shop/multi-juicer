@@ -94,7 +94,6 @@ export const JoiningPage = ({
             name="passcode"
             data-test-id="passcode-input"
             minLength={8}
-            maxLength={8}
             autoComplete="current-password"
             disabled={isJoining}
             value={passcode}

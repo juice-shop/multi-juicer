@@ -36,11 +36,12 @@ type RuntimeEnvironment struct {
 }
 
 type Config struct {
-	JuiceShopConfig        JuiceShopConfig `json:"juiceShop"`
-	MaxInstances           int             `json:"maxInstances"`
-	CookieConfig           CookieConfig    `json:"cookie"`
-	AdminConfig            *AdminConfig
-	ContentSecurityPolicy  string
+	JuiceShopConfig       JuiceShopConfig `json:"juiceShop"`
+	MaxInstances          int             `json:"maxInstances"`
+	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
+	CookieConfig          CookieConfig    `json:"cookie"`
+	AdminConfig           *AdminConfig
+	ContentSecurityPolicy string
 }
 
 type AdminConfig struct {
@@ -133,6 +134,14 @@ func New() *Bundle {
 		panic(err)
 	}
 
+	if config.TeamPasscodeLength == 0 {
+		config.TeamPasscodeLength = 12
+	} else if config.TeamPasscodeLength < 8 {
+		panic(errors.New("teamPasscodeLength must be at least 8."))
+	} else if config.TeamPasscodeLength%4 != 0 {
+		panic(errors.New("teamPasscodeLength must be a multiple of 4. e.g. 8, 12, 16."))
+	}
+
 	config.CookieConfig.SigningKey = cookieSigningKey
 	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
 	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
@@ -155,7 +164,7 @@ func New() *Bundle {
 		RuntimeEnvironment: RuntimeEnvironment{
 			Namespace: namespace,
 		},
-		GeneratePasscode:       passcode.GeneratePasscode,
+		GeneratePasscode:       passcode.GetPasscodeGeneratorWithPasscodeLength(config.TeamPasscodeLength),
 		GetJuiceShopUrlForTeam: getJuiceShopUrlForTeam,
 		BcryptRounds:           bcrypt.DefaultCost,
 		Log:                    log.New(os.Stdout, "", log.LstdFlags),

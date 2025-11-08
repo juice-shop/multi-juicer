@@ -92,6 +92,8 @@ balancer:
 config:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
+  # -- Passcode length for the team passcode, needs to be at least 8 characters long and a multiple of 4. e.g 8, 12, 16. Anything over 16 might to long to be nicely displayed in the UI.
+  teamPasscodeLength: 12
   juiceShop:
     # -- Juice Shop Image to use
     image: bkimminich/juice-shop
