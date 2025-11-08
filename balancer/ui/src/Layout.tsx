@@ -365,7 +365,7 @@ export function Layout({
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
       <header>
-        <Card className="p-4 flex justify-between items-center">
+        <Card className="p-2 sm:p-4 flex justify-between items-center flex-col sm:flex-row gap-y-3">
           <Link to={primaryBackLink} className="flex items-center gap-3">
             <img
               src="/balancer/multi-juicer.svg"
