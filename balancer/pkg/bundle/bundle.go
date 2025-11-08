@@ -137,9 +137,9 @@ func New() *Bundle {
 	if config.TeamPasscodeLength == 0 {
 		config.TeamPasscodeLength = 12
 	} else if config.TeamPasscodeLength < 8 {
-		panic(errors.New("teamPasscodeLength must be at least 8."))
+		panic(errors.New("teamPasscodeLength must be at least 8"))
 	} else if config.TeamPasscodeLength%4 != 0 {
-		panic(errors.New("teamPasscodeLength must be a multiple of 4. e.g. 8, 12, 16."))
+		panic(errors.New("teamPasscodeLength must be a multiple of 4. e.g. 8, 12, 16"))
 	}
 
 	config.CookieConfig.SigningKey = cookieSigningKey
