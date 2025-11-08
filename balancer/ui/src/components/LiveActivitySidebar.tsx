@@ -1,35 +1,13 @@
-import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 
+import { useActivityFeed, type ActivityEvent } from "@/hooks/useActivityFeed";
 import { classNames } from "@/util/classNames";
 
 import { Card } from "./Card";
 import { ReadableTimestamp } from "./ReadableTimestamp";
 import { Spinner } from "./Spinner";
 
-// --- Type Definitions ---
-interface ActivityEvent {
-  team: string;
-  challengeKey: string; // Added challengeKey to use in links
-  challengeName: string;
-  points: number;
-  solvedAt: string; // ISO String
-  isFirstSolve: boolean;
-}
-
-// --- API Fetching ---
-async function fetchActivityFeed(
-  signal?: AbortSignal
-): Promise<ActivityEvent[]> {
-  const response = await fetch("/balancer/api/activity-feed", { signal });
-  if (!response.ok) {
-    throw new Error("Failed to fetch activity feed");
-  }
-  return response.json();
-}
-
-// --- Event Item Component ---
 const EventItem = ({
   event,
   isLast,
@@ -52,7 +30,7 @@ const EventItem = ({
       ></div>
       {/* Timeline Vertical Line */}
       {!isLast && (
-        <div className="absolute left-[6px] top-[18px] h-full w-px bg-orange-500"></div>
+        <div className="absolute left-1.5 top-[18px] h-full w-px bg-orange-500"></div>
       )}
 
       <p className="text-sm">
@@ -93,48 +71,7 @@ const EventItem = ({
 
 // --- Main Sidebar Component ---
 export const LiveActivitySidebar = () => {
-  const [events, setEvents] = useState<ActivityEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const intervalRef = useRef<number | null>(null);
-
-  const loadAndPollRef = useRef<
-    ((signal: AbortSignal) => Promise<void>) | null
-  >(null);
-
-  loadAndPollRef.current = async (signal: AbortSignal) => {
-    try {
-      const data = await fetchActivityFeed(signal);
-      setEvents(data);
-    } catch (error) {
-      // Ignore abort errors - these are expected when component unmounts
-      if (error instanceof Error && error.name === "AbortError") {
-        return;
-      }
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    // Initial load
-    loadAndPollRef.current?.(abortController.signal);
-
-    // Poll every 5 seconds
-    intervalRef.current = window.setInterval(() => {
-      loadAndPollRef.current?.(abortController.signal);
-    }, 5000);
-
-    return () => {
-      abortController.abort();
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, []);
+  const { data: events, isLoading } = useActivityFeed();
 
   return (
     <Card className="border-t-4 border-orange-500">
@@ -155,7 +92,7 @@ export const LiveActivitySidebar = () => {
           <div className="flex justify-center items-center h-full">
             <Spinner />
           </div>
-        ) : events.length === 0 ? (
+        ) : !events || events.length === 0 ? (
           <p className="text-gray-500">
             <FormattedMessage
               id="activity.no_events"

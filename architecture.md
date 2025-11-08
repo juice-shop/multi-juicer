@@ -47,7 +47,7 @@ The backend server is responsible for:
   - `/balancer/api/score-board/top` - Global leaderboard with top teams
   - `/balancer/api/teams/status` - Current logged-in team's detailed status (requires authentication)
   - `/balancer/api/teams/{team}/status` - Any team's detailed status including solved challenges, position, and instance readiness
-- Activity feed endpoint for displaying recent challenge solutions across all teams
+  - `/balancer/api/activity-feed` - Recent challenge solutions across all teams (15 most recent events)
 - Admin endpoints for instance management (list, delete, restart)
 - Health and readiness probes for Kubernetes orchestration
 
@@ -86,6 +86,7 @@ The web frontend provides a user-friendly interface for participants and organiz
   - `useHttpLongPoll` - Generic HTTP long polling implementation
   - `useScoreboard` - Fetches global leaderboard with top teams
   - `useTeamStatus` - Fetches team status (supports both current user and specific teams)
+  - `useActivityFeed` - Fetches recent activity feed events
 - Framer Motion for smooth animations and transitions
 - Tailwind CSS for styling
 - Internationalization support via react-intl
@@ -186,11 +187,20 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 
 ### Score Display and Updates
 
-1. Frontend establishes long polling connections to score endpoints
+1. Frontend establishes long polling connections to score and activity feed endpoints
 2. Balancer's scoring service calculates scores by querying all team deployments
 3. When scores change, waiting long poll requests receive immediate responses
-4. Clients display updated scores and re-establish long polling connections
+4. Clients display updated scores and activity feed, then re-establish long polling connections
 5. Process repeats to provide real-time updates with minimal server overhead
+
+### Activity Feed Updates
+
+1. Frontend establishes a long polling connection to `/balancer/api/activity-feed`
+2. Server returns the 15 most recent challenge solve events with team names, challenge details, and timestamps
+3. When new challenges are solved (scores update), the long poll request completes with fresh activity data
+4. Frontend displays the new activity in the live activity sidebar
+5. Client automatically re-establishes the long polling connection with the last update timestamp
+6. If no updates occur within 25 seconds, server returns 204 No Content and client retries
 
 ### Instance Cleanup
 
