@@ -2,8 +2,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 
-import { classNames } from "@/util/classNames";
-
 export const PasscodeDisplayCard = ({ passcode = "" }) => {
   const intl = useIntl();
   const placeHolder = passcode.replace(/./g, "●");
@@ -34,16 +32,19 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
           );
         }}
       >
-        <div className="flex gap-1">
-          {activlyDisplayedPasscode.split("").map((char, index) => (
-            <span
-              key={index}
-              className={classNames(
-                "font-mono p-3 rounded-sm inline-block dark:bg-gray-900 bg-gray-200",
-                (index + 1) % 4 === 0 ? "mr-3" : ""
-              )}
-            >
-              {char}
+        <div className="flex gap-3 flex-wrap">
+          {activlyDisplayedPasscode.match(/.{1,4}/g)!.map((group, index) => (
+            <span className="flex gap-1" key={"group-" + index}>
+              {group.split("").map((char, index) => (
+                <span
+                  key={"char-" + index}
+                  className={
+                    "font-mono p-3 rounded-sm inline-block dark:bg-gray-900 bg-gray-200"
+                  }
+                >
+                  {char}
+                </span>
+              ))}
             </span>
           ))}
         </div>
