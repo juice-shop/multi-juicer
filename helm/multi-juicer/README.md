@@ -20,7 +20,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 |-----|------|---------|-------------|
 | balancer.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | balancer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
-| balancer.contentSecurityPolicy | string | `"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"` | Content Security Policy header configuration for index.html responses. Set to empty string to disable CSP header. |
+| balancer.contentSecurityPolicy | string | `"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"` | Content Security Policy header configuration for index.html responses. Set to empty string to disable CSP header. |
 | balancer.cookie.cookieParserSecret | string | `nil` | Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again. |
 | balancer.cookie.name | string | `"balancer"` | Changes the cookies name used to identify teams. |
 | balancer.cookie.secure | bool | `false` | Sets the secure attribute on cookie so that it only be send over https |
@@ -29,7 +29,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | balancer.metrics.serviceMonitor.labels | object | `{}` | If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name> |
 | balancer.pod.annotations | object | `{}` | Optional Additional annotations for the balancer pods. |
 | balancer.pod.labels | object | `{}` | Optional Additional labels for the balancer pods. |
-| balancer.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
+| balancer.podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | balancer.replicas | int | `1` | Number of replicas of the balancer deployment |
 | balancer.repository | string | `"ghcr.io/juice-shop/multi-juicer/balancer"` |  |
 | balancer.resources.limits.cpu | string | `"400m"` |  |
@@ -55,14 +55,15 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.nodeEnv | string | `"multi-juicer"` | Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`. |
 | config.juiceShop.pod.annotations | object | `{}` | Optional Additional annotations for the Juice Shop pods. |
 | config.juiceShop.pod.labels | object | `{}` | Optional Additional labels for the Juice Shop pods. |
-| config.juiceShop.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
+| config.juiceShop.podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | config.juiceShop.resources | object | `{"requests":{"cpu":"150m","memory":"300Mi"}}` | Optional resources definitions to set for each JuiceShop instance |
 | config.juiceShop.runtimeClassName | string | `nil` | Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/) |
-| config.juiceShop.tag | string | `"v19.0.0"` |  |
+| config.juiceShop.tag | string | `"v19.1.1"` |  |
 | config.juiceShop.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | config.juiceShop.volumeMounts | list | `[]` | Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | config.juiceShop.volumes | list | `[]` | Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | config.maxInstances | int | `10` | Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap |
+| config.teamPasscodeLength | int | `12` | Passcode length for the team passcode, needs to be at least 8 characters long and a multiple of 4. e.g 8, 12, 16. |
 | imagePullPolicy | string | `"IfNotPresent"` |  |
 | imagePullSecrets | list | `[]` | imagePullSecrets used for balancer, progress-watchdog and cleaner. You'll also need to set `config.juiceShop.imagePullSecrets`` to set the imagePullSecrets if you are using a private registry for all images |
 | ingress.annotations | object | `{}` |  |
@@ -77,7 +78,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | juiceShopCleanup.enabled | bool | `true` |  |
 | juiceShopCleanup.failedJobsHistoryLimit | int | `1` |  |
 | juiceShopCleanup.gracePeriod | string | `"24h"` | Specifies when Juice Shop instances will be deleted when unused for that period. |
-| juiceShopCleanup.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
+| juiceShopCleanup.podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | juiceShopCleanup.repository | string | `"ghcr.io/juice-shop/multi-juicer/cleaner"` |  |
 | juiceShopCleanup.resources.limits.memory | string | `"256Mi"` |  |
 | juiceShopCleanup.resources.requests.memory | string | `"256Mi"` |  |
@@ -87,7 +88,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | nodeSelector | object | `{}` |  |
 | progressWatchdog.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | progressWatchdog.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
-| progressWatchdog.podSecurityContext | object | `{"runAsNonRoot":true}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
+| progressWatchdog.podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | progressWatchdog.repository | string | `"ghcr.io/juice-shop/multi-juicer/progress-watchdog"` |  |
 | progressWatchdog.resources.limits.cpu | string | `"20m"` |  |
 | progressWatchdog.resources.limits.memory | string | `"48Mi"` |  |
