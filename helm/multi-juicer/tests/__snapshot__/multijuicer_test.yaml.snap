@@ -59,7 +59,7 @@ default values render correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v19.0.0",
+            "tag": "v19.1.1",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -99,7 +99,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1d777778d9d3961ff2eb8e0d51d1eafcfb0dec516c2e25b0b6e9beaf2f2490e3
+            checksum/config: c30a8676e92ced759c90eaeaf27af870a18b827ebf7b501fff0a4900ec1907f2
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -123,7 +123,7 @@ default values render correctly:
                       key: cookieParserSecret
                       name: balancer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
-                  value: 'default-src ''self''; script-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src ''self''; connect-src ''self''; frame-ancestors ''none''; base-uri ''self''; form-action ''self''; object-src ''none''; upgrade-insecure-requests'
+                  value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -615,7 +615,7 @@ full values render out correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v19.0.0",
+            "tag": "v19.1.1",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -655,7 +655,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 6ebec65f5fdaa3257fe45fb5b7fd12e60008f384ecf1af09cf8e57f644818185
+            checksum/config: 5a1d84c11064ed8fdf5f72dc3c847a9df8607b223d86afb726ac1d329f68013a
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -679,7 +679,7 @@ full values render out correctly:
                       key: cookieParserSecret
                       name: balancer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
-                  value: 'default-src ''self''; script-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src ''self''; connect-src ''self''; frame-ancestors ''none''; base-uri ''self''; form-action ''self''; object-src ''none''; upgrade-insecure-requests'
+                  value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -2874,7 +2874,7 @@ production notes work correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v19.0.0",
+            "tag": "v19.1.1",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -2914,7 +2914,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 6ebec65f5fdaa3257fe45fb5b7fd12e60008f384ecf1af09cf8e57f644818185
+            checksum/config: 5a1d84c11064ed8fdf5f72dc3c847a9df8607b223d86afb726ac1d329f68013a
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -2938,7 +2938,7 @@ production notes work correctly:
                       key: cookieParserSecret
                       name: balancer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
-                  value: 'default-src ''self''; script-src ''self''; style-src ''self'' ''unsafe-inline''; img-src ''self'' data: https:; font-src ''self''; connect-src ''self''; frame-ancestors ''none''; base-uri ''self''; form-action ''self''; object-src ''none''; upgrade-insecure-requests'
+                  value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
