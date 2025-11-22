@@ -13,5 +13,5 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 RUN chmod +x cleaner
 
 FROM gcr.io/distroless/static:nonroot
-COPY --from=builder --chown=root:root /src/cleaner /cleaner
+COPY --from=builder --chown=root:root --chmod=755 /src/cleaner /cleaner
 CMD ["/cleaner"]
