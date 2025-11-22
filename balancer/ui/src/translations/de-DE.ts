@@ -19,8 +19,15 @@ export default {
   log_out: "Ausloggen",
   reset_passcode: "Passwort zurücksetzen",
   passcode_explanation:
-    "Verwende diesen Passcode, um demselben Team auf einem anderen Gerät oder mit einem Teamkollegen beizutreten.",
+    "Teile den Beitritts-Link oder den Passcode mit deinen Teamkollegen, um diesem Team beizutreten.",
+  join_link_label: "Beitritts-Link",
+  copy_join_link: "Beitritts-Link kopieren",
+  copy_link_button: "Beitritts-Link kopieren",
+  join_link_copied: "Beitritts-Link in die Zwischenablage kopiert",
+  passcode_label: "Oder verwende den Passcode",
   passcode: "Passwort",
+  reset_passcode_confirmation:
+    "Bist du sicher, dass du den Passcode zurücksetzen möchtest? Dadurch werden alle zuvor geteilten Beitritts-Links und Passcodes ungültig.",
   instance_status_start_hacking: "Anfangen zu hacken",
   instance_status_starting: "Juice Shop-Instanz startet",
   "admin_table.table_header": "Aktive Teams",

@@ -18,8 +18,15 @@ export default {
   logged_in_as: "Ingelogd als",
   log_out: "Uitloggen",
   passcode_explanation:
-    "Gebruik deze toegangscode om je bij hetzelfde team aan te sluiten op een ander apparaat of met een teamgenoot.",
+    "Deel de deelname-link of passcode met je teamgenoten om bij dit team te komen.",
+  join_link_label: "Deelname-link",
+  copy_join_link: "Deelname-link kopiëren",
+  copy_link_button: "Deelname-link kopiëren",
+  join_link_copied: "Deelname-link gekopieerd naar klembord",
+  passcode_label: "Of gebruik passcode",
   passcode: "Passcode",
+  reset_passcode_confirmation:
+    "Weet je zeker dat je de passcode wilt resetten? Dit maakt alle eerder gedeelde deelname-links en passcodes ongeldig.",
   instance_status_start_hacking: "Start Hacking",
   instance_status_starting: "Juice Shop bezig met starten",
   "admin_table.table_header": "Actieve Teams",

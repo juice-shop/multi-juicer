@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -16,7 +16,7 @@ export const JoiningPage = ({
   const navigate = useNavigate();
   const { team } = useParams();
 
-  async function sendJoinRequest() {
+  const sendJoinRequestWithPasscode = async (passcodeToUse: string) => {
     try {
       setFailed(false);
       setIsJoining(true);
@@ -25,7 +25,7 @@ export const JoiningPage = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ passcode }),
+        body: JSON.stringify({ passcode: passcodeToUse }),
       });
       setIsJoining(false);
 
@@ -46,7 +46,25 @@ export const JoiningPage = ({
       console.error("Unknown error while trying to join a team!");
       console.error(error);
       setFailed(true);
+      setIsJoining(false);
     }
+  };
+
+  // Check for passcode in URL fragment and auto-join
+  useEffect(() => {
+    const fragment = window.location.hash.slice(1); // Remove the '#'
+    if (fragment && fragment.length >= 8) {
+      setPasscode(fragment);
+      // Auto-submit after a short delay to allow state to update
+      setTimeout(() => {
+        sendJoinRequestWithPasscode(fragment);
+      }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function sendJoinRequest() {
+    sendJoinRequestWithPasscode(passcode);
   }
 
   function onSubmit(event: React.FormEvent) {

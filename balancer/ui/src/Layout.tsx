@@ -77,6 +77,17 @@ function PasscodeResetMenuItem({
   async function resetPasscode() {
     if (!activeTeam) return;
 
+    const confirmed = confirm(
+      intl.formatMessage({
+        id: "reset_passcode_confirmation",
+        defaultMessage:
+          "Are you sure you want to reset the passcode? This will invalidate all previously shared join links and passcodes.",
+      })
+    );
+    if (!confirmed) {
+      return;
+    }
+
     setIsResetting(true);
     try {
       const response = await fetch("/balancer/api/teams/reset-passcode", {
