@@ -24,7 +24,8 @@ export default {
   copy_join_link: "Beitritts-Link kopieren",
   copy_link_button: "Beitritts-Link kopieren",
   join_link_copied: "Beitritts-Link in die Zwischenablage kopiert",
-  passcode_label: "Oder verwende den Passcode",
+  passcode_label:
+    "Oder verwende denselben Teamnamen und den folgenden Passcode",
   passcode: "Passwort",
   reset_passcode_confirmation:
     "Bist du sicher, dass du den Passcode zurücksetzen möchtest? Dadurch werden alle zuvor geteilten Beitritts-Links und Passcodes ungültig.",

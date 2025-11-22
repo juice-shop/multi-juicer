@@ -56,7 +56,7 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
         <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
           <FormattedMessage
             id="passcode_label"
-            defaultMessage="Or use passcode"
+            defaultMessage="Or use the same teamname and the following passcode"
           />
         </p>
         <div

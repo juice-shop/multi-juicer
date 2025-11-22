@@ -23,7 +23,7 @@ export default {
   copy_join_link: "Deelname-link kopiëren",
   copy_link_button: "Deelname-link kopiëren",
   join_link_copied: "Deelname-link gekopieerd naar klembord",
-  passcode_label: "Of gebruik passcode",
+  passcode_label: "Of gebruik dezelfde teamnaam en de volgende passcode",
   passcode: "Passcode",
   reset_passcode_confirmation:
     "Weet je zeker dat je de passcode wilt resetten? Dit maakt alle eerder gedeelde deelname-links en passcodes ongeldig.",
