@@ -144,6 +144,14 @@ tasks:
       - helm unittest .
     dir: helm/multi-juicer/
 
+  helm:docs:
+    preconditions:
+      - sh: helm-docs --version
+        msg: "helm-docs is not installed: https://github.com/norwoodj/helm-docs"
+    cmds:
+      - helm-docs .
+    dir: helm/multi-juicer/
+
   helm:test:update-snapshots:
     preconditions:
       - sh: helm version
