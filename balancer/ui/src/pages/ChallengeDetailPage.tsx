@@ -210,9 +210,12 @@ export const ChallengeDetailPage = () => {
                   <td className="p-3 text-center font-mono">
                     {index + 1}
                     {index === 0 && (
-                      <span className="ml-2 text-red-500" title="First Solve">
-                        🎉
-                      </span>
+                      <img
+                        src="/balancer/icons/party-popper.svg"
+                        alt="First Solve"
+                        title="First Solve"
+                        className="ml-2 inline-block h-5 w-5"
+                      />
                     )}
                   </td>
                   <td className="p-3">
