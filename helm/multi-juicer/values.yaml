@@ -99,7 +99,7 @@ config:
   juiceShop:
     # -- Juice Shop Image to use
     image: bkimminich/juice-shop
-    tag: v19.0.0
+    tag: v19.1.1
     imagePullSecrets: []
     imagePullPolicy: IfNotPresent
     # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/companion-guide/latest/part4/ctf.html#_overriding_the_ctf_key
