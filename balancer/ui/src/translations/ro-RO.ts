@@ -1,0 +1,88 @@
+export default {
+  getting_started_text:
+    "Alege un nume de echipă ca să te putem recunoaște. Dacă vrei să te alături altor persoane, folosește numele lor de echipă.",
+  getting_started: "Să începem",
+  join_failed_text: "Eroare la crearea sau alăturarea echipei.",
+  teamname: "Nume echipă",
+  teamname_validation_constraints:
+    "Numele echipei trebuie să conțină cel puțin trei caractere și poate include litere mici, cifre sau '-'",
+  create_or_join_team_label: "Creează / alătură-te unei echipe",
+  change_language: "Schimbă limba",
+  "navigation.team": "Echipa ta",
+  "navigation.scoreboard": "Clasament",
+  joining_team: "Alăturare în curs la {team}",
+  joining_failed:
+    "Nu s-a putut intra în echipă. Ești sigur că parola este corectă?",
+  team_passcode: "Parola echipei",
+  join_team: "Alătură-te echipei",
+  logged_in_as: "Autentificat ca",
+  log_out: "Deconectare",
+  reset_passcode: "Resetează parola",
+  passcode_explanation:
+    "Distribuie linkul de alăturare sau parola cu colegii tăi pentru a intra în această echipă.",
+  join_link_label: "Link de alăturare",
+  copy_join_link: "Copiază linkul de alăturare",
+  copy_link_button: "Copiază linkul de alăturare",
+  join_link_copied: "Linkul de alăturare a fost copiat în clipboard",
+  passcode_label: "Sau folosește același nume de echipă și parola următoare",
+  passcode: "Parolă",
+  reset_passcode_confirmation:
+    "Ești sigur că vrei să resetezi parola? Aceasta va invalida toate linkurile și parolele distribuite anterior.",
+  instance_status_start_hacking: "Începe hacking-ul",
+  instance_status_starting: "Instanța Juice Shop pornește",
+  "admin_table.table_header": "Echipe active",
+  "admin_table.created": "Creată",
+  "admin_table.restarting": "Se repornește",
+  "admin_table.restart": "Repornește",
+  "admin_table.deleting": "Se șterge...",
+  "admin_table.delete": "Șterge",
+  "admin_table.latUsed": "Ultima utilizare",
+  "admin_table.no_teams": "Nicio echipă activă",
+  "admin_table.instance_status.up_and_running": "activă 🟢",
+  "admin_table.instance_status.down": "căzută ⚠️",
+  "admin_table.cheat_score": "Scor de trișare",
+  "admin_table.cheat_score_tooltip":
+    "Acest scor indică dacă provocările sunt rezolvate mai repede decât se așteaptă în mod normal. Este posibil să nu identifice cu acuratețe trișarea reală. Apasă aici pentru a afla mai multe.",
+  "admin_table.no_cheat_score": "Fără scor de trișare",
+  updating_score: "Scorul tău este calculat...",
+  score_overview: "Clasament",
+  team_score:
+    "Echipa ta este pe locul {position} din {totalTeams} cu {solvedChallengeCount} provocări rezolvate.",
+  "navigation.admin": "Admin",
+  "activity.title": "Activitate live",
+  "activity.solved_challenge":
+    "{team} a rezolvat {challenge} (+{points} puncte)",
+  "activity.no_events": "Nicio activitate recentă.",
+  "team_detail.loading": "Se încarcă detaliile echipei...",
+  "team_detail.rank": "Locul {position} din {totalTeams}",
+  "team_detail.solved_challenges": "Provocări rezolvate",
+  "team_detail.no_solves": "Nicio provocare rezolvată încă.",
+  "team_detail.header.challenge": "Provocare",
+  "team_detail.header.difficulty": "Dificultate",
+  "team_detail.header.solved": "Rezolvată",
+  "challenge_detail.loading": "Se încarcă detaliile provocării...",
+  "challenge_detail.solves_title": "Rezolvări",
+  "challenge_detail.no_one_solved":
+    "Nimeni nu a rezolvat această provocare încă.",
+  "challenge_detail.header.team": "Echipă",
+  "challenge_detail.header.solved": "Rezolvată",
+  "scoreboard.loading": "Se încarcă clasamentul...",
+  "scoreboard.error":
+    "Nu s-a putut încărca clasamentul. Încearcă din nou...",
+  "scoreboard.header.team": "Echipă",
+  "scoreboard.header.score": "Scor",
+  "scoreboard.header.challenges": "Provocări",
+  difficulty: "Dificultate: {difficulty}/6",
+  logout_confirmation:
+    "Ești sigur că vrei să te deconectezi? Dacă nu ai salvat parola, nu vei mai putea intra din nou.",
+  logout_success: "Deconectare reușită",
+  passcode_copied: "Parolă copiată în clipboard",
+  passcode_reset_success: "Parolă resetată cu succes",
+  passcode_reset_error: "Eroare la resetarea parolei",
+  admin_delete_team_confirmation:
+    'Ești sigur că vrei să ștergi echipa "{team}"?',
+  admin_restart_team_confirmation:
+    'Ești sigur că vrei să repornești echipa "{team}"?',
+  instance_status_not_found:
+    "Nu s-a găsit instanța pentru această echipă. O poți recrea autentificându-te din nou.",
+};
