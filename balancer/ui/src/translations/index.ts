@@ -28,6 +28,13 @@ const availableLanguages: Language[] = [
       import("./nl-NL") as Promise<{ default: Record<string, string> }>,
   },
   {
+    flag: "🇷🇴",
+    name: "Romanian",
+    key: "ro-RO",
+    messageLoader: () =>
+      import("./ro-RO") as Promise<{ default: Record<string, string> }>,
+  },
+  {
     flag: "🇺🇦",
     name: "Ukrainian",
     key: "uk-UA",
