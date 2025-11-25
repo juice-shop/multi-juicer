@@ -67,8 +67,7 @@ export default {
   "challenge_detail.header.team": "Echipă",
   "challenge_detail.header.solved": "Rezolvată",
   "scoreboard.loading": "Se încarcă clasamentul...",
-  "scoreboard.error":
-    "Nu s-a putut încărca clasamentul. Încearcă din nou...",
+  "scoreboard.error": "Nu s-a putut încărca clasamentul. Încearcă din nou...",
   "scoreboard.header.team": "Echipă",
   "scoreboard.header.score": "Scor",
   "scoreboard.header.challenges": "Provocări",
