@@ -6,7 +6,7 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "dompurify": "^3.3.0",
-    "motion": "^12.23.24",
+    "motion": "^12.23.25",
     "promise-retry": "^2.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -22,7 +22,7 @@
     "@types/node": "^24.10.1",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^5.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -33,10 +33,10 @@
     "globals": "^16.5.0",
     "jsdom": "^27.2.0",
     "postcss": "^8.5.6",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.3",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4",
-    "vitest": "^4.0.13"
+    "vite": "^7.2.6",
+    "vitest": "^4.0.14"
   },
   "scripts": {
     "start": "vite",
