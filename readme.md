@@ -68,16 +68,16 @@ The numbers above reflect the default resource limits. These can be tweaked, see
 
 ### How many users can MultiJuicer handle?
 
-There is no real fixed limit. (Even thought you can configure one 😉)
-The custom LoadBalancer, through which all traffic for the individual Instances flows, can be replicated as much as you'd like.
+There is no real fixed limit (even though you can configure one 😉).
+The custom LoadBalancer, through which all the traffic for the individual instances flows, can be replicated as much as you'd like.
 You can also attach a [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to automatically scale the LoadBalancer.
 
 ### Why a custom LoadBalancer?
 
-There are some special requirements which we didn't find to be easily solved with any pre build load balancer:
+There are some special requirements which we didn't find to be easily solved with any pre built load balancer:
 
 - Restricting the number of users for a deployment to only the members of a certain team.
-- The load balancers cookie must be save and not easy to spoof to access another instance.
+- The load balancers cookie must be safe and not easy to spoof to access another instance.
 - Handling starting of new instances.
 
 If you have awesome ideas on how to overcome these issues without a custom load balancer, please write us, we'd love to hear from you!
