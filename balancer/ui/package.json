@@ -12,17 +12,17 @@
     "react-dom": "^19.2.3",
     "react-hot-toast": "^2.6.0",
     "react-intl": "^7.1.14",
-    "react-router-dom": "^7.10.1",
+    "react-router-dom": "^7.11.0",
     "reactjs-popup": "^2.0.6",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@types/node": "^25.0.2",
+    "@testing-library/react": "^16.3.1",
+    "@types/node": "^25.0.3",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^5.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -36,7 +36,7 @@
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "vite": "^7.3.0",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.16"
   },
   "scripts": {
     "start": "vite",
