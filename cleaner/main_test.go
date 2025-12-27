@@ -47,7 +47,7 @@ func TestRunCleanup(t *testing.T) {
 	}
 
 	t.Run("No Deployments Found", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		currentTime := time.Now()
 		maxInactive := time.Duration(30 * time.Minute)
 
@@ -59,7 +59,7 @@ func TestRunCleanup(t *testing.T) {
 	})
 
 	t.Run("Deployment Without LastRequest Annotation", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(&appsv1.Deployment{
+		clientset := fake.NewClientset(&appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:        "team1",
 				Namespace:   testNamespace,
@@ -82,7 +82,7 @@ func TestRunCleanup(t *testing.T) {
 	})
 
 	t.Run("Deployment With Invalid LastRequest Annotation", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(createDeployment("team1", "invalid"), createService("team1"))
+		clientset := fake.NewClientset(createDeployment("team1", "invalid"), createService("team1"))
 
 		currentTime := time.Now()
 		maxInactive := time.Duration(30 * time.Minute)
@@ -96,7 +96,7 @@ func TestRunCleanup(t *testing.T) {
 
 	t.Run("Active Deployment - Should Not Be Deleted", func(t *testing.T) {
 		lastRequestTime := strconv.FormatInt(time.Now().Add(-10*time.Minute).UnixMilli(), 10)
-		clientset := fake.NewSimpleClientset(createDeployment("team1", lastRequestTime), createService("team1"))
+		clientset := fake.NewClientset(createDeployment("team1", lastRequestTime), createService("team1"))
 
 		currentTime := time.Now()
 		maxInactive := time.Duration(30 * time.Minute)
@@ -110,7 +110,7 @@ func TestRunCleanup(t *testing.T) {
 
 	t.Run("Inactive Deployment - Should Be Deleted", func(t *testing.T) {
 		lastRequestTime := strconv.FormatInt(time.Now().Add(-60*time.Minute).UnixMilli(), 10)
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createDeployment("team1", lastRequestTime),
 			createService("team1"),
 		)
@@ -126,7 +126,7 @@ func TestRunCleanup(t *testing.T) {
 	})
 
 	t.Run("Failure to Delete Deployment", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(createDeployment("team1", strconv.FormatInt(time.Now().Add(-60*time.Minute).UnixMilli(), 10)), createService("team1"))
+		clientset := fake.NewClientset(createDeployment("team1", strconv.FormatInt(time.Now().Add(-60*time.Minute).UnixMilli(), 10)), createService("team1"))
 
 		clientset.PrependReactor("delete", "deployments", func(action clientgotesting.Action) (handled bool, ret runtime.Object, err error) {
 			return true, nil, fmt.Errorf("failed to delete deployment")
@@ -144,7 +144,7 @@ func TestRunCleanup(t *testing.T) {
 
 	t.Run("Failure to Delete Service", func(t *testing.T) {
 		lastRequestTime := strconv.FormatInt(time.Now().Add(-60*time.Minute).UnixMilli(), 10)
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createDeployment("team1", lastRequestTime),
 			createService("team1"),
 		)
