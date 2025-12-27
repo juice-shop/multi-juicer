@@ -51,7 +51,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -93,7 +93,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -126,7 +126,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		// Request with a timestamp in the past - should return immediately since data is newer
 		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top?wait-for-update-after=2024-01-01T00:00:00Z", nil)
@@ -152,7 +152,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		// Request with a timestamp in the future - should timeout after 25 seconds
 		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top?wait-for-update-after=2099-01-01T00:00:00Z", nil)
@@ -184,7 +184,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		// Get a timestamp AFTER the initial score calculation
 		// This ensures our long-poll will wait for the update
@@ -266,7 +266,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 

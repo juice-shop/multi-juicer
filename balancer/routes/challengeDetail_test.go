@@ -55,7 +55,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 	require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 	server := http.NewServeMux()
-	AddRoutes(server, bundle, scoringService)
+	AddRoutes(server, bundle, scoringService, nil)
 
 	t.Run("should return solvers in chronological order (First Solve first)", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/challenges/%s", solvedChallengeKey), nil)
