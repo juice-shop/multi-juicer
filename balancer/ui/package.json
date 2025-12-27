@@ -11,7 +11,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hot-toast": "^2.6.0",
-    "react-intl": "^7.1.14",
+    "react-intl": "^8.0.9",
     "react-router-dom": "^7.11.0",
     "reactjs-popup": "^2.0.6",
     "tailwindcss": "^4.1.11"
