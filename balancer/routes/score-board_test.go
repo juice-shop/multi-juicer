@@ -44,7 +44,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo", `[]`, "0"),
 		)
@@ -89,7 +89,7 @@ func TestScoreBoardHandler(t *testing.T) {
 			teams = append(teams, createTeam(teamName, `[]`, "0"))
 		}
 		teams = append(teams, createTeam("winning-team", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"))
-		clientset := fake.NewSimpleClientset(teams...)
+		clientset := fake.NewClientset(teams...)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
@@ -118,7 +118,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("long-polling returns immediately when updates exist", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("team1", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
@@ -144,7 +144,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("long-polling times out when no updates occur", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("team1", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
@@ -168,7 +168,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("long-polling returns when score is updated during wait", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("team1", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
@@ -263,7 +263,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		AddRoutes(server, bundle, scoringService)

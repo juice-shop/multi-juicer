@@ -28,7 +28,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 
 		initialPasscodeHash := "$2a$10$wnxvqClPk/13SbdowdJtu.2thGxrZe4qrsaVdTVUsYIrVVClhPMfS"
 
-		clientset := fake.NewSimpleClientset(&appsv1.Deployment{
+		clientset := fake.NewClientset(&appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("juiceshop-%s", team),
 				Namespace: "test-namespace",
@@ -75,7 +75,7 @@ func TestResetPasscodeHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
 

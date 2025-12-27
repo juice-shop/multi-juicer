@@ -52,7 +52,7 @@ func TestActivityFeedHandler(t *testing.T) {
 		teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"},{"key":"%s","solvedAt":"%s"}]`,
 			challenge1, time1.Format(time.RFC3339), challenge2, time3.Format(time.RFC3339))
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
 			createTeamWithSolvedChallenges("team-bravo", teamBravoChallenges),
 		)
@@ -108,7 +108,7 @@ func TestActivityFeedHandler(t *testing.T) {
 	})
 
 	t.Run("with no solves, should return an empty array", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithSolvedChallenges("team-alpha", "[]"),
 			createTeamWithSolvedChallenges("team-bravo", "[]"),
 		)
@@ -139,7 +139,7 @@ func TestActivityFeedHandler(t *testing.T) {
 			mockDeployments = append(mockDeployments, createTeamWithSolvedChallenges(fmt.Sprintf("team-%d", i), challengeJSON))
 		}
 
-		clientset := fake.NewSimpleClientset(mockDeployments...)
+		clientset := fake.NewClientset(mockDeployments...)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())

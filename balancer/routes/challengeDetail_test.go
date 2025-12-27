@@ -44,7 +44,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 	teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, secondSolveTime.Format(time.RFC3339))
 	teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, firstSolveTime.Format(time.RFC3339))
 
-	clientset := fake.NewSimpleClientset(
+	clientset := fake.NewClientset(
 		createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
 		createTeamWithSolvedChallenges("team-bravo", teamBravoChallenges),
 	)

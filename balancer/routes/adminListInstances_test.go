@@ -61,7 +61,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
 
@@ -78,7 +78,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1),
 			createTeam("test-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 0),
 		)
@@ -121,7 +121,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		cheatScores1 := `[{"totalCheatScore":0.25,"timestamp":"2024-10-18T13:55:18Z"},{"totalCheatScore":0.42,"timestamp":"2024-10-18T14:30:22Z"}]`
 		cheatScores2 := `[{"totalCheatScore":0.15,"timestamp":"2024-10-18T13:50:10Z"}]`
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithCheatScores("team-with-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, cheatScores1),
 			createTeamWithCheatScores("another-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 1, cheatScores2),
 			createTeam("team-without-scores", time.UnixMilli(1_650_000_000_000), time.UnixMilli(1_729_259_555_123), 0),
@@ -174,7 +174,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		// Create team with invalid cheat scores JSON
 		invalidCheatScores := `{invalid json`
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithCheatScores("team-invalid-json", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, invalidCheatScores),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
@@ -203,7 +203,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		// Create team with empty cheat scores array
 		emptyCheatScores := `[]`
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithCheatScores("team-empty-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, emptyCheatScores),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)

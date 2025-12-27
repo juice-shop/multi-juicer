@@ -59,7 +59,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment)
+		clientset := fake.NewClientset(balancerDeployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
@@ -133,7 +133,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment)
+		clientset := fake.NewClientset(balancerDeployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		bundle.Config.CookieConfig.Secure = true
@@ -151,7 +151,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			balancerDeployment,
 			createTeam("team-1"),
 			createTeam("team-2"),
@@ -194,7 +194,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
+		clientset := fake.NewClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
@@ -212,7 +212,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
+		clientset := fake.NewClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
@@ -230,7 +230,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment, createTeam(team))
+		clientset := fake.NewClientset(balancerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
@@ -295,7 +295,7 @@ func TestJoinHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(balancerDeployment)
+		clientset := fake.NewClientset(balancerDeployment)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle, nil)
 

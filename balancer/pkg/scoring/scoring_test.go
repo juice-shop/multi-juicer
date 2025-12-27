@@ -53,7 +53,7 @@ func TestScoreingService(t *testing.T) {
 
 	novemberFirst := time.Date(2024, 11, 1, 19, 55, 48, 211000000, time.UTC)
 	t.Run("correctly calculates team scores", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo", `[]`, "0"),
 		)
@@ -94,7 +94,7 @@ func TestScoreingService(t *testing.T) {
 	})
 
 	t.Run("teams with the same score get the same position assigned", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo-1", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
 			createTeam("barfoo-2", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
@@ -161,7 +161,7 @@ func TestScoreingService(t *testing.T) {
 	})
 
 	t.Run("calculates score for known challenges only and skip unknown challenges", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"unkown-challenge-key","solvedAt":"2024-11-01T19:55:48.211Z"},{"key":"nullByteChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "2"),
 			createTeam("barfoo", `[]`, "0"),
 		)
@@ -198,7 +198,7 @@ func TestScoreingService(t *testing.T) {
 	})
 
 	t.Run("properly sets readiness", func(t *testing.T) {
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithInstanceReadiness("foobar", `[]`, "0", false),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)

@@ -13,7 +13,7 @@ import (
 )
 
 func NewTestBundle() *bundle.Bundle {
-	clientset := fake.NewSimpleClientset()
+	clientset := fake.NewClientset()
 	return NewTestBundleWithCustomFakeClient(clientset)
 }
 
