@@ -1,0 +1,59 @@
+package routes
+
+import (
+	"encoding/json"
+	"net/http"
+
+	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
+)
+
+// ChallengeListItem represents a challenge in the list response.
+type ChallengeListItem struct {
+	Key         string `json:"key"`
+	Name        string `json:"name"`
+	Category    string `json:"category"`
+	Description string `json:"description"`
+	Difficulty  int    `json:"difficulty"`
+	SolveCount  int    `json:"solveCount"`
+}
+
+// ChallengesListResponse is the response payload for the challenges list endpoint.
+type ChallengesListResponse struct {
+	Challenges []ChallengeListItem `json:"challenges"`
+}
+
+func handleChallenges(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get all team scores to calculate solve counts
+		allTeamScores := scoringService.GetScores()
+
+		// Create a map to count solves per challenge
+		solveCounts := make(map[string]int)
+		for _, teamScore := range allTeamScores {
+			for _, solvedChallenge := range teamScore.Challenges {
+				solveCounts[solvedChallenge.Key]++
+			}
+		}
+
+		// Build the response with all challenges
+		challenges := make([]ChallengeListItem, 0, len(bundle.JuiceShopChallenges))
+		for _, challenge := range bundle.JuiceShopChallenges {
+			challenges = append(challenges, ChallengeListItem{
+				Key:         challenge.Key,
+				Name:        challenge.Name,
+				Category:    challenge.Category,
+				Description: challenge.Description,
+				Difficulty:  challenge.Difficulty,
+				SolveCount:  solveCounts[challenge.Key],
+			})
+		}
+
+		response := ChallengesListResponse{
+			Challenges: challenges,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	})
+}
