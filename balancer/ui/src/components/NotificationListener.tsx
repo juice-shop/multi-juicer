@@ -1,15 +1,11 @@
-import { useNotifications } from "@/hooks/useNotifications";
+import { useAdminMessage } from "@/hooks/useAdminMessage";
 
 export default function NotificationListener() {
-  const { data } = useNotifications();
-  return (
-    <ul>
-      {data?.map((item, index) => (
-        <li key={index} className={``}>
-          <p>{item.title}</p>
-          <div>{item.message}</div>
-        </li>
-      ))}
-    </ul>
+  const { data } = useAdminMessage();
+  return (<div>
+    {/*will add toast here*/}
+          <p>{data?.title}</p>
+          <div>{data?.message}</div>
+       </div>
   );
 }
