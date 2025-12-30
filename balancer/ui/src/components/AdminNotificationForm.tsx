@@ -12,13 +12,12 @@ export default function AdminNotificationForm({ teams }: { teams: Team[] }) {
   async function sendNotification() {
     if (!title) return;
 
-    const res = await fetch("/balancer/api/notifications", {
+    const res = await fetch("/balancer/api/admin-message", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        team,
         title,
         message,
         level: "info",
