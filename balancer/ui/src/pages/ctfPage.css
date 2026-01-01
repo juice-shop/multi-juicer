@@ -1,0 +1,760 @@
+/* ============================================
+   CSS Custom Properties - Configurable Theme
+   ============================================ */
+:root {
+  /* Neon color palette - customize these for different themes */
+  --neon-primary: #ff6b6b;
+  --neon-accent: #fdd84e;
+  --neon-secondary: #00ff66;
+  --background: #101010;
+  --neon-neutral: #b8b8b8;
+
+  /* Glow and effects */
+  --glow-intensity: 1.5;
+  --scanline-opacity: 0.1;
+
+  /* UI colors */
+  --ui-text: var(--neon-primary);
+  --ui-border: var(--neon-primary);
+  --ui-glow: var(--neon-primary);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--background);
+  font-family: "Courier New", "Courier", monospace;
+  color: var(--ui-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ============================================
+   Canvas Container (Three.js)
+   ============================================ */
+#canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#canvas-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+#canvas-container canvas:active {
+  cursor: grabbing;
+}
+
+/* ============================================
+   Info Panel
+   ============================================ */
+.info-panel {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid var(--ui-border);
+  box-shadow:
+    0 0 5px rgba(255, 107, 107, 0.3),
+    inset 0 0 5px rgba(255, 107, 107, 0.05);
+  backdrop-filter: blur(5px);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-panel h1 {
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow:
+    0 0 10px var(--ui-glow),
+    0 0 20px var(--ui-glow);
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.info-panel-logo {
+  height: 1.4em;
+  width: auto;
+  vertical-align: middle;
+}
+
+/* ============================================
+   Left Panels Container (Grid Layout)
+   ============================================ */
+.left-panels-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  bottom: 20px;
+  width: 350px;
+  display: grid;
+  gap: 10px;
+  z-index: 100;
+  align-content: start;
+}
+
+/* Default: all collapsed - all rows auto, don't fill height */
+.left-panels-container.all-collapsed {
+  grid-template-rows: auto auto auto;
+}
+
+/* Teams panel open - second row expands */
+.left-panels-container.teams-open {
+  grid-template-rows: auto 1fr auto;
+  align-content: stretch;
+}
+
+/* Activity panel open - third row expands */
+.left-panels-container.activity-open {
+  grid-template-rows: auto auto 1fr;
+  align-content: stretch;
+}
+
+/* Both panels open - share available space equally */
+.left-panels-container.both-open {
+  grid-template-rows: auto 1fr 1fr;
+  align-content: stretch;
+}
+
+/* ============================================
+   Side Panels (Teams & Live Activity)
+   ============================================ */
+.side-panel {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid var(--ui-border);
+  box-shadow:
+    0 0 5px rgba(255, 107, 107, 0.3),
+    inset 0 0 5px rgba(255, 107, 107, 0.05);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.side-panel.collapsed {
+  display: flex;
+  flex-direction: column;
+}
+
+.side-panel.open {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-header {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--neon-primary);
+  text-shadow: 0 0 3px rgba(255, 107, 107, 0.5);
+  border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+  flex-shrink: 0;
+}
+
+.panel-header .arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  margin-right: 5px;
+}
+
+.panel-header .arrow:not(.open) {
+  transform: rotate(-90deg);
+}
+
+.panel-header:hover {
+  color: var(--neon-accent);
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.6);
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  scroll-behavior: smooth;
+}
+
+.panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+  background: var(--neon-primary);
+  border-radius: 4px;
+  box-shadow: 0 0 3px rgba(255, 107, 107, 0.4);
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-accent);
+  box-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+}
+
+.panel-placeholder {
+  font-size: 12px;
+  opacity: 0.7;
+  padding: 10px;
+  color: var(--neon-neutral);
+}
+
+.panel-placeholder p {
+  margin: 5px 0;
+}
+
+@media (max-width: 1024px) {
+  .left-panels-container {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .left-panels-container {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-panel {
+    transition: none;
+  }
+
+  .panel-content {
+    scroll-behavior: auto !important;
+  }
+
+  .panel-header .arrow {
+    transition: none;
+  }
+}
+
+/* ============================================
+   Teams Panel Specific Styles
+   ============================================ */
+.teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.teams-list .team-item {
+  padding: 10px;
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  transition: all 0.3s ease;
+}
+
+.teams-list .team-item:hover {
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(40, 20, 20, 0.8);
+}
+
+.team-row-1 {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--neon-primary);
+  margin-bottom: 5px;
+}
+
+.team-row-2 {
+  font-size: 10px;
+  color: var(--neon-neutral);
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   Live Activity Panel Specific Styles
+   ============================================ */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.activity-item {
+  padding: 5px 0;
+}
+
+.activity-row-1 {
+  font-size: 11px;
+  color: var(--neon-primary);
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+.activity-row-2 {
+  font-size: 9px;
+  color: var(--neon-neutral);
+  opacity: 0.7;
+}
+
+/* ============================================
+   Loading Screen
+   ============================================ */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease-out;
+}
+
+.loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-text {
+  font-size: 20px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  text-shadow:
+    0 0 10px var(--neon-primary),
+    0 0 20px var(--neon-primary);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading-bar {
+  width: 300px;
+  height: 4px;
+  background: rgba(0, 255, 255, 0.2);
+  border: 1px solid var(--neon-primary);
+  box-shadow: 0 0 10px var(--neon-primary);
+  overflow: hidden;
+}
+
+.loading-progress {
+  height: 100%;
+  background: var(--neon-primary);
+  box-shadow:
+    0 0 10px var(--neon-primary),
+    0 0 20px var(--neon-primary);
+  transition: width 0.3s ease-out;
+  width: 0%;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 10px var(--ui-glow),
+      0 0 20px var(--ui-glow);
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow:
+      0 0 5px var(--ui-glow),
+      0 0 10px var(--ui-glow);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+  .info-panel {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 15px;
+    min-width: unset;
+  }
+
+  .info-panel h1 {
+    font-size: 18px;
+  }
+
+  .info-panel p {
+    font-size: 10px;
+  }
+
+  .loading-text {
+    font-size: 16px;
+  }
+
+  .loading-bar {
+    width: 200px;
+  }
+}
+
+/* ============================================
+   Accessibility
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .info-panel h1,
+  .loading-text {
+    animation: none;
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .info-panel,
+  .loading {
+    display: none;
+  }
+}
+
+/* ============================================
+   Challenges Panel
+   ============================================ */
+
+.challenges-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid var(--ui-border);
+  box-shadow:
+    0 0 5px rgba(255, 107, 107, 0.3),
+    inset 0 0 5px rgba(255, 107, 107, 0.05);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: height 0.3s ease;
+}
+
+.challenges-panel.open {
+  bottom: 20px;
+  height: auto;
+}
+
+.challenges-panel.collapsed {
+  height: auto;
+}
+
+.challenges-summary {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--neon-primary);
+  text-shadow: 0 0 3px rgba(255, 107, 107, 0.5);
+  border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+  flex-shrink: 0;
+}
+
+.challenges-summary .arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  margin-right: 5px;
+}
+
+.challenges-summary .arrow:not(.open) {
+  transform: rotate(-90deg);
+}
+
+.challenges-summary:hover {
+  color: var(--neon-accent);
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.6);
+}
+
+.challenges-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.challenges-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+
+.challenges-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.challenges-list::-webkit-scrollbar-track {
+  background: rgba(0, 255, 255, 0.1);
+}
+
+.challenges-list::-webkit-scrollbar-thumb {
+  background: var(--neon-primary);
+  border-radius: 4px;
+  box-shadow: 0 0 3px rgba(255, 107, 107, 0.4);
+}
+
+.challenges-list::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-accent);
+  box-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+}
+
+.challenge-item {
+  padding: 10px;
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.challenge-item:hover {
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(40, 20, 20, 0.8);
+}
+
+.challenge-item.highlighted {
+  border-color: var(--neon-accent);
+  background: rgba(255, 0, 255, 0.1);
+  box-shadow:
+    0 0 8px rgba(255, 0, 255, 0.3),
+    inset 0 0 5px rgba(255, 0, 255, 0.15);
+  animation: pulse-highlight 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-highlight {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px rgba(255, 0, 255, 0.3),
+      inset 0 0 5px rgba(255, 0, 255, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 12px rgba(255, 0, 255, 0.4),
+      inset 0 0 8px rgba(255, 0, 255, 0.2);
+  }
+}
+
+.challenge-row-1 {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--neon-primary);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.challenge-row-2 {
+  font-size: 10px;
+  color: var(--neon-neutral);
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.challenge-row-2.solved {
+  color: var(--neon-secondary);
+}
+
+.challenge-row-2 .difficulty {
+  color: var(--neon-accent);
+}
+
+@media (max-width: 1024px) {
+  .challenges-panel {
+    width: 280px;
+    right: 10px;
+    top: 10px;
+    bottom: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .challenges-panel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .challenge-item,
+  .challenges-summary::before {
+    transition: none;
+  }
+
+  .challenge-item.highlighted {
+    animation: none;
+  }
+
+  .challenges-list {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Challenge Detail View */
+.challenge-detail-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.back-button {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid var(--neon-accent);
+  color: var(--neon-accent);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  text-align: left;
+  width: fit-content;
+}
+
+.back-button:hover {
+  background: rgba(255, 107, 107, 0.2);
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.challenge-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.challenge-detail-name {
+  font-size: 28px;
+  color: var(--neon-accent);
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+  margin: 0;
+  font-weight: normal;
+}
+
+.challenge-detail-meta {
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.difficulty-stars {
+  color: #ffd700;
+  font-size: 20px;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.description-text {
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.field-label {
+  color: rgba(255, 107, 107, 0.7);
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.challenge-detail-solves {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.solves-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.solve-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.solve-item:hover {
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(40, 20, 20, 0.8);
+}
+
+.team-name {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.solve-time {
+  color: rgba(255, 107, 107, 0.7);
+  font-size: 14px;
+  font-style: italic;
+}

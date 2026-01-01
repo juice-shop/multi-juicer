@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",
+    "@types/three": "^0.182.0",
     "dompurify": "^3.3.0",
     "motion": "^12.23.24",
     "promise-retry": "^2.0.1",
@@ -14,7 +15,9 @@
     "react-intl": "^7.1.14",
     "react-router-dom": "^7.9.5",
     "reactjs-popup": "^2.0.6",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "three": "^0.182.0",
+    "three-conic-polygon-geometry": "^2.1.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

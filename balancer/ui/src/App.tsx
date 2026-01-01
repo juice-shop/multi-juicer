@@ -14,6 +14,7 @@ const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("@/pages/ScoreOverviewPage"));
 const TeamDetailPage = lazy(() => import("@/pages/TeamDetailPage"));
 const ChallengeDetailPage = lazy(() => import("@/pages/ChallengeDetailPage"));
+const CtfPage = lazy(() => import("@/pages/CtfPage"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -93,6 +94,14 @@ function App() {
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
       <BrowserRouter basename="/balancer">
         <Routes>
+          <Route
+            path="/ctf"
+            element={
+              <Suspense fallback={<Spinner />}>
+                <CtfPage />
+              </Suspense>
+            }
+          />
           <Route
             path="/*"
             element={
