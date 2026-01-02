@@ -16,7 +16,7 @@ export function Loading({
   return (
     <div className="fixed top-0 left-0 w-screen h-screen bg-ctf-bg flex flex-col items-center justify-center z-[1000] transition-opacity duration-500">
       <div
-        className="text-xl tracking-[4px] uppercase mb-8 animate-pulse text-ctf-primary"
+        className="text-xl tracking-[4px] uppercase mb-8 text-ctf-primary"
         style={{
           textShadow:
             "0 0 10px var(--color-ctf-primary), 0 0 20px var(--color-ctf-primary)",

@@ -46,18 +46,4 @@
     background-color: var(--background);
     color: var(--font-color);
   }
-
-  @keyframes pulse-highlight {
-    0%,
-    100% {
-      box-shadow:
-        0 0 8px rgba(255, 0, 255, 0.3),
-        inset 0 0 5px rgba(255, 0, 255, 0.15);
-    }
-    50% {
-      box-shadow:
-        0 0 12px rgba(255, 0, 255, 0.4),
-        inset 0 0 8px rgba(255, 0, 255, 0.2);
-    }
-  }
 }
