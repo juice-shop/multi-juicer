@@ -38,38 +38,66 @@ export function ChallengeDetailView({
   const stars = "★".repeat(challenge.difficulty);
 
   return (
-    <div className="challenge-detail-view">
-      <button className="back-button" onClick={onBack}>
+    <div className="h-full flex flex-col p-5 overflow-y-auto">
+      <button
+        className="bg-[rgba(255,107,107,0.1)] border border-ctf-accent text-ctf-accent py-2.5 px-5 cursor-pointer font-['VT323',monospace] text-lg mb-5 transition-all duration-300 text-left w-fit hover:bg-[rgba(255,107,107,0.2)] hover:shadow-[0_0_10px_rgba(255,107,107,0.5)]"
+        onClick={onBack}
+      >
         ← Back
       </button>
 
-      <div className="challenge-detail-content">
-        <h2 className="challenge-detail-name">{challenge.name}</h2>
+      <div className="flex flex-col gap-5">
+        <h2
+          className="text-[28px] text-ctf-accent m-0 font-normal"
+          style={{ textShadow: "0 0 10px rgba(255, 107, 107, 0.5)" }}
+        >
+          {challenge.name}
+        </h2>
 
-        <div className="challenge-detail-meta">
+        <div className="text-ctf-primary text-lg">
           {countryName || "Unassigned"} -{" "}
-          <span className="difficulty-stars">{stars}</span>
+          <span
+            className="text-ctf-gold text-xl"
+            style={{ textShadow: "0 0 5px rgba(255, 215, 0, 0.5)" }}
+          >
+            {stars}
+          </span>
         </div>
 
-        <p className="description-text">{challenge.description}</p>
+        <p className="text-ctf-primary text-base leading-relaxed m-0">
+          {challenge.description}
+        </p>
 
-        <div className="challenge-detail-solves">
-          <div className="field-label">Solves:</div>
+        <div className="flex flex-col gap-2.5">
+          <div className="text-ctf-primary/70 text-base font-bold uppercase">
+            Solves:
+          </div>
           {detailLoading && (
-            <div className="panel-placeholder">Loading solves...</div>
+            <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
+              Loading solves...
+            </div>
           )}
           {detailError && (
-            <div className="panel-placeholder">Error: {detailError}</div>
+            <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
+              Error: {detailError}
+            </div>
           )}
           {detailData && (
-            <div className="solves-list">
+            <div className="flex flex-col gap-2">
               {detailData.solves.length === 0 ? (
-                <div className="panel-placeholder">No solves yet</div>
+                <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
+                  No solves yet
+                </div>
               ) : (
                 detailData.solves.map((solve, index) => (
-                  <div key={index} className="solve-item">
-                    <span className="team-name">{solve.team}</span>
-                    <span className="solve-time">
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-[12px_15px] bg-ctf-bg-item border border-ctf-border rounded transition-all duration-300 hover:border-ctf-border-hover hover:bg-ctf-bg-item-hover"
+                  >
+                    <span className="text-ctf-primary text-lg font-bold">
+                      {solve.team}
+                    </span>
+                    <span className="text-ctf-primary/70 text-sm italic">
                       {formatTimeAgo(solve.solvedAt)}
                     </span>
                   </div>

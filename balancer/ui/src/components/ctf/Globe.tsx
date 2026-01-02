@@ -255,13 +255,24 @@ export function Globe({
 
   if (error) {
     return (
-      <div className="loading">
-        <div className="loading-text" style={{ color: "#FF0000" }}>
+      <div className="fixed top-0 left-0 w-screen h-screen bg-ctf-bg flex flex-col items-center justify-center z-[1000] transition-opacity duration-500">
+        <div
+          className="text-xl tracking-[4px] uppercase mb-8 animate-pulse text-red-500"
+          style={{
+            textShadow: "0 0 10px #FF0000, 0 0 20px #FF0000",
+          }}
+        >
           ERROR: {error}
         </div>
       </div>
     );
   }
 
-  return <div id="canvas-container" ref={containerRef} />;
+  return (
+    <div
+      id="canvas-container"
+      className="fixed top-0 left-0 w-screen h-screen [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full [&>canvas]:cursor-grab [&>canvas]:touch-none [&>canvas:active]:cursor-grabbing"
+      ref={containerRef}
+    />
+  );
 }

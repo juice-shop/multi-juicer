@@ -13,8 +13,6 @@ import {
 import { CountryGeometryManager } from "@/lib/globe/country-geometry";
 import { loadGeoJSON, type CountryData } from "@/lib/globe/data/geojson-loader";
 
-import "./ctfPage.css";
-
 // CSS Color Utilities
 function getCSSVariable(name: string): string {
   return getComputedStyle(document.documentElement)

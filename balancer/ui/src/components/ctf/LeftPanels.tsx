@@ -19,20 +19,26 @@ export function LeftPanels({
   onActivityToggle,
   challengeMappings,
 }: LeftPanelsProps) {
-  let containerClass = "left-panels-container";
+  // Determine grid template rows based on which panels are open
+  let gridTemplateRows = "auto auto auto"; // all-collapsed
+  let alignContent = "start";
 
   if (teamsOpen && activityOpen) {
-    containerClass += " both-open";
+    gridTemplateRows = "auto 1fr 1fr"; // both-open
+    alignContent = "stretch";
   } else if (teamsOpen) {
-    containerClass += " teams-open";
+    gridTemplateRows = "auto 1fr auto"; // teams-open
+    alignContent = "stretch";
   } else if (activityOpen) {
-    containerClass += " activity-open";
-  } else {
-    containerClass += " all-collapsed";
+    gridTemplateRows = "auto auto 1fr"; // activity-open
+    alignContent = "stretch";
   }
 
   return (
-    <div className={containerClass}>
+    <div
+      className="absolute top-5 left-5 bottom-5 w-[350px] grid gap-2.5 z-100 max-[1024px]:w-[280px] max-[768px]:hidden"
+      style={{ gridTemplateRows, alignContent }}
+    >
       <InfoPanel />
       <TeamsPanel isOpen={teamsOpen} onToggle={onTeamsToggle} />
       <LiveActivityPanel

@@ -1,11 +1,33 @@
 @import "tailwindcss";
 
+@theme {
+  /* CTF-specific color palette */
+  --color-ctf-primary: #ff6b6b;
+  --color-ctf-accent: #fdd84e;
+  --color-ctf-secondary: #00ff66;
+  --color-ctf-neutral: #b8b8b8;
+  --color-ctf-bg: #101010;
+  --color-ctf-bg-panel: rgb(0 0 0 / 0.8);
+  --color-ctf-bg-item: rgb(20 20 20 / 0.6);
+  --color-ctf-bg-item-hover: rgb(40 20 20 / 0.8);
+  --color-ctf-border: rgb(255 107 107 / 0.2);
+  --color-ctf-border-hover: rgb(255 107 107 / 0.4);
+  --color-ctf-gold: #ffd700;
+  --color-ctf-magenta: rgb(255 0 255 / 0.1);
+}
+
 @layer base {
   :root {
     --background: #f9fbfc;
     --background-highlight: #fff;
     --font-color: #000;
     --font-color-highlight: #000;
+
+    /* Neon color palette for CTF page - kept for getCSSVariable() compatibility */
+    --neon-primary: #ff6b6b;
+    --neon-accent: #fdd84e;
+    --neon-secondary: #00ff66;
+    --glow-intensity: 1.5;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -23,5 +45,19 @@
       sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     background-color: var(--background);
     color: var(--font-color);
+  }
+
+  @keyframes pulse-highlight {
+    0%,
+    100% {
+      box-shadow:
+        0 0 8px rgba(255, 0, 255, 0.3),
+        inset 0 0 5px rgba(255, 0, 255, 0.15);
+    }
+    50% {
+      box-shadow:
+        0 0 12px rgba(255, 0, 255, 0.4),
+        inset 0 0 8px rgba(255, 0, 255, 0.2);
+    }
   }
 }
