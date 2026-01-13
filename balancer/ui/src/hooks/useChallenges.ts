@@ -7,6 +7,7 @@ export interface Challenge {
   description: string;
   difficulty: 1 | 2 | 3 | 4 | 5 | 6;
   solveCount: number;
+  firstSolver?: string | null;
 }
 
 interface ChallengesResponse {

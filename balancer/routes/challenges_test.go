@@ -91,6 +91,12 @@ func TestChallengesHandler(t *testing.T) {
 		assert.Equal(t, 2, challenge1.SolveCount, "Challenge 1 should have 2 solves")
 		assert.Equal(t, 1, challenge2.SolveCount, "Challenge 2 should have 1 solve")
 
+		// Verify first solvers
+		require.NotNil(t, challenge1.FirstSolver, "Challenge 1 should have a first solver")
+		assert.Equal(t, "team-alpha", *challenge1.FirstSolver, "team-alpha solved challenge 1 first (earlier timestamp)")
+		require.NotNil(t, challenge2.FirstSolver, "Challenge 2 should have a first solver")
+		assert.Equal(t, "team-bravo", *challenge2.FirstSolver, "team-bravo was the only solver of challenge 2")
+
 		// Verify that challenge details are present
 		assert.NotEmpty(t, challenge1.Name)
 		assert.NotEmpty(t, challenge1.Key)
@@ -125,9 +131,10 @@ func TestChallengesHandler(t *testing.T) {
 		// Verify that we got all challenges
 		assert.Greater(t, len(response.Challenges), 0, "Should return at least one challenge")
 
-		// Verify that all challenges have zero solves
+		// Verify that all challenges have zero solves and no first solver
 		for _, challenge := range response.Challenges {
 			assert.Equal(t, 0, challenge.SolveCount, "All challenges should have 0 solves")
+			assert.Nil(t, challenge.FirstSolver, "All challenges should have nil firstSolver when unsolved")
 			assert.NotEmpty(t, challenge.Key)
 			assert.NotEmpty(t, challenge.Name)
 		}
@@ -158,9 +165,61 @@ func TestChallengesHandler(t *testing.T) {
 		// Verify that we got all challenges from the bundle
 		assert.Greater(t, len(response.Challenges), 0, "Should return at least one challenge")
 
-		// Verify that all challenges have zero solves
+		// Verify that all challenges have zero solves and no first solver
 		for _, challenge := range response.Challenges {
 			assert.Equal(t, 0, challenge.SolveCount, "All challenges should have 0 solves when no teams exist")
+			assert.Nil(t, challenge.FirstSolver, "All challenges should have nil firstSolver when no teams exist")
 		}
+	})
+
+	t.Run("should correctly identify first solver based on earliest timestamp", func(t *testing.T) {
+		const challengeKey = "scoreBoardChallenge"
+
+		// Create timestamps with team-charlie solving first, then team-alpha, then team-bravo
+		solveTimeCharlie := time.Now().Add(-30 * time.Minute) // Earliest
+		solveTimeAlpha := time.Now().Add(-20 * time.Minute)   // Middle
+		solveTimeBravo := time.Now().Add(-10 * time.Minute)   // Latest
+
+		teamCharlieChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challengeKey, solveTimeCharlie.Format(time.RFC3339))
+		teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challengeKey, solveTimeAlpha.Format(time.RFC3339))
+		teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challengeKey, solveTimeBravo.Format(time.RFC3339))
+
+		clientset := fake.NewSimpleClientset(
+			createTeamWithSolvedChallenges("team-charlie", teamCharlieChallenges),
+			createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
+			createTeamWithSolvedChallenges("team-bravo", teamBravoChallenges),
+		)
+
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := scoring.NewScoringService(bundle)
+		err := scoringService.CalculateAndCacheScoreBoard(context.Background())
+		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
+
+		server := http.NewServeMux()
+		AddRoutes(server, bundle, scoringService)
+
+		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		rr := httptest.NewRecorder()
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChallengesListResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		require.NoError(t, err)
+
+		// Find the challenge
+		var challenge *ChallengeListItem
+		for i := range response.Challenges {
+			if response.Challenges[i].Key == challengeKey {
+				challenge = &response.Challenges[i]
+				break
+			}
+		}
+
+		require.NotNil(t, challenge, "Challenge should be in the response")
+		assert.Equal(t, 3, challenge.SolveCount, "Challenge should have 3 solves")
+		require.NotNil(t, challenge.FirstSolver, "Challenge should have a first solver")
+		assert.Equal(t, "team-charlie", *challenge.FirstSolver, "team-charlie should be first solver (earliest timestamp)")
 	})
 }

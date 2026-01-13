@@ -64,8 +64,8 @@ export default function CtfPage() {
 
   // UI states
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
-  const [teamsOpen, setTeamsOpen] = useState(false);
-  const [activityOpen, setActivityOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(true);
+  const [activityOpen, setActivityOpen] = useState(true);
   const [selectedChallenge, setSelectedChallenge] =
     useState<ChallengeCountryMapping | null>(null);
 
@@ -152,10 +152,12 @@ export default function CtfPage() {
         setLoadingProgress(60);
         let solved = new Set<string>();
         let countriesWithChallenges = new Set<string>();
+        let solvedWithPatterns = new Map<string, number>();
         if (challenges.length > 0) {
           const mappings = mapChallengesToCountries(challenges, countries);
           const result = getCountriesByChallengeStatus(mappings);
           solved = result.solved;
+          solvedWithPatterns = result.solvedWithPatterns;
 
           // Get all countries that have challenges (solved or unsolved)
           countriesWithChallenges = new Set(
@@ -177,7 +179,8 @@ export default function CtfPage() {
         const geometryManager = new CountryGeometryManager(
           countries,
           solved,
-          countriesWithChallenges
+          countriesWithChallenges,
+          solvedWithPatterns
         );
 
         // Step 5: Done

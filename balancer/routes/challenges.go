@@ -10,12 +10,13 @@ import (
 
 // ChallengeListItem represents a challenge in the list response.
 type ChallengeListItem struct {
-	Key         string `json:"key"`
-	Name        string `json:"name"`
-	Category    string `json:"category"`
-	Description string `json:"description"`
-	Difficulty  int    `json:"difficulty"`
-	SolveCount  int    `json:"solveCount"`
+	Key         string  `json:"key"`
+	Name        string  `json:"name"`
+	Category    string  `json:"category"`
+	Description string  `json:"description"`
+	Difficulty  int     `json:"difficulty"`
+	SolveCount  int     `json:"solveCount"`
+	FirstSolver *string `json:"firstSolver"`
 }
 
 // ChallengesListResponse is the response payload for the challenges list endpoint.
@@ -30,15 +31,36 @@ func handleChallenges(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 
 		// Create a map to count solves per challenge
 		solveCounts := make(map[string]int)
+
+		// Track first solver for each challenge (key -> team name and earliest solve time)
+		type solveInfo struct {
+			team     string
+			solvedAt scoring.ChallengeProgress
+		}
+		firstSolvers := make(map[string]solveInfo)
+
 		for _, teamScore := range allTeamScores {
 			for _, solvedChallenge := range teamScore.Challenges {
 				solveCounts[solvedChallenge.Key]++
+
+				// Track first solver
+				if existing, found := firstSolvers[solvedChallenge.Key]; !found || solvedChallenge.SolvedAt.Before(existing.solvedAt.SolvedAt) {
+					firstSolvers[solvedChallenge.Key] = solveInfo{
+						team:     teamScore.Name,
+						solvedAt: solvedChallenge,
+					}
+				}
 			}
 		}
 
 		// Build the response with all challenges
 		challenges := make([]ChallengeListItem, 0, len(bundle.JuiceShopChallenges))
 		for _, challenge := range bundle.JuiceShopChallenges {
+			var firstSolver *string
+			if info, found := firstSolvers[challenge.Key]; found {
+				firstSolver = &info.team
+			}
+
 			challenges = append(challenges, ChallengeListItem{
 				Key:         challenge.Key,
 				Name:        challenge.Name,
@@ -46,6 +68,7 @@ func handleChallenges(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 				Description: challenge.Description,
 				Difficulty:  challenge.Difficulty,
 				SolveCount:  solveCounts[challenge.Key],
+				FirstSolver: firstSolver,
 			})
 		}
 

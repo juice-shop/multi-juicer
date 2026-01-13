@@ -1,3 +1,9 @@
+/**
+ * @deprecated This shader has been replaced by neon-pattern.ts
+ * which uses team-specific pattern textures instead of GLSL stripes.
+ * Kept for backwards compatibility only.
+ */
+
 import { ShaderMaterial, Vector3, AdditiveBlending, DoubleSide } from "three";
 
 export function createNeonStripedMaterial(

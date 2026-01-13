@@ -120,12 +120,8 @@ export function Globe({
         scene.add(occlusionSphere);
 
         // 6. Create globe renderer with pre-computed data
-        globeRenderer = new GlobeRenderer(
-          scene,
-          geometryManager,
-          themeColors,
-          countries
-        );
+        globeRenderer = new GlobeRenderer(scene);
+        await globeRenderer.initialize(geometryManager, themeColors, countries);
 
         // 7. Setup mouse interaction for country hover effects
         mouseInteraction = new MouseInteraction(
@@ -135,6 +131,7 @@ export function Globe({
           {
             solid: globeRenderer.solidMeshes,
             striped: globeRenderer.stripedMeshes,
+            pattern: globeRenderer.patternMeshes,
           },
           onCountryHover,
           onCountryClick

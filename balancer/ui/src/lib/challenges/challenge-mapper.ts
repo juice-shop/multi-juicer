@@ -1,4 +1,5 @@
 import type { CountryData } from "../globe/data/geojson-loader";
+import { getPatternIndexForTeam } from "../patterns/pattern-selector";
 
 // Re-export Challenge from the hook
 export type { Challenge } from "../../hooks/useChallenges";
@@ -11,6 +12,8 @@ export interface CountryPopulation {
 export interface ChallengeCountryMapping {
   challenge: Challenge;
   countryName: string | null;
+  firstSolver?: string | null;
+  patternIndex?: number;
 }
 
 /**
@@ -87,9 +90,16 @@ export function mapChallengesToCountries(
   const mappings: ChallengeCountryMapping[] = sortedChallenges.map(
     (challenge, index) => {
       const country = sortedCountries[index];
+      const firstSolver = challenge.firstSolver || null;
+      const patternIndex = firstSolver
+        ? getPatternIndexForTeam(firstSolver)
+        : undefined;
+
       return {
         challenge,
         countryName: country ? country.name : null,
+        firstSolver,
+        patternIndex,
       };
     }
   );
@@ -105,18 +115,26 @@ export function mapChallengesToCountries(
 /**
  * Get sets of countries by challenge solve status
  * @param mappings - Array of challenge-country mappings
- * @returns Object with solved and unsolved country sets
+ * @returns Object with solved and unsolved country sets, plus pattern mapping
  */
 export function getCountriesByChallengeStatus(
   mappings: ChallengeCountryMapping[]
-): { solved: Set<string>; unsolved: Set<string> } {
+): {
+  solved: Set<string>;
+  unsolved: Set<string>;
+  solvedWithPatterns: Map<string, number>;
+} {
   const solved = new Set<string>();
   const unsolved = new Set<string>();
+  const solvedWithPatterns = new Map<string, number>();
 
   for (const mapping of mappings) {
     if (mapping.countryName) {
       if (mapping.challenge.solveCount > 0) {
         solved.add(mapping.countryName);
+        if (mapping.patternIndex !== undefined) {
+          solvedWithPatterns.set(mapping.countryName, mapping.patternIndex);
+        }
       } else {
         unsolved.add(mapping.countryName);
       }
@@ -128,5 +146,5 @@ export function getCountriesByChallengeStatus(
   );
   console.log("Solved countries:", Array.from(solved).join(", "));
 
-  return { solved, unsolved };
+  return { solved, unsolved, solvedWithPatterns };
 }

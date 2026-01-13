@@ -14,19 +14,23 @@ interface GeometryWithName {
 export class CountryGeometryManager {
   wireframeGeometries: GeometryWithName[] = [];
   stripedGeometries: GeometryWithName[] = [];
+  patternGeometries: GeometryWithName[] = [];
   solidGeometries: GeometryWithName[] = [];
   highlightedCountries: Set<string> = new Set();
   totalVertexCount: number = 0;
   countriesWithChallenges: Set<string>;
   solvedCountries: Set<string>;
+  countryPatternMap: Map<string, number>;
 
   constructor(
     countries: CountryData[],
     solvedCountries: Set<string>,
-    countriesWithChallenges: Set<string>
+    countriesWithChallenges: Set<string>,
+    solvedWithPatterns: Map<string, number>
   ) {
     this.countriesWithChallenges = countriesWithChallenges;
     this.solvedCountries = solvedCountries;
+    this.countryPatternMap = solvedWithPatterns;
     this.createGeometries(countries);
   }
 
@@ -55,25 +59,21 @@ export class CountryGeometryManager {
       // Determine fill type
       const fillType = this.getFillType(country.name);
 
-      // Create filled geometry for striped or solid countries
+      // Create filled geometry for pattern or solid countries
       if (fillType !== "none") {
         this.highlightedCountries.add(country.name);
 
         const positionAttr = geometry.attributes.position;
 
-        if (fillType === "striped") {
-          // Striped countries use the same geometry for both
-          this.stripedGeometries.push({
+        if (fillType === "pattern") {
+          // Pattern countries use the new pattern-based rendering
+          this.patternGeometries.push({
             name: country.name,
             geometry: geometry,
           });
-          this.solidGeometries.push({
-            name: country.name,
-            geometry: geometry,
-          });
-          // Count vertices for both (same geometry used twice)
+          // Count vertices
           if (positionAttr) {
-            this.totalVertexCount += positionAttr.count * 2;
+            this.totalVertexCount += positionAttr.count;
           }
         } else if (fillType === "solid") {
           this.solidGeometries.push({
@@ -99,7 +99,7 @@ export class CountryGeometryManager {
     console.log(
       `Created ${this.wireframeGeometries.length} wireframe geometries`
     );
-    console.log(`Created ${this.stripedGeometries.length} striped geometries`);
+    console.log(`Created ${this.patternGeometries.length} pattern geometries`);
     console.log(`Created ${this.solidGeometries.length} solid geometries`);
     console.log(
       `Total vertex count: ${this.totalVertexCount.toLocaleString()}`
@@ -109,9 +109,9 @@ export class CountryGeometryManager {
   /**
    * Determine the fill type for a country
    */
-  getFillType(name: string): "striped" | "solid" | "none" {
-    if (this.solvedCountries.has(name)) {
-      return "striped";
+  getFillType(name: string): "pattern" | "solid" | "none" {
+    if (this.solvedCountries.has(name) && this.countryPatternMap.has(name)) {
+      return "pattern";
     }
 
     if (this.countriesWithChallenges.has(name)) {
@@ -119,5 +119,12 @@ export class CountryGeometryManager {
     }
 
     return "none";
+  }
+
+  /**
+   * Get the pattern index for a country
+   */
+  getPatternIndex(countryName: string): number | undefined {
+    return this.countryPatternMap.get(countryName);
   }
 }

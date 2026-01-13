@@ -1,4 +1,5 @@
 import { useScoreboard } from "@/hooks/useScoreboard";
+import { getPatternPathForTeam } from "@/lib/patterns/pattern-selector";
 
 interface TeamsPanelProps {
   isOpen: boolean;
@@ -40,20 +41,52 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
           )}
           {teams && (
             <div className="flex flex-col gap-2.5">
-              {teams.map((team, index) => (
-                <div
-                  key={index}
-                  className="p-2.5 bg-ctf-bg-item border border-ctf-border transition-all duration-300 hover:border-ctf-border-hover hover:bg-ctf-bg-item-hover"
-                >
-                  <div className="text-xs font-bold uppercase tracking-[1px] text-ctf-primary mb-1.5">
-                    #{team.position} {team.name}
+              {teams.map((team, index) => {
+                const patternPath = getPatternPathForTeam(team.name);
+
+                return (
+                  <div
+                    key={index}
+                    className="flex bg-ctf-bg-item border border-ctf-border transition-all duration-300 hover:border-ctf-border-hover hover:bg-ctf-bg-item-hover overflow-hidden min-h-[60px]"
+                  >
+                    {/* Content section - left 67% */}
+                    <div className="flex-1 p-2.5 flex flex-col justify-center">
+                      <div className="text-xs font-bold uppercase tracking-[1px] text-ctf-primary mb-1.5">
+                        #{team.position} {team.name}
+                      </div>
+                      <div className="text-[10px] text-ctf-neutral opacity-90 uppercase tracking-[1px]">
+                        {team.score}pts - {team.solvedChallengeCount}{" "}
+                        {team.solvedChallengeCount === 1 ? "Solve" : "Solves"}
+                      </div>
+                    </div>
+
+                    {/* Pattern section - right 33% */}
+                    <div className="w-1/3 flex-shrink-0 relative overflow-hidden bg-black/20">
+                      {/* Rotated pattern background */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage: `url(${patternPath})`,
+                          backgroundSize: "30px 30px",
+                          backgroundRepeat: "repeat",
+                          backgroundPosition: "center",
+                          transform: "rotate(45deg) scale(1.8)",
+                          transformOrigin: "center",
+                          imageRendering: "crisp-edges",
+                        }}
+                      />
+                      {/* Overlay gradient for fade effect */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(to left, rgba(0,0,0,0) 0%, rgba(2,2,2,0.5) 100%)",
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="text-[10px] text-ctf-neutral opacity-90 uppercase tracking-[1px]">
-                    {team.score}pts - {team.solvedChallengeCount}{" "}
-                    {team.solvedChallengeCount === 1 ? "Solve" : "Solves"}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

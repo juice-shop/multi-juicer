@@ -9,9 +9,13 @@ import {
   ShaderMaterial,
 } from "three";
 
+import { getPatternPathByIndex } from "../patterns/pattern-selector";
+import { TextureCache } from "../patterns/texture-cache";
+
 import { createCapitalMarkers } from "./capital-markers";
 import type { CountryGeometryManager } from "./country-geometry";
 import type { CountryData } from "./data/geojson-loader";
+import { createNeonPatternMaterial } from "./materials/neon-pattern";
 import { createNeonSolidMaterial } from "./materials/neon-solid";
 import { createNeonStripedMaterial } from "./materials/neon-striped";
 import { createNeonWireframeMaterial } from "./materials/neon-wireframe";
@@ -33,26 +37,31 @@ interface ThemeColors {
 export class GlobeRenderer {
   wireframeLines: Line[] = [];
   stripedMeshes: Mesh[] = [];
+  patternMeshes: Mesh[] = [];
   solidMeshes: Mesh[] = [];
   triangleWireframes: LineSegments[] = []; // For visualizing triangle edges
   capitalMarkers: Mesh[] = []; // Yellow donut markers for capitals
   private scene: Scene;
+  private textureCache: TextureCache;
 
-  constructor(
-    scene: Scene,
-    geometryManager: CountryGeometryManager,
-    themeColors: ThemeColors,
-    countries: CountryData[]
-  ) {
+  constructor(scene: Scene) {
     this.scene = scene;
-    this.createRenderObjects(geometryManager, themeColors, countries);
+    this.textureCache = TextureCache.getInstance();
   }
 
-  private createRenderObjects(
+  async initialize(
     geometryManager: CountryGeometryManager,
     themeColors: ThemeColors,
     countries: CountryData[]
-  ): void {
+  ): Promise<void> {
+    await this.createRenderObjects(geometryManager, themeColors, countries);
+  }
+
+  private async createRenderObjects(
+    geometryManager: CountryGeometryManager,
+    themeColors: ThemeColors,
+    countries: CountryData[]
+  ): Promise<void> {
     // Create wireframe material (shared across all country borders)
     const wireframeMaterial = createNeonWireframeMaterial(
       themeColors.primary,
@@ -102,6 +111,50 @@ export class GlobeRenderer {
     }
 
     console.log(`Added ${this.stripedMeshes.length} striped meshes to scene`);
+
+    // Create pattern meshes for solved challenges
+    for (const { geometry, name } of geometryManager.patternGeometries) {
+      const patternIndex = geometryManager.getPatternIndex(name);
+
+      if (patternIndex === undefined) {
+        console.warn(`No pattern index for country: ${name}`);
+        continue;
+      }
+
+      // Load texture
+      const patternPath = getPatternPathByIndex(patternIndex);
+
+      try {
+        const texture = await this.textureCache.loadTexture(patternPath);
+
+        // Create pattern material
+        const patternMaterial = createNeonPatternMaterial(
+          themeColors.primary,
+          themeColors.glowIntensity,
+          texture
+        );
+
+        const mesh = new Mesh(geometry, patternMaterial);
+        mesh.name = name;
+        mesh.userData.countryName = name;
+        this.patternMeshes.push(mesh);
+        this.scene.add(mesh);
+      } catch (error) {
+        console.error(`Failed to load pattern for ${name}:`, error);
+        // Fallback: use solid material
+        const solidMaterial = createNeonSolidMaterial(
+          themeColors.primary,
+          themeColors.glowIntensity
+        );
+        const mesh = new Mesh(geometry, solidMaterial);
+        mesh.name = name;
+        mesh.userData.countryName = name;
+        this.solidMeshes.push(mesh);
+        this.scene.add(mesh);
+      }
+    }
+
+    console.log(`Added ${this.patternMeshes.length} pattern meshes to scene`);
 
     // Create solid meshes for top 100 populated countries
     for (const { geometry, name } of geometryManager.solidGeometries) {
@@ -170,6 +223,14 @@ export class GlobeRenderer {
 
     // Update striped materials
     for (const mesh of this.stripedMeshes) {
+      const material = mesh.material as ShaderMaterial;
+      if (material.uniforms?.u_cameraPosition) {
+        material.uniforms.u_cameraPosition.value.copy(cameraPosition);
+      }
+    }
+
+    // Update pattern materials
+    for (const mesh of this.patternMeshes) {
       const material = mesh.material as ShaderMaterial;
       if (material.uniforms?.u_cameraPosition) {
         material.uniforms.u_cameraPosition.value.copy(cameraPosition);
