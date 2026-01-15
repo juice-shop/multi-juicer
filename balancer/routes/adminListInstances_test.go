@@ -98,14 +98,16 @@ func TestAdminListInstanceshandler(t *testing.T) {
 				Ready:       true,
 				CreatedAt:   1_700_000_000_000,
 				LastConnect: 1_729_259_666_123,
-				CheatScore:  nil,
+				CheatScore:        nil,
+				CheatScoreHistory: nil,
 			},
 			{
 				Team:        "test-team",
 				Ready:       false,
 				CreatedAt:   1_600_000_000_000,
 				LastConnect: 1_729_259_333_123,
-				CheatScore:  nil,
+				CheatScore:        nil,
+				CheatScoreHistory: nil,
 			},
 		}, response.Instances)
 	})
@@ -153,11 +155,15 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		assert.NotNil(t, teamWithScores)
 		assert.NotNil(t, teamWithScores.CheatScore)
 		assert.InDelta(t, 0.42, *teamWithScores.CheatScore, 0.001)
+		assert.Len(t, teamWithScores.CheatScoreHistory, 2)
+		assert.Equal(t, 0.25, teamWithScores.CheatScoreHistory[0].TotalCheatScore)
+		assert.Equal(t, 0.42, teamWithScores.CheatScoreHistory[1].TotalCheatScore)
 
 		// Verify team with single cheat score returns it (0.15)
 		assert.NotNil(t, anotherTeam)
 		assert.NotNil(t, anotherTeam.CheatScore)
 		assert.InDelta(t, 0.15, *anotherTeam.CheatScore, 0.001)
+		assert.Len(t, anotherTeam.CheatScoreHistory, 1)
 
 		// Verify team without cheat scores has nil
 		assert.NotNil(t, teamWithoutScores)
