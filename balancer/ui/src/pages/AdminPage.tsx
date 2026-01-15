@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import Popup from "reactjs-popup";
 
 import { Card } from "@/components/Card";
+import { CheatScoreGraph } from "@/components/CheatScoreGraph/CheatScoreGraph";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 
 const buttonClasses =
@@ -102,6 +104,10 @@ interface Team {
   createdAt: Date;
   lastConnect: Date;
   cheatScore?: number;
+  cheatScoreHistory?: {
+    totalCheatScore: number;
+    timestamp: string;
+  }[];
 }
 
 interface TeamRaw {
@@ -110,6 +116,10 @@ interface TeamRaw {
   createdAt: string;
   lastConnect: string;
   cheatScore?: number;
+  cheatScoreHistory?: {
+    totalCheatScore: number;
+    timestamp: string;
+  }[];
 }
 
 async function fetchAdminData(signal?: AbortSignal): Promise<Team[]> {
@@ -251,9 +261,42 @@ export default function AdminPage() {
                       ℹ️
                     </a>
                   </p>
-                  <p className="text-sm text-gray-800 dark:text-gray-200">
-                    {(team.cheatScore * 100).toFixed(1)}%
-                  </p>
+                  {team.cheatScoreHistory &&
+                  team.cheatScoreHistory.length > 1 ? (
+                    <Popup
+                      trigger={
+                        <span
+                          className="text-sm text-gray-800 dark:text-gray-200 cursor-help
+                            border-b border-dotted border-transparent
+                            hover:border-gray-400"
+                        >
+                          <br />
+                          {(team.cheatScore * 100).toFixed(1)}%
+                        </span>
+                      }
+                      position={["top center", "bottom center"]}
+                      on="hover"
+                      mouseEnterDelay={800}
+                      arrow={true}
+                      arrowStyle={{
+                        color: "black",
+                      }}
+                      contentStyle={{
+                        padding: "0px",
+                        border: "none",
+                        borderRadius: "0.25rem",
+                      }}
+                    >
+                      <CheatScoreGraph
+                        history={team.cheatScoreHistory}
+                        teamname={team.team}
+                      />
+                    </Popup>
+                  ) : (
+                    <p className="text-sm text-gray-800 dark:text-gray-200">
+                      {(team.cheatScore * 100).toFixed(1)}%
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
