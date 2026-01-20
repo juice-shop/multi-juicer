@@ -44,6 +44,11 @@ export default {
   "admin_table.cheat_score_tooltip":
     "Acest scor indică dacă provocările sunt rezolvate mai repede decât se așteaptă în mod normal. Este posibil să nu identifice cu acuratețe trișarea reală. Apasă aici pentru a afla mai multe.",
   "admin_table.no_cheat_score": "Fără scor de trișare",
+  "cheat_score_graph.title": "Istoricul scorului de trișare",
+  "cheat_score_graph.not_enough_data": "Date insuficiente pentru grafic",
+  "cheat_score_graph.x_axis_label": "Provocări rezolvate →",
+  "cheat_score_graph.expand": "Extinde",
+  "cheat_score_graph.close": "Închide",
   updating_score: "Scorul tău este calculat...",
   score_overview: "Clasament",
   team_score:
