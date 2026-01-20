@@ -293,7 +293,14 @@ export default function AdminPage() {
                       />
                     </Popup>
                   ) : (
-                    <p className="text-sm text-gray-800 dark:text-gray-200">
+                    <p
+                      className="text-sm text-gray-800 dark:text-gray-200 cursor-help"
+                      title={intl.formatMessage({
+                        id: "admin_table.cheat_score_graph_not_available_yet",
+                        defaultMessage:
+                          "The cheat score graph will be available once more than one challenge is solved",
+                      })}
+                    >
                       {(team.cheatScore * 100).toFixed(1)}%
                     </p>
                   )}
