@@ -1,3 +1,5 @@
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { CheatScoreChart } from "./CheatScoreChart";
 
 interface Props {
@@ -16,6 +18,8 @@ export function CheatScoreGraphDialog({
   history,
   teamname,
 }: Props) {
+  const intl = useIntl();
+
   if (!open) return null;
 
   return (
@@ -26,15 +30,21 @@ export function CheatScoreGraphDialog({
       >
         <div className="absolute top-3 left-3 z-10 pointer-events-none">
           <h3 className="text-m ml-5 font-semibold uppercase tracking-wider text-gray-800 dark:text-gray-300">
-            Cheat Score History ·{" "}
-            <span className="text-gray-500 lowercase">{teamname}</span>
+            <FormattedMessage
+              id="cheat_score_graph.title"
+              defaultMessage="Cheat Score History"
+            />{" "}
+            · <span className="text-gray-500 lowercase">{teamname}</span>
           </h3>
         </div>
 
         <button
           onClick={onClose}
           className="cursor-pointer absolute top-4 right-4 z-20 text-gray-300 hover:text-white transition bg-gray-900/50 hover:bg-gray-800 p-2 rounded-full leading-none w-8 h-8 flex items-center justify-center"
-          title="Close"
+          title={intl.formatMessage({
+            id: "cheat_score_graph.close",
+            defaultMessage: "Close",
+          })}
         >
           ✕
         </button>

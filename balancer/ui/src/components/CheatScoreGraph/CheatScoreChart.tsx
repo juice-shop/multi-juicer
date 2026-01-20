@@ -1,5 +1,10 @@
-import React, { useMemo, useState, useRef, useLayoutEffect } from "react";
-import { FormattedDate, FormattedTime } from "react-intl";
+import React, { useState, useRef, useLayoutEffect } from "react";
+import {
+  FormattedDate,
+  FormattedMessage,
+  FormattedTime,
+  useIntl,
+} from "react-intl";
 
 interface CheatScoreChartProps {
   history: {
@@ -10,6 +15,7 @@ interface CheatScoreChartProps {
 }
 
 export function CheatScoreChart({ history, variant }: CheatScoreChartProps) {
+  const intl = useIntl();
   const [hoverData, setHoverData] = useState<{
     x: number;
     y: number;
@@ -89,7 +95,10 @@ export function CheatScoreChart({ history, variant }: CheatScoreChartProps) {
   if (history.length < 2) {
     return (
       <div className="text-gray-500 text-sm p-4 text-center">
-        Not enough data for graph
+        <FormattedMessage
+          id="cheat_score_graph.not_enough_data"
+          defaultMessage="Not enough data for graph"
+        />
       </div>
     );
   }
@@ -185,7 +194,10 @@ export function CheatScoreChart({ history, variant }: CheatScoreChartProps) {
           textAnchor="middle"
           className="fill-gray-600 dark:fill-gray-400 text-[11px] font-medium"
         >
-          Challenges Solved →
+          {intl.formatMessage({
+            id: "cheat_score_graph.x_axis_label",
+            defaultMessage: "Challenges Solved →",
+          })}
         </text>
 
         {/* Data line */}

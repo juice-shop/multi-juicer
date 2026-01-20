@@ -46,6 +46,11 @@ export default {
   "admin_table.cheat_score_tooltip":
     "Цей показник вказує, чи вирішуються завдання швидше, ніж зазвичай очікується. Він може не точно ідентифікувати справжнє шахрайство. Натисніть, щоб дізнатися більше.",
   "admin_table.no_cheat_score": "Немає показника читів",
+  "cheat_score_graph.title": "Історія показника читів",
+  "cheat_score_graph.not_enough_data": "Недостатньо даних для графіка",
+  "cheat_score_graph.x_axis_label": "Вирішені завдання →",
+  "cheat_score_graph.expand": "Розгорнути",
+  "cheat_score_graph.close": "Закрити",
   updating_score: "Ваш рахунок обчислюється...",
   score_overview: "Огляд рахунку",
   team_score:
