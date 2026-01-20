@@ -43,6 +43,8 @@ export default {
   "admin_table.cheat_score_tooltip":
     "Deze score geeft aan of uitdagingen sneller worden opgelost dan normaal verwacht. Het kan mogelijk niet nauwkeurig daadwerkelijk valsspelen identificeren. Klik om meer te weten te komen.",
   "admin_table.no_cheat_score": "Geen cheat score",
+  "admin_table.cheat_score_graph_not_available_yet":
+    "De cheat score grafiek wordt beschikbaar zodra meer dan één uitdaging is opgelost",
   "cheat_score_graph.title": "Cheat Score Geschiedenis",
   "cheat_score_graph.not_enough_data": "Niet genoeg data voor grafiek",
   "cheat_score_graph.x_axis_label": "Opgeloste uitdagingen →",

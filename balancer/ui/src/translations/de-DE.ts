@@ -45,6 +45,8 @@ export default {
   "admin_table.cheat_score_tooltip":
     "Dieser Score zeigt an, ob Herausforderungen schneller gelöst werden als normalerweise erwartet. Er identifiziert möglicherweise nicht genau tatsächliches Cheaten. Klicken Sie hier, um mehr zu erfahren.",
   "admin_table.no_cheat_score": "Kein Cheat-Score",
+  "admin_table.cheat_score_graph_not_available_yet":
+    "Das Cheat-Score-Diagramm wird verfügbar, sobald mehr als eine Herausforderung gelöst wurde",
   "cheat_score_graph.title": "Cheat-Score-Verlauf",
   "cheat_score_graph.not_enough_data": "Nicht genügend Daten für Diagramm",
   "cheat_score_graph.x_axis_label": "Gelöste Herausforderungen →",
