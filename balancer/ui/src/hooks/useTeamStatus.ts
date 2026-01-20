@@ -9,10 +9,8 @@ interface SolvedChallengeResponse {
   solvedAt: string; // ISO string
 }
 
-export interface SolvedChallenge extends Omit<
-  SolvedChallengeResponse,
-  "solvedAt"
-> {
+export interface SolvedChallenge
+  extends Omit<SolvedChallengeResponse, "solvedAt"> {
   solvedAt: Date; // Convert string to Date object
 }
 
@@ -25,10 +23,8 @@ interface TeamStatusResponse {
   readiness: boolean;
 }
 
-export interface TeamStatus extends Omit<
-  TeamStatusResponse,
-  "solvedChallenges"
-> {
+export interface TeamStatus
+  extends Omit<TeamStatusResponse, "solvedChallenges"> {
   solvedChallenges: SolvedChallenge[];
 }
 

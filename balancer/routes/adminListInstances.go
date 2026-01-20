@@ -16,10 +16,10 @@ type AdminListInstancesResponse struct {
 }
 
 type AdminListJuiceShopInstance struct {
-	Team        string   `json:"team"`
-	Ready       bool     `json:"ready"`
-	CreatedAt   int64    `json:"createdAt"`
-	LastConnect int64    `json:"lastConnect"`
+	Team              string            `json:"team"`
+	Ready             bool              `json:"ready"`
+	CreatedAt         int64             `json:"createdAt"`
+	LastConnect       int64             `json:"lastConnect"`
 	CheatScore        *float64          `json:"cheatScore,omitempty"`
 	CheatScoreHistory []CheatScoreEntry `json:"cheatScoreHistory,omitempty"`
 }
@@ -75,10 +75,10 @@ func handleAdminListInstances(bundle *bundle.Bundle) http.Handler {
 				}
 
 				instances = append(instances, AdminListJuiceShopInstance{
-					Team:        teamDeployment.Labels["team"],
-					Ready:       teamDeployment.Status.ReadyReplicas == 1,
-					CreatedAt:   teamDeployment.CreationTimestamp.UnixMilli(),
-					LastConnect: lastConnection.UnixMilli(),
+					Team:              teamDeployment.Labels["team"],
+					Ready:             teamDeployment.Status.ReadyReplicas == 1,
+					CreatedAt:         teamDeployment.CreationTimestamp.UnixMilli(),
+					LastConnect:       lastConnection.UnixMilli(),
 					CheatScore:        cheatScore,
 					CheatScoreHistory: cheatScores,
 				})
