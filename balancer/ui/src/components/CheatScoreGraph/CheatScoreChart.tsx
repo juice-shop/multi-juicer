@@ -38,36 +38,30 @@ export function CheatScoreChart({ history, variant }: CheatScoreChartProps) {
   const { width, height } = dimensions;
   const padding = 50;
 
-  const points = useMemo(() => {
-    if (history.length < 2 || width === 0 || height === 0) return [];
+  const sortedHistory = [...history].sort(
+    (a, b) =>
+      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 
-    const sortedHistory = [...history].sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+  const points =
+    history.length < 2 || width === 0 || height === 0
+      ? []
+      : sortedHistory.map((h, index) => {
+          const x =
+            padding +
+            (index / (sortedHistory.length - 1)) * (width - 2 * padding);
+          const y =
+            height - padding - h.totalCheatScore * (height - 2 * padding);
+          return { x, y, score: h.totalCheatScore, timestamp: h.timestamp };
+        });
 
-    const maxScore = 1;
-
-    return sortedHistory.map((h, index) => {
-      const x =
-        padding + (index / (sortedHistory.length - 1)) * (width - 2 * padding);
-
-      const y =
-        height -
-        padding -
-        (h.totalCheatScore / maxScore) * (height - 2 * padding);
-
-      return { x, y, score: h.totalCheatScore, timestamp: h.timestamp };
-    });
-  }, [history, width, height]);
-
-  const pathData = useMemo(() => {
-    if (points.length === 0) return "";
-    return points.reduce((acc, point, i) => {
-      if (i === 0) return `M ${point.x} ${point.y}`;
-      return `${acc} L ${point.x} ${point.y}`;
-    }, "");
-  }, [points]);
+  const pathData =
+    points.length === 0
+      ? ""
+      : points.reduce((acc, point, i) => {
+          if (i === 0) return `M ${point.x} ${point.y}`;
+          return `${acc} L ${point.x} ${point.y}`;
+        }, "");
 
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!containerRef.current || points.length === 0) return;
