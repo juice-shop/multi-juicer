@@ -276,7 +276,7 @@ export default function AdminPage() {
                       }
                       position={["top center", "bottom center"]}
                       on="hover"
-                      mouseEnterDelay={800}
+                      mouseEnterDelay={100}
                       arrow={true}
                       arrowStyle={{
                         color: "black",
