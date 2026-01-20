@@ -45,8 +45,7 @@ export function CheatScoreChart({ history, variant }: CheatScoreChartProps) {
   const padding = 50;
 
   const sortedHistory = [...history].sort(
-    (a, b) =>
-      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
 
   const points =

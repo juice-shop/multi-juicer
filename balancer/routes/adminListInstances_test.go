@@ -94,18 +94,18 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		assert.Equal(t, []AdminListJuiceShopInstance{
 			{
-				Team:        "foobar",
-				Ready:       true,
-				CreatedAt:   1_700_000_000_000,
-				LastConnect: 1_729_259_666_123,
+				Team:              "foobar",
+				Ready:             true,
+				CreatedAt:         1_700_000_000_000,
+				LastConnect:       1_729_259_666_123,
 				CheatScore:        nil,
 				CheatScoreHistory: nil,
 			},
 			{
-				Team:        "test-team",
-				Ready:       false,
-				CreatedAt:   1_600_000_000_000,
-				LastConnect: 1_729_259_333_123,
+				Team:              "test-team",
+				Ready:             false,
+				CreatedAt:         1_600_000_000_000,
+				LastConnect:       1_729_259_333_123,
 				CheatScore:        nil,
 				CheatScoreHistory: nil,
 			},
