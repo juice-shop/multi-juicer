@@ -26,7 +26,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
-            - image: '{{ .Values.juiceShopCleanup.repository }}:{{ .Values.juiceShopCleanup.tag | default (printf "v%s" .Chart.Version) }}'
+            - image: '{{ .Values.juiceShopCleanup.repository }}:{{ .Values.juiceShopCleanup.tag | default (printf "v%s" .Chart.AppVersion) }}'
               imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
               name: 'cleanup-job'
               {{- with .Values.juiceShopCleanup.containerSecurityContext }}

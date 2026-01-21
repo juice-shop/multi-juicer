@@ -1,0 +1,61 @@
+suite: OCI & Flux Version Compliance
+# DOCUMENTATION:
+# These tests ensure that Chart.AppVersion is used for image tags instead of
+# Chart.Version. Flux/GitOps tools inject SemVer build metadata (e.g. "+38f0858")
+# into Chart.Version but NOT into Chart.AppVersion, making AppVersion safe for
+# Docker tags (which cannot contain "+").
+
+tests:
+  # ==========================================================
+  # TEST 1: Progress Watchdog Component
+  # ==========================================================
+  - it: progress-watchdog should use Chart.AppVersion for image tag even when Chart.Version has build metadata
+    templates:
+      - templates/progress-watchdog/deployment.yaml
+    
+    # Simulate Flux behavior: Chart.Version has build metadata, but AppVersion doesn't
+    chart:
+      version: "8.3.0+38f085896f69"
+      appVersion: "8.3.0"
+
+    # The image tag should use AppVersion (clean), not Chart.Version (with +metadata)
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/juice-shop/multi-juicer/progress-watchdog:v8.3.0"
+
+  # ==========================================================
+  # TEST 2: Balancer Component
+  # ==========================================================
+  - it: balancer should use Chart.AppVersion for image tag even when Chart.Version has build metadata
+    templates:
+      - templates/balancer/deployment.yaml
+    
+    # Simulate Flux behavior: Chart.Version has build metadata, but AppVersion doesn't
+    chart:
+      version: "8.3.0+38f085896f69"
+      appVersion: "8.3.0"
+    
+    # The image tag should use AppVersion (clean), not Chart.Version (with +metadata)
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "ghcr.io/juice-shop/multi-juicer/balancer:v8.3.0"
+
+  # ==========================================================
+  # TEST 3: Cleanup CronJob Component
+  # ==========================================================
+  - it: cleanup cronjob should use Chart.AppVersion for image tag even when Chart.Version has build metadata
+    templates:
+      - templates/cleanup/cron-job.yaml
+    
+    # Simulate Flux behavior: Chart.Version has build metadata, but AppVersion doesn't
+    chart:
+      version: "8.3.0+38f085896f69"
+      appVersion: "8.3.0"
+    
+    # The image tag should use AppVersion (clean), not Chart.Version (with +metadata)
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: "ghcr.io/juice-shop/multi-juicer/cleaner:v8.3.0"
