@@ -9,6 +9,7 @@ import { JoiningPage } from "@/pages/JoiningPage";
 import { JoinPage } from "@/pages/JoinPage";
 import { TeamStatusPage } from "@/pages/TeamStatusPage";
 import availableLanguages, { MessageLoader } from "@/translations/index";
+
 import { NotificationListener } from "./components/NotificationListener";
 
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
@@ -143,7 +144,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster />
-      <NotificationListener/>
+      <NotificationListener />
     </IntlProvider>
   );
 }
