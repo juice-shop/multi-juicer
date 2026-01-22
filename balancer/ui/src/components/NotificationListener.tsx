@@ -1,11 +1,37 @@
-import { useAdminMessage } from "@/hooks/useAdminMessage";
+import { useEffect, useRef } from "react"
+import toast from "react-hot-toast"
+import { useAdminMessage } from "@/hooks/useAdminMessage"
 
-export default function NotificationListener() {
-  const { data } = useAdminMessage();
-  return (<div>
-    {/*will add toast here*/}
-          <p>{data?.title}</p>
-          <div>{data?.message}</div>
-       </div>
-  );
+export function NotificationListener() {
+  const { data } = useAdminMessage()
+  const lastSeenRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!data) return
+
+    if (lastSeenRef.current === data.updatedAt) return
+    lastSeenRef.current = data.updatedAt
+
+    const content = (
+      <div>
+        <strong>{data.title}</strong>
+        <div>{data.message}</div>
+      </div>
+    )
+
+    switch (data.level) {
+      case "error":
+        toast.error(content)
+        break
+      case "warning":
+        toast(content, { icon: "⚠️" })
+        break
+      case "info":
+      default:
+        toast(content)
+        break
+    }
+  }, [data])
+
+  return null
 }
