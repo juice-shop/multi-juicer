@@ -90,20 +90,8 @@ export class CountryGeometryManager {
         const triangleCount = indexAttr
           ? indexAttr.count / 3
           : positionAttr.count / 3;
-        console.log(
-          `Created ${fillType} geometry for ${country.name}: ${triangleCount} triangles`
-        );
       }
     }
-
-    console.log(
-      `Created ${this.wireframeGeometries.length} wireframe geometries`
-    );
-    console.log(`Created ${this.patternGeometries.length} pattern geometries`);
-    console.log(`Created ${this.solidGeometries.length} solid geometries`);
-    console.log(
-      `Total vertex count: ${this.totalVertexCount.toLocaleString()}`
-    );
   }
 
   /**

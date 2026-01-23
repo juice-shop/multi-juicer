@@ -72,20 +72,6 @@ export function mapChallengesToCountries(
   // Aggregate and sort countries by population DESC
   const sortedCountries = aggregateCountryPopulations(countries);
 
-  console.log(
-    `Mapping ${sortedChallenges.length} challenges to ${sortedCountries.length} countries`
-  );
-  console.log(
-    "Top 10 countries by population:",
-    sortedCountries
-      .slice(0, 10)
-      .map((c) => `${c.name} (${c.population.toLocaleString()})`)
-  );
-  console.log(
-    "First 10 challenges by difficulty:",
-    sortedChallenges.slice(0, 10).map((c) => `${c.name} (${c.difficulty}★)`)
-  );
-
   // Map challenges to countries
   const mappings: ChallengeCountryMapping[] = sortedChallenges.map(
     (challenge, index) => {
@@ -103,11 +89,6 @@ export function mapChallengesToCountries(
       };
     }
   );
-
-  // Log some stats
-  const assignedCount = mappings.filter((m) => m.countryName !== null).length;
-  const unassignedCount = mappings.filter((m) => m.countryName === null).length;
-  console.log(`Assigned: ${assignedCount}, Unassigned: ${unassignedCount}`);
 
   return mappings;
 }
@@ -140,11 +121,6 @@ export function getCountriesByChallengeStatus(
       }
     }
   }
-
-  console.log(
-    `Solved countries: ${solved.size}, Unsolved countries: ${unsolved.size}`
-  );
-  console.log("Solved countries:", Array.from(solved).join(", "));
 
   return { solved, unsolved, solvedWithPatterns };
 }

@@ -23,13 +23,6 @@ interface GeoJSONGeometry {
   coordinates: number[][][] | number[][][][];
 }
 
-// Debug: Check if import worked
-console.log(
-  "ConicPolygonGeometry imported:",
-  typeof ConicPolygonGeometry,
-  ConicPolygonGeometry
-);
-
 export interface CountryData {
   name: string;
   partIndex: number;
@@ -62,8 +55,6 @@ export async function loadGeoJSON(
     const countries = processGeoJSON(geojson, onProgress);
 
     if (onProgress) onProgress(1.0);
-
-    console.log(`Loaded ${countries.length} country geometries`);
 
     return countries;
   } catch (error) {
@@ -110,19 +101,7 @@ function processGeoJSON(
         continue;
       }
 
-      console.log(`${countryName} part ${i} polygon structure:`, {
-        isArray: Array.isArray(polygon),
-        length: polygon.length,
-        firstRingLength: polygon[0]?.length,
-        firstPoint: polygon[0]?.[0],
-      });
-
       try {
-        console.log(
-          `Creating geometry for ${countryName} part ${i} with polygon:`,
-          polygon
-        );
-
         // Create filled mesh geometry using ConicPolygonGeometry
         // curvatureResolution: Lower = more detail, higher = fewer vertices
         const conicGeometry = new ConicPolygonGeometry(
@@ -138,14 +117,8 @@ function processGeoJSON(
         // Create border line geometry from polygon outline
         const borderGeometry = createBorderGeometry(polygon);
 
-        console.log(
-          `Created geometry for ${countryName} part ${i}:`,
-          conicGeometry
-        );
-
         if (conicGeometry && conicGeometry.attributes.position) {
           const vertexCount = conicGeometry.attributes.position.count;
-          console.log(`${countryName} part ${i}: ${vertexCount} vertices`);
 
           countries.push({
             name: countryName,

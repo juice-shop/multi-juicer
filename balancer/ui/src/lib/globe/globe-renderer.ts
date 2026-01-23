@@ -76,8 +76,6 @@ export class GlobeRenderer {
       this.scene.add(line);
     }
 
-    console.log(`Added ${this.wireframeLines.length} wireframe lines to scene`);
-
     // Create striped meshes for specific countries
     for (const { geometry, name } of geometryManager.stripedGeometries) {
       // Create per-country material for individual hover control
@@ -109,8 +107,6 @@ export class GlobeRenderer {
         this.scene.add(wireframeMesh);
       }
     }
-
-    console.log(`Added ${this.stripedMeshes.length} striped meshes to scene`);
 
     // Create pattern meshes for solved challenges
     for (const { geometry, name } of geometryManager.patternGeometries) {
@@ -154,8 +150,6 @@ export class GlobeRenderer {
       }
     }
 
-    console.log(`Added ${this.patternMeshes.length} pattern meshes to scene`);
-
     // Create solid meshes for top 100 populated countries
     for (const { geometry, name } of geometryManager.solidGeometries) {
       // Create per-country material for individual hover control
@@ -188,14 +182,6 @@ export class GlobeRenderer {
       }
     }
 
-    console.log(`Added ${this.solidMeshes.length} solid meshes to scene`);
-
-    if (SHOW_TRIANGLE_WIREFRAMES) {
-      console.log(
-        `Added ${this.triangleWireframes.length} triangle wireframe overlays`
-      );
-    }
-
     // Create capital markers for highlighted countries
     this.capitalMarkers = createCapitalMarkers(
       countries,
@@ -204,8 +190,64 @@ export class GlobeRenderer {
     for (const marker of this.capitalMarkers) {
       this.scene.add(marker);
     }
+  }
 
-    console.log(`Added ${this.capitalMarkers.length} capital markers to scene`);
+  /**
+   * Transition a country from solid fill to pattern fill (when challenge is solved)
+   * This is an imperative update that doesn't require React re-render
+   * Handles multi-polygon countries (e.g., Japan with multiple islands) by transitioning all parts
+   */
+  async transitionCountryToSolved(
+    countryName: string,
+    patternIndex: number,
+    themeColors: { primary: number[]; glowIntensity: number }
+  ): Promise<void> {
+    // Find ALL solid meshes for this country (handles multi-polygon countries like Japan)
+    const solidMeshesToTransition = this.solidMeshes.filter(
+      (mesh) => mesh.name === countryName
+    );
+
+    if (solidMeshesToTransition.length === 0) {
+      console.warn(
+        `Cannot transition country "${countryName}": no solid mesh found`
+      );
+      return;
+    }
+
+    // Load the pattern texture once
+    const patternPath = getPatternPathByIndex(patternIndex);
+
+    try {
+      const texture = await this.textureCache.loadTexture(patternPath);
+
+      // Create pattern material (shared across all parts of the country)
+      const patternMaterial = createNeonPatternMaterial(
+        themeColors.primary,
+        themeColors.glowIntensity,
+        texture
+      );
+
+      // Transition each part (island) of the country
+      for (const solidMesh of solidMeshesToTransition) {
+        // Create new pattern mesh using the SAME geometry
+        const patternMesh = new Mesh(solidMesh.geometry, patternMaterial);
+        patternMesh.name = countryName;
+        patternMesh.userData.countryName = countryName;
+
+        // Hide the solid mesh
+        solidMesh.visible = false;
+
+        // Add pattern mesh to scene and track it
+        this.patternMeshes.push(patternMesh);
+        this.scene.add(patternMesh);
+      }
+
+    } catch (error) {
+      console.error(
+        `Failed to transition country "${countryName}" to pattern:`,
+        error
+      );
+    }
   }
 
   /**

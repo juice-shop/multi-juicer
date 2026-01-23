@@ -28,7 +28,5 @@ export function setupComposer(
   bloomPass.renderToScreen = true;
   composer.addPass(bloomPass);
 
-  console.log("Post-processing composer setup complete");
-
   return composer;
 }

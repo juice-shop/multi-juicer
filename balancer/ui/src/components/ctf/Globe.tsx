@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Scene, Color, PerspectiveCamera, WebGLRenderer } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -17,6 +17,15 @@ interface ThemeColors {
   glowIntensity: number;
 }
 
+/** Imperative handle for controlling the globe without React re-renders */
+export interface GlobeHandle {
+  /** Transition a country from solid fill to pattern fill */
+  transitionCountryToSolved(
+    countryName: string,
+    patternIndex: number
+  ): Promise<void>;
+}
+
 interface GlobeProps {
   countries: CountryData[];
   geometryManager: CountryGeometryManager;
@@ -24,19 +33,51 @@ interface GlobeProps {
   onStatsUpdate?: (fps: number, vertexCount: number) => void;
   onCountryHover?: (countryName: string | null) => void;
   onCountryClick?: (countryName: string) => void;
+  /** Called when the globe is ready with an imperative handle */
+  onGlobeReady?: (handle: GlobeHandle) => void;
 }
 
-export function Globe({
+function GlobeInternal({
   countries,
   geometryManager,
   themeColors,
   onStatsUpdate,
   onCountryHover,
   onCountryClick,
+  onGlobeReady,
 }: GlobeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Store refs for values needed in imperative updates
+  const themeColorsRef = useRef(themeColors);
+  const onCountryHoverRef = useRef(onCountryHover);
+  const onCountryClickRef = useRef(onCountryClick);
+  const onStatsUpdateRef = useRef(onStatsUpdate);
+  const onGlobeReadyRef = useRef(onGlobeReady);
+
+  // Keep refs updated
+  useEffect(() => {
+    themeColorsRef.current = themeColors;
+  }, [themeColors]);
+
+  useEffect(() => {
+    onCountryHoverRef.current = onCountryHover;
+  }, [onCountryHover]);
+
+  useEffect(() => {
+    onCountryClickRef.current = onCountryClick;
+  }, [onCountryClick]);
+
+  useEffect(() => {
+    onStatsUpdateRef.current = onStatsUpdate;
+  }, [onStatsUpdate]);
+
+  useEffect(() => {
+    onGlobeReadyRef.current = onGlobeReady;
+  }, [onGlobeReady]);
+
+  // Main initialization - runs ONCE
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -59,8 +100,6 @@ export function Globe({
 
     async function init() {
       try {
-        console.log("Initializing Globe with pre-computed data...");
-
         // 1. Create scene
         scene = new Scene();
         scene.background = new Color(0x020202);
@@ -133,9 +172,28 @@ export function Globe({
             striped: globeRenderer.stripedMeshes,
             pattern: globeRenderer.patternMeshes,
           },
-          onCountryHover,
-          onCountryClick
+          (countryName) => onCountryHoverRef.current?.(countryName),
+          (countryName) => onCountryClickRef.current?.(countryName)
         );
+
+        // 7b. Create imperative handle and notify parent
+        const handle: GlobeHandle = {
+          transitionCountryToSolved: async (
+            countryName: string,
+            patternIndex: number
+          ) => {
+            const colors = themeColorsRef.current;
+            await globeRenderer.transitionCountryToSolved(
+              countryName,
+              patternIndex,
+              {
+                primary: colors.primary,
+                glowIntensity: colors.glowIntensity,
+              }
+            );
+          },
+        };
+        onGlobeReadyRef.current?.(handle);
 
         // 8. Setup post-processing
         composer = setupComposer(renderer, scene, camera);
@@ -173,7 +231,7 @@ export function Globe({
           composer.render();
 
           // Update stats display
-          onStatsUpdate?.(stats.fps, stats.vertexCount);
+          onStatsUpdateRef.current?.(stats.fps, stats.vertexCount);
 
           animationFrameId = requestAnimationFrame(render);
         }
@@ -186,13 +244,11 @@ export function Globe({
         // Handle visibility change (pause when tab is hidden)
         const handleVisibilityChange = () => {
           if (document.hidden) {
-            console.log("Tab hidden - pausing render loop");
             isRunning = false;
             if (animationFrameId) {
               cancelAnimationFrame(animationFrameId);
             }
           } else {
-            console.log("Tab visible - resuming render loop");
             isRunning = true;
             lastFrameTime = performance.now();
             animationFrameId = requestAnimationFrame(render);
@@ -241,14 +297,8 @@ export function Globe({
     }
 
     init();
-  }, [
-    countries,
-    geometryManager,
-    themeColors,
-    onStatsUpdate,
-    onCountryHover,
-    onCountryClick,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countries, geometryManager]);
 
   if (error) {
     return (
@@ -273,3 +323,16 @@ export function Globe({
     />
   );
 }
+
+/**
+ * Globe component wrapped in React.memo with custom comparison.
+ * Only re-renders if core data changes (countries, geometryManager, themeColors).
+ * Callbacks are intentionally ignored since they read from refs internally.
+ */
+export const Globe = memo(GlobeInternal, (prev, next) => {
+  return (
+    prev.countries === next.countries &&
+    prev.geometryManager === next.geometryManager &&
+    prev.themeColors === next.themeColors
+  );
+});

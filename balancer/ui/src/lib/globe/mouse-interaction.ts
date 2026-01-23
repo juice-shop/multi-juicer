@@ -226,7 +226,6 @@ export class MouseInteraction {
 
       if (isVisible) {
         // Emit click event
-        console.log("Clicked country:", countryName);
         this.onCountryClick?.(countryName);
       }
     }

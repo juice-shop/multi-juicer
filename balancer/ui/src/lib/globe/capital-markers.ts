@@ -81,12 +81,7 @@ export function createCapitalMarkers(
 
     torusMesh.name = `capital_${countryName}`;
     markers.push(torusMesh);
-
-    console.log(
-      `Created capital marker for ${countryName} at (${props.capitalLat}, ${props.capitalLng})`
-    );
   }
 
-  console.log(`Created ${markers.length} capital markers`);
   return markers;
 }
