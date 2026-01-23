@@ -1,5 +1,4 @@
 import {
-  Line,
   Mesh,
   LineBasicMaterial,
   WireframeGeometry,
@@ -35,7 +34,7 @@ interface ThemeColors {
  * Adds all country geometries to the scene with appropriate materials
  */
 export class GlobeRenderer {
-  wireframeLines: Line[] = [];
+  wireframeLines: LineSegments[] = []; // Country border lines as individual segments
   stripedMeshes: Mesh[] = [];
   patternMeshes: Mesh[] = [];
   solidMeshes: Mesh[] = [];
@@ -69,8 +68,9 @@ export class GlobeRenderer {
     );
 
     // Create wireframe lines for all countries
+    // Use LineSegments because boundary edge geometry is individual segments (not a continuous path)
     for (const { geometry, name } of geometryManager.wireframeGeometries) {
-      const line = new Line(geometry, wireframeMaterial);
+      const line = new LineSegments(geometry, wireframeMaterial);
       line.name = name;
       this.wireframeLines.push(line);
       this.scene.add(line);
@@ -241,7 +241,6 @@ export class GlobeRenderer {
         this.patternMeshes.push(patternMesh);
         this.scene.add(patternMesh);
       }
-
     } catch (error) {
       console.error(
         `Failed to transition country "${countryName}" to pattern:`,

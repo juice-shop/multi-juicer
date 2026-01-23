@@ -85,11 +85,6 @@ export class CountryGeometryManager {
             this.totalVertexCount += positionAttr.count;
           }
         }
-
-        const indexAttr = geometry.index;
-        const triangleCount = indexAttr
-          ? indexAttr.count / 3
-          : positionAttr.count / 3;
       }
     }
   }

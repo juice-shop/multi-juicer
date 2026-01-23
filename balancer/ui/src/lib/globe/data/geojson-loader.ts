@@ -104,22 +104,22 @@ function processGeoJSON(
       try {
         // Create filled mesh geometry using ConicPolygonGeometry
         // curvatureResolution: Lower = more detail, higher = fewer vertices
+        // Note: Only use ONE closed surface (top), not both, to avoid double-layered geometry
         const conicGeometry = new ConicPolygonGeometry(
           polygon,
           1.0, // bottomHeight (on sphere surface)
-          1.0, // topHeight (flat, not extruded)
-          true, // closedBottom
-          true, // closedTop
+          1.0, // topHeight (same as bottom = flat, not extruded)
+          false, // closedBottom (disabled to avoid double layer)
+          true, // closedTop (single surface facing outward)
           false, // includeSides (no sides for flat polygons)
           3.0 // curvatureResolution in degrees (balance between quality and performance)
         );
 
-        // Create border line geometry from polygon outline
-        const borderGeometry = createBorderGeometry(polygon);
+        // Extract boundary edges directly from fill geometry
+        // This ensures perfect alignment between borders and fills
+        const borderGeometry = extractBoundaryEdges(conicGeometry);
 
         if (conicGeometry && conicGeometry.attributes.position) {
-          const vertexCount = conicGeometry.attributes.position.count;
-
           countries.push({
             name: countryName,
             partIndex: i,
@@ -171,39 +171,72 @@ function extractPolygons(geometry: GeoJSONGeometry): PolygonCoordinates[] {
 }
 
 /**
- * Create border line geometry from polygon coordinates
- * Projects lat/lon to sphere surface and creates line segments
+ * Extract boundary edges from a BufferGeometry mesh
+ * Returns only perimeter edges (edges that belong to exactly one triangle)
+ * This ensures perfect alignment with the fill geometry
  */
-function createBorderGeometry(polygon: PolygonCoordinates): BufferGeometry {
+function extractBoundaryEdges(geometry: BufferGeometry): BufferGeometry {
+  const positions = geometry.attributes.position;
+  const indices = geometry.index;
+
+  if (!indices) {
+    console.warn("Geometry has no index, cannot extract boundary edges");
+    return new BufferGeometry();
+  }
+
+  // Map: edge key -> count
+  const edgeMap = new Map<string, number>();
+
+  // Count each edge occurrence
+  for (let i = 0; i < indices.count; i += 3) {
+    const a = indices.getX(i);
+    const b = indices.getX(i + 1);
+    const c = indices.getX(i + 2);
+
+    incrementEdgeCount(edgeMap, a, b);
+    incrementEdgeCount(edgeMap, b, c);
+    incrementEdgeCount(edgeMap, c, a);
+  }
+
+  // Extract boundary edges (count === 1)
   const vertices: number[] = [];
 
-  // Process outer ring (polygon[0]) and holes (polygon[1+])
-  for (let ringIdx = 0; ringIdx < polygon.length; ringIdx++) {
-    const ring = polygon[ringIdx];
+  for (const [edgeKey, count] of edgeMap.entries()) {
+    if (count === 1) {
+      const [a, b] = edgeKey.split(",").map(Number);
 
-    for (let i = 0; i < ring.length; i++) {
-      const [lon, lat] = ring[i];
-
-      // Convert lat/lon to radians (match ConicPolygonGeometry's polar2Cartesian exactly)
-      const phi = (90 - lat) * (Math.PI / 180);
-      const theta = (90 - lon) * (Math.PI / 180);
-
-      // Project to unit sphere (r = 1.0, matching ConicPolygonGeometry)
-      const x = Math.sin(phi) * Math.cos(theta);
-      const y = Math.cos(phi);
-      const z = Math.sin(phi) * Math.sin(theta);
-
-      vertices.push(x, y, z);
+      // Add both vertices of the edge
+      vertices.push(
+        positions.getX(a),
+        positions.getY(a),
+        positions.getZ(a),
+        positions.getX(b),
+        positions.getY(b),
+        positions.getZ(b)
+      );
     }
   }
 
-  const geometry = new BufferGeometry();
-  geometry.setAttribute(
+  const boundaryGeometry = new BufferGeometry();
+  boundaryGeometry.setAttribute(
     "position",
     new BufferAttribute(new Float32Array(vertices), 3)
   );
 
-  return geometry;
+  return boundaryGeometry;
+}
+
+/**
+ * Helper: Increment edge count in map with normalized key
+ */
+function incrementEdgeCount(
+  map: Map<string, number>,
+  a: number,
+  b: number
+): void {
+  // Normalize edge key (smaller index first)
+  const key = a < b ? `${a},${b}` : `${b},${a}`;
+  map.set(key, (map.get(key) || 0) + 1);
 }
 
 /**
