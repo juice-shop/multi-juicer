@@ -22,23 +22,22 @@ export function createNeonPatternMaterial(
     },
 
     vertexShader: `
-      varying vec3 v_worldPosition;
       varying vec3 v_viewPosition;
       varying vec2 v_uv;
 
       void main() {
         // Transform to world space
         vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        v_worldPosition = worldPosition.xyz;
+        vec3 worldPos = worldPosition.xyz;
 
         // Transform to view space
         vec4 viewPosition = viewMatrix * worldPosition;
         v_viewPosition = viewPosition.xyz;
 
         // Calculate UV from spherical coordinates
-        float radius = length(v_worldPosition);
-        float lat = asin(v_worldPosition.z / radius);
-        float lon = atan(v_worldPosition.y, v_worldPosition.x);
+        float radius = length(worldPos);
+        float lat = asin(worldPos.z / radius);
+        float lon = atan(worldPos.y, worldPos.x);
 
         // Normalize to 0-1 range
         v_uv = vec2(
@@ -54,7 +53,6 @@ export function createNeonPatternMaterial(
     fragmentShader: `
       precision mediump float;
 
-      varying vec3 v_worldPosition;
       varying vec3 v_viewPosition;
       varying vec2 v_uv;
 

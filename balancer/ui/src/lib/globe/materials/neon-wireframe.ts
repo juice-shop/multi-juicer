@@ -12,13 +12,11 @@ export function createNeonWireframeMaterial(
     },
 
     vertexShader: `
-      varying vec3 v_worldPosition;
       varying vec3 v_viewPosition;
 
       void main() {
         // Transform to world space
         vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        v_worldPosition = worldPosition.xyz;
 
         // Transform to view space
         vec4 viewPosition = viewMatrix * worldPosition;
@@ -32,7 +30,6 @@ export function createNeonWireframeMaterial(
     fragmentShader: `
       precision mediump float;
 
-      varying vec3 v_worldPosition;
       varying vec3 v_viewPosition;
 
       uniform vec3 u_neonColor;
