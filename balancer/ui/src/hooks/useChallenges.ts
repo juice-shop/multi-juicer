@@ -56,8 +56,7 @@ export function useChallenges(options: UseChallengesOptions = {}) {
       const result: ChallengesResponse = await response.json();
       setData(result.challenges);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Unknown error";
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
       console.error("Error fetching challenges:", err);
     } finally {
