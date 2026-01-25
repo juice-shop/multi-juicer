@@ -144,7 +144,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster />
-      <NotificationListener />
+      {!!activeTeam && activeTeam !== "admin" && <NotificationListener />}
     </IntlProvider>
   );
 }
