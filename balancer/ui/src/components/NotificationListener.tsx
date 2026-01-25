@@ -19,7 +19,7 @@ export function NotificationListener() {
       </div>
     );
 
-    toast(content, { icon: "🔔", duration: 0 });
+    toast(content, { duration: 0 });
   }, [data]);
 
   return null;
