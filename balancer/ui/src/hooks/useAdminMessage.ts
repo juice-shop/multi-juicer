@@ -11,7 +11,7 @@ async function fetchAdminMessage(
 ): Promise<AdminMessage | null> {
   const url = lastSeen
     ? `/balancer/api/admin-message?wait-for-update-after=${lastSeen.toISOString()}`
-    : `/balancer/api/admin-message`;
+    : `/balancer/api/admin-message?wait-for-update-after=${new Date().toISOString()}`;
 
   const res = await fetch(url, { signal });
 
