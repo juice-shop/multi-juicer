@@ -17,7 +17,6 @@ func StartWatcher(
 	b *bundle.Bundle,
 	service *Service,
 ) {
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -38,12 +37,12 @@ func watchOnce(
 		Watch(ctx, metav1.ListOptions{
 			FieldSelector: "metadata.name=" + ConfigMapName,
 		})
-
 	if err != nil {
 		b.Log.Printf("admin message watcher error: %v", err)
 		time.Sleep(2 * time.Second)
 		return
 	}
+
 	defer watcher.Stop()
 	for {
 		select {

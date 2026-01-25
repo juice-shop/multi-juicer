@@ -44,7 +44,6 @@ func (s *Service) WaitForUpdatesNewerThan(
 	ctx context.Context,
 	after time.Time,
 ) (*Message, time.Time, bool) {
-
 	s.mu.Lock()
 	if s.lastUpdate.After(after) {
 		msg := s.current
@@ -53,12 +52,18 @@ func (s *Service) WaitForUpdatesNewerThan(
 		return msg, ts, msg != nil
 	}
 
+	const maxWaitTime = 25 * time.Second
+	timeout := time.NewTimer(maxWaitTime)
+	defer timeout.Stop()
+
 	ch := make(chan struct{})
 	s.waiters = append(s.waiters, ch)
 	s.mu.Unlock()
 
 	select {
 	case <-ctx.Done():
+		return nil, time.Time{}, false
+	case <-timeout.C:
 		return nil, time.Time{}, false
 	case <-ch:
 		s.mu.Lock()
