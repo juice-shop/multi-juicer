@@ -48,31 +48,32 @@ export default function AdminNotificationForm() {
           defaultMessage="Send a notification"
         />
       </h1>
-
-      <input
-        type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="message text..."
-        className="border px-2 py-1 rounded w-full"
-      />
-      <button
-        className={buttonClasses}
-        disabled={sending}
-        onClick={sendNotification}
-      >
-        {sending ? (
-          <FormattedMessage
-            id="admin_table.sending"
-            defaultMessage="sending..."
-          />
-        ) : (
-          <FormattedMessage
-            id="admin_page.send_notification"
-            defaultMessage="send"
-          />
-        )}
-      </button>
+      <div>
+        <textarea
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="message text..."
+          className="bg-gray-300 mb-2 border-none rounded-sm p-3 text-sm block w-full text-gray-800 invalid:outline invalid:outline-red-500 invalid:bg-red-100"
+        />
+        <button
+          className={buttonClasses}
+          disabled={sending}
+          onClick={sendNotification}
+        >
+          {sending ? (
+            <FormattedMessage
+              id="admin_table.sending"
+              defaultMessage="sending..."
+            />
+          ) : (
+            <FormattedMessage
+              id="admin_page.send_notification"
+              defaultMessage="send"
+            />
+          )}
+        </button>
+      </div>
     </Card>
   );
 }

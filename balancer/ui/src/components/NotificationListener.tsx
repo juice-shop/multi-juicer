@@ -13,13 +13,21 @@ export function NotificationListener() {
     if (lastSeenRef.current === data.updatedAt) return;
     lastSeenRef.current = data.updatedAt;
 
-    const content = (
-      <div>
-        <strong>{data.text}</strong>
-      </div>
+    // toast.dismiss();
+    toast(
+      (t) => (
+        <span className="flex gap-2 items-start justify-center">
+          <strong className="break-all">Message from admin: {data.text}</strong>
+          <button
+            className="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-gray-600 text-white text-sm leading-none hover:bg-red-700 transition"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            ✕
+          </button>
+        </span>
+      ),
+      { duration: Infinity }
     );
-
-    toast(content, { duration: 0 });
   }, [data]);
 
   return null;
