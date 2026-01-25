@@ -8,17 +8,19 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/adminmessage"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 )
 
 func TestHandleGetAdminMessageImmediate(t *testing.T) {
 	svc := adminmessage.NewService()
+	bundle := testutil.NewTestBundle()
 
 	svc.Set(&adminmessage.Message{
 		Text:      "Hello",
 		UpdatedAt: time.Now().UTC(),
 	})
 
-	handler := handleGetAdminMessage(svc)
+	handler := handleGetAdminMessage(svc, bundle)
 
 	req := httptest.NewRequest(
 		http.MethodGet,
@@ -36,7 +38,8 @@ func TestHandleGetAdminMessageImmediate(t *testing.T) {
 
 func TestHandleGetAdminMessageNoUpdate(t *testing.T) {
 	svc := adminmessage.NewService()
-	handler := handleGetAdminMessage(svc)
+	bundle := testutil.NewTestBundle()
+	handler := handleGetAdminMessage(svc, bundle)
 
 	req := httptest.NewRequest(
 		http.MethodGet,

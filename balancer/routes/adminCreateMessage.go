@@ -18,10 +18,10 @@ func handleSetAdminMessage(
 	b *bundle.Bundle,
 ) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		team, err := teamcookie.GetTeamFromRequest(b, r)
 		if err != nil || team != "admin" {
 			http.Error(w, "", http.StatusUnauthorized)
+			b.Log.Println("error getting team from teamcookie: ", err)
 			return
 		}
 
@@ -29,7 +29,8 @@ func handleSetAdminMessage(
 			Text string `json:"text"`
 		}
 
-		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		if err = json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			b.Log.Println("error getting team from teamcookie: ", err)
 			http.Error(w, "invalid payload", http.StatusBadRequest)
 			return
 		}
@@ -55,6 +56,7 @@ func handleSetAdminMessage(
 		}
 
 		if err != nil {
+			b.Log.Println("error creating configmap: ", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
