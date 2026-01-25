@@ -22,8 +22,8 @@ func main() {
 	go StartMetricsServer()
 	scoringService.CalculateAndCacheScoreBoard(ctx)
 	go scoringService.StartingScoringWorker(ctx)
-	StartBalancerServer(bundle, scoringService, adminMsgService)
 	go adminmessage.StartWatcher(ctx, bundle, adminMsgService)
+	StartBalancerServer(bundle, scoringService, adminMsgService)
 }
 
 func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService, adminMsgService *adminmessage.Service) {
