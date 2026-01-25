@@ -1,14 +1,18 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { FormattedMessage } from "react-intl";
+
+import { Card } from "./Card";
+
+const buttonClasses =
+  "inline m-0 bg-gray-700 text-white p-2 px-3 text-sm rounded-sm disabled:cursor-wait disabled:opacity-50";
 
 export default function AdminNotificationForm() {
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
-  const [level, setLevel] = useState<"info" | "warning" | "error">("info");
+  const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
 
   async function sendNotification() {
-    if (!title || sending) return;
+    if (!text || sending) return;
 
     setSending(true);
     try {
@@ -18,9 +22,7 @@ export default function AdminNotificationForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title,
-          message,
-          level,
+          text,
         }),
       });
 
@@ -29,9 +31,7 @@ export default function AdminNotificationForm() {
       }
 
       toast.success("message sent");
-      setTitle("");
-      setMessage("");
-      setLevel("info");
+      setText("");
     } catch (err) {
       console.error(err);
       toast.error("Failed to send message");
@@ -41,48 +41,38 @@ export default function AdminNotificationForm() {
   }
 
   return (
-    <div className="space-y-3 border rounded p-4 bg-gray-50 dark:bg-gray-900">
-      <h2 className="font-semibold text-lg">Send a message to teams...</h2>
+    <Card className="space-y-3 p-4">
+      <h1 className="text-xl font-semibold">
+        <FormattedMessage
+          id="admin_page.send_message_button"
+          defaultMessage="Send a notification"
+        />
+      </h1>
 
       <input
         type="text"
-        required
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="message heading..."
-        className="border px-2 py-1 rounded w-full"
-      />
-
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
         placeholder="message text..."
         className="border px-2 py-1 rounded w-full"
       />
-
-      <div className="flex gap-4 text-sm">
-        {(["info", "warning", "error"] as const).map((lvl) => (
-          <label key={lvl} className="flex items-center gap-1">
-            <input
-              type="radio"
-              name="level"
-              value={lvl}
-              checked={level === lvl}
-              onChange={() => setLevel(lvl)}
-            />
-            {lvl}
-          </label>
-        ))}
-      </div>
-
       <button
-        onClick={sendNotification}
+        className={buttonClasses}
         disabled={sending}
-        className="px-3 py-1 rounded bg-blue-600 text-white disabled:opacity-50"
+        onClick={sendNotification}
       >
-        {sending ? "Sending…" : "Send"}
+        {sending ? (
+          <FormattedMessage
+            id="admin_table.sending"
+            defaultMessage="sending..."
+          />
+        ) : (
+          <FormattedMessage
+            id="admin_page.send_notification"
+            defaultMessage="send"
+          />
+        )}
       </button>
-    </div>
+    </Card>
   );
 }

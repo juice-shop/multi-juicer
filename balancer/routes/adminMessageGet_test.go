@@ -14,7 +14,7 @@ func TestHandleGetAdminMessageImmediate(t *testing.T) {
 	svc := adminmessage.NewService()
 
 	svc.Set(&adminmessage.Message{
-		Title:     "Hello",
+		Text:      "Hello",
 		UpdatedAt: time.Now().UTC(),
 	})
 

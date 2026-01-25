@@ -63,9 +63,7 @@ func watchOnce(
 			)
 
 			service.Set(&Message{
-				Title:     cm.Data["title"],
-				Message:   cm.Data["message"],
-				Level:     cm.Data["level"],
+				Text:      cm.Data["text"],
 				UpdatedAt: ts,
 			})
 

@@ -26,9 +26,7 @@ func handleSetAdminMessage(
 		}
 
 		var payload struct {
-			Title   string `json:"title"`
-			Message string `json:"message"`
-			Level   string `json:"level"`
+			Text string `json:"text"`
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
@@ -43,9 +41,7 @@ func handleSetAdminMessage(
 				Name: adminmessage.ConfigMapName,
 			},
 			Data: map[string]string{
-				"title":     payload.Title,
-				"message":   payload.Message,
-				"level":     payload.Level,
+				"text":      payload.Text,
 				"updatedAt": now.Format(time.RFC3339),
 			},
 		}

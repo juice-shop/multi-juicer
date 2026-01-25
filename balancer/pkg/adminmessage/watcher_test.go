@@ -35,9 +35,7 @@ func TestWatcherUpdatesService(t *testing.T) {
 			Name: ConfigMapName,
 		},
 		Data: map[string]string{
-			"title":     "Admin",
-			"message":   "Hello",
-			"level":     "info",
+			"text":      "Hello",
 			"updatedAt": now.Format(time.RFC3339),
 		},
 	}
@@ -46,6 +44,6 @@ func TestWatcherUpdatesService(t *testing.T) {
 
 	assert.Eventually(t, func() bool {
 		msg, _ := svc.Get()
-		return msg != nil && msg.Message == "Hello"
+		return msg != nil && msg.Text == "Hello"
 	}, time.Second, 10*time.Millisecond)
 }

@@ -11,9 +11,7 @@ func TestServiceSetAndGet(t *testing.T) {
 
 	now := time.Now().UTC()
 	msg := &Message{
-		Title:     "Title",
-		Message:   "Body",
-		Level:     "info",
+		Text:      "Body",
 		UpdatedAt: now,
 	}
 
@@ -24,12 +22,13 @@ func TestServiceSetAndGet(t *testing.T) {
 	if got == nil {
 		t.Fatalf("expected message, got nil")
 	}
+	if got.Text != msg.Text {
+		t.Fatalf("messaeg doesn't match")
+	}
 	if ts != now {
 		t.Fatalf("timestamp mismatch")
 	}
-	if got.Title != "Title" {
-		t.Fatalf("wrong title")
-	}
+
 }
 
 func TestWaitForUpdatesImmediate(t *testing.T) {
@@ -37,7 +36,7 @@ func TestWaitForUpdatesImmediate(t *testing.T) {
 
 	now := time.Now().UTC()
 	svc.Set(&Message{
-		Title:     "Hello",
+		Text:      "Hello",
 		UpdatedAt: now,
 	})
 
@@ -49,7 +48,7 @@ func TestWaitForUpdatesImmediate(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected update")
 	}
-	if msg.Title != "Hello" {
+	if msg.Text != "Hello" {
 		t.Fatalf("wrong message")
 	}
 	if ts != now {
@@ -80,7 +79,7 @@ func TestWaitForUpdatesBlocksThenUnblocks(t *testing.T) {
 	time.Sleep(50 * time.Millisecond)
 
 	svc.Set(&Message{
-		Title:     "New",
+		Text:      "New",
 		UpdatedAt: time.Now().UTC(),
 	})
 

@@ -3,8 +3,6 @@ package adminmessage
 import "time"
 
 type Message struct {
-	Title     string    `json:"title"`
-	Message   string    `json:"message"`
-	Level     string    `json:"level"`
+	Text      string    `json:"text"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

@@ -18,9 +18,7 @@ func TestHandleSetAdminMessageAdminSuccess(t *testing.T) {
 	handler := handleSetAdminMessage(b)
 
 	body, _ := json.Marshal(map[string]string{
-		"title":   "Hi",
-		"message": "Test",
-		"level":   "info",
+		"text": "Hello",
 	})
 
 	req := httptest.NewRequest(

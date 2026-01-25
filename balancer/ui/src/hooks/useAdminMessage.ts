@@ -1,9 +1,7 @@
 import { useHttpLongPoll } from "./useHttpLongPoll";
 
 export interface AdminMessage {
-  title: string;
-  message: string;
-  level: string;
+  text: string;
   updatedAt: string;
 }
 

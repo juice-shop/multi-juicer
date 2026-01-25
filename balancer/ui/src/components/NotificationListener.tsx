@@ -15,23 +15,11 @@ export function NotificationListener() {
 
     const content = (
       <div>
-        <strong>{data.title}</strong>
-        <div>{data.message}</div>
+        <strong>{data.text}</strong>
       </div>
     );
 
-    switch (data.level) {
-      case "error":
-        toast.error(content, { icon: "❌", duration: 0 });
-        break;
-      case "warning":
-        toast(content, { icon: "⚠️", duration: 0 });
-        break;
-      case "info":
-      default:
-        toast(content, { icon: "🔔", duration: 0 });
-        break;
-    }
+    toast(content, { icon: "🔔", duration: 0 });
   }, [data]);
 
   return null;
