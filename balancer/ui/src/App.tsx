@@ -10,6 +10,8 @@ import { JoinPage } from "@/pages/JoinPage";
 import { TeamStatusPage } from "@/pages/TeamStatusPage";
 import availableLanguages, { MessageLoader } from "@/translations/index";
 
+import { NotificationListener } from "./components/NotificationListener";
+
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("@/pages/ScoreOverviewPage"));
 const TeamDetailPage = lazy(() => import("@/pages/TeamDetailPage"));
@@ -142,6 +144,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster />
+      {!!activeTeam && activeTeam !== "admin" && <NotificationListener />}
     </IntlProvider>
   );
 }

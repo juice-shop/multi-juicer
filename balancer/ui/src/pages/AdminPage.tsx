@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import Popup from "reactjs-popup";
 
+import AdminNotificationForm from "@/components/AdminNotificationForm";
 import { Card } from "@/components/Card";
 import { CheatScoreGraph } from "@/components/CheatScoreGraph/CheatScoreGraph";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
@@ -180,6 +181,8 @@ export default function AdminPage() {
 
   return (
     <div className="flex flex-col gap-2 w-full lg:max-w-4xl">
+      <AdminNotificationForm />
+
       <h1 className="text-xl font-semibold">
         <FormattedMessage
           id="admin_table.table_header"

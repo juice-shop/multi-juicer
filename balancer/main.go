@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/juice-shop/multi-juicer/balancer/pkg/adminmessage"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/routes"
@@ -14,18 +15,20 @@ import (
 func main() {
 	bundle := bundle.New()
 	scoringService := scoring.NewScoringService(bundle)
+	adminMsgService := adminmessage.NewService()
 
 	ctx := context.Background()
 
 	go StartMetricsServer()
 	scoringService.CalculateAndCacheScoreBoard(ctx)
 	go scoringService.StartingScoringWorker(ctx)
-	StartBalancerServer(bundle, scoringService)
+	go adminmessage.StartWatcher(ctx, bundle, adminMsgService)
+	StartBalancerServer(bundle, scoringService, adminMsgService)
 }
 
-func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService) {
+func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService, adminMsgService *adminmessage.Service) {
 	router := http.NewServeMux()
-	routes.AddRoutes(router, bundle, scoringService)
+	routes.AddRoutes(router, bundle, scoringService, adminMsgService)
 
 	bundle.Log.Println("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{
