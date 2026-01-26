@@ -6,23 +6,23 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "dompurify": "^3.3.1",
-    "motion": "^12.23.26",
+    "motion": "^12.29.2",
     "promise-retry": "^2.0.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hot-toast": "^2.6.0",
-    "react-intl": "^8.0.9",
-    "react-router-dom": "^7.11.0",
+    "react-intl": "^8.1.1",
+    "react-router-dom": "^7.13.0",
     "reactjs-popup": "^2.0.6",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.1",
-    "@types/node": "^25.0.3",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^25.0.10",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^5.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -33,10 +33,10 @@
     "globals": "^16.5.0",
     "jsdom": "^27.4.0",
     "postcss": "^8.5.6",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "vitest": "^4.0.16"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   },
   "scripts": {
     "start": "vite",
