@@ -15,7 +15,7 @@ import (
 )
 
 func TestWatcherUpdatesService(t *testing.T) {
-	clientset := fake.NewSimpleClientset()
+	clientset := fake.NewClientset()
 	b := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
 	svc := NewService()
