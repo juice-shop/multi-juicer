@@ -61,9 +61,9 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -78,12 +78,12 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1),
 			createTeam("test-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 0),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -94,18 +94,20 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		assert.Equal(t, []AdminListJuiceShopInstance{
 			{
-				Team:        "foobar",
-				Ready:       true,
-				CreatedAt:   1_700_000_000_000,
-				LastConnect: 1_729_259_666_123,
-				CheatScore:  nil,
+				Team:              "foobar",
+				Ready:             true,
+				CreatedAt:         1_700_000_000_000,
+				LastConnect:       1_729_259_666_123,
+				CheatScore:        nil,
+				CheatScoreHistory: nil,
 			},
 			{
-				Team:        "test-team",
-				Ready:       false,
-				CreatedAt:   1_600_000_000_000,
-				LastConnect: 1_729_259_333_123,
-				CheatScore:  nil,
+				Team:              "test-team",
+				Ready:             false,
+				CreatedAt:         1_600_000_000_000,
+				LastConnect:       1_729_259_333_123,
+				CheatScore:        nil,
+				CheatScoreHistory: nil,
 			},
 		}, response.Instances)
 	})
@@ -121,13 +123,13 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		cheatScores1 := `[{"totalCheatScore":0.25,"timestamp":"2024-10-18T13:55:18Z"},{"totalCheatScore":0.42,"timestamp":"2024-10-18T14:30:22Z"}]`
 		cheatScores2 := `[{"totalCheatScore":0.15,"timestamp":"2024-10-18T13:50:10Z"}]`
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithCheatScores("team-with-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, cheatScores1),
 			createTeamWithCheatScores("another-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 1, cheatScores2),
 			createTeam("team-without-scores", time.UnixMilli(1_650_000_000_000), time.UnixMilli(1_729_259_555_123), 0),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -153,11 +155,15 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		assert.NotNil(t, teamWithScores)
 		assert.NotNil(t, teamWithScores.CheatScore)
 		assert.InDelta(t, 0.42, *teamWithScores.CheatScore, 0.001)
+		assert.Len(t, teamWithScores.CheatScoreHistory, 2)
+		assert.Equal(t, 0.25, teamWithScores.CheatScoreHistory[0].TotalCheatScore)
+		assert.Equal(t, 0.42, teamWithScores.CheatScoreHistory[1].TotalCheatScore)
 
 		// Verify team with single cheat score returns it (0.15)
 		assert.NotNil(t, anotherTeam)
 		assert.NotNil(t, anotherTeam.CheatScore)
 		assert.InDelta(t, 0.15, *anotherTeam.CheatScore, 0.001)
+		assert.Len(t, anotherTeam.CheatScoreHistory, 1)
 
 		// Verify team without cheat scores has nil
 		assert.NotNil(t, teamWithoutScores)
@@ -174,11 +180,11 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		// Create team with invalid cheat scores JSON
 		invalidCheatScores := `{invalid json`
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithCheatScores("team-invalid-json", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, invalidCheatScores),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -203,11 +209,11 @@ func TestAdminListInstanceshandler(t *testing.T) {
 		// Create team with empty cheat scores array
 		emptyCheatScores := `[]`
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithCheatScores("team-empty-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, emptyCheatScores),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)

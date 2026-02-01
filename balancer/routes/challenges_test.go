@@ -47,7 +47,7 @@ func TestChallengesHandler(t *testing.T) {
 			challenge1Key, solveTime2.Format(time.RFC3339),
 			challenge2Key, solveTime2.Format(time.RFC3339))
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
 			createTeamWithSolvedChallenges("team-bravo", teamBravoChallenges),
 		)
@@ -58,7 +58,7 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()
@@ -105,7 +105,7 @@ func TestChallengesHandler(t *testing.T) {
 
 	t.Run("should return all challenges with zero solve counts when no teams have solved anything", func(t *testing.T) {
 		// Setup with teams that have no solved challenges
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithSolvedChallenges("team-alpha", "[]"),
 			createTeamWithSolvedChallenges("team-bravo", "[]"),
 		)
@@ -116,7 +116,7 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()
@@ -142,7 +142,7 @@ func TestChallengesHandler(t *testing.T) {
 
 	t.Run("should return all challenges even when no teams exist", func(t *testing.T) {
 		// Setup with no teams
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
@@ -150,7 +150,7 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()
@@ -184,7 +184,7 @@ func TestChallengesHandler(t *testing.T) {
 		teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challengeKey, solveTimeAlpha.Format(time.RFC3339))
 		teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, challengeKey, solveTimeBravo.Format(time.RFC3339))
 
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeamWithSolvedChallenges("team-charlie", teamCharlieChallenges),
 			createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
 			createTeamWithSolvedChallenges("team-bravo", teamBravoChallenges),
@@ -196,7 +196,7 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()

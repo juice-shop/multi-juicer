@@ -48,14 +48,14 @@ func TestTeamStatusHandler(t *testing.T) {
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
 			createTeam("barfoo", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -68,11 +68,11 @@ func TestTeamStatusHandler(t *testing.T) {
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(createTeam("other-team", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"))
+		clientset := fake.NewClientset(createTeam("other-team", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"))
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -82,7 +82,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	t.Run("returns ready when instance gets update by the scoring watcher", func(t *testing.T) {
 		server := http.NewServeMux()
 		deployment := createTeamNumberOfReadyReplicas(team, `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1", 0)
-		clientset := fake.NewSimpleClientset(deployment)
+		clientset := fake.NewClientset(deployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
@@ -92,7 +92,7 @@ func TestTeamStatusHandler(t *testing.T) {
 		err := scoringService.CalculateAndCacheScoreBoard(ctx)
 		assert.Nil(t, err)
 
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		// Verify initial state - readiness should be false
 		{
@@ -133,7 +133,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundle()
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -149,7 +149,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundle()
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -161,14 +161,14 @@ func TestTeamStatusHandler(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/teams/foobar/status", nil)
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset(
+		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
 			createTeam("barfoo", `[]`, "0"),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -180,11 +180,11 @@ func TestTeamStatusHandler(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/teams/nonexistent/status", nil)
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -198,7 +198,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundle()
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService)
+		AddRoutes(server, bundle, scoringService, nil)
 
 		server.ServeHTTP(rr, req)
 

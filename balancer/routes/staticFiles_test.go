@@ -18,7 +18,7 @@ func TestStaticFileHandler(t *testing.T) {
 		server := http.NewServeMux()
 		bundle := testutil.NewTestBundle()
 		bundle.StaticAssetsDirectory = "../ui/build/"
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -41,7 +41,7 @@ func TestStaticFileHandler(t *testing.T) {
 		server := http.NewServeMux()
 		bundle := testutil.NewTestBundle()
 		bundle.StaticAssetsDirectory = "../ui/build/"
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		for _, route := range frontendRoutes {
 			req, _ := http.NewRequest("GET", route, nil)
@@ -62,7 +62,7 @@ func TestStaticFileHandler(t *testing.T) {
 		bundle := testutil.NewTestBundle()
 		bundle.StaticAssetsDirectory = "../ui/build/"
 		bundle.Config.ContentSecurityPolicy = "default-src 'self'; script-src 'self'"
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -78,7 +78,7 @@ func TestStaticFileHandler(t *testing.T) {
 		bundle := testutil.NewTestBundle()
 		bundle.StaticAssetsDirectory = "../ui/build/"
 		bundle.Config.ContentSecurityPolicy = ""
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -94,7 +94,7 @@ func TestStaticFileHandler(t *testing.T) {
 		bundle := testutil.NewTestBundle()
 		bundle.StaticAssetsDirectory = "../ui/build/"
 		bundle.Config.ContentSecurityPolicy = "default-src 'self'; script-src 'self'"
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 

@@ -1,4 +1,8 @@
-import { useHttpLongPoll } from "./useHttpLongPoll";
+import {
+  useHttpLongPoll,
+  FetchResult,
+  extractLastUpdateTimestamp,
+} from "./useHttpLongPoll";
 
 export interface TeamScore {
   name: string;
@@ -12,28 +16,30 @@ export interface TeamScore {
  *
  * @param lastSeen - The timestamp of the last update, or null for initial fetch
  * @param signal - AbortSignal for request cancellation
- * @returns An array of team scores, or null if the server returns 204 (no new data)
+ * @returns An array of team scores and server timestamp, or null if the server returns 204 (no new data)
  */
 async function fetchScoreboard(
   lastSeen: Date | null,
   signal?: AbortSignal
-): Promise<TeamScore[] | null> {
+): Promise<FetchResult<TeamScore[]>> {
   const url = lastSeen
     ? `/balancer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
     : "/balancer/api/score-board/top";
 
   const response = await fetch(url, { signal });
 
+  const lastUpdateTimestamp = extractLastUpdateTimestamp(response);
+
   // Status 204 No Content means the long-poll timed out without new data
   if (response.status === 204) {
-    return null;
+    return { data: null, lastUpdateTimestamp };
   }
   if (!response.ok) {
     throw new Error("Failed to fetch scoreboard data");
   }
 
   const { teams } = (await response.json()) as { teams: TeamScore[] };
-  return teams;
+  return { data: teams, lastUpdateTimestamp };
 }
 
 /**

@@ -50,7 +50,7 @@ func TestProxyHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -71,7 +71,7 @@ func TestProxyHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -94,13 +94,13 @@ func TestProxyHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(readyDeployment)
+		clientset := fake.NewClientset(readyDeployment)
 		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil)
+		AddRoutes(server, bu, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -122,13 +122,13 @@ func TestProxyHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(readyDeployment)
+		clientset := fake.NewClientset(readyDeployment)
 		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil)
+		AddRoutes(server, bu, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -161,13 +161,13 @@ func TestProxyHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset(unreadyDeployment)
+		clientset := fake.NewClientset(unreadyDeployment)
 		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil)
+		AddRoutes(server, bu, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -189,13 +189,13 @@ func TestProxyHandler(t *testing.T) {
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewSimpleClientset()
+		clientset := fake.NewClientset()
 		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
 
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil)
+		AddRoutes(server, bu, nil, nil)
 
 		server.ServeHTTP(rr, req)
 

@@ -25,8 +25,10 @@ interface ChallengeSolve extends Omit<ChallengeSolveResponse, "solvedAt"> {
   solvedAt: Date; // Convert string to Date object
 }
 
-interface ChallengeDetailData
-  extends Omit<ChallengeDetailDataResponse, "solves"> {
+interface ChallengeDetailData extends Omit<
+  ChallengeDetailDataResponse,
+  "solves"
+> {
   solves: ChallengeSolve[];
 }
 

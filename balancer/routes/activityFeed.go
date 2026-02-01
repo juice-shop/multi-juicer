@@ -132,7 +132,7 @@ func handleActivityFeed(bundle *b.Bundle, scoringService *scoring.ScoringService
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Last-Modified", lastUpdateTime.UTC().Format(time.RFC1123))
-		w.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339))
+		w.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 		w.WriteHeader(http.StatusOK)
 		w.Write(responseBytes)
 	})

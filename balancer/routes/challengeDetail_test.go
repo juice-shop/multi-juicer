@@ -44,7 +44,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 	teamAlphaChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, secondSolveTime.Format(time.RFC3339))
 	teamBravoChallenges := fmt.Sprintf(`[{"key":"%s","solvedAt":"%s"}]`, solvedChallengeKey, firstSolveTime.Format(time.RFC3339))
 
-	clientset := fake.NewSimpleClientset(
+	clientset := fake.NewClientset(
 		createTeamWithSolvedChallenges("team-alpha", teamAlphaChallenges),
 		createTeamWithSolvedChallenges("team-bravo", teamBravoChallenges),
 	)
@@ -55,7 +55,7 @@ func TestChallengeDetailHandler(t *testing.T) {
 	require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 	server := http.NewServeMux()
-	AddRoutes(server, bundle, scoringService)
+	AddRoutes(server, bundle, scoringService, nil)
 
 	t.Run("should return solvers in chronological order (First Solve first)", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/balancer/api/challenges/%s", solvedChallengeKey), nil)

@@ -14,3 +14,10 @@ rules:
   - apiGroups: [""] # "" indicates the core API group
     resources: ["pods"]
     verbs: ["get", "list", "delete"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "create", "update", "watch"]
+    resourceNames: ["multi-juicer-notification"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create", "update"] # create doesn't properly work with resourceNames, for the initial reation of the multi-juicer-notification, we need general create permissions :(

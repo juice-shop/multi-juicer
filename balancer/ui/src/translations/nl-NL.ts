@@ -43,6 +43,13 @@ export default {
   "admin_table.cheat_score_tooltip":
     "Deze score geeft aan of uitdagingen sneller worden opgelost dan normaal verwacht. Het kan mogelijk niet nauwkeurig daadwerkelijk valsspelen identificeren. Klik om meer te weten te komen.",
   "admin_table.no_cheat_score": "Geen cheat score",
+  "admin_table.cheat_score_graph_not_available_yet":
+    "De cheat score grafiek wordt beschikbaar zodra meer dan één uitdaging is opgelost",
+  "cheat_score_graph.title": "Cheat Score Geschiedenis",
+  "cheat_score_graph.not_enough_data": "Niet genoeg data voor grafiek",
+  "cheat_score_graph.x_axis_label": "Opgeloste uitdagingen →",
+  "cheat_score_graph.expand": "Uitvouwen",
+  "cheat_score_graph.close": "Sluiten",
   updating_score: "Je score wordt berekend...",
   score_overview: "Scoreoverzicht",
   team_score:
@@ -84,4 +91,18 @@ export default {
     'Weet je zeker dat je team "{team}" opnieuw wilt starten?',
   instance_status_not_found:
     "Kon de instantie voor het team niet vinden. Je kunt deze opnieuw aanmaken door opnieuw in te loggen.",
+  "admin.notification.title": "Meldingen plaatsen voor alle gebruikers",
+  "admin.notification.description":
+    "Meldingen worden aan alle gebruikers in de MultiJuicer-interface getoond. Ze kunnen worden gebruikt om gebruikers te informeren over belangrijke updates of problemen. Let op: ze worden niet weergegeven in de JuiceShop-interface.",
+  "admin.notification.placeholder": "Voer melding in...",
+  "admin.notification.characters_remaining": "{count} tekens over",
+  "admin.notification.markdown_supported": "Basis markdown ondersteund",
+  "admin.notification.error.too_long":
+    "Bericht is te lang (maximaal 128 tekens)",
+  "admin.notification.success": "Melding succesvol bijgewerkt",
+  "admin.notification.cleared": "Melding gewist",
+  "admin.notification.error": "Fout bij het bijwerken van de melding",
+  "admin.notification.submitting": "Bijwerken...",
+  "admin.notification.submit": "Melding plaatsen",
+  "admin.notification.clear": "Melding wissen",
 };

@@ -31,7 +31,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.Version) }}'
+          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.AppVersion) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
           {{- with .Values.balancer.containerSecurityContext }}
           securityContext:

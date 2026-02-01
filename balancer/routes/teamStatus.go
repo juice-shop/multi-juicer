@@ -89,17 +89,17 @@ func handleTeamStatus(b *bundle.Bundle, scoringService *scoring.ScoringService) 
 					if teamScore == nil {
 						return nil, time.Time{}, false, nil
 					}
-					return teamScore, time.Now(), true, nil
+					return teamScore, teamScore.LastUpdate, true, nil
 				}
 				teamScore, ok := scoringService.GetScoreForTeam(team)
 				if !ok {
 					// Return error to trigger 404
 					return nil, time.Time{}, false, &teamNotFoundError{}
 				}
-				return teamScore, time.Now(), true, nil
+				return teamScore, teamScore.LastUpdate, true, nil
 			}
 
-			teamScore, _, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
+			teamScore, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
 			if err != nil {
 				if _, ok := err.(*teamNotFoundError); ok {
 					http.Error(responseWriter, "team not found", http.StatusNotFound)
@@ -145,6 +145,7 @@ func handleTeamStatus(b *bundle.Bundle, scoringService *scoring.ScoringService) 
 			}
 
 			responseWriter.Header().Set("Content-Type", "application/json")
+			responseWriter.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 			responseWriter.WriteHeader(http.StatusOK)
 			responseWriter.Write(responseBytes)
 		},

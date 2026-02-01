@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/timeutil"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -79,7 +80,7 @@ func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[stri
 		currentScoresSorted: sortTeamsByScoreAndCalculatePositions(initialScores),
 		currentScoresMutex:  &sync.Mutex{},
 
-		lastUpdate: time.Now(),
+		lastUpdate: timeutil.TruncateToMillisecond(time.Now()),
 
 		challengesMap: cachedChallengesMap,
 	}
@@ -237,7 +238,7 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				s.currentScores[score.Name] = score
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-				s.lastUpdate = time.Now()
+				s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 				s.currentScoresMutex.Unlock()
 			case watch.Deleted:
 				deployment := event.Object.(*appsv1.Deployment)
@@ -245,7 +246,7 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 				s.currentScoresMutex.Lock()
 				delete(s.currentScores, team)
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-				s.lastUpdate = time.Now()
+				s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 				s.currentScoresMutex.Unlock()
 			default:
 			}
@@ -294,7 +295,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 			Score:             0,
 			Challenges:        []ChallengeProgress{},
 			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
-			LastUpdate:        time.Now(),
+			LastUpdate:        timeutil.TruncateToMillisecond(time.Now()),
 		}
 	}
 
@@ -308,7 +309,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 			Score:             0,
 			Challenges:        []ChallengeProgress{},
 			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
-			LastUpdate:        time.Now(),
+			LastUpdate:        timeutil.TruncateToMillisecond(time.Now()),
 		}
 	}
 
@@ -329,7 +330,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 		Score:             score,
 		Challenges:        solvedChallengeNames,
 		InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
-		LastUpdate:        time.Now(),
+		LastUpdate:        timeutil.TruncateToMillisecond(time.Now()),
 	}
 }
 

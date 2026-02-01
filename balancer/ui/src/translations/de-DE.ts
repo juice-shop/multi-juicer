@@ -45,6 +45,13 @@ export default {
   "admin_table.cheat_score_tooltip":
     "Dieser Score zeigt an, ob Herausforderungen schneller gelöst werden als normalerweise erwartet. Er identifiziert möglicherweise nicht genau tatsächliches Cheaten. Klicken Sie hier, um mehr zu erfahren.",
   "admin_table.no_cheat_score": "Kein Cheat-Score",
+  "admin_table.cheat_score_graph_not_available_yet":
+    "Das Cheat-Score-Diagramm wird verfügbar, sobald mehr als eine Herausforderung gelöst wurde",
+  "cheat_score_graph.title": "Cheat-Score-Verlauf",
+  "cheat_score_graph.not_enough_data": "Nicht genügend Daten für Diagramm",
+  "cheat_score_graph.x_axis_label": "Gelöste Herausforderungen →",
+  "cheat_score_graph.expand": "Erweitern",
+  "cheat_score_graph.close": "Schließen",
   updating_score: "Dein Punktestand wird berechnet...",
   score_overview: "Punkteübersicht",
   team_score:
@@ -86,4 +93,18 @@ export default {
     'Bist du sicher, dass du Team "{team}" neu starten möchtest?',
   instance_status_not_found:
     "Die Instanz für das Team konnte nicht gefunden werden. Du kannst sie neu erstellen, indem du dich erneut anmeldest.",
+  "admin.notification.title": "Benachrichtigungen an alle Benutzer senden",
+  "admin.notification.description":
+    "Benachrichtigungen werden allen Benutzern in der MultiJuicer-Oberfläche angezeigt. Sie können verwendet werden, um Benutzer über wichtige Updates oder Probleme zu informieren. Hinweis: Sie werden nicht in der JuiceShop-Oberfläche angezeigt.",
+  "admin.notification.placeholder": "Benachrichtigung eingeben...",
+  "admin.notification.characters_remaining": "{count} Zeichen übrig",
+  "admin.notification.markdown_supported": "Einfaches Markdown unterstützt",
+  "admin.notification.error.too_long":
+    "Nachricht ist zu lang (maximal 128 Zeichen)",
+  "admin.notification.success": "Benachrichtigung erfolgreich aktualisiert",
+  "admin.notification.cleared": "Benachrichtigung gelöscht",
+  "admin.notification.error": "Fehler beim Aktualisieren der Benachrichtigung",
+  "admin.notification.submitting": "Wird aktualisiert...",
+  "admin.notification.submit": "Benachrichtigung senden",
+  "admin.notification.clear": "Benachrichtigung löschen",
 };

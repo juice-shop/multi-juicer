@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 
-import { useHttpLongPoll } from "./useHttpLongPoll";
+import {
+  useHttpLongPoll,
+  FetchResult,
+  extractLastUpdateTimestamp,
+} from "./useHttpLongPoll";
 
 interface SolvedChallengeResponse {
   key: string;
@@ -9,8 +13,10 @@ interface SolvedChallengeResponse {
   solvedAt: string; // ISO string
 }
 
-export interface SolvedChallenge
-  extends Omit<SolvedChallengeResponse, "solvedAt"> {
+export interface SolvedChallenge extends Omit<
+  SolvedChallengeResponse,
+  "solvedAt"
+> {
   solvedAt: Date; // Convert string to Date object
 }
 
@@ -23,8 +29,10 @@ interface TeamStatusResponse {
   readiness: boolean;
 }
 
-export interface TeamStatus
-  extends Omit<TeamStatusResponse, "solvedChallenges"> {
+export interface TeamStatus extends Omit<
+  TeamStatusResponse,
+  "solvedChallenges"
+> {
   solvedChallenges: SolvedChallenge[];
 }
 
@@ -34,18 +42,20 @@ export interface TeamStatus
  * @param team - The name of the team to fetch, or "me" for current logged-in team
  * @param lastSeen - The timestamp of the last update, or null for initial fetch
  * @param signal - AbortSignal for request cancellation
- * @returns The team status data, or null if the server returns 204 (no new data)
+ * @returns The team status data and server timestamp, or null if the server returns 204 (no new data)
  */
 async function fetchTeamStatus(
   team: "me" | string,
   lastSeen: Date | null,
   signal?: AbortSignal
-): Promise<TeamStatus | null> {
+): Promise<FetchResult<TeamStatus>> {
   const url = lastSeen
     ? `/balancer/api/teams/${team}/status?wait-for-update-after=${lastSeen.toISOString()}`
     : `/balancer/api/teams/${team}/status`;
 
   const response = await fetch(url, { signal });
+
+  const lastUpdateTimestamp = extractLastUpdateTimestamp(response);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -54,12 +64,12 @@ async function fetchTeamStatus(
     throw new Error("Failed to fetch team status");
   }
   if (response.status === 204) {
-    return null;
+    return { data: null, lastUpdateTimestamp };
   }
   const rawStatus = (await response.json()) as TeamStatusResponse;
 
   // Process the raw response to convert date strings to Date objects and sort
-  return {
+  const data: TeamStatus = {
     ...rawStatus,
     solvedChallenges: rawStatus.solvedChallenges
       .map((challenge) => ({
@@ -68,6 +78,8 @@ async function fetchTeamStatus(
       }))
       .sort((a, b) => b.solvedAt.getTime() - a.solvedAt.getTime()), // Sort by most recent first
   };
+
+  return { data, lastUpdateTimestamp };
 }
 
 export interface UseTeamStatusOptions {

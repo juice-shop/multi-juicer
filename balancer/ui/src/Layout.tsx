@@ -6,6 +6,8 @@ import Popup from "reactjs-popup";
 import type { PopupActions } from "reactjs-popup/dist/types";
 
 import { Card } from "@/components/Card";
+import { NotificationBanner } from "@/components/NotificationBanner";
+import { useNotifications } from "@/hooks/useNotifications";
 import availableLanguages, { type Language } from "@/translations";
 import { classNames } from "@/util/classNames";
 
@@ -366,6 +368,10 @@ export function Layout({
   activeTeam: string | null;
   setActiveTeam: (team: string | null) => void;
 }) {
+  const { data: notification } = useNotifications();
+  const hasNotification =
+    notification && notification.enabled && notification.message;
+
   let primaryBackLink = "/";
   if (activeTeam === "admin") {
     primaryBackLink = "/admin";
@@ -376,22 +382,30 @@ export function Layout({
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
       <header>
-        <Card className="p-2 sm:p-4 flex justify-between items-center flex-col sm:flex-row gap-y-3">
-          <Link to={primaryBackLink} className="flex items-center gap-3">
-            <img
-              src="/balancer/multi-juicer.svg"
-              alt="MultiJuicer Logo"
-              className="h-12"
-            />
-          </Link>
+        <div>
+          <NotificationBanner notification={notification} />
+          <Card
+            className={classNames(
+              "p-2 sm:p-4 flex justify-between items-center flex-col sm:flex-row gap-y-3",
+              hasNotification ? "rounded-t-none" : ""
+            )}
+          >
+            <Link to={primaryBackLink} className="flex items-center gap-3">
+              <img
+                src="/balancer/multi-juicer.svg"
+                alt="MultiJuicer Logo"
+                className="h-12"
+              />
+            </Link>
 
-          <Navigation
-            activeTeam={activeTeam}
-            switchLanguage={switchLanguage}
-            selectedLocale={selectedLocale}
-            setActiveTeam={setActiveTeam}
-          />
-        </Card>
+            <Navigation
+              activeTeam={activeTeam}
+              switchLanguage={switchLanguage}
+              selectedLocale={selectedLocale}
+              setActiveTeam={setActiveTeam}
+            />
+          </Card>
+        </div>
       </header>
 
       <main className="flex flex-col items-center justify-center">

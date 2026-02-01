@@ -16,11 +16,12 @@ type AdminListInstancesResponse struct {
 }
 
 type AdminListJuiceShopInstance struct {
-	Team        string   `json:"team"`
-	Ready       bool     `json:"ready"`
-	CreatedAt   int64    `json:"createdAt"`
-	LastConnect int64    `json:"lastConnect"`
-	CheatScore  *float64 `json:"cheatScore,omitempty"`
+	Team              string            `json:"team"`
+	Ready             bool              `json:"ready"`
+	CreatedAt         int64             `json:"createdAt"`
+	LastConnect       int64             `json:"lastConnect"`
+	CheatScore        *float64          `json:"cheatScore,omitempty"`
+	CheatScoreHistory []CheatScoreEntry `json:"cheatScoreHistory,omitempty"`
 }
 
 type CheatScoreEntry struct {
@@ -62,9 +63,9 @@ func handleAdminListInstances(bundle *bundle.Bundle) http.Handler {
 
 				// Parse cheat scores and get the newest one
 				var cheatScore *float64
+				var cheatScores []CheatScoreEntry
 				cheatScoresAnnotation := teamDeployment.Annotations["multi-juicer.owasp-juice.shop/cheatScores"]
 				if cheatScoresAnnotation != "" {
-					var cheatScores []CheatScoreEntry
 					err := json.Unmarshal([]byte(cheatScoresAnnotation), &cheatScores)
 					if err == nil && len(cheatScores) > 0 {
 						// Get the newest cheat score (last entry in the array)
@@ -74,11 +75,12 @@ func handleAdminListInstances(bundle *bundle.Bundle) http.Handler {
 				}
 
 				instances = append(instances, AdminListJuiceShopInstance{
-					Team:        teamDeployment.Labels["team"],
-					Ready:       teamDeployment.Status.ReadyReplicas == 1,
-					CreatedAt:   teamDeployment.CreationTimestamp.UnixMilli(),
-					LastConnect: lastConnection.UnixMilli(),
-					CheatScore:  cheatScore,
+					Team:              teamDeployment.Labels["team"],
+					Ready:             teamDeployment.Status.ReadyReplicas == 1,
+					CreatedAt:         teamDeployment.CreationTimestamp.UnixMilli(),
+					LastConnect:       lastConnection.UnixMilli(),
+					CheatScore:        cheatScore,
+					CheatScoreHistory: cheatScores,
 				})
 			}
 

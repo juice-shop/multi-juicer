@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import Popup from "reactjs-popup";
 
 import { Card } from "@/components/Card";
+import { CheatScoreGraph } from "@/components/CheatScoreGraph/CheatScoreGraph";
+import { NotificationManager } from "@/components/NotificationManager";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 
 const buttonClasses =
@@ -102,6 +105,10 @@ interface Team {
   createdAt: Date;
   lastConnect: Date;
   cheatScore?: number;
+  cheatScoreHistory?: {
+    totalCheatScore: number;
+    timestamp: string;
+  }[];
 }
 
 interface TeamRaw {
@@ -110,6 +117,10 @@ interface TeamRaw {
   createdAt: string;
   lastConnect: string;
   cheatScore?: number;
+  cheatScoreHistory?: {
+    totalCheatScore: number;
+    timestamp: string;
+  }[];
 }
 
 async function fetchAdminData(signal?: AbortSignal): Promise<Team[]> {
@@ -169,7 +180,9 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 w-full lg:max-w-4xl">
+    <div className="flex flex-col gap-4 w-full lg:max-w-4xl">
+      <NotificationManager />
+
       <h1 className="text-xl font-semibold">
         <FormattedMessage
           id="admin_table.table_header"
@@ -251,9 +264,49 @@ export default function AdminPage() {
                       ℹ️
                     </a>
                   </p>
-                  <p className="text-sm text-gray-800 dark:text-gray-200">
-                    {(team.cheatScore * 100).toFixed(1)}%
-                  </p>
+                  {team.cheatScoreHistory &&
+                  team.cheatScoreHistory.length > 1 ? (
+                    <Popup
+                      trigger={
+                        <span
+                          className="text-sm text-gray-800 dark:text-gray-200 cursor-help
+                            border-b border-dotted border-transparent
+                            hover:border-gray-400"
+                        >
+                          <br />
+                          {(team.cheatScore * 100).toFixed(1)}%
+                        </span>
+                      }
+                      position={["top center", "bottom center"]}
+                      on="hover"
+                      mouseEnterDelay={100}
+                      arrow={true}
+                      arrowStyle={{
+                        color: "black",
+                      }}
+                      contentStyle={{
+                        padding: "0px",
+                        border: "none",
+                        borderRadius: "0.25rem",
+                      }}
+                    >
+                      <CheatScoreGraph
+                        history={team.cheatScoreHistory}
+                        teamname={team.team}
+                      />
+                    </Popup>
+                  ) : (
+                    <p
+                      className="text-sm text-gray-800 dark:text-gray-200 cursor-help"
+                      title={intl.formatMessage({
+                        id: "admin_table.cheat_score_graph_not_available_yet",
+                        defaultMessage:
+                          "The cheat score graph will be available once more than one challenge is solved",
+                      })}
+                    >
+                      {(team.cheatScore * 100).toFixed(1)}%
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">

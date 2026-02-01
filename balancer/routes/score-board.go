@@ -83,7 +83,7 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 
 			responseWriter.Header().Set("Content-Type", "application/json")
 			responseWriter.Header().Set("Last-Modified", lastUpdateTime.UTC().Format(time.RFC1123))
-			responseWriter.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339))
+			responseWriter.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 			responseWriter.WriteHeader(http.StatusOK)
 			responseWriter.Write(responseBytes)
 		},
