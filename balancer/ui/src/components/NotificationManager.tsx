@@ -134,19 +134,27 @@ export function NotificationManager() {
               rows={2}
               maxLength={128}
             />
-            <p
-              className={`text-sm mt-1 ${
-                remainingChars < 50
-                  ? "text-orange-600 dark:text-orange-400"
-                  : "text-gray-600 dark:text-gray-400"
-              }`}
-            >
-              {remainingChars}{" "}
-              <FormattedMessage
-                id="admin.notification.characters_remaining"
-                defaultMessage="characters remaining"
-              />
-            </p>
+            <div className="flex justify-between items-center mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                <FormattedMessage
+                  id="admin.notification.markdown_supported"
+                  defaultMessage="Basic markdown supported"
+                />
+              </p>
+              <p
+                className={`text-sm ${
+                  remainingChars < 50
+                    ? "text-orange-600 dark:text-orange-400"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              >
+                <FormattedMessage
+                  id="admin.notification.characters_remaining"
+                  defaultMessage="{count} characters remaining"
+                  values={{ count: remainingChars }}
+                />
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-2">
