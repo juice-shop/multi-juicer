@@ -6,6 +6,7 @@ import {
 
 export interface NotificationData {
   message: string;
+  enabled: boolean;
   updatedAt: string; // ISO String
 }
 
@@ -14,7 +15,7 @@ export interface NotificationData {
  *
  * @param lastSeen - The timestamp of the last update, or null for initial fetch
  * @param signal - AbortSignal for request cancellation
- * @returns The notification data and server timestamp, or null if no notification exists or server returns 204
+ * @returns The notification data (including enabled field) and server timestamp, or null on long-poll timeout
  */
 async function fetchNotification(
   lastSeen: Date | null,
@@ -28,7 +29,7 @@ async function fetchNotification(
 
   const lastUpdateTimestamp = extractLastUpdateTimestamp(response);
 
-  // Status 204 No Content means no notification or long-poll timeout
+  // Status 204 No Content means long-poll timeout (no updates within the wait period)
   if (response.status === 204) {
     return { data: null, lastUpdateTimestamp };
   }
@@ -38,11 +39,8 @@ async function fetchNotification(
 
   const data: NotificationData = await response.json();
 
-  // Return null if message is empty
-  if (!data.message || data.message.trim() === "") {
-    return { data: null, lastUpdateTimestamp };
-  }
-
+  // Always return the full data including the enabled field
+  // Let components decide how to handle disabled/empty notifications
   return { data, lastUpdateTimestamp };
 }
 
@@ -54,7 +52,7 @@ async function fetchNotification(
  * between requests to avoid spamming the server.
  *
  * @returns An object containing:
- *   - data: The notification data, or null if no notification exists
+ *   - data: The notification data (including enabled field), or null on timeout
  *   - isLoading: True during the initial load
  *   - error: Error message if the fetch failed, or null
  */

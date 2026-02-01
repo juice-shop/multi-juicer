@@ -34,7 +34,7 @@ func TestNotificationsHandler(t *testing.T) {
 		assert.NotEqual(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("returns 204 No Content when no notification exists", func(t *testing.T) {
+	t.Run("returns 200 OK with enabled=false when no notification exists", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/balancer/api/notifications", nil)
 		rr := httptest.NewRecorder()
 
@@ -46,7 +46,15 @@ func TestNotificationsHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusNoContent, rr.Code)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
+		assert.NotEmpty(t, rr.Header().Get("X-Last-Update"))
+
+		var response NotificationResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Nil(t, err)
+		assert.False(t, response.Enabled)
+		assert.Equal(t, "", response.Message)
 	})
 
 	t.Run("returns notification data when available", func(t *testing.T) {
@@ -90,15 +98,18 @@ func TestNotificationsHandler(t *testing.T) {
 
 		server.ServeHTTP(rr, req)
 
-		// Note: The service may return 204 if the watcher hasn't processed the ConfigMap yet
+		// Note: The service will return enabled=false if the watcher hasn't processed the ConfigMap yet
 		// In a real scenario, the watcher would be running and would have processed it
-		if rr.Code == http.StatusOK {
-			assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
-			assert.NotEmpty(t, rr.Header().Get("X-Last-Update"))
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
+		assert.NotEmpty(t, rr.Header().Get("X-Last-Update"))
 
-			var response NotificationResponse
-			err = json.Unmarshal(rr.Body.Bytes(), &response)
-			assert.Nil(t, err)
+		var response NotificationResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Nil(t, err)
+
+		// Only check message if notification is enabled (watcher processed it)
+		if response.Enabled {
 			assert.Equal(t, "Test notification message", response.Message)
 		}
 	})

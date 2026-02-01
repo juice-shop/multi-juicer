@@ -369,7 +369,8 @@ export function Layout({
   setActiveTeam: (team: string | null) => void;
 }) {
   const { data: notification } = useNotifications();
-  const hasNotification = notification && notification.message;
+  const hasNotification =
+    notification && notification.enabled && notification.message;
 
   let primaryBackLink = "/";
   if (activeTeam === "admin") {

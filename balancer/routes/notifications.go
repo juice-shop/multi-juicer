@@ -13,6 +13,7 @@ import (
 
 type NotificationResponse struct {
 	Message   string    `json:"message"`
+	Enabled   bool      `json:"enabled"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
@@ -27,23 +28,33 @@ func handleNotifications(b *bundle.Bundle, notificationService *notification.Not
 					// Timeout, no updates
 					return nil, time.Time{}, false, nil
 				}
-				// Return nil if notification is disabled or doesn't exist
-				if notification == nil {
-					return nil, lastUpdateTime, true, nil
+				// Return disabled notification if it doesn't exist or is disabled
+				if notification == nil || !notification.Enabled {
+					return &NotificationResponse{
+						Message:   "",
+						Enabled:   false,
+						UpdatedAt: lastUpdateTime,
+					}, lastUpdateTime, true, nil
 				}
 				return &NotificationResponse{
 					Message:   notification.Message,
+					Enabled:   true,
 					UpdatedAt: lastUpdateTime,
 				}, lastUpdateTime, true, nil
 			}
 
 			// Initial fetch: return current notification immediately
 			notification, lastUpdateTime := notificationService.GetNotificationWithTimestamp()
-			if notification == nil {
-				return nil, lastUpdateTime, true, nil
+			if notification == nil || !notification.Enabled {
+				return &NotificationResponse{
+					Message:   "",
+					Enabled:   false,
+					UpdatedAt: lastUpdateTime,
+				}, lastUpdateTime, true, nil
 			}
 			return &NotificationResponse{
 				Message:   notification.Message,
+				Enabled:   true,
 				UpdatedAt: lastUpdateTime,
 			}, lastUpdateTime, true, nil
 		}
@@ -61,13 +72,6 @@ func handleNotifications(b *bundle.Bundle, notificationService *notification.Not
 			return
 		}
 
-		// If response is nil (notification disabled/doesn't exist), return 204
-		if response == nil {
-			w.WriteHeader(http.StatusNoContent)
-			w.Write([]byte{})
-			return
-		}
-
 		responseBytes, marshalErr := json.Marshal(response)
 		if marshalErr != nil {
 			b.Log.Printf("Failed to marshal notification response: %s", marshalErr)
@@ -76,7 +80,7 @@ func handleNotifications(b *bundle.Bundle, notificationService *notification.Not
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339))
+		w.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 		w.WriteHeader(http.StatusOK)
 		w.Write(responseBytes)
 	})

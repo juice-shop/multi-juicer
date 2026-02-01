@@ -14,7 +14,7 @@ export function NotificationBanner({
     return DOMPurify.sanitize(rawHtml);
   }, [notification?.message]);
 
-  if (!notification || !notification.message) {
+  if (!notification || !notification.enabled || !notification.message) {
     return null;
   }
 

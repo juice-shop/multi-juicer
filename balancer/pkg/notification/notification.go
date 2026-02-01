@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/timeutil"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,7 +32,7 @@ func NewNotificationService(bundle *bundle.Bundle) *NotificationService {
 		bundle:              bundle,
 		currentNotification: nil,
 		mutex:               &sync.RWMutex{},
-		lastUpdate:          time.Now(),
+		lastUpdate:          timeutil.TruncateToMillisecond(time.Now()),
 	}
 }
 
@@ -175,7 +176,7 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 
 	if cm == nil {
 		s.currentNotification = nil
-		s.lastUpdate = time.Now()
+		s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 		return
 	}
 
@@ -183,7 +184,7 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 	if !ok {
 		s.bundle.Log.Printf("Notification ConfigMap missing 'notification.json' key")
 		s.currentNotification = nil
-		s.lastUpdate = time.Now()
+		s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 		return
 	}
 
@@ -191,11 +192,11 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 	if err := json.Unmarshal([]byte(jsonData), &notification); err != nil {
 		s.bundle.Log.Printf("Failed to parse notification JSON: %v", err)
 		s.currentNotification = nil
-		s.lastUpdate = time.Now()
+		s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 		return
 	}
 
 	s.currentNotification = &notification
-	s.lastUpdate = time.Now()
+	s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 	s.bundle.Log.Printf("Updated notification: enabled=%v, message=%q", notification.Enabled, notification.Message)
 }

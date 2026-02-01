@@ -141,13 +141,21 @@ export function useHttpLongPoll<T>(
       const lastUpdateStarted = new Date();
       const result = await fetchFn(lastSuccessfulUpdate, signal);
 
-      // Only update lastSuccessfulUpdate when we receive new data
+      // Update the timestamp for the next poll
+      // Prefer server-provided timestamp when available to avoid clock skew
       let nextLastSuccessfulUpdate = lastSuccessfulUpdate;
-      if (result.data !== null) {
+      if (result.lastUpdateTimestamp) {
+        // Server provided a timestamp - this indicates a state update (even if data is null)
+        nextLastSuccessfulUpdate = result.lastUpdateTimestamp;
+        // Update data whenever we have a server timestamp (state change)
         setData(result.data);
-        // Prefer server-provided timestamp when available to avoid clock skew
-        nextLastSuccessfulUpdate = result.lastUpdateTimestamp ?? new Date();
+      } else if (result.data !== null) {
+        // No server timestamp but we have data - use client time and update data
+        nextLastSuccessfulUpdate = new Date();
+        setData(result.data);
       }
+      // If no timestamp and no data, it's a timeout (204) - don't update anything
+
       setIsLoading(false);
       setError(null);
 
