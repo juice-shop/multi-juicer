@@ -93,4 +93,18 @@ export default {
     'Bist du sicher, dass du Team "{team}" neu starten möchtest?',
   instance_status_not_found:
     "Die Instanz für das Team konnte nicht gefunden werden. Du kannst sie neu erstellen, indem du dich erneut anmeldest.",
+  "admin.notification.title": "Benachrichtigungen an alle Benutzer senden",
+  "admin.notification.description":
+    "Benachrichtigungen werden allen Benutzern in der MultiJuicer-Oberfläche angezeigt. Sie können verwendet werden, um Benutzer über wichtige Updates oder Probleme zu informieren. Hinweis: Sie werden nicht in der JuiceShop-Oberfläche angezeigt.",
+  "admin.notification.placeholder": "Benachrichtigung eingeben...",
+  "admin.notification.characters_remaining": "{count} Zeichen übrig",
+  "admin.notification.markdown_supported": "Einfaches Markdown unterstützt",
+  "admin.notification.error.too_long":
+    "Nachricht ist zu lang (maximal 128 Zeichen)",
+  "admin.notification.success": "Benachrichtigung erfolgreich aktualisiert",
+  "admin.notification.cleared": "Benachrichtigung gelöscht",
+  "admin.notification.error": "Fehler beim Aktualisieren der Benachrichtigung",
+  "admin.notification.submitting": "Wird aktualisiert...",
+  "admin.notification.submit": "Benachrichtigung senden",
+  "admin.notification.clear": "Benachrichtigung löschen",
 };

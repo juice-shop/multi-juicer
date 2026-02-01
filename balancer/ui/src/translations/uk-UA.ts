@@ -93,4 +93,18 @@ export default {
     'Ви впевнені, що хочете перезапустити команду "{team}"?',
   instance_status_not_found:
     "Не вдалося знайти інстанс для команди. Ви можете відновити його, увійшовши знову.",
+  "admin.notification.title": "Опублікувати повідомлення для всіх користувачів",
+  "admin.notification.description":
+    "Повідомлення показуються всім користувачам в інтерфейсі MultiJuicer. Вони можуть використовуватися для інформування користувачів про важливі оновлення або проблеми. Примітка: вони не відображаються в інтерфейсі JuiceShop.",
+  "admin.notification.placeholder": "Введіть повідомлення...",
+  "admin.notification.characters_remaining": "Залишилося символів: {count}",
+  "admin.notification.markdown_supported": "Підтримується базовий markdown",
+  "admin.notification.error.too_long":
+    "Повідомлення занадто довге (максимум 128 символів)",
+  "admin.notification.success": "Повідомлення успішно оновлено",
+  "admin.notification.cleared": "Повідомлення видалено",
+  "admin.notification.error": "Помилка при оновленні повідомлення",
+  "admin.notification.submitting": "Оновлення...",
+  "admin.notification.submit": "Опублікувати повідомлення",
+  "admin.notification.clear": "Видалити повідомлення",
 };

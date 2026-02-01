@@ -91,4 +91,18 @@ export default {
     'Ești sigur că vrei să repornești echipa "{team}"?',
   instance_status_not_found:
     "Nu s-a găsit instanța pentru această echipă. O poți recrea autentificându-te din nou.",
+  "admin.notification.title": "Postează notificări pentru toți utilizatorii",
+  "admin.notification.description":
+    "Notificările sunt afișate tuturor utilizatorilor în interfața MultiJuicer. Pot fi folosite pentru a informa utilizatorii despre actualizări sau probleme importante. Notă: nu sunt afișate în interfața JuiceShop.",
+  "admin.notification.placeholder": "Introdu mesajul notificării...",
+  "admin.notification.characters_remaining": "{count} caractere rămase",
+  "admin.notification.markdown_supported": "Markdown de bază acceptat",
+  "admin.notification.error.too_long":
+    "Mesajul este prea lung (maxim 128 de caractere)",
+  "admin.notification.success": "Notificare actualizată cu succes",
+  "admin.notification.cleared": "Notificare ștearsă",
+  "admin.notification.error": "Eroare la actualizarea notificării",
+  "admin.notification.submitting": "Se actualizează...",
+  "admin.notification.submit": "Postează notificare",
+  "admin.notification.clear": "Șterge notificarea",
 };
