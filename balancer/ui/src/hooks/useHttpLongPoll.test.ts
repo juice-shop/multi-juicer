@@ -22,8 +22,8 @@ describe("useHttpLongPoll", () => {
   });
 
   test("should fetch data on mount and update state", async () => {
-    const mockData = { data: "test" };
-    const fetchFn = vi.fn().mockResolvedValue(mockData);
+    const mockData = "test";
+    const fetchFn = vi.fn().mockResolvedValue({ data: mockData });
 
     const { result, unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
@@ -39,7 +39,7 @@ describe("useHttpLongPoll", () => {
   });
 
   test("should handle 204 no content (null response)", async () => {
-    const fetchFn = vi.fn().mockResolvedValue(null);
+    const fetchFn = vi.fn().mockResolvedValue({ data: null });
 
     const { result, unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
@@ -78,10 +78,11 @@ describe("useHttpLongPoll", () => {
 
   test("should recover from errors on retry", async () => {
     const error = new Error("Network error");
+    const mockData = "test";
     const fetchFn = vi
       .fn()
       .mockRejectedValueOnce(error)
-      .mockResolvedValue({ data: "test" });
+      .mockResolvedValue({ data: mockData });
 
     const consoleErrorSpy = vi
       .spyOn(console, "error")
@@ -106,7 +107,7 @@ describe("useHttpLongPoll", () => {
       { timeout: 2000 }
     );
 
-    expect(result.current.data).toEqual({ data: "test" });
+    expect(result.current.data).toEqual(mockData);
     expect(fetchFn).toHaveBeenCalledTimes(2);
 
     consoleErrorSpy.mockRestore();
@@ -136,8 +137,8 @@ describe("useHttpLongPoll", () => {
   });
 
   test("should use custom calculateWaitTime function", async () => {
-    const mockData = { data: "test" };
-    const fetchFn = vi.fn().mockResolvedValue(mockData);
+    const mockData = "test";
+    const fetchFn = vi.fn().mockResolvedValue({ data: mockData });
     const calculateWaitTime = vi.fn().mockReturnValue(100);
 
     const { unmount } = renderHook(() =>
@@ -157,7 +158,7 @@ describe("useHttpLongPoll", () => {
   });
 
   test("should call calculateWaitTime with null when response is null", async () => {
-    const fetchFn = vi.fn().mockResolvedValue(null);
+    const fetchFn = vi.fn().mockResolvedValue({ data: null });
     const calculateWaitTime = vi.fn().mockReturnValue(100);
 
     const { unmount } = renderHook(() =>
@@ -276,11 +277,11 @@ describe("useHttpLongPoll", () => {
   });
 
   test("should keep previous data on null response", async () => {
-    const mockData1 = { data: "test1" };
+    const mockData1 = "test1";
     const fetchFn = vi
       .fn()
-      .mockResolvedValueOnce(mockData1)
-      .mockResolvedValueOnce(null);
+      .mockResolvedValueOnce({ data: mockData1 })
+      .mockResolvedValueOnce({ data: null });
 
     const { result, unmount } = renderHook(() =>
       useHttpLongPoll({

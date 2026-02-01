@@ -1,13 +1,52 @@
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * Extracts the last update timestamp from the X-Last-Update response header.
+ * This helper ensures consistent handling of server-provided timestamps across
+ * all long-polling endpoints.
+ *
+ * @param response - The fetch Response object
+ * @returns The parsed timestamp, or undefined if the header is not present or invalid
+ */
+export function extractLastUpdateTimestamp(
+  response: Response
+): Date | undefined {
+  const timestampHeader = response.headers.get("X-Last-Update");
+  if (!timestampHeader) {
+    return undefined;
+  }
+
+  const timestamp = new Date(timestampHeader);
+  // Validate that the parsed date is valid
+  return isNaN(timestamp.getTime()) ? undefined : timestamp;
+}
+
+export interface FetchResult<T> {
+  /**
+   * The fetched data, or null if the server returned 204 (no new data).
+   */
+  data: T | null;
+
+  /**
+   * Optional server-provided timestamp from the X-Last-Update header.
+   * When provided, this timestamp will be used for the next poll request
+   * instead of client-side time, avoiding clock skew issues.
+   */
+  lastUpdateTimestamp?: Date;
+}
+
 export interface HttpLongPollOptions<T> {
   /**
    * The fetch function that performs the HTTP request.
-   * Should return null if the server returns 204 (no new data).
+   * Should return data as null if the server returns 204 (no new data).
+   * Can optionally include a server-provided timestamp to avoid clock skew.
    * @param lastSeen - The timestamp of the last successful update, or null for the initial fetch
    * @param signal - AbortSignal for cancellation
    */
-  fetchFn: (lastSeen: Date | null, signal: AbortSignal) => Promise<T | null>;
+  fetchFn: (
+    lastSeen: Date | null,
+    signal: AbortSignal
+  ) => Promise<FetchResult<T>>;
 
   /**
    * Function to calculate the wait time before the next poll.
@@ -100,18 +139,22 @@ export function useHttpLongPoll<T>(
   ) => {
     try {
       const lastUpdateStarted = new Date();
-      const newData = await fetchFn(lastSuccessfulUpdate, signal);
+      const result = await fetchFn(lastSuccessfulUpdate, signal);
 
-      if (newData !== null) {
-        setData(newData);
+      // Only update lastSuccessfulUpdate when we receive new data
+      let nextLastSuccessfulUpdate = lastSuccessfulUpdate;
+      if (result.data !== null) {
+        setData(result.data);
+        // Prefer server-provided timestamp when available to avoid clock skew
+        nextLastSuccessfulUpdate = result.lastUpdateTimestamp ?? new Date();
       }
       setIsLoading(false);
       setError(null);
 
       // Schedule the next poll
-      const waitTime = calculateWaitTime(lastUpdateStarted, newData);
+      const waitTime = calculateWaitTime(lastUpdateStarted, result.data);
       timeoutRef.current = window.setTimeout(() => {
-        pollRef.current?.(new Date(), signal);
+        pollRef.current?.(nextLastSuccessfulUpdate, signal);
       }, waitTime);
     } catch (err) {
       // Ignore abort errors - these are expected when the component unmounts

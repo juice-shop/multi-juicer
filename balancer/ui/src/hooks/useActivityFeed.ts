@@ -1,4 +1,8 @@
-import { useHttpLongPoll } from "./useHttpLongPoll";
+import {
+  useHttpLongPoll,
+  FetchResult,
+  extractLastUpdateTimestamp,
+} from "./useHttpLongPoll";
 
 export interface ActivityEvent {
   team: string;
@@ -14,27 +18,30 @@ export interface ActivityEvent {
  *
  * @param lastSeen - The timestamp of the last update, or null for initial fetch
  * @param signal - AbortSignal for request cancellation
- * @returns An array of activity events, or null if the server returns 204 (no new data)
+ * @returns An array of activity events and server timestamp, or null if the server returns 204 (no new data)
  */
 async function fetchActivityFeed(
   lastSeen: Date | null,
   signal?: AbortSignal
-): Promise<ActivityEvent[] | null> {
+): Promise<FetchResult<ActivityEvent[]>> {
   const url = lastSeen
     ? `/balancer/api/activity-feed?wait-for-update-after=${lastSeen.toISOString()}`
     : "/balancer/api/activity-feed";
 
   const response = await fetch(url, { signal });
 
+  const lastUpdateTimestamp = extractLastUpdateTimestamp(response);
+
   // Status 204 No Content means the long-poll timed out without new data
   if (response.status === 204) {
-    return null;
+    return { data: null, lastUpdateTimestamp };
   }
   if (!response.ok) {
     throw new Error("Failed to fetch activity feed");
   }
 
-  return response.json();
+  const data = await response.json();
+  return { data, lastUpdateTimestamp };
 }
 
 /**

@@ -1,4 +1,8 @@
-import { useHttpLongPoll } from "./useHttpLongPoll";
+import {
+  useHttpLongPoll,
+  FetchResult,
+  extractLastUpdateTimestamp,
+} from "./useHttpLongPoll";
 
 export interface NotificationData {
   message: string;
@@ -10,21 +14,23 @@ export interface NotificationData {
  *
  * @param lastSeen - The timestamp of the last update, or null for initial fetch
  * @param signal - AbortSignal for request cancellation
- * @returns The notification data, or null if no notification exists or server returns 204
+ * @returns The notification data and server timestamp, or null if no notification exists or server returns 204
  */
 async function fetchNotification(
   lastSeen: Date | null,
   signal?: AbortSignal
-): Promise<NotificationData | null> {
+): Promise<FetchResult<NotificationData>> {
   const url = lastSeen
     ? `/balancer/api/notifications?wait-for-update-after=${lastSeen.toISOString()}`
     : "/balancer/api/notifications";
 
   const response = await fetch(url, { signal });
 
+  const lastUpdateTimestamp = extractLastUpdateTimestamp(response);
+
   // Status 204 No Content means no notification or long-poll timeout
   if (response.status === 204) {
-    return null;
+    return { data: null, lastUpdateTimestamp };
   }
   if (!response.ok) {
     throw new Error("Failed to fetch notification");
@@ -34,10 +40,10 @@ async function fetchNotification(
 
   // Return null if message is empty
   if (!data.message || data.message.trim() === "") {
-    return null;
+    return { data: null, lastUpdateTimestamp };
   }
 
-  return data;
+  return { data, lastUpdateTimestamp };
 }
 
 /**
