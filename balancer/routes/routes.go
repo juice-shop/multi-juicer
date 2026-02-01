@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -25,6 +26,7 @@ func AddRoutes(
 	router *http.ServeMux,
 	bundle *bundle.Bundle,
 	scoringService *scoring.ScoringService,
+	notificationService *notification.NotificationService,
 ) {
 	router.Handle("/", trackRequestMetrics(handleProxy(bundle)))
 	router.Handle("GET /balancer", redirectLoggedInTeamsToStatus(bundle, handleStaticFiles(bundle)))
@@ -37,10 +39,12 @@ func AddRoutes(
 	router.Handle("GET /balancer/api/teams/status", handleTeamStatus(bundle, scoringService))
 	router.Handle("GET /balancer/api/teams/{team}/status", handleTeamStatus(bundle, scoringService))
 	router.Handle("GET /balancer/api/activity-feed", handleActivityFeed(bundle, scoringService))
+	router.Handle("GET /balancer/api/notifications", handleNotifications(bundle, notificationService))
 
 	router.Handle("GET /balancer/api/admin/all", handleAdminListInstances(bundle))
 	router.Handle("DELETE /balancer/api/admin/teams/{team}/delete", handleAdminDeleteInstance(bundle))
 	router.Handle("POST /balancer/api/admin/teams/{team}/restart", handleAdminRestartInstance(bundle))
+	router.Handle("POST /balancer/api/admin/notifications", handleAdminPostNotification(bundle))
 
 	router.HandleFunc("GET /balancer/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

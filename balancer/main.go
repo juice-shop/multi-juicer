@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/routes"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -14,18 +15,20 @@ import (
 func main() {
 	bundle := bundle.New()
 	scoringService := scoring.NewScoringService(bundle)
+	notificationService := notification.NewNotificationService(bundle)
 
 	ctx := context.Background()
 
 	go StartMetricsServer()
 	scoringService.CalculateAndCacheScoreBoard(ctx)
 	go scoringService.StartingScoringWorker(ctx)
-	StartBalancerServer(bundle, scoringService)
+	go notificationService.StartNotificationWatcher(ctx)
+	StartBalancerServer(bundle, scoringService, notificationService)
 }
 
-func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService) {
+func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService, notificationService *notification.NotificationService) {
 	router := http.NewServeMux()
-	routes.AddRoutes(router, bundle, scoringService)
+	routes.AddRoutes(router, bundle, scoringService, notificationService)
 
 	bundle.Log.Println("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{

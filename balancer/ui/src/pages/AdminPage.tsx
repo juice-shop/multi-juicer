@@ -4,6 +4,7 @@ import Popup from "reactjs-popup";
 
 import { Card } from "@/components/Card";
 import { CheatScoreGraph } from "@/components/CheatScoreGraph/CheatScoreGraph";
+import { NotificationManager } from "@/components/NotificationManager";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 
 const buttonClasses =
@@ -179,7 +180,9 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 w-full lg:max-w-4xl">
+    <div className="flex flex-col gap-4 w-full lg:max-w-4xl">
+      <NotificationManager />
+
       <h1 className="text-xl font-semibold">
         <FormattedMessage
           id="admin_table.table_header"

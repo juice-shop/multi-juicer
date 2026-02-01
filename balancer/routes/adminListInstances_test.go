@@ -63,7 +63,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 
@@ -83,7 +83,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 			createTeam("test-team", time.UnixMilli(1_600_000_000_000), time.UnixMilli(1_729_259_333_123), 0),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -129,7 +129,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 			createTeam("team-without-scores", time.UnixMilli(1_650_000_000_000), time.UnixMilli(1_729_259_555_123), 0),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -184,7 +184,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 			createTeamWithCheatScores("team-invalid-json", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, invalidCheatScores),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -213,7 +213,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 			createTeamWithCheatScores("team-empty-scores", time.UnixMilli(1_700_000_000_000), time.UnixMilli(1_729_259_666_123), 1, emptyCheatScores),
 		)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil)
+		AddRoutes(server, bundle, nil, nil)
 
 		server.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)

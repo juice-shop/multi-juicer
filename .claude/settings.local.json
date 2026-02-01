@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(git log:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(task lint:*)",
+      "Bash(task lint:fix)",
+      "Bash(task test)",
+      "Bash(go test:*)",
+      "Bash(task build:*)"
+    ]
+  }
+}
