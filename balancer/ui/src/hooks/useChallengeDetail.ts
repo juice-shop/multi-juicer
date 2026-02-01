@@ -14,10 +14,8 @@ interface ChallengeDetailDataResponse {
   solves: ChallengeSolveResponse[];
 }
 
-export interface ChallengeSolve extends Omit<
-  ChallengeSolveResponse,
-  "solvedAt"
-> {
+export interface ChallengeSolve
+  extends Omit<ChallengeSolveResponse, "solvedAt"> {
   solvedAt: Date; // Convert string to Date object
 }
 
