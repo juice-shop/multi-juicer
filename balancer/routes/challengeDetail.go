@@ -7,7 +7,6 @@ import (
 	"time"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 )
 
 // ChallengeSolve represents a team that has solved a particular challenge.
@@ -33,7 +32,7 @@ type ChallengeDetailResponse struct {
 	Solves      ChallengeSolves `json:"solves"`
 }
 
-func handleChallengeDetail(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
+func handleChallengeDetail(bundle *b.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		challengeKey := r.PathValue("challengeKey")
 
@@ -53,7 +52,7 @@ func handleChallengeDetail(bundle *b.Bundle, scoringService *scoring.ScoringServ
 
 		// 2. Iterate through all teams and their solved challenges to find who solved this one.
 		solves := make(ChallengeSolves, 0)
-		allTeamScores := scoringService.GetScores()
+		allTeamScores := bundle.ScoringService.GetScores()
 
 		for teamName, teamScore := range allTeamScores {
 			for _, solvedChallenge := range teamScore.Challenges {

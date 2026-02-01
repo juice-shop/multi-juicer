@@ -13,9 +13,15 @@ import (
 )
 
 func main() {
-	bundle := bundle.New()
-	scoringService := scoring.NewScoringService(bundle)
-	notificationService := notification.NewNotificationService(bundle)
+	b := bundle.New()
+	
+	// Initialize services
+	scoringService := scoring.NewScoringService(b)
+	notificationService := notification.NewNotificationService(b)
+	
+	// Wire services into bundle
+	b.ScoringService = scoringService
+	b.NotificationService = notificationService
 
 	ctx := context.Background()
 
@@ -23,14 +29,14 @@ func main() {
 	scoringService.CalculateAndCacheScoreBoard(ctx)
 	go scoringService.StartingScoringWorker(ctx)
 	go notificationService.StartNotificationWatcher(ctx)
-	StartBalancerServer(bundle, scoringService, notificationService)
+	StartBalancerServer(b)
 }
 
-func StartBalancerServer(bundle *bundle.Bundle, scoringService *scoring.ScoringService, notificationService *notification.NotificationService) {
+func StartBalancerServer(b *bundle.Bundle) {
 	router := http.NewServeMux()
-	routes.AddRoutes(router, bundle, scoringService, notificationService)
+	routes.AddRoutes(router, b)
 
-	bundle.Log.Println("Starting MultiJuicer balancer on :8080")
+	b.Log.Println("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,

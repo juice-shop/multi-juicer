@@ -50,7 +50,7 @@ func TestProxyHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle, nil, nil)
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -71,7 +71,7 @@ func TestProxyHandler(t *testing.T) {
 		server := http.NewServeMux()
 
 		bundle := testutil.NewTestBundle()
-		AddRoutes(server, bundle, nil, nil)
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -100,7 +100,7 @@ func TestProxyHandler(t *testing.T) {
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil, nil)
+		AddRoutes(server, bu)
 
 		server.ServeHTTP(rr, req)
 
@@ -128,7 +128,7 @@ func TestProxyHandler(t *testing.T) {
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil, nil)
+		AddRoutes(server, bu)
 
 		server.ServeHTTP(rr, req)
 
@@ -167,7 +167,7 @@ func TestProxyHandler(t *testing.T) {
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil, nil)
+		AddRoutes(server, bu)
 
 		server.ServeHTTP(rr, req)
 
@@ -195,7 +195,7 @@ func TestProxyHandler(t *testing.T) {
 		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
 			return fmt.Sprintf("%s/%s/", ts.URL, team)
 		}
-		AddRoutes(server, bu, nil, nil)
+		AddRoutes(server, bu)
 
 		server.ServeHTTP(rr, req)
 

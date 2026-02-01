@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,7 +31,9 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		server := http.NewServeMux()
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil, nil)
+		notificationService := notification.NewNotificationService(bundle)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -52,7 +55,9 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		server := http.NewServeMux()
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil, nil)
+		notificationService := notification.NewNotificationService(bundle)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -77,6 +82,8 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 	t.Run("updates existing ConfigMap on subsequent posts", func(t *testing.T) {
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		notificationService := notification.NewNotificationService(bundle)
+		bundle.NotificationService = notificationService
 
 		// First request
 		requestBody1 := AdminNotificationRequest{
@@ -90,7 +97,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		rr1 := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, nil, nil)
+		AddRoutes(server, bundle)
 		server.ServeHTTP(rr1, req1)
 
 		assert.Equal(t, http.StatusOK, rr1.Code)
@@ -142,7 +149,9 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		server := http.NewServeMux()
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil, nil)
+		notificationService := notification.NewNotificationService(bundle)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -159,7 +168,9 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		server := http.NewServeMux()
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
-		AddRoutes(server, bundle, nil, nil)
+		notificationService := notification.NewNotificationService(bundle)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 

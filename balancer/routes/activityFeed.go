@@ -9,7 +9,6 @@ import (
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 )
 
 // ActivityEvent represents a single event in the activity feed.
@@ -30,7 +29,7 @@ func (a BySolvedAt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a BySolvedAt) Less(i, j int) bool { return a[i].SolvedAt.After(a[j].SolvedAt) }
 
 // buildActivityFeed constructs the activity feed from team scores
-func buildActivityFeed(bundle *b.Bundle, allTeamScores map[string]*scoring.TeamScore) []ActivityEvent {
+func buildActivityFeed(bundle *b.Bundle, allTeamScores map[string]*b.TeamScore) []ActivityEvent {
 	allEvents := make([]ActivityEvent, 0)
 	firstSolves := make(map[string]time.Time) // Map challengeKey -> first solve time
 
@@ -84,26 +83,26 @@ func buildActivityFeed(bundle *b.Bundle, allTeamScores map[string]*scoring.TeamS
 	return recentEvents
 }
 
-func handleActivityFeed(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
+func handleActivityFeed(bundle *b.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Define the fetch function for long polling
 		fetchFunc := func(ctx context.Context, waitAfter *time.Time) ([]ActivityEvent, time.Time, bool, error) {
 			if waitAfter != nil {
-				allTeamScores, lastUpdateTime := scoringService.WaitForUpdatesNewerThanWithTimestamp(ctx, *waitAfter)
+				allTeamScores, lastUpdateTime := bundle.ScoringService.WaitForUpdatesNewerThanWithTimestamp(ctx, *waitAfter)
 				if allTeamScores == nil {
 					return nil, time.Time{}, false, nil
 				}
 				// Convert sorted team scores to map
-				scoresMap := make(map[string]*scoring.TeamScore)
+				scoresMap := make(map[string]*b.TeamScore)
 				for _, score := range allTeamScores {
 					scoresMap[score.Name] = score
 				}
 				activityFeed := buildActivityFeed(bundle, scoresMap)
 				return activityFeed, lastUpdateTime, true, nil
 			}
-			allTeamScores, lastUpdateTime := scoringService.GetTopScoresWithTimestamp()
+			allTeamScores, lastUpdateTime := bundle.ScoringService.GetTopScoresWithTimestamp()
 			// Convert sorted team scores to map
-			scoresMap := make(map[string]*scoring.TeamScore)
+			scoresMap := make(map[string]*b.TeamScore)
 			for _, score := range allTeamScores {
 				scoresMap[score.Name] = score
 			}

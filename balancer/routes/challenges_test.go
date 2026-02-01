@@ -58,7 +58,8 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()
@@ -116,7 +117,8 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()
@@ -150,7 +152,8 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()
@@ -196,7 +199,8 @@ func TestChallengesHandler(t *testing.T) {
 		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
 		rr := httptest.NewRecorder()

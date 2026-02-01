@@ -14,29 +14,23 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
-type Notification struct {
-	Message   string    `json:"message"`
-	Enabled   bool      `json:"enabled"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
 type NotificationService struct {
 	bundle              *bundle.Bundle
-	currentNotification *Notification
+	currentNotification *bundle.Notification
 	mutex               *sync.RWMutex
 	lastUpdate          time.Time
 }
 
-func NewNotificationService(bundle *bundle.Bundle) *NotificationService {
+func NewNotificationService(b *bundle.Bundle) *NotificationService {
 	return &NotificationService{
-		bundle:              bundle,
+		bundle:              b,
 		currentNotification: nil,
 		mutex:               &sync.RWMutex{},
 		lastUpdate:          timeutil.TruncateToMillisecond(time.Now()),
 	}
 }
 
-func (s *NotificationService) GetNotificationWithTimestamp() (*Notification, time.Time) {
+func (s *NotificationService) GetNotificationWithTimestamp() (*bundle.Notification, time.Time) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
@@ -48,7 +42,7 @@ func (s *NotificationService) GetNotificationWithTimestamp() (*Notification, tim
 	return s.currentNotification, s.lastUpdate
 }
 
-func (s *NotificationService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) (*Notification, time.Time, bool) {
+func (s *NotificationService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) (*bundle.Notification, time.Time, bool) {
 	// Fast path: check if we already have newer data
 	s.mutex.RLock()
 	if s.lastUpdate.After(lastSeenUpdate) {
@@ -188,7 +182,7 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 		return
 	}
 
-	var notification Notification
+	var notification bundle.Notification
 	if err := json.Unmarshal([]byte(jsonData), &notification); err != nil {
 		s.bundle.Log.Printf("Failed to parse notification JSON: %v", err)
 		s.currentNotification = nil
@@ -199,4 +193,64 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 	s.currentNotification = &notification
 	s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 	s.bundle.Log.Printf("Updated notification: enabled=%v, message=%q", notification.Enabled, notification.Message)
+}
+
+// SetNotification updates or creates the notification ConfigMap
+func (s *NotificationService) SetNotification(ctx context.Context, message string, enabled bool) error {
+	const configMapName = "multi-juicer-notification"
+
+	// Build notification data
+	notificationData := bundle.Notification{
+		Message:   message,
+		Enabled:   enabled,
+		UpdatedAt: timeutil.TruncateToMillisecond(time.Now()),
+	}
+
+	notificationJSON, err := json.Marshal(notificationData)
+	if err != nil {
+		return err
+	}
+
+	// Try to get existing ConfigMap
+	existingCM, err := s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Get(
+		ctx,
+		configMapName,
+		metav1.GetOptions{},
+	)
+
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Create new ConfigMap
+			configMap := &corev1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      configMapName,
+					Namespace: s.bundle.RuntimeEnvironment.Namespace,
+				},
+				Data: map[string]string{
+					"notification.json": string(notificationJSON),
+				},
+			}
+
+			_, err = s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Create(
+				ctx,
+				configMap,
+				metav1.CreateOptions{},
+			)
+			return err
+		}
+		return err
+	}
+
+	// Update existing ConfigMap
+	if existingCM.Data == nil {
+		existingCM.Data = make(map[string]string)
+	}
+	existingCM.Data["notification.json"] = string(notificationJSON)
+
+	_, err = s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Update(
+		ctx,
+		existingCM,
+		metav1.UpdateOptions{},
+	)
+	return err
 }

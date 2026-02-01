@@ -55,7 +55,8 @@ func TestTeamStatusHandler(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -72,7 +73,8 @@ func TestTeamStatusHandler(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -92,7 +94,8 @@ func TestTeamStatusHandler(t *testing.T) {
 		err := scoringService.CalculateAndCacheScoreBoard(ctx)
 		assert.Nil(t, err)
 
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		// Verify initial state - readiness should be false
 		{
@@ -133,7 +136,8 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundle()
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -149,7 +153,8 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundle()
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -168,7 +173,8 @@ func TestTeamStatusHandler(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -184,7 +190,8 @@ func TestTeamStatusHandler(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -198,7 +205,8 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		bundle := testutil.NewTestBundle()
 		scoringService := scoring.NewScoringService(bundle)
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 

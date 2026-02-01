@@ -1,6 +1,7 @@
 package notification
 
 import (
+b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"context"
 	"encoding/json"
 	"testing"
@@ -19,7 +20,7 @@ func TestParseAndUpdateNotification(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		service := NewNotificationService(bundle)
 
-		notificationData := Notification{
+		notificationData := b.Notification{
 			Message:   "Test notification",
 			Enabled:   true,
 			UpdatedAt: time.Now(),
@@ -60,7 +61,7 @@ func TestParseAndUpdateNotification(t *testing.T) {
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		service := NewNotificationService(bundle)
 
-		notificationData := Notification{
+		notificationData := b.Notification{
 			Message:   "Test notification",
 			Enabled:   false,
 			UpdatedAt: time.Now(),
@@ -113,7 +114,7 @@ func TestWaitForUpdatesNewerThan(t *testing.T) {
 		service := NewNotificationService(bundle)
 
 		// Set up a notification
-		notificationData := Notification{
+		notificationData := b.Notification{
 			Message:   "Test notification",
 			Enabled:   true,
 			UpdatedAt: time.Now(),

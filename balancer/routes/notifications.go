@@ -8,7 +8,6 @@ import (
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
 )
 
 type NotificationResponse struct {
@@ -17,13 +16,13 @@ type NotificationResponse struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-func handleNotifications(b *bundle.Bundle, notificationService *notification.NotificationService) http.Handler {
+func handleNotifications(b *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Define the fetch function for long polling
 		fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*NotificationResponse, time.Time, bool, error) {
 			if waitAfter != nil {
 				// Long polling: wait for updates newer than waitAfter
-				notification, lastUpdateTime, hasUpdate := notificationService.WaitForUpdatesNewerThan(ctx, *waitAfter)
+				notification, lastUpdateTime, hasUpdate := b.NotificationService.WaitForUpdatesNewerThan(ctx, *waitAfter)
 				if !hasUpdate {
 					// Timeout, no updates
 					return nil, time.Time{}, false, nil
@@ -44,7 +43,7 @@ func handleNotifications(b *bundle.Bundle, notificationService *notification.Not
 			}
 
 			// Initial fetch: return current notification immediately
-			notification, lastUpdateTime := notificationService.GetNotificationWithTimestamp()
+			notification, lastUpdateTime := b.NotificationService.GetNotificationWithTimestamp()
 			if notification == nil || !notification.Enabled {
 				return &NotificationResponse{
 					Message:   "",

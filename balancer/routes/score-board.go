@@ -8,7 +8,6 @@ import (
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 )
 
 type ScoreBoardResponse struct {
@@ -23,19 +22,19 @@ type TeamScore struct {
 	SolvedChallengeCount int    `json:"solvedChallengeCount"`
 }
 
-func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
+func handleScoreBoard(bundle *b.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			// Define the fetch function for long polling
-			fetchFunc := func(ctx context.Context, waitAfter *time.Time) ([]*scoring.TeamScore, time.Time, bool, error) {
+			fetchFunc := func(ctx context.Context, waitAfter *time.Time) ([]*b.TeamScore, time.Time, bool, error) {
 				if waitAfter != nil {
-					totalTeams, lastUpdateTime := scoringService.WaitForUpdatesNewerThanWithTimestamp(ctx, *waitAfter)
+					totalTeams, lastUpdateTime := bundle.ScoringService.WaitForUpdatesNewerThanWithTimestamp(ctx, *waitAfter)
 					if totalTeams == nil {
 						return nil, time.Time{}, false, nil
 					}
 					return totalTeams, lastUpdateTime, true, nil
 				}
-				totalTeams, lastUpdateTime := scoringService.GetTopScoresWithTimestamp()
+				totalTeams, lastUpdateTime := bundle.ScoringService.GetTopScoresWithTimestamp()
 				return totalTeams, lastUpdateTime, true, nil
 			}
 
@@ -51,7 +50,7 @@ func handleScoreBoard(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 				return
 			}
 
-			var topTeams []*scoring.TeamScore
+		var topTeams []*b.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
 			if len(totalTeams) > 24 {
 				topTeams = totalTeams[:24]

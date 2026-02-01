@@ -14,48 +14,12 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
-type TeamScore struct {
-	Name              string              `json:"name"`
-	Score             int                 `json:"score"`
-	Position          int                 `json:"position"`
-	Challenges        []ChallengeProgress `json:"challenges"`
-	LastUpdate        time.Time           `json:"lastUpdate"`
-	InstanceReadiness bool                `json:"readiness"`
-}
-
-func (t *TeamScore) EqualsIgnoringLastUpdate(other *TeamScore) bool {
-	if t.Name != other.Name {
-		return false
-	}
-	if t.Score != other.Score {
-		return false
-	}
-	if t.Position != other.Position {
-		return false
-	}
-	if len(t.Challenges) != len(other.Challenges) {
-		return false
-	}
-	for i := range t.Challenges {
-		if t.Challenges[i].Key != other.Challenges[i].Key {
-			return false
-		}
-	}
-	return t.InstanceReadiness == other.InstanceReadiness
-}
-
-// PersistedChallengeProgress is stored as a json array on the JuiceShop deployments, saving which challenges have been solved and when
-type ChallengeProgress struct {
-	Key      string    `json:"key"`
-	SolvedAt time.Time `json:"solvedAt"`
-}
-
 var cachedChallengesMap map[string](bundle.JuiceShopChallenge)
 
 type ScoringService struct {
 	bundle              *bundle.Bundle
-	currentScores       map[string]*TeamScore
-	currentScoresSorted []*TeamScore
+	currentScores       map[string]*bundle.TeamScore
+	currentScoresSorted []*bundle.TeamScore
 	currentScoresMutex  *sync.Mutex
 
 	lastUpdate time.Time
@@ -63,11 +27,11 @@ type ScoringService struct {
 	challengesMap map[string](bundle.JuiceShopChallenge)
 }
 
-func NewScoringService(bundle *bundle.Bundle) *ScoringService {
-	return NewScoringServiceWithInitialScores(bundle, make(map[string]*TeamScore))
+func NewScoringService(b *bundle.Bundle) *ScoringService {
+	return NewScoringServiceWithInitialScores(b, make(map[string]*bundle.TeamScore))
 }
 
-func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[string]*TeamScore) *ScoringService {
+func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[string]*bundle.TeamScore) *ScoringService {
 	// create a map of challenges for easy lookup by challenge key
 	cachedChallengesMap = make(map[string](bundle.JuiceShopChallenge))
 	for _, challenge := range b.JuiceShopChallenges {
@@ -86,37 +50,37 @@ func NewScoringServiceWithInitialScores(b *bundle.Bundle, initialScores map[stri
 	}
 }
 
-func (s *ScoringService) GetScores() map[string]*TeamScore {
+func (s *ScoringService) GetScores() map[string]*bundle.TeamScore {
 	s.currentScoresMutex.Lock()
 	defer s.currentScoresMutex.Unlock()
 	return s.currentScores
 }
 
-func (s *ScoringService) GetScoreForTeam(team string) (*TeamScore, bool) {
+func (s *ScoringService) GetScoreForTeam(team string) (*bundle.TeamScore, bool) {
 	s.currentScoresMutex.Lock()
 	defer s.currentScoresMutex.Unlock()
 	score, ok := s.currentScores[team]
 	return score, ok
 }
 
-func (s *ScoringService) GetTopScores() []*TeamScore {
+func (s *ScoringService) GetTopScores() []*bundle.TeamScore {
 	s.currentScoresMutex.Lock()
 	defer s.currentScoresMutex.Unlock()
 	return s.currentScoresSorted
 }
 
-func (s *ScoringService) GetTopScoresWithTimestamp() ([]*TeamScore, time.Time) {
+func (s *ScoringService) GetTopScoresWithTimestamp() ([]*bundle.TeamScore, time.Time) {
 	s.currentScoresMutex.Lock()
 	defer s.currentScoresMutex.Unlock()
 	return s.currentScoresSorted, s.lastUpdate
 }
 
-func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore {
+func (s *ScoringService) WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*bundle.TeamScore {
 	scores, _ := s.WaitForUpdatesNewerThanWithTimestamp(ctx, lastSeenUpdate)
 	return scores
 }
 
-func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Context, lastSeenUpdate time.Time) ([]*TeamScore, time.Time) {
+func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Context, lastSeenUpdate time.Time) ([]*bundle.TeamScore, time.Time) {
 	s.currentScoresMutex.Lock()
 	if s.lastUpdate.After(lastSeenUpdate) {
 		// the last update was after the last seen update, so we can return the current scores without waiting
@@ -154,7 +118,7 @@ func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Contex
 	}
 }
 
-func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team string, lastSeenUpdate time.Time) *TeamScore {
+func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team string, lastSeenUpdate time.Time) *bundle.TeamScore {
 	s.currentScoresMutex.Lock()
 	if score, ok := s.currentScores[team]; ok {
 		if score.LastUpdate.After(lastSeenUpdate) {
@@ -286,46 +250,46 @@ func getDeployments(context context.Context, bundle *bundle.Bundle) (*appsv1.Dep
 	return deployments, nil
 }
 
-func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, challengesMap map[string](bundle.JuiceShopChallenge)) *TeamScore {
+func calculateScore(b *bundle.Bundle, teamDeployment *appsv1.Deployment, challengesMap map[string](bundle.JuiceShopChallenge)) *bundle.TeamScore {
 	solvedChallengesString := teamDeployment.Annotations["multi-juicer.owasp-juice.shop/challenges"]
 	team := teamDeployment.Labels["team"]
 	if solvedChallengesString == "" {
-		return &TeamScore{
+		return &bundle.TeamScore{
 			Name:              team,
 			Score:             0,
-			Challenges:        []ChallengeProgress{},
+			Challenges:        []bundle.ChallengeProgress{},
 			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
 			LastUpdate:        timeutil.TruncateToMillisecond(time.Now()),
 		}
 	}
 
-	solvedChallenges := []ChallengeProgress{}
+	solvedChallenges := []bundle.ChallengeProgress{}
 	err := json.Unmarshal([]byte(solvedChallengesString), &solvedChallenges)
 
 	if err != nil {
-		bundle.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
-		return &TeamScore{
+		b.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
+		return &bundle.TeamScore{
 			Name:              team,
 			Score:             0,
-			Challenges:        []ChallengeProgress{},
+			Challenges:        []bundle.ChallengeProgress{},
 			InstanceReadiness: teamDeployment.Status.ReadyReplicas > 0,
 			LastUpdate:        timeutil.TruncateToMillisecond(time.Now()),
 		}
 	}
 
 	score := 0
-	solvedChallengeNames := []ChallengeProgress{}
+	solvedChallengeNames := []bundle.ChallengeProgress{}
 	for _, challengeSolved := range solvedChallenges {
 		challenge, ok := challengesMap[challengeSolved.Key]
 		if !ok {
-			bundle.Log.Printf("JuiceShop deployment '%s' has a solved challenge '%s' that is not in the challenges map. The used JuiceShop version might be incompatible with this MultiJuicer version.", team, challengeSolved.Key)
+			b.Log.Printf("JuiceShop deployment '%s' has a solved challenge '%s' that is not in the challenges map. The used JuiceShop version might be incompatible with this MultiJuicer version.", team, challengeSolved.Key)
 			continue
 		}
 		score += challenge.Difficulty * 10
 		solvedChallengeNames = append(solvedChallengeNames, challengeSolved)
 	}
 
-	return &TeamScore{
+	return &bundle.TeamScore{
 		Name:              team,
 		Score:             score,
 		Challenges:        solvedChallengeNames,
@@ -334,7 +298,7 @@ func calculateScore(bundle *bundle.Bundle, teamDeployment *appsv1.Deployment, ch
 	}
 }
 
-func getLatestChallengeSolve(challenges []ChallengeProgress) time.Time {
+func getLatestChallengeSolve(challenges []bundle.ChallengeProgress) time.Time {
 	var maxTime time.Time
 	for _, challenge := range challenges {
 		if challenge.SolvedAt.After(maxTime) {
@@ -344,8 +308,8 @@ func getLatestChallengeSolve(challenges []ChallengeProgress) time.Time {
 	return maxTime
 }
 
-func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*TeamScore) []*TeamScore {
-	sortedTeamScores := make([]*TeamScore, len(teamScores))
+func sortTeamsByScoreAndCalculatePositions(teamScores map[string]*bundle.TeamScore) []*bundle.TeamScore {
+	sortedTeamScores := make([]*bundle.TeamScore, len(teamScores))
 
 	i := 0
 	for _, teamScore := range teamScores {

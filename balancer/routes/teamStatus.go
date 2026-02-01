@@ -8,7 +8,6 @@ import (
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 )
 
@@ -38,7 +37,7 @@ func (e *teamNotFoundError) Error() string {
 	return "team not found"
 }
 
-func handleTeamStatus(b *bundle.Bundle, scoringService *scoring.ScoringService) http.Handler {
+func handleTeamStatus(b *bundle.Bundle) http.Handler {
 	challengesByKeys := make(map[string]bundle.JuiceShopChallenge)
 	for _, challenge := range b.JuiceShopChallenges {
 		challengesByKeys[challenge.Key] = challenge
@@ -83,40 +82,39 @@ func handleTeamStatus(b *bundle.Bundle, scoringService *scoring.ScoringService) 
 			}
 
 			// Define the fetch function for long polling
-			fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*scoring.TeamScore, time.Time, bool, error) {
-				if waitAfter != nil {
-					teamScore := scoringService.WaitForTeamUpdatesNewerThan(ctx, team, *waitAfter)
-					if teamScore == nil {
-						return nil, time.Time{}, false, nil
-					}
-					return teamScore, teamScore.LastUpdate, true, nil
-				}
-				teamScore, ok := scoringService.GetScoreForTeam(team)
-				if !ok {
-					// Return error to trigger 404
-					return nil, time.Time{}, false, &teamNotFoundError{}
+		fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*bundle.TeamScore, time.Time, bool, error) {
+			if waitAfter != nil {
+				teamScore := b.ScoringService.WaitForTeamUpdatesNewerThan(ctx, team, *waitAfter)
+				if teamScore == nil {
+					return nil, time.Time{}, false, nil
 				}
 				return teamScore, teamScore.LastUpdate, true, nil
 			}
+			teamScore, ok := b.ScoringService.GetScoreForTeam(team)
+			if !ok {
+				// Return error to trigger 404
+				return nil, time.Time{}, false, &teamNotFoundError{}
+			}
+			return teamScore, teamScore.LastUpdate, true, nil
+		}
 
-			teamScore, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
-			if err != nil {
-				if _, ok := err.(*teamNotFoundError); ok {
-					http.Error(responseWriter, "team not found", http.StatusNotFound)
-					return
-				}
-				b.Log.Printf("Long poll error: %s", err)
-				http.Error(responseWriter, "Invalid time format", statusCode)
+		teamScore, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
+		if err != nil {
+			if _, ok := err.(*teamNotFoundError); ok {
+				http.Error(responseWriter, "team not found", http.StatusNotFound)
 				return
 			}
-			if statusCode == http.StatusNoContent {
-				responseWriter.WriteHeader(http.StatusNoContent)
-				responseWriter.Write([]byte{})
-				return
-			}
+			b.Log.Printf("Long poll error: %s", err)
+			http.Error(responseWriter, "Invalid time format", statusCode)
+			return
+		}
+		if statusCode == http.StatusNoContent {
+			responseWriter.WriteHeader(http.StatusNoContent)
+			responseWriter.Write([]byte{})
+			return
+		}
 
-			teamCount := len(scoringService.GetScores())
-
+		teamCount := len(b.ScoringService.GetScores())
 			// Build solved challenges array
 			solvedChallenges := make([]SolvedChallenge, len(teamScore.Challenges))
 			for i, challenge := range teamScore.Challenges {

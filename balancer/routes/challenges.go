@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 )
 
 // ChallengeListItem represents a challenge in the list response.
@@ -24,10 +23,10 @@ type ChallengesListResponse struct {
 	Challenges []ChallengeListItem `json:"challenges"`
 }
 
-func handleChallenges(bundle *b.Bundle, scoringService *scoring.ScoringService) http.Handler {
+func handleChallenges(bundle *b.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get all team scores to calculate solve counts
-		allTeamScores := scoringService.GetScores()
+		allTeamScores := bundle.ScoringService.GetScores()
 
 		// Create a map to count solves per challenge
 		solveCounts := make(map[string]int)
@@ -35,9 +34,9 @@ func handleChallenges(bundle *b.Bundle, scoringService *scoring.ScoringService) 
 		// Track first solver for each challenge (key -> team name and earliest solve time)
 		type solveInfo struct {
 			team     string
-			solvedAt scoring.ChallengeProgress
-		}
-		firstSolvers := make(map[string]solveInfo)
+		solvedAt b.ChallengeProgress
+	}
+	firstSolvers := make(map[string]solveInfo)
 
 		for _, teamScore := range allTeamScores {
 			for _, solvedChallenge := range teamScore.Challenges {

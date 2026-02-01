@@ -63,7 +63,8 @@ func TestActivityFeedHandler(t *testing.T) {
 		require.NoError(t, err)
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		// --- Test Execution ---
 		req, _ := http.NewRequest("GET", "/balancer/api/activity-feed", nil)
@@ -116,7 +117,8 @@ func TestActivityFeedHandler(t *testing.T) {
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/activity-feed", nil)
 		rr := httptest.NewRecorder()
@@ -144,7 +146,8 @@ func TestActivityFeedHandler(t *testing.T) {
 		scoringService := scoring.NewScoringService(bundle)
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, scoringService, nil)
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
 
 		req, _ := http.NewRequest("GET", "/balancer/api/activity-feed", nil)
 		rr := httptest.NewRecorder()

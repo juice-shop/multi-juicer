@@ -1,11 +1,13 @@
 package bundle
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/passcode"
 	"golang.org/x/crypto/bcrypt"
@@ -14,7 +16,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-// Bundle holds all the dependencies and configurationthat are used by the routes
+// Bundle holds all the dependencies and configuration that are used by the routes
 // for testing it can be mocked out, see testutil/testUtils.go for helper functions to easily mock out the bundle
 type Bundle struct {
 	RuntimeEnvironment RuntimeEnvironment
@@ -29,6 +31,10 @@ type Bundle struct {
 	Log                    *log.Logger
 
 	JuiceShopChallenges []JuiceShopChallenge
+
+	// Services - set after Bundle creation to avoid cyclic dependencies
+	ScoringService      ScoringService
+	NotificationService NotificationService
 }
 
 type RuntimeEnvironment struct {
@@ -98,6 +104,71 @@ type JuiceShopChallenge struct {
 	MitigationUrl string   `json:"mitigationUrl"`
 	Key           string   `json:"key"`
 	DisabledEnv   []string `json:"disabledEnv"`
+}
+
+// TeamScore represents a team's current score and challenge progress
+type TeamScore struct {
+	Name              string              `json:"name"`
+	Score             int                 `json:"score"`
+	Position          int                 `json:"position"`
+	Challenges        []ChallengeProgress `json:"challenges"`
+	LastUpdate        time.Time           `json:"lastUpdate"`
+	InstanceReadiness bool                `json:"readiness"`
+}
+
+func (t *TeamScore) EqualsIgnoringLastUpdate(other *TeamScore) bool {
+	if t.Name != other.Name {
+		return false
+	}
+	if t.Score != other.Score {
+		return false
+	}
+	if t.Position != other.Position {
+		return false
+	}
+	if len(t.Challenges) != len(other.Challenges) {
+		return false
+	}
+	for i := range t.Challenges {
+		if t.Challenges[i].Key != other.Challenges[i].Key {
+			return false
+		}
+	}
+	return t.InstanceReadiness == other.InstanceReadiness
+}
+
+// ChallengeProgress represents a solved challenge
+type ChallengeProgress struct {
+	Key      string    `json:"key"`
+	SolvedAt time.Time `json:"solvedAt"`
+}
+
+// Notification represents a system-wide notification
+type Notification struct {
+	Message   string    `json:"message"`
+	Enabled   bool      `json:"enabled"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// ScoringService defines the interface for the scoring service
+type ScoringService interface {
+	GetScores() map[string]*TeamScore
+	GetScoreForTeam(team string) (*TeamScore, bool)
+	GetTopScores() []*TeamScore
+	GetTopScoresWithTimestamp() ([]*TeamScore, time.Time)
+	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore
+	WaitForUpdatesNewerThanWithTimestamp(ctx context.Context, lastSeenUpdate time.Time) ([]*TeamScore, time.Time)
+	WaitForTeamUpdatesNewerThan(ctx context.Context, team string, lastSeenUpdate time.Time) *TeamScore
+	CalculateAndCacheScoreBoard(ctx context.Context) error
+	StartingScoringWorker(ctx context.Context)
+}
+
+// NotificationService defines the interface for the notification service
+type NotificationService interface {
+	GetNotificationWithTimestamp() (*Notification, time.Time)
+	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) (*Notification, time.Time, bool)
+	StartNotificationWatcher(ctx context.Context)
+	SetNotification(ctx context.Context, message string, enabled bool) error
 }
 
 func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {

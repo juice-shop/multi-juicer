@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,8 @@ func TestNotificationsHandler(t *testing.T) {
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		notificationService := notification.NewNotificationService(bundle)
-		AddRoutes(server, bundle, nil, notificationService)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -42,7 +44,8 @@ func TestNotificationsHandler(t *testing.T) {
 		clientset := fake.NewClientset()
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		notificationService := notification.NewNotificationService(bundle)
-		AddRoutes(server, bundle, nil, notificationService)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -63,7 +66,7 @@ func TestNotificationsHandler(t *testing.T) {
 		notificationService := notification.NewNotificationService(bundle)
 
 		// Create a ConfigMap with notification data
-		notificationData := notification.Notification{
+		notificationData := b.Notification{
 			Message:   "Test notification message",
 			Enabled:   true,
 			UpdatedAt: time.Now(),
@@ -94,7 +97,8 @@ func TestNotificationsHandler(t *testing.T) {
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, nil, notificationService)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -132,7 +136,8 @@ func TestNotificationsHandler(t *testing.T) {
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, nil, notificationService)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
@@ -146,7 +151,7 @@ func TestNotificationsHandler(t *testing.T) {
 		notificationService := notification.NewNotificationService(bundle)
 
 		// Create notification
-		notificationData := notification.Notification{
+		notificationData := b.Notification{
 			Message:   "Test",
 			Enabled:   true,
 			UpdatedAt: time.Now(),
@@ -175,7 +180,8 @@ func TestNotificationsHandler(t *testing.T) {
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
-		AddRoutes(server, bundle, nil, notificationService)
+		bundle.NotificationService = notificationService
+		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
