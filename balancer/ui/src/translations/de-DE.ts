@@ -93,6 +93,8 @@ export default {
     'Bist du sicher, dass du Team "{team}" neu starten möchtest?',
   instance_status_not_found:
     "Die Instanz für das Team konnte nicht gefunden werden. Du kannst sie neu erstellen, indem du dich erneut anmeldest.",
+  clipboard_not_available:
+    "Zugriff auf die Zwischenablage ist nicht verfügbar. Bitte kopiere den Inhalt manuell.",
   "admin.notification.title": "Benachrichtigungen an alle Benutzer senden",
   "admin.notification.description":
     "Benachrichtigungen werden allen Benutzern in der MultiJuicer-Oberfläche angezeigt. Sie können verwendet werden, um Benutzer über wichtige Updates oder Probleme zu informieren. Hinweis: Sie werden nicht in der JuiceShop-Oberfläche angezeigt.",

@@ -13,6 +13,16 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
   const joinLink = `${window.location.origin}/balancer/teams/${team}/joining#${passcode}`;
 
   const copyJoinLink = () => {
+    if (!navigator.clipboard) {
+      toast.error(
+        intl.formatMessage({
+          id: "clipboard_not_available",
+          defaultMessage:
+            "Clipboard access is not available. Please copy the link manually.",
+        })
+      );
+      return;
+    }
     navigator.clipboard.writeText(joinLink);
     toast.success(
       intl.formatMessage({
@@ -66,6 +76,16 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
           onMouseLeave={() => setActivlyDisplayedPasscode(placeHolder)}
           title="Click to copy"
           onClick={() => {
+            if (!navigator.clipboard) {
+              toast.error(
+                intl.formatMessage({
+                  id: "clipboard_not_available",
+                  defaultMessage:
+                    "Clipboard access is not available. Please copy the passcode manually.",
+                })
+              );
+              return;
+            }
             navigator.clipboard.writeText(passcode);
             toast.success(
               intl.formatMessage({

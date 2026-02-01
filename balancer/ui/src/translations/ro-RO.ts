@@ -91,6 +91,8 @@ export default {
     'Ești sigur că vrei să repornești echipa "{team}"?',
   instance_status_not_found:
     "Nu s-a găsit instanța pentru această echipă. O poți recrea autentificându-te din nou.",
+  clipboard_not_available:
+    "Accesul la clipboard nu este disponibil. Te rugăm să copiezi conținutul manual.",
   "admin.notification.title": "Postează notificări pentru toți utilizatorii",
   "admin.notification.description":
     "Notificările sunt afișate tuturor utilizatorilor în interfața MultiJuicer. Pot fi folosite pentru a informa utilizatorii despre actualizări sau probleme importante. Notă: nu sunt afișate în interfața JuiceShop.",

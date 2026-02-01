@@ -91,6 +91,8 @@ export default {
     'Weet je zeker dat je team "{team}" opnieuw wilt starten?',
   instance_status_not_found:
     "Kon de instantie voor het team niet vinden. Je kunt deze opnieuw aanmaken door opnieuw in te loggen.",
+  clipboard_not_available:
+    "Toegang tot klembord is niet beschikbaar. Kopieer de inhoud handmatig.",
   "admin.notification.title": "Meldingen plaatsen voor alle gebruikers",
   "admin.notification.description":
     "Meldingen worden aan alle gebruikers in de MultiJuicer-interface getoond. Ze kunnen worden gebruikt om gebruikers te informeren over belangrijke updates of problemen. Let op: ze worden niet weergegeven in de JuiceShop-interface.",
