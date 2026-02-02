@@ -3,7 +3,13 @@ import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useParams } from "react-router-dom";
 
-export const PasscodeDisplayCard = ({ passcode = "" }) => {
+export const PasscodeDisplayCard = ({
+  passcode = "",
+  isAdminResetMode = false,
+}: {
+  passcode?: string;
+  isAdminResetMode?: boolean;
+}) => {
   const intl = useIntl();
   const { team } = useParams();
   const placeHolder = passcode.replace(/./g, "●");
@@ -32,42 +38,54 @@ export const PasscodeDisplayCard = ({ passcode = "" }) => {
     );
   };
 
+  const explanationMessage = isAdminResetMode
+    ? {
+        id: "passcode_updated_explanation_admin",
+        defaultMessage: "Copy and share this passcode with the team members.",
+      }
+    : {
+        id: "passcode_explanation",
+        defaultMessage:
+          "Share the join link or passcode with your teammates to join this team.",
+      };
+
   return (
     <>
       <p className="text-sm mb-4">
-        <FormattedMessage
-          id="passcode_explanation"
-          defaultMessage="Share the join link or passcode with your teammates to join this team."
-        />
+        <FormattedMessage {...explanationMessage} />
       </p>
 
       {/* Join Link Section */}
-      <div className="mb-4 flex justify-center">
-        <button
-          onClick={copyJoinLink}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-sm transition-colors flex items-center gap-2"
-          title={intl.formatMessage({
-            id: "copy_join_link",
-            defaultMessage: "Copy join link",
-          })}
-        >
-          <img src="/balancer/icons/link.svg" alt="" className="h-5 w-5" />
-          <span>
-            <FormattedMessage
-              id="copy_link_button"
-              defaultMessage="Copy Join Link"
-            />
-          </span>
-        </button>
-      </div>
+      {!isAdminResetMode && (
+        <div className="mb-4 flex justify-center">
+          <button
+            onClick={copyJoinLink}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-sm transition-colors flex items-center gap-2"
+            title={intl.formatMessage({
+              id: "copy_join_link",
+              defaultMessage: "Copy join link",
+            })}
+          >
+            <img src="/balancer/icons/link.svg" alt="" className="h-5 w-5" />
+            <span>
+              <FormattedMessage
+                id="copy_link_button"
+                defaultMessage="Copy Join Link"
+              />
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Passcode Section */}
       <div>
         <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-          <FormattedMessage
-            id="passcode_label"
-            defaultMessage="Or use the same teamname and the following passcode"
-          />
+          {!isAdminResetMode && (
+            <FormattedMessage
+              id="passcode_label"
+              defaultMessage="Or use the same teamname and the following passcode"
+            />
+          )}
         </p>
         <div
           className="flex justify-center cursor-copy"
