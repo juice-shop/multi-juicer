@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import Popup from "reactjs-popup";
+import type { PopupActions } from "reactjs-popup/dist/types";
 
+import { PasscodeDisplayCard } from "@/cards/PassCodeDisplayCard";
 import { Card } from "@/components/Card";
 import { CheatScoreGraph } from "@/components/CheatScoreGraph/CheatScoreGraph";
 import { NotificationManager } from "@/components/NotificationManager";
@@ -20,6 +22,11 @@ const messages = defineMessages({
   admin_restart_team_confirmation: {
     id: "admin_restart_team_confirmation",
     defaultMessage: 'Are you sure you want to restart team "{team}"?',
+  },
+  admin_reset_passcode_confirmation: {
+    id: "admin_reset_passcode_confirmation",
+    defaultMessage:
+      'Are you sure you want to reset the passcode for team "{team}"?',
   },
 });
 
@@ -96,6 +103,161 @@ function DeleteInstanceButton({ team }: { team: string }) {
         <FormattedMessage id="admin_table.delete" defaultMessage="delete" />
       )}
     </button>
+  );
+}
+
+function TeamActionMenu({ team }: { team: string }) {
+  const intl = useIntl();
+  const [resetting, setResetting] = useState(false);
+  const [showPasscodeModal, setShowPasscodeModal] = useState(false);
+  const [newPasscode, setNewPasscode] = useState<string | null>(null);
+  const popupRef = useRef<PopupActions>(null);
+  const prefersDarkScheme =
+    window?.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+
+  const close = () => popupRef.current?.close();
+
+  const resetPasscode = async () => {
+    const confirmed = confirm(
+      intl.formatMessage(messages.admin_reset_passcode_confirmation, { team })
+    );
+    if (!confirmed) return;
+
+    setResetting(true);
+    try {
+      const response = await fetch(
+        `/balancer/api/admin/teams/${team}/reset-passcode`,
+        { method: "POST" }
+      );
+
+      if (!response.ok) {
+        throw new Error("Reset failed");
+      }
+
+      const data = await response.json();
+      setNewPasscode(data.passcode);
+      setShowPasscodeModal(true);
+    } catch (err) {
+      console.error(err);
+      alert(`Error resetting passcode for team "${team}"`);
+    } finally {
+      setResetting(false);
+      close();
+    }
+  };
+
+  return (
+    <>
+      <Popup
+        ref={popupRef}
+        contentStyle={{
+          border: "none",
+          borderRadius: "8px",
+          boxShadow:
+            "0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06)",
+          backgroundColor: prefersDarkScheme ? "#0f172a" : "#f3f4f6",
+          padding: "0.5rem 0",
+          width: "15rem",
+          zIndex: 50,
+        }}
+        arrowStyle={{
+          color: prefersDarkScheme ? "#0f172a" : "#f3f4f6",
+        }}
+        trigger={
+          <button
+            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors cursor-pointer"
+            aria-label="Team Actions"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
+              <circle cx="8" cy="3" r="1.5" />
+              <circle cx="8" cy="8" r="1.5" />
+              <circle cx="8" cy="13" r="1.5" />
+            </svg>
+          </button>
+        }
+        position="bottom right"
+        closeOnDocumentClick
+      >
+        <div className="py-1">
+          <button
+            disabled={resetting}
+            onClick={resetPasscode}
+            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors cursor-pointer text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span role="img" aria-label="Reset Passcode">
+              🔑
+            </span>
+            <span>
+              <FormattedMessage
+                id="admin_table.reset_passcode"
+                defaultMessage="reset team's passcode"
+              />
+            </span>
+          </button>
+          {/* Other team actions can be added here */}
+        </div>
+      </Popup>
+      <Popup
+        open={showPasscodeModal}
+        modal
+        nested
+        closeOnDocumentClick={false}
+        onClose={() => {
+          setShowPasscodeModal(false);
+          setNewPasscode(null);
+        }}
+        overlayStyle={{
+          background: "rgba(0,0,0,0.5)",
+          zIndex: 999,
+        }}
+        contentStyle={{
+          borderRadius: "8px",
+          padding: "0",
+          width: "100%",
+          maxWidth: "32rem",
+          zIndex: 1000,
+        }}
+      >
+        <Card className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">
+              <FormattedMessage
+                id="admin_table.new_passcode"
+                defaultMessage={`Passcode updated for team "${team}"`}
+              />
+            </h3>
+            <button
+              onClick={() => {
+                setShowPasscodeModal(false);
+                setNewPasscode(null);
+              }}
+              className="text-gray-500 hover:text-black dark:hover:text-white cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+
+          {newPasscode && (
+            <PasscodeDisplayCard
+              passcode={newPasscode}
+              isAdminResetMode={true}
+            />
+          )}
+
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => {
+                setShowPasscodeModal(false);
+                setNewPasscode(null);
+              }}
+              className="bg-gray-600 text-white px-4 py-2 rounded-sm cursor-pointer"
+            >
+              <FormattedMessage id="close" defaultMessage="Close" />
+            </button>
+          </div>
+        </Card>
+      </Popup>
+    </>
   );
 }
 
@@ -206,7 +368,7 @@ export default function AdminPage() {
         return (
           <Card
             key={team.team}
-            className="grid grid-cols-2 sm:grid-cols-5 items-center gap-8 gap-y-2 p-4"
+            className="relative grid grid-cols-2 sm:grid-cols-5 items-center gap-8 gap-y-2 p-4 pr-15"
           >
             <div>
               <h4 className="font-semibold">{team.team}</h4>
@@ -320,6 +482,9 @@ export default function AdminPage() {
 
             <DeleteInstanceButton team={team.team} />
             <RestartInstanceButton team={team.team} />
+            <div className="absolute right-2">
+              <TeamActionMenu team={team.team} />
+            </div>
           </Card>
         );
       })}
