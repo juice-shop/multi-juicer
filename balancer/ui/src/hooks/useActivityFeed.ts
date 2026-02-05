@@ -6,11 +6,12 @@ import {
 
 export interface ActivityEvent {
   team: string;
-  challengeKey: string;
-  challengeName: string;
-  points: number;
-  solvedAt: string; // ISO String
-  isFirstSolve: boolean;
+  eventType: "challenge_solved" | "team_created";
+  challengeKey?: string;
+  challengeName?: string;
+  points?: number;
+  timestamp: string; // ISO String
+  isFirstSolve?: boolean;
 }
 
 /**

@@ -15,9 +15,12 @@ const EventItem = ({
   event: ActivityEvent;
   isLast: boolean;
 }) => {
-  const eventColor = event.isFirstSolve
-    ? "border-red-500"
-    : "border-orange-500";
+  const isTeamCreated = event.eventType === "team_created";
+  const eventColor = isTeamCreated
+    ? "border-yellow-400"
+    : event.isFirstSolve
+      ? "border-red-500"
+      : "border-orange-500";
 
   return (
     <div className="relative pl-6">
@@ -34,36 +37,48 @@ const EventItem = ({
       )}
 
       <p className="text-sm">
-        <FormattedMessage
-          id="activity.solved_challenge"
-          defaultMessage="{team} solved {challenge} (+{points} pts)"
-          values={{
-            team: (
-              <Link
-                to={`/score-overview/teams/${event.team}`}
-                className="font-bold hover:underline"
-              >
-                {event.team}
-              </Link>
-            ),
-            challenge: (
-              <Link
-                to={`/score-overview/challenges/${event.challengeKey}`}
-                className="font-bold hover:underline"
-              >
-                {event.challengeName}
-              </Link>
-            ),
-            points: (
-              <span className="text-green-500 font-semibold">
-                {event.points}
-              </span>
-            ),
-          }}
-        />
+        {isTeamCreated ? (
+          <>
+            <Link
+              to={`/score-overview/teams/${event.team}`}
+              className="font-bold hover:underline"
+            >
+              {event.team}
+            </Link>{" "}
+            joined the CTF
+          </>
+        ) : (
+          <FormattedMessage
+            id="activity.solved_challenge"
+            defaultMessage="{team} solved {challenge} (+{points} pts)"
+            values={{
+              team: (
+                <Link
+                  to={`/score-overview/teams/${event.team}`}
+                  className="font-bold hover:underline"
+                >
+                  {event.team}
+                </Link>
+              ),
+              challenge: (
+                <Link
+                  to={`/score-overview/challenges/${event.challengeKey}`}
+                  className="font-bold hover:underline"
+                >
+                  {event.challengeName}
+                </Link>
+              ),
+              points: (
+                <span className="text-green-500 font-semibold">
+                  {event.points}
+                </span>
+              ),
+            }}
+          />
+        )}
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        <ReadableTimestamp date={new Date(event.solvedAt)} />
+        <ReadableTimestamp date={new Date(event.timestamp)} />
       </p>
     </div>
   );
@@ -102,7 +117,7 @@ export const LiveActivitySidebar = () => {
           <div className="flex flex-col gap-4">
             {events.map((event, index) => (
               <EventItem
-                key={`${event.challengeKey}-${event.team}`}
+                key={`${event.eventType}-${event.challengeKey || event.team}-${index}`}
                 event={event}
                 isLast={index === events.length - 1}
               />
