@@ -78,12 +78,12 @@ func TestActivityFeedHandler(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &feed)
 		require.NoError(t, err)
 
-		require.Len(t, feed, 3, "Expected 3 total solve events in the feed")
+		require.Len(t, feed, 5, "Expected 3 solve events + 2 team creation events in the feed")
 
 		// 1. Verify sorting (newest first)
 		assert.Equal(t, challenge2, feed[0].ChallengeKey, "The newest event should be at the top of the feed")
 		assert.Equal(t, "team-bravo", feed[0].Team)
-		assert.Equal(t, time3.UTC().Truncate(time.Second), feed[0].SolvedAt.UTC().Truncate(time.Second))
+		assert.Equal(t, time3.UTC().Truncate(time.Second), feed[0].Timestamp.UTC().Truncate(time.Second))
 
 		assert.Equal(t, challenge1, feed[1].ChallengeKey)
 		assert.Equal(t, "team-alpha", feed[1].Team)
@@ -91,6 +91,10 @@ func TestActivityFeedHandler(t *testing.T) {
 		// 2. Verify First Solve detection
 		var teamAlphaEvent, teamBravoC1Event, teamBravoC2Event ActivityEvent
 		for _, event := range feed {
+			// Skip team creation events
+			if event.EventType != "challenge_solved" {
+				continue
+			}
 			if event.Team == "team-alpha" {
 				teamAlphaEvent = event
 			} else if event.ChallengeKey == challenge1 {
@@ -125,7 +129,13 @@ func TestActivityFeedHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.JSONEq(t, `[]`, rr.Body.String())
+		var feed []ActivityEvent
+		err := json.Unmarshal(rr.Body.Bytes(), &feed)
+		require.NoError(t, err)
+		// Even with no solves, we expect team creation events
+		require.Len(t, feed, 2, "Expected 2 team creation events")
+		assert.Equal(t, "team_created", feed[0].EventType)
+		assert.Equal(t, "team_created", feed[1].EventType)
 	})
 
 	t.Run("with more than 15 solves, should return only the 15 newest events", func(t *testing.T) {
@@ -160,6 +170,6 @@ func TestActivityFeedHandler(t *testing.T) {
 
 		// Assert that the feed is limited to 15 items
 		assert.Len(t, feed, 15, "Feed should be limited to 15 events")
-		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].SolvedAt.UTC().Truncate(time.Second))
+		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].Timestamp.UTC().Truncate(time.Second))
 	})
 }

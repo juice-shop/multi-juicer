@@ -9,27 +9,53 @@ import (
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/longpoll"
+	appsv1 "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // ActivityEvent represents a single event in the activity feed.
 type ActivityEvent struct {
 	Team          string    `json:"team"`
-	ChallengeKey  string    `json:"challengeKey"`
-	ChallengeName string    `json:"challengeName"`
-	Points        int       `json:"points"`
-	SolvedAt      time.Time `json:"solvedAt"`
-	IsFirstSolve  bool      `json:"isFirstSolve"`
+	EventType     string    `json:"eventType"` // "challenge_solved" | "team_created"
+	ChallengeKey  string    `json:"challengeKey,omitempty"`
+	ChallengeName string    `json:"challengeName,omitempty"`
+	Points        int       `json:"points,omitempty"`
+	Timestamp     time.Time `json:"timestamp"`
+	IsFirstSolve  bool      `json:"isFirstSolve,omitempty"`
 }
 
-// BySolvedAt sorts events by their timestamp, newest first.
-type BySolvedAt []ActivityEvent
+// ByTimestamp sorts events by their timestamp, newest first.
+type ByTimestamp []ActivityEvent
 
-func (a BySolvedAt) Len() int           { return len(a) }
-func (a BySolvedAt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a BySolvedAt) Less(i, j int) bool { return a[i].SolvedAt.After(a[j].SolvedAt) }
+func (a ByTimestamp) Len() int           { return len(a) }
+func (a ByTimestamp) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTimestamp) Less(i, j int) bool { return a[i].Timestamp.After(a[j].Timestamp) }
 
-// buildActivityFeed constructs the activity feed from team scores
-func buildActivityFeed(bundle *b.Bundle, allTeamScores map[string]*b.TeamScore) []ActivityEvent {
+// buildTeamCreationEvents constructs team creation events from deployments
+func buildTeamCreationEvents(deployments []*appsv1.Deployment) []ActivityEvent {
+	events := make([]ActivityEvent, 0, len(deployments))
+	for _, deployment := range deployments {
+		teamName, ok := deployment.Labels["team"]
+		if !ok {
+			continue
+		}
+
+		events = append(events, ActivityEvent{
+			Team:      teamName,
+			EventType: "team_created",
+			Timestamp: deployment.CreationTimestamp.Time,
+		})
+	}
+	return events
+}
+
+// buildActivityFeed constructs the activity feed from team scores and deployments
+func buildActivityFeed(
+	bundle *b.Bundle,
+	allTeamScores map[string]*b.TeamScore,
+	deployments []*appsv1.Deployment,
+) []ActivityEvent {
+
 	allEvents := make([]ActivityEvent, 0)
 	firstSolves := make(map[string]time.Time) // Map challengeKey -> first solve time
 
@@ -48,10 +74,11 @@ func buildActivityFeed(bundle *b.Bundle, allTeamScores map[string]*b.TeamScore) 
 
 			event := ActivityEvent{
 				Team:          teamName,
+				EventType:     "challenge_solved",
 				ChallengeKey:  solvedChallenge.Key,
 				ChallengeName: challengeDetails.Name,
 				Points:        challengeDetails.Difficulty * 10,
-				SolvedAt:      solvedChallenge.SolvedAt,
+				Timestamp:     solvedChallenge.SolvedAt,
 			}
 			allEvents = append(allEvents, event)
 
@@ -62,16 +89,22 @@ func buildActivityFeed(bundle *b.Bundle, allTeamScores map[string]*b.TeamScore) 
 		}
 	}
 
-	// 2. Add "First Solve" information
+	// 2. Add team creation events
+	allEvents = append(allEvents, buildTeamCreationEvents(deployments)...)
+
+	// 3. Add "First Solve" information
 	for i := range allEvents {
 		event := &allEvents[i]
-		if firstSolveTime, ok := firstSolves[event.ChallengeKey]; ok && event.SolvedAt.Equal(firstSolveTime) {
+		if event.EventType != "challenge_solved" {
+			continue
+		}
+		if firstSolveTime, ok := firstSolves[event.ChallengeKey]; ok && event.Timestamp.Equal(firstSolveTime) {
 			event.IsFirstSolve = true
 		}
 	}
 
 	// 3. Sort all events chronologically (newest first)
-	sort.Sort(BySolvedAt(allEvents))
+	sort.Sort(ByTimestamp(allEvents))
 
 	// 4. Limit to the 15 most recent events
 	limit := 15
@@ -87,6 +120,24 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Define the fetch function for long polling
 		fetchFunc := func(ctx context.Context, waitAfter *time.Time) ([]ActivityEvent, time.Time, bool, error) {
+
+			// Fetch all deployments from Kubernetes
+			deploymentList, err := bundle.ClientSet.
+				AppsV1().
+				Deployments(bundle.RuntimeEnvironment.Namespace).
+				List(ctx, metav1.ListOptions{
+					LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
+				})
+			if err != nil {
+				bundle.Log.Printf("Failed to list deployments for activity feed: %s", err)
+				return nil, time.Time{}, false, err
+			}
+
+			deployments := make([]*appsv1.Deployment, len(deploymentList.Items))
+			for i := range deploymentList.Items {
+				deployments[i] = &deploymentList.Items[i]
+			}
+
 			if waitAfter != nil {
 				allTeamScores, lastUpdateTime := bundle.ScoringService.WaitForUpdatesNewerThanWithTimestamp(ctx, *waitAfter)
 				if allTeamScores == nil {
@@ -97,7 +148,7 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 				for _, score := range allTeamScores {
 					scoresMap[score.Name] = score
 				}
-				activityFeed := buildActivityFeed(bundle, scoresMap)
+				activityFeed := buildActivityFeed(bundle, scoresMap, deployments)
 				return activityFeed, lastUpdateTime, true, nil
 			}
 			allTeamScores, lastUpdateTime := bundle.ScoringService.GetTopScoresWithTimestamp()
@@ -106,7 +157,7 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 			for _, score := range allTeamScores {
 				scoresMap[score.Name] = score
 			}
-			activityFeed := buildActivityFeed(bundle, scoresMap)
+			activityFeed := buildActivityFeed(bundle, scoresMap, deployments)
 			return activityFeed, lastUpdateTime, true, nil
 		}
 

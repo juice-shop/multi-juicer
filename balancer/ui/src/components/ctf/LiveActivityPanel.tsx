@@ -67,8 +67,21 @@ export function LiveActivityPanel({
           {activities && (
             <div className="flex flex-col gap-1.5">
               {activities.map((activity, index) => {
+                if (activity.eventType === "team_created") {
+                  return (
+                    <div key={index} className="py-1.5">
+                      <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
+                        "{activity.team}" team joined the CTF
+                      </div>
+                      <div className="text-[9px] text-ctf-neutral opacity-70">
+                        {formatTimeAgo(activity.timestamp)}
+                      </div>
+                    </div>
+                  );
+                }
+                // Challenge solved event
                 const countryName = challengeToCountry.get(
-                  activity.challengeKey
+                  activity.challengeKey!
                 );
                 const challengeDisplay = countryName
                   ? `${activity.challengeName} (${countryName})`
@@ -81,7 +94,7 @@ export function LiveActivityPanel({
                       {activity.points} pts)
                     </div>
                     <div className="text-[9px] text-ctf-neutral opacity-70">
-                      {formatTimeAgo(activity.solvedAt)}
+                      {formatTimeAgo(activity.timestamp)}
                     </div>
                   </div>
                 );
