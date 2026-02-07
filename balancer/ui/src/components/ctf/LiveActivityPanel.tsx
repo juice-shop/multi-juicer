@@ -1,4 +1,8 @@
-import { useActivityFeed } from "@/hooks/useActivityFeed";
+import {
+  useActivityFeed,
+  isTeamCreatedEvent,
+  isChallengeSolvedEvent,
+} from "@/hooks/useActivityFeed";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
 interface LiveActivityPanelProps {
@@ -39,7 +43,7 @@ export function LiveActivityPanel({
       className={`bg-ctf-bg-panel border-2 border-ctf-primary backdrop-blur-[5px] flex flex-col transition-all duration-300 overflow-hidden shadow-[0_0_5px_rgba(255,107,107,0.3),inset_0_0_5px_rgba(255,107,107,0.05)] ${isOpen ? "min-h-0" : ""}`}
     >
       <div
-        className="p-[15px_20px] text-base font-bold uppercase tracking-[2px] cursor-pointer select-none text-ctf-primary border-b border-ctf-border flex-shrink-0 hover:text-ctf-accent"
+        className="p-[15px_20px] text-base font-bold uppercase tracking-[2px] cursor-pointer select-none text-ctf-primary border-b border-ctf-border shrink-0 hover:text-ctf-accent"
         style={{
           textShadow: "0 0 3px rgba(255, 107, 107, 0.5)",
         }}
@@ -67,7 +71,7 @@ export function LiveActivityPanel({
           {activities && (
             <div className="flex flex-col gap-1.5">
               {activities.map((activity, index) => {
-                if (activity.eventType === "team_created") {
+                if (isTeamCreatedEvent(activity)) {
                   return (
                     <div key={index} className="py-1.5">
                       <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
@@ -79,25 +83,29 @@ export function LiveActivityPanel({
                     </div>
                   );
                 }
-                // Challenge solved event
-                const countryName = challengeToCountry.get(
-                  activity.challengeKey!
-                );
-                const challengeDisplay = countryName
-                  ? `${activity.challengeName} (${countryName})`
-                  : activity.challengeName;
 
-                return (
-                  <div key={index} className="py-1.5">
-                    <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
-                      {activity.team} solved {challengeDisplay} (+
-                      {activity.points} pts)
+                if (isChallengeSolvedEvent(activity)) {
+                  const countryName = challengeToCountry.get(
+                    activity.challengeKey
+                  );
+                  const challengeDisplay = countryName
+                    ? `${activity.challengeName} (${countryName})`
+                    : activity.challengeName;
+
+                  return (
+                    <div key={index} className="py-1.5">
+                      <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
+                        {activity.team} solved {challengeDisplay} (+
+                        {activity.points} pts)
+                      </div>
+                      <div className="text-[9px] text-ctf-neutral opacity-70">
+                        {formatTimeAgo(activity.timestamp)}
+                      </div>
                     </div>
-                    <div className="text-[9px] text-ctf-neutral opacity-70">
-                      {formatTimeAgo(activity.timestamp)}
-                    </div>
-                  </div>
-                );
+                  );
+                }
+
+                return null;
               })}
             </div>
           )}

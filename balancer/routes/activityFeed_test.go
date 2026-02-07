@@ -19,6 +19,40 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
+// Helper to unmarshal activity events from JSON
+func unmarshalActivityFeed(data []byte) ([]ActivityEvent, error) {
+	var rawEvents []json.RawMessage
+	if err := json.Unmarshal(data, &rawEvents); err != nil {
+		return nil, err
+	}
+
+	events := make([]ActivityEvent, 0, len(rawEvents))
+	for _, raw := range rawEvents {
+		// First unmarshal to determine event type
+		var base BaseEvent
+		if err := json.Unmarshal(raw, &base); err != nil {
+			return nil, err
+		}
+
+		switch base.EventType {
+		case EventTypeTeamCreated:
+			var event TeamCreatedEvent
+			if err := json.Unmarshal(raw, &event); err != nil {
+				return nil, err
+			}
+			events = append(events, &event)
+		case EventTypeChallengeSolved:
+			var event ChallengeSolvedEvent
+			if err := json.Unmarshal(raw, &event); err != nil {
+				return nil, err
+			}
+			events = append(events, &event)
+		}
+	}
+
+	return events, nil
+}
+
 // Helper to create mock deployments with solved challenges
 func createTeamWithSolvedChallenges(team string, challengesJSON string) *appsv1.Deployment {
 	return &appsv1.Deployment{
@@ -74,35 +108,39 @@ func TestActivityFeedHandler(t *testing.T) {
 		// --- Assertions ---
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		var feed []ActivityEvent
-		err = json.Unmarshal(rr.Body.Bytes(), &feed)
+		feed, err := unmarshalActivityFeed(rr.Body.Bytes())
 		require.NoError(t, err)
 
 		require.Len(t, feed, 5, "Expected 3 solve events + 2 team creation events in the feed")
 
 		// 1. Verify sorting (newest first)
-		assert.Equal(t, challenge2, feed[0].ChallengeKey, "The newest event should be at the top of the feed")
-		assert.Equal(t, "team-bravo", feed[0].Team)
-		assert.Equal(t, time3.UTC().Truncate(time.Second), feed[0].Timestamp.UTC().Truncate(time.Second))
+		solvedEvent0, ok := IsChallengeSolvedEvent(feed[0])
+		require.True(t, ok, "First event should be a challenge solved event")
+		assert.Equal(t, challenge2, solvedEvent0.ChallengeKey, "The newest event should be at the top of the feed")
+		assert.Equal(t, "team-bravo", solvedEvent0.GetTeam())
+		assert.Equal(t, time3.UTC().Truncate(time.Second), solvedEvent0.GetTimestamp().UTC().Truncate(time.Second))
 
-		assert.Equal(t, challenge1, feed[1].ChallengeKey)
-		assert.Equal(t, "team-alpha", feed[1].Team)
+		solvedEvent1, ok := IsChallengeSolvedEvent(feed[1])
+		require.True(t, ok, "Second event should be a challenge solved event")
+		assert.Equal(t, challenge1, solvedEvent1.ChallengeKey)
+		assert.Equal(t, "team-alpha", solvedEvent1.GetTeam())
 
 		// 2. Verify First Solve detection
-		var teamAlphaEvent, teamBravoC1Event, teamBravoC2Event ActivityEvent
+		var teamAlphaEvent, teamBravoC1Event, teamBravoC2Event *ChallengeSolvedEvent
 		for _, event := range feed {
-			// Skip team creation events
-			if event.EventType != "challenge_solved" {
-				continue
-			}
-			if event.Team == "team-alpha" {
-				teamAlphaEvent = event
-			} else if event.ChallengeKey == challenge1 {
-				teamBravoC1Event = event
-			} else {
-				teamBravoC2Event = event
+			if solvedEvent, ok := IsChallengeSolvedEvent(event); ok {
+				if solvedEvent.GetTeam() == "team-alpha" {
+					teamAlphaEvent = solvedEvent
+				} else if solvedEvent.ChallengeKey == challenge1 {
+					teamBravoC1Event = solvedEvent
+				} else {
+					teamBravoC2Event = solvedEvent
+				}
 			}
 		}
+		require.NotNil(t, teamAlphaEvent)
+		require.NotNil(t, teamBravoC1Event)
+		require.NotNil(t, teamBravoC2Event)
 		assert.False(t, teamAlphaEvent.IsFirstSolve, "Team Alpha's solve should not be First Solve")
 		assert.True(t, teamBravoC1Event.IsFirstSolve, "Team Bravo's solve of challenge 1 should be First Solve")
 		assert.True(t, teamBravoC2Event.IsFirstSolve, "Team Bravo's solve of challenge 2 should be First Solve (as they are the only solver)")
@@ -129,20 +167,21 @@ func TestActivityFeedHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		var feed []ActivityEvent
-		err := json.Unmarshal(rr.Body.Bytes(), &feed)
+		feed, err := unmarshalActivityFeed(rr.Body.Bytes())
 		require.NoError(t, err)
 		// Even with no solves, we expect team creation events
 		require.Len(t, feed, 2, "Expected 2 team creation events")
-		assert.Equal(t, "team_created", feed[0].EventType)
-		assert.Equal(t, "team_created", feed[1].EventType)
+		_, ok1 := IsTeamCreatedEvent(feed[0])
+		assert.True(t, ok1, "First event should be a team created event")
+		_, ok2 := IsTeamCreatedEvent(feed[1])
+		assert.True(t, ok2, "Second event should be a team created event")
 	})
 
 	t.Run("with more than 15 solves, should return only the 15 newest events", func(t *testing.T) {
 		var mockDeployments []runtime.Object
 		var newestSolveTime time.Time
 		// Create 20 solve events
-		for i := 0; i < 20; i++ {
+		for i := range 20 {
 			solveTime := time.Now().Add(time.Duration(-i) * time.Minute)
 			if i == 0 {
 				newestSolveTime = solveTime
@@ -164,12 +203,11 @@ func TestActivityFeedHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		var feed []ActivityEvent
-		err := json.Unmarshal(rr.Body.Bytes(), &feed)
+		feed, err := unmarshalActivityFeed(rr.Body.Bytes())
 		require.NoError(t, err)
 
 		// Assert that the feed is limited to 15 items
 		assert.Len(t, feed, 15, "Feed should be limited to 15 events")
-		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].Timestamp.UTC().Truncate(time.Second))
+		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].GetTimestamp().UTC().Truncate(time.Second))
 	})
 }

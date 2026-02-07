@@ -13,23 +13,65 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ActivityEvent represents a single event in the activity feed.
-type ActivityEvent struct {
-	Team          string    `json:"team"`
-	EventType     string    `json:"eventType"` // "challenge_solved" | "team_created"
-	ChallengeKey  string    `json:"challengeKey,omitempty"`
-	ChallengeName string    `json:"challengeName,omitempty"`
-	Points        int       `json:"points,omitempty"`
-	Timestamp     time.Time `json:"timestamp"`
-	IsFirstSolve  bool      `json:"isFirstSolve,omitempty"`
+// EventType represents the type of activity event
+type EventType string
+
+const (
+	EventTypeTeamCreated     EventType = "team_created"
+	EventTypeChallengeSolved EventType = "challenge_solved"
+)
+
+// ActivityEvent is the interface that all activity events must implement
+type ActivityEvent interface {
+	GetEventType() EventType
+	GetTeam() string
+	GetTimestamp() time.Time
+}
+
+// BaseEvent contains common fields for all activity events
+type BaseEvent struct {
+	Team      string    `json:"team"`
+	EventType EventType `json:"eventType"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+func (e BaseEvent) GetEventType() EventType { return e.EventType }
+func (e BaseEvent) GetTeam() string         { return e.Team }
+func (e BaseEvent) GetTimestamp() time.Time { return e.Timestamp }
+
+// TeamCreatedEvent represents a team joining the CTF
+type TeamCreatedEvent struct {
+	BaseEvent
+}
+
+// ChallengeSolvedEvent represents a team solving a challenge
+type ChallengeSolvedEvent struct {
+	BaseEvent
+	ChallengeKey  string `json:"challengeKey"`
+	ChallengeName string `json:"challengeName"`
+	Points        int    `json:"points"`
+	IsFirstSolve  bool   `json:"isFirstSolve,omitempty"`
+}
+
+// Type assertion helpers
+func IsTeamCreatedEvent(event ActivityEvent) (*TeamCreatedEvent, bool) {
+	e, ok := event.(*TeamCreatedEvent)
+	return e, ok
+}
+
+func IsChallengeSolvedEvent(event ActivityEvent) (*ChallengeSolvedEvent, bool) {
+	e, ok := event.(*ChallengeSolvedEvent)
+	return e, ok
 }
 
 // ByTimestamp sorts events by their timestamp, newest first.
 type ByTimestamp []ActivityEvent
 
-func (a ByTimestamp) Len() int           { return len(a) }
-func (a ByTimestamp) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByTimestamp) Less(i, j int) bool { return a[i].Timestamp.After(a[j].Timestamp) }
+func (a ByTimestamp) Len() int      { return len(a) }
+func (a ByTimestamp) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByTimestamp) Less(i, j int) bool {
+	return a[i].GetTimestamp().After(a[j].GetTimestamp())
+}
 
 // buildTeamCreationEvents constructs team creation events from deployments
 func buildTeamCreationEvents(deployments []*appsv1.Deployment) []ActivityEvent {
@@ -40,10 +82,12 @@ func buildTeamCreationEvents(deployments []*appsv1.Deployment) []ActivityEvent {
 			continue
 		}
 
-		events = append(events, ActivityEvent{
-			Team:      teamName,
-			EventType: "team_created",
-			Timestamp: deployment.CreationTimestamp.Time,
+		events = append(events, &TeamCreatedEvent{
+			BaseEvent: BaseEvent{
+				Team:      teamName,
+				EventType: EventTypeTeamCreated,
+				Timestamp: deployment.CreationTimestamp.Time,
+			},
 		})
 	}
 	return events
@@ -72,13 +116,15 @@ func buildActivityFeed(
 				continue // Should not happen in a consistent system
 			}
 
-			event := ActivityEvent{
-				Team:          teamName,
-				EventType:     "challenge_solved",
+			event := &ChallengeSolvedEvent{
+				BaseEvent: BaseEvent{
+					Team:      teamName,
+					EventType: EventTypeChallengeSolved,
+					Timestamp: solvedChallenge.SolvedAt,
+				},
 				ChallengeKey:  solvedChallenge.Key,
 				ChallengeName: challengeDetails.Name,
 				Points:        challengeDetails.Difficulty * 10,
-				Timestamp:     solvedChallenge.SolvedAt,
 			}
 			allEvents = append(allEvents, event)
 
@@ -94,19 +140,18 @@ func buildActivityFeed(
 
 	// 3. Add "First Solve" information
 	for i := range allEvents {
-		event := &allEvents[i]
-		if event.EventType != "challenge_solved" {
-			continue
-		}
-		if firstSolveTime, ok := firstSolves[event.ChallengeKey]; ok && event.Timestamp.Equal(firstSolveTime) {
-			event.IsFirstSolve = true
+		event := allEvents[i]
+		if solvedEvent, ok := IsChallengeSolvedEvent(event); ok {
+			if firstSolveTime, exists := firstSolves[solvedEvent.ChallengeKey]; exists && solvedEvent.GetTimestamp().Equal(firstSolveTime) {
+				solvedEvent.IsFirstSolve = true
+			}
 		}
 	}
 
-	// 3. Sort all events chronologically (newest first)
+	// 4. Sort all events chronologically (newest first)
 	sort.Sort(ByTimestamp(allEvents))
 
-	// 4. Limit to the 15 most recent events
+	// 5. Limit to the 15 most recent events
 	limit := 15
 	if len(allEvents) < limit {
 		limit = len(allEvents)

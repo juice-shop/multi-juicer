@@ -4,14 +4,42 @@ import {
   extractLastUpdateTimestamp,
 } from "./useHttpLongPoll";
 
-export interface ActivityEvent {
+interface BaseActivityEvent {
   team: string;
-  eventType: "challenge_solved" | "team_created";
-  challengeKey?: string;
-  challengeName?: string;
-  points?: number;
   timestamp: string; // ISO String
-  isFirstSolve?: boolean;
+}
+
+export interface TeamCreatedEvent extends BaseActivityEvent {
+  eventType: "team_created";
+}
+
+export interface ChallengeSolvedEvent extends BaseActivityEvent {
+  eventType: "challenge_solved";
+  challengeKey: string;
+  challengeName: string;
+  points: number;
+  isFirstSolve: boolean;
+}
+
+// Discriminated union type for all activity events
+export type ActivityEvent = TeamCreatedEvent | ChallengeSolvedEvent;
+
+/**
+ * Type guard to check if an event is a TeamCreatedEvent
+ */
+export function isTeamCreatedEvent(
+  event: ActivityEvent
+): event is TeamCreatedEvent {
+  return event.eventType === "team_created";
+}
+
+/**
+ * Type guard to check if an event is a ChallengeSolvedEvent
+ */
+export function isChallengeSolvedEvent(
+  event: ActivityEvent
+): event is ChallengeSolvedEvent {
+  return event.eventType === "challenge_solved";
 }
 
 /**

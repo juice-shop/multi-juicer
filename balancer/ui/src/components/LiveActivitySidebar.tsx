@@ -1,7 +1,12 @@
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 
-import { useActivityFeed, type ActivityEvent } from "@/hooks/useActivityFeed";
+import {
+  useActivityFeed,
+  type ActivityEvent,
+  isTeamCreatedEvent,
+  isChallengeSolvedEvent,
+} from "@/hooks/useActivityFeed";
 import { classNames } from "@/util/classNames";
 
 import { Card } from "./Card";
@@ -15,8 +20,7 @@ const EventItem = ({
   event: ActivityEvent;
   isLast: boolean;
 }) => {
-  const isTeamCreated = event.eventType === "team_created";
-  const eventColor = isTeamCreated
+  const eventColor = isTeamCreatedEvent(event)
     ? "border-yellow-400"
     : event.isFirstSolve
       ? "border-red-500"
@@ -33,11 +37,11 @@ const EventItem = ({
       ></div>
       {/* Timeline Vertical Line */}
       {!isLast && (
-        <div className="absolute left-1.5 top-[18px] h-full w-px bg-orange-500"></div>
+        <div className="absolute left-1.5 top-4.5 h-full w-px bg-orange-500"></div>
       )}
 
       <p className="text-sm">
-        {isTeamCreated ? (
+        {isTeamCreatedEvent(event) ? (
           <>
             <Link
               to={`/score-overview/teams/${event.team}`}
@@ -47,7 +51,7 @@ const EventItem = ({
             </Link>{" "}
             joined the CTF
           </>
-        ) : (
+        ) : isChallengeSolvedEvent(event) ? (
           <FormattedMessage
             id="activity.solved_challenge"
             defaultMessage="{team} solved {challenge} (+{points} pts)"
@@ -75,7 +79,7 @@ const EventItem = ({
               ),
             }}
           />
-        )}
+        ) : null}
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
         <ReadableTimestamp date={new Date(event.timestamp)} />
@@ -101,7 +105,7 @@ export const LiveActivitySidebar = () => {
           />
         </h2>
       </div>
-      <div className="h-[500px] overflow-y-auto p-4 pt-0">
+      <div className="h-125 overflow-y-auto p-4 pt-0">
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
             <Spinner />
@@ -115,13 +119,19 @@ export const LiveActivitySidebar = () => {
           </p>
         ) : (
           <div className="flex flex-col gap-4">
-            {events.map((event, index) => (
-              <EventItem
-                key={`${event.eventType}-${event.challengeKey || event.team}-${index}`}
-                event={event}
-                isLast={index === events.length - 1}
-              />
-            ))}
+            {events.map((event, index) => {
+              const key = isChallengeSolvedEvent(event)
+                ? `${event.eventType}-${event.challengeKey}-${index}`
+                : `${event.eventType}-${event.team}-${index}`;
+
+              return (
+                <EventItem
+                  key={key}
+                  event={event}
+                  isLast={index === events.length - 1}
+                />
+              );
+            })}
           </div>
         )}
       </div>
