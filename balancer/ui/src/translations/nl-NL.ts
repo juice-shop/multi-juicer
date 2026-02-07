@@ -57,6 +57,7 @@ export default {
   reset_passcode: "Passcode resetten",
   "navigation.admin": "Admin",
   "activity.title": "Live Activiteit",
+  "activity.team_joined": "{team} heeft zich aangesloten",
   "activity.solved_challenge":
     "{team} heeft {challenge} opgelost (+{points} punten)",
   "activity.no_events": "Geen recente activiteit.",

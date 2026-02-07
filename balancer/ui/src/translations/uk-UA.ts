@@ -59,6 +59,7 @@ export default {
     "Ваша команда займає {position}-е місце з {totalTeams}, вирішивши {solvedChallengeCount} завдань.",
   "navigation.admin": "Адмін",
   "activity.title": "Жива активність",
+  "activity.team_joined": "{team} приєднався",
   "activity.solved_challenge":
     "{team} вирішив(ла) {challenge} (+{points} балів)",
   "activity.no_events": "Немає останніх активностей.",

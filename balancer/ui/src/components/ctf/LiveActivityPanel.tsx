@@ -1,3 +1,5 @@
+import { FormattedMessage } from "react-intl";
+
 import {
   useActivityFeed,
   isTeamCreatedEvent,
@@ -75,7 +77,11 @@ export function LiveActivityPanel({
                   return (
                     <div key={index} className="py-1.5">
                       <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
-                        "{activity.team}" team joined the CTF
+                        <FormattedMessage
+                          id="activity.team_joined"
+                          defaultMessage="{team} joined"
+                          values={{ team: `"${activity.team}"` }}
+                        />
                       </div>
                       <div className="text-[9px] text-ctf-neutral opacity-70">
                         {formatTimeAgo(activity.timestamp)}

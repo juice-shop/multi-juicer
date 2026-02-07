@@ -58,6 +58,7 @@ export default {
     "Dein Team liegt auf Platz {position} von {totalTeams} mit {solvedChallengeCount} gelösten Herausforderungen.",
   "navigation.admin": "Admin",
   "activity.title": "Live-Aktivität",
+  "activity.team_joined": "{team} ist beigetreten",
   "activity.solved_challenge":
     "{team} hat {challenge} gelöst (+{points} Punkte)",
   "activity.no_events": "Keine aktuellen Aktivitäten.",

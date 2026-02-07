@@ -57,6 +57,7 @@ export default {
     "Echipa ta este pe locul {position} din {totalTeams} cu {solvedChallengeCount} provocări rezolvate.",
   "navigation.admin": "Admin",
   "activity.title": "Activitate live",
+  "activity.team_joined": "{team} s-a alăturat",
   "activity.solved_challenge":
     "{team} a rezolvat {challenge} (+{points} puncte)",
   "activity.no_events": "Nicio activitate recentă.",

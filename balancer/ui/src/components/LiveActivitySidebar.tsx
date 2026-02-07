@@ -42,15 +42,20 @@ const EventItem = ({
 
       <p className="text-sm">
         {isTeamCreatedEvent(event) ? (
-          <>
-            <Link
-              to={`/score-overview/teams/${event.team}`}
-              className="font-bold hover:underline"
-            >
-              {event.team}
-            </Link>{" "}
-            joined the CTF
-          </>
+          <FormattedMessage
+            id="activity.team_joined"
+            defaultMessage="{team} joined"
+            values={{
+              team: (
+                <Link
+                  to={`/score-overview/teams/${event.team}`}
+                  className="font-bold hover:underline"
+                >
+                  {event.team}
+                </Link>
+              ),
+            }}
+          />
         ) : isChallengeSolvedEvent(event) ? (
           <FormattedMessage
             id="activity.solved_challenge"
