@@ -13,7 +13,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
+	k8stesting "k8s.io/client-go/testing"
 )
 
 func TestAdminResetPasscodeHandler(t *testing.T) {
@@ -123,6 +125,41 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 
 		assert.Equal(t, rr.Code, http.StatusBadRequest)
 		assert.Empty(t, clientset.Actions())
+	})
+
+	t.Run("admin reset passcode returns 500 when kubernetes patch fails", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", team), nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
+		req.SetPathValue("team", team)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		initialPasscodeHash := "$2a$10$wnxvqClPk/13SbdowdJtu.2thGxrZe4qrsaVdTVUsYIrVVClhPMfS"
+
+		clientset := fake.NewClientset(&appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("juiceshop-%s", team),
+				Namespace: "test-namespace",
+				Annotations: map[string]string{
+					"multi-juicer.owasp-juice.shop/passcode": initialPasscodeHash,
+				},
+			},
+		})
+		clientset.PrependReactor("patch", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+			return true, nil, fmt.Errorf("kubernetes patch failed")
+		})
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+
+		// The passcode annotation must not have changed
+		deployment, err := clientset.AppsV1().Deployments("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+		assert.Nil(t, err)
+		assert.Equal(t, initialPasscodeHash, deployment.Annotations["multi-juicer.owasp-juice.shop/passcode"])
 	})
 
 	t.Run("admin reset passcode returns 404 when team deployment does not exist", func(t *testing.T) {

@@ -57,12 +57,17 @@ func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Patch(
+			_, err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Patch(
 				req.Context(),
 				deployment.Name, types.StrategicMergePatchType,
 				patch,
 				metav1.PatchOptions{},
 			)
+			if err != nil {
+				bundle.Log.Printf("Failed to update passcode for team '%s': %v", teamToReset, err)
+				http.Error(responseWriter, "Failed to update passcode", http.StatusInternalServerError)
+				return
+			}
 
 			responseBody := ResetPasscodeResponse{
 				Message:  "Passcode reset successfully",
