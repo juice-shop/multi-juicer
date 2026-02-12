@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 )
 
 type AdminNotificationRequest struct {
@@ -20,13 +19,6 @@ type AdminNotificationResponse struct {
 func handleAdminPostNotification(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			// Check admin authentication
-			team, err := teamcookie.GetTeamFromRequest(bundle, req)
-			if err != nil || team != "admin" {
-				http.Error(responseWriter, "", http.StatusUnauthorized)
-				return
-			}
-
 			// Parse request body
 			var notificationReq AdminNotificationRequest
 			if err := json.NewDecoder(req.Body).Decode(&notificationReq); err != nil {

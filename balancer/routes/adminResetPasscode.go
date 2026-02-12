@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	"golang.org/x/crypto/bcrypt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -15,12 +14,6 @@ import (
 func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			team, err := teamcookie.GetTeamFromRequest(bundle, req)
-			if err != nil || team != "admin" {
-				http.Error(responseWriter, "", http.StatusUnauthorized)
-				return
-			}
-
 			teamToReset := req.PathValue("team")
 			if !isValidTeamName(teamToReset) {
 				http.Error(responseWriter, "invalid team name", http.StatusBadRequest)

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -32,12 +31,6 @@ type CheatScoreEntry struct {
 func handleAdminListInstances(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			team, err := teamcookie.GetTeamFromRequest(bundle, req)
-			if err != nil || team != "admin" {
-				http.Error(responseWriter, "", http.StatusUnauthorized)
-				return
-			}
-
 			deployments, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).List(req.Context(), metav1.ListOptions{
 				LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 			})

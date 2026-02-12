@@ -5,19 +5,12 @@ import (
 	"net/http"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
-	"github.com/juice-shop/multi-juicer/balancer/pkg/teamcookie"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func handleAdminRestartInstance(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
-			team, err := teamcookie.GetTeamFromRequest(bundle, req)
-			if err != nil || team != "admin" {
-				http.Error(responseWriter, "", http.StatusUnauthorized)
-				return
-			}
-
 			teamToRestart := req.PathValue("team")
 			if !isValidTeamName(teamToRestart) {
 				http.Error(responseWriter, "invalid team name", http.StatusBadRequest)
