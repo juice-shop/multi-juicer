@@ -48,6 +48,8 @@ export default {
   "admin_table.no_cheat_score": "Немає показника читів",
   "admin_table.cheat_score_graph_not_available_yet":
     "Графік показника читів буде доступний після вирішення більше ніж одного завдання",
+  "admin_table.reset_passcode": "Скинути пароль команди",
+  "admin_table.new_passcode": 'Пароль оновлено для команди "{team}"',
   "cheat_score_graph.title": "Історія показника читів",
   "cheat_score_graph.not_enough_data": "Недостатньо даних для графіка",
   "cheat_score_graph.x_axis_label": "Вирішені завдання →",
@@ -88,10 +90,14 @@ export default {
   passcode_copied: "Пароль скопійовано до буферу обміну",
   passcode_reset_success: "Пароль успішно скинуто",
   passcode_reset_error: "Помилка при скиданні пароля",
+  passcode_updated_explanation_admin:
+    "Скопіюйте та поділіться цим паролем з членами команди.",
   admin_delete_team_confirmation:
     'Ви впевнені, що хочете видалити команду "{team}"?',
   admin_restart_team_confirmation:
     'Ви впевнені, що хочете перезапустити команду "{team}"?',
+  admin_reset_passcode_confirmation:
+    'Ви впевнені, що хочете скинути пароль для команди "{team}"?',
   instance_status_not_found:
     "Не вдалося знайти інстанс для команди. Ви можете відновити його, увійшовши знову.",
   clipboard_not_available:

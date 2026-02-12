@@ -46,6 +46,8 @@ export default {
   "admin_table.no_cheat_score": "Fără scor de trișare",
   "admin_table.cheat_score_graph_not_available_yet":
     "Graficul scorului de trișare va fi disponibil după ce mai mult de o provocare este rezolvată",
+  "admin_table.reset_passcode": "Resetează parola echipei",
+  "admin_table.new_passcode": 'Parolă actualizată pentru echipa "{team}"',
   "cheat_score_graph.title": "Istoricul scorului de trișare",
   "cheat_score_graph.not_enough_data": "Date insuficiente pentru grafic",
   "cheat_score_graph.x_axis_label": "Provocări rezolvate →",
@@ -86,10 +88,14 @@ export default {
   passcode_copied: "Parolă copiată în clipboard",
   passcode_reset_success: "Parolă resetată cu succes",
   passcode_reset_error: "Eroare la resetarea parolei",
+  passcode_updated_explanation_admin:
+    "Copiază și distribuie această parolă cu membrii echipei.",
   admin_delete_team_confirmation:
     'Ești sigur că vrei să ștergi echipa "{team}"?',
   admin_restart_team_confirmation:
     'Ești sigur că vrei să repornești echipa "{team}"?',
+  admin_reset_passcode_confirmation:
+    'Ești sigur că vrei să resetezi parola pentru echipa "{team}"?',
   instance_status_not_found:
     "Nu s-a găsit instanța pentru această echipă. O poți recrea autentificându-te din nou.",
   clipboard_not_available:

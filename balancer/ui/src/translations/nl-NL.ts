@@ -45,6 +45,8 @@ export default {
   "admin_table.no_cheat_score": "Geen cheat score",
   "admin_table.cheat_score_graph_not_available_yet":
     "De cheat score grafiek wordt beschikbaar zodra meer dan één uitdaging is opgelost",
+  "admin_table.reset_passcode": "Team passcode resetten",
+  "admin_table.new_passcode": 'Passcode bijgewerkt voor team "{team}"',
   "cheat_score_graph.title": "Cheat Score Geschiedenis",
   "cheat_score_graph.not_enough_data": "Niet genoeg data voor grafiek",
   "cheat_score_graph.x_axis_label": "Opgeloste uitdagingen →",
@@ -86,10 +88,14 @@ export default {
   passcode_copied: "Passcode gekopieerd naar klembord",
   passcode_reset_success: "Passcode succesvol gereset",
   passcode_reset_error: "Fout bij het resetten van passcode",
+  passcode_updated_explanation_admin:
+    "Kopieer en deel deze passcode met de teamleden.",
   admin_delete_team_confirmation:
     'Weet je zeker dat je team "{team}" wilt verwijderen?',
   admin_restart_team_confirmation:
     'Weet je zeker dat je team "{team}" opnieuw wilt starten?',
+  admin_reset_passcode_confirmation:
+    'Weet je zeker dat je de passcode voor team "{team}" wilt resetten?',
   instance_status_not_found:
     "Kon de instantie voor het team niet vinden. Je kunt deze opnieuw aanmaken door opnieuw in te loggen.",
   clipboard_not_available:

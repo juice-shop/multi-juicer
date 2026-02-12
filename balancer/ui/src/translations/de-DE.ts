@@ -47,6 +47,8 @@ export default {
   "admin_table.no_cheat_score": "Kein Cheat-Score",
   "admin_table.cheat_score_graph_not_available_yet":
     "Das Cheat-Score-Diagramm wird verfügbar, sobald mehr als eine Herausforderung gelöst wurde",
+  "admin_table.reset_passcode": "Team-Passcode zurücksetzen",
+  "admin_table.new_passcode": 'Passcode aktualisiert für Team "{team}"',
   "cheat_score_graph.title": "Cheat-Score-Verlauf",
   "cheat_score_graph.not_enough_data": "Nicht genügend Daten für Diagramm",
   "cheat_score_graph.x_axis_label": "Gelöste Herausforderungen →",
@@ -88,10 +90,14 @@ export default {
   passcode_copied: "Passwort in die Zwischenablage kopiert",
   passcode_reset_success: "Passwort erfolgreich zurückgesetzt",
   passcode_reset_error: "Fehler beim Zurücksetzen des Passworts",
+  passcode_updated_explanation_admin:
+    "Kopieren und teilen Sie diesen Passcode mit den Teammitgliedern.",
   admin_delete_team_confirmation:
     'Bist du sicher, dass du Team "{team}" löschen möchtest?',
   admin_restart_team_confirmation:
     'Bist du sicher, dass du Team "{team}" neu starten möchtest?',
+  admin_reset_passcode_confirmation:
+    'Bist du sicher, dass du den Passcode für Team "{team}" zurücksetzen möchtest?',
   instance_status_not_found:
     "Die Instanz für das Team konnte nicht gefunden werden. Du kannst sie neu erstellen, indem du dich erneut anmeldest.",
   clipboard_not_available:
