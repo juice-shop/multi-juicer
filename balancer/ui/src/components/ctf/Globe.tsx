@@ -365,6 +365,8 @@ function GlobeInternal({
         controls.addEventListener("start", () => {
           lastActivityTime = performance.now();
           controls.autoRotate = false;
+          controls.minPolarAngle = 0;
+          controls.maxPolarAngle = Math.PI;
         });
 
         function render(currentTime: number) {
@@ -383,6 +385,26 @@ function GlobeInternal({
             controls.autoRotate = false;
           } else if (currentTime - lastActivityTime > IDLE_TIMEOUT) {
             controls.autoRotate = true;
+
+            // Slowly drift the camera back toward the equator (polarAngle = π/2)
+            // so auto-rotation doesn't look awkward near the poles
+            // Slightly above equator (~20° north) to keep more landmass in view
+            const EQUATOR_ANGLE = Math.PI / 2 - 0.35;
+            const polarAngle = controls.getPolarAngle();
+            const diff = EQUATOR_ANGLE - polarAngle;
+            if (Math.abs(diff) > 0.01) {
+              const DRIFT_SPEED = 0.003;
+              const step = diff * DRIFT_SPEED;
+              controls.minPolarAngle = polarAngle + step;
+              controls.maxPolarAngle = polarAngle + step;
+            } else {
+              controls.minPolarAngle = EQUATOR_ANGLE;
+              controls.maxPolarAngle = EQUATOR_ANGLE;
+            }
+          } else {
+            // Free look — allow full polar range
+            controls.minPolarAngle = 0;
+            controls.maxPolarAngle = Math.PI;
           }
 
           // Update controls
