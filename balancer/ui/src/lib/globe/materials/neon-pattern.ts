@@ -16,6 +16,7 @@ export function createNeonPatternMaterial(
       u_neonColor: { value: new Vector3(...neonColor) },
       u_glowIntensity: { value: glowIntensity },
       u_hoverIntensity: { value: 0.0 },
+      u_highlightIntensity: { value: 0.0 },
       u_patternTexture: { value: patternTexture },
       u_patternRotation: { value: Math.PI / 4 }, // 45 degrees
       u_patternScale: { value: 64.0 }, // Adjust for desired repetition (higher = more repetition)
@@ -59,6 +60,7 @@ export function createNeonPatternMaterial(
       uniform vec3 u_neonColor;
       uniform float u_glowIntensity;
       uniform float u_hoverIntensity;
+      uniform float u_highlightIntensity;
       uniform sampler2D u_patternTexture;
       uniform float u_patternRotation;
       uniform float u_patternScale;
@@ -91,13 +93,18 @@ export function createNeonPatternMaterial(
         vec3 hoverColor = u_neonColor * u_glowIntensity * 1.8;
 
         // Blend between normal and hover color
-        vec3 color = mix(normalColor, hoverColor, u_hoverIntensity);
+        vec3 baseColor = mix(normalColor, hoverColor, u_hoverIntensity);
+
+        // Highlight effect - bright warm accent blend
+        vec3 highlightColor = vec3(1.0, 0.4, 0.0) * u_glowIntensity * 2.5;
+        vec3 color = mix(baseColor, highlightColor, u_highlightIntensity);
 
         // Final color with depth fade
         vec3 finalColor = color * depthFade;
 
-        // Blend opacity
-        float finalOpacity = mix(0.9, 1.0, u_hoverIntensity);
+        // Blend opacity (highlight forces full opacity)
+        float baseOpacity = mix(0.9, 1.0, u_hoverIntensity);
+        float finalOpacity = mix(baseOpacity, 1.0, u_highlightIntensity);
 
         // Output with alpha for blending
         gl_FragColor = vec4(finalColor, depthFade * finalOpacity);

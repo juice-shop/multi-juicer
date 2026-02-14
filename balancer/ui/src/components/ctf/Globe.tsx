@@ -1,11 +1,17 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { Scene, Color, PerspectiveCamera, WebGLRenderer } from "three";
+import { Scene, Color, PerspectiveCamera, WebGLRenderer, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 
+import { SolveSequenceAnimation } from "@/lib/globe/animations/solve-sequence";
 import type { CountryGeometryManager } from "@/lib/globe/country-geometry";
 import type { CountryData } from "@/lib/globe/data/geojson-loader";
+import { GlobeAnimator } from "@/lib/globe/globe-animator";
 import { GlobeRenderer } from "@/lib/globe/globe-renderer";
+import {
+  latLonToSphere,
+  greatCircleDistance,
+} from "@/lib/globe/math/projection";
 import { MouseInteraction } from "@/lib/globe/mouse-interaction";
 import { createOcclusionSphere } from "@/lib/globe/occlusion-sphere";
 import { setupComposer } from "@/lib/globe/postprocessing/composer-setup";
@@ -24,6 +30,16 @@ export interface GlobeHandle {
     countryName: string,
     patternIndex: number
   ): Promise<void>;
+  /** Rotate camera to the country, transition material, and pulse a highlight glow */
+  focusAndHighlightCountry(countryName: string, patternIndex: number): void;
+  /**
+   * Enqueue multiple solve animations, sorted by geographic proximity
+   * (greedy nearest-neighbor from the current camera position) so the camera
+   * traces a short path instead of jumping randomly around the globe.
+   */
+  focusAndHighlightCountries(
+    solves: Array<{ countryName: string; patternIndex: number }>
+  ): void;
 }
 
 interface GlobeProps {
@@ -90,6 +106,7 @@ function GlobeInternal({
     let composer: EffectComposer;
     let globeRenderer: GlobeRenderer;
     let mouseInteraction: MouseInteraction;
+    let animator: GlobeAnimator;
 
     const stats = {
       fps: 0,
@@ -162,6 +179,9 @@ function GlobeInternal({
         globeRenderer = new GlobeRenderer(scene);
         await globeRenderer.initialize(geometryManager, themeColors, countries);
 
+        // 6b. Create animation manager
+        animator = new GlobeAnimator();
+
         // 7. Setup mouse interaction for country hover effects
         mouseInteraction = new MouseInteraction(
           camera,
@@ -191,6 +211,131 @@ function GlobeInternal({
                 glowIntensity: colors.glowIntensity,
               }
             );
+          },
+          focusAndHighlightCountry: (
+            countryName: string,
+            patternIndex: number
+          ) => {
+            const center = globeRenderer.getCountryCenter(countryName);
+            if (!center) {
+              // Fallback: just do the material transition without animation
+              const colors = themeColorsRef.current;
+              globeRenderer
+                .transitionCountryToSolved(countryName, patternIndex, {
+                  primary: colors.primary,
+                  glowIntensity: colors.glowIntensity,
+                })
+                .catch(console.error);
+              return;
+            }
+
+            const targetPos = latLonToSphere(center.lon, center.lat, 1.0);
+            const colors = themeColorsRef.current;
+
+            animator.enqueue(
+              new SolveSequenceAnimation({
+                countryName,
+                patternIndex,
+                targetPosition: new Vector3(
+                  targetPos.x,
+                  targetPos.y,
+                  targetPos.z
+                ),
+                camera,
+                controls,
+                globeRenderer,
+                themeColors: {
+                  primary: colors.primary,
+                  glowIntensity: colors.glowIntensity,
+                },
+              })
+            );
+          },
+          focusAndHighlightCountries: (
+            solves: Array<{ countryName: string; patternIndex: number }>
+          ) => {
+            if (solves.length === 0) return;
+
+            // Resolve centers for all solves, separate those without geo data
+            type SolveWithCenter = {
+              countryName: string;
+              patternIndex: number;
+              lat: number;
+              lon: number;
+            };
+            const withCenter: SolveWithCenter[] = [];
+            for (const s of solves) {
+              const center = globeRenderer.getCountryCenter(s.countryName);
+              if (center) {
+                withCenter.push({ ...s, lat: center.lat, lon: center.lon });
+              } else {
+                // No geo data — transition immediately without animation
+                const colors = themeColorsRef.current;
+                globeRenderer
+                  .transitionCountryToSolved(s.countryName, s.patternIndex, {
+                    primary: colors.primary,
+                    glowIntensity: colors.glowIntensity,
+                  })
+                  .catch(console.error);
+              }
+            }
+
+            if (withCenter.length === 0) return;
+
+            // Sort by geographic proximity (greedy nearest-neighbor from camera)
+            // Convert current camera position to lat/lon
+            const camPos = camera.position;
+            const camR = camPos.length();
+            let curLat = 90 - Math.acos(camPos.y / camR) * (180 / Math.PI);
+            let curLon = 90 - Math.atan2(camPos.z, camPos.x) * (180 / Math.PI);
+
+            const remaining = [...withCenter];
+            const sorted: SolveWithCenter[] = [];
+
+            while (remaining.length > 0) {
+              let bestIdx = 0;
+              let bestDist = Infinity;
+              for (let i = 0; i < remaining.length; i++) {
+                const d = greatCircleDistance(
+                  curLon,
+                  curLat,
+                  remaining[i].lon,
+                  remaining[i].lat
+                );
+                if (d < bestDist) {
+                  bestDist = d;
+                  bestIdx = i;
+                }
+              }
+              const chosen = remaining.splice(bestIdx, 1)[0];
+              sorted.push(chosen);
+              curLat = chosen.lat;
+              curLon = chosen.lon;
+            }
+
+            // Enqueue animations in proximity order
+            const colors = themeColorsRef.current;
+            for (const s of sorted) {
+              const targetPos = latLonToSphere(s.lon, s.lat, 1.0);
+              animator.enqueue(
+                new SolveSequenceAnimation({
+                  countryName: s.countryName,
+                  patternIndex: s.patternIndex,
+                  targetPosition: new Vector3(
+                    targetPos.x,
+                    targetPos.y,
+                    targetPos.z
+                  ),
+                  camera,
+                  controls,
+                  globeRenderer,
+                  themeColors: {
+                    primary: colors.primary,
+                    glowIntensity: colors.glowIntensity,
+                  },
+                })
+              );
+            }
           },
         };
         onGlobeReadyRef.current?.(handle);
@@ -223,6 +368,9 @@ function GlobeInternal({
 
           // Update controls
           controls.update();
+
+          // Drive queued animations (camera focus, highlights, etc.)
+          animator.update(deltaTime, currentTime);
 
           // Update material uniforms
           globeRenderer.updateUniforms(camera.position);
@@ -302,7 +450,7 @@ function GlobeInternal({
 
   if (error) {
     return (
-      <div className="fixed top-0 left-0 w-screen h-screen bg-ctf-bg flex flex-col items-center justify-center z-[1000] transition-opacity duration-500">
+      <div className="fixed top-0 left-0 w-screen h-screen bg-ctf-bg flex flex-col items-center justify-center z-1000 transition-opacity duration-500">
         <div
           className="text-xl tracking-[4px] uppercase mb-8 text-red-500"
           style={{

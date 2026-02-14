@@ -42,6 +42,8 @@ export class GlobeRenderer {
   capitalMarkers: Mesh[] = []; // Yellow donut markers for capitals
   private scene: Scene;
   private textureCache: TextureCache;
+  /** Map of country name → capital {lat, lon} for camera focus animations */
+  private countryCenters = new Map<string, { lat: number; lon: number }>();
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -190,6 +192,45 @@ export class GlobeRenderer {
     for (const marker of this.capitalMarkers) {
       this.scene.add(marker);
     }
+
+    // Build country center lookup from capital coordinates
+    for (const country of countries) {
+      if (this.countryCenters.has(country.name)) continue;
+      const props = country.properties;
+      if (
+        props &&
+        typeof props.capitalLat === "number" &&
+        typeof props.capitalLng === "number"
+      ) {
+        this.countryCenters.set(country.name, {
+          lat: props.capitalLat,
+          lon: props.capitalLng,
+        });
+      }
+    }
+
+    // Fallback: for countries without capital data, compute center from solid mesh bounding sphere
+    for (const mesh of this.solidMeshes) {
+      if (this.countryCenters.has(mesh.name)) continue;
+      mesh.geometry.computeBoundingSphere();
+      const center = mesh.geometry.boundingSphere?.center;
+      if (center) {
+        // Convert 3D position back to lat/lon (reverse of latLonToSphere)
+        const r = center.length();
+        if (r > 0.001) {
+          const lat = 90 - Math.acos(center.y / r) * (180 / Math.PI);
+          const lon = 90 - Math.atan2(center.z, center.x) * (180 / Math.PI);
+          this.countryCenters.set(mesh.name, { lat, lon });
+        }
+      }
+    }
+  }
+
+  /**
+   * Look up the center coordinates for a country (capital city or geometry centroid).
+   */
+  getCountryCenter(countryName: string): { lat: number; lon: number } | null {
+    return this.countryCenters.get(countryName) ?? null;
   }
 
   /**

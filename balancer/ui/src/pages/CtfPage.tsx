@@ -171,14 +171,13 @@ export default function CtfPage() {
       preparedData.challengeToCountryMap // Use stable map from initial load
     );
 
-    // Transition each newly solved country
-    for (const solved of newlySolved) {
-      globeHandleRef.current
-        .transitionCountryToSolved(solved.countryName, solved.patternIndex)
-        .catch((error) => {
-          console.error(`Failed to transition ${solved.countryName}:`, error);
-        });
-    }
+    // Animate newly solved countries (sorted by geographic proximity for smooth camera path)
+    globeHandleRef.current.focusAndHighlightCountries(
+      newlySolved.map((s) => ({
+        countryName: s.countryName,
+        patternIndex: s.patternIndex,
+      }))
+    );
 
     // Update the previous challenges ref
     previousChallengesRef.current = challenges;
