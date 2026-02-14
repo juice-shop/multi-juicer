@@ -170,6 +170,8 @@ function GlobeInternal({
         controls.minZoom = 2.5;
         controls.maxZoom = 5;
         controls.enablePan = false;
+        controls.autoRotate = false;
+        controls.autoRotateSpeed = 0.5;
 
         // 5. Create occlusion sphere
         const occlusionSphere = createOcclusionSphere(0.999);
@@ -356,6 +358,15 @@ function GlobeInternal({
         isRunning = true;
         lastFrameTime = performance.now();
 
+        let lastActivityTime = performance.now();
+        const IDLE_TIMEOUT = 10_000;
+
+        // Reset activity timer on user interaction (drag, scroll, touch)
+        controls.addEventListener("start", () => {
+          lastActivityTime = performance.now();
+          controls.autoRotate = false;
+        });
+
         function render(currentTime: number) {
           if (!isRunning) return;
 
@@ -365,6 +376,14 @@ function GlobeInternal({
           // Update stats
           stats.frameTime = deltaTime;
           stats.fps = Math.round(1000 / deltaTime);
+
+          // Auto-rotate after idle timeout
+          if (!animator.isIdle) {
+            lastActivityTime = currentTime;
+            controls.autoRotate = false;
+          } else if (currentTime - lastActivityTime > IDLE_TIMEOUT) {
+            controls.autoRotate = true;
+          }
 
           // Update controls
           controls.update();

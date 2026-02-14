@@ -19,6 +19,11 @@ export class GlobeAnimator {
     this.queue.push(animation);
   }
 
+  /** Whether the animator has no current or queued animations. */
+  get isIdle(): boolean {
+    return this.current === null && this.queue.length === 0;
+  }
+
   /** Called every frame from the render loop. */
   update(deltaTime: number, currentTime: number): void {
     if (!this.current && this.queue.length > 0) {
