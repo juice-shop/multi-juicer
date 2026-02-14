@@ -117,7 +117,7 @@ export function NotificationManager() {
         <p>
           <FormattedMessage
             id="admin.notification.description"
-            defaultMessage="Notifications are shown to all users in the MultiJuicer UI. They can be used to inform users about important updates or issues. Note: they are not displayed in the JuiceShop UI."
+            defaultMessage="Notifications are shown to all users in the MultiJuicer UI. They can be used to inform users about important updates or issues."
           />
         </p>
 
