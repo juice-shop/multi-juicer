@@ -36,6 +36,7 @@ func AddRoutes(
 	router.Handle("GET /balancer/api/teams/status", handleTeamStatus(bundle))
 	router.Handle("GET /balancer/api/teams/{team}/status", handleTeamStatus(bundle))
 	router.Handle("GET /balancer/api/activity-feed", handleActivityFeed(bundle))
+	router.Handle("GET /balancer/api/team-solves", handleTeamSolves(bundle))
 	router.Handle("GET /balancer/api/notifications", handleNotifications(bundle))
 
 	router.Handle("GET /balancer/api/admin/all", requireAdmin(bundle, handleAdminListInstances(bundle)))

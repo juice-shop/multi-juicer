@@ -11,9 +11,14 @@ import {
   getCountriesByChallengeStatus,
   type ChallengeCountryMapping,
 } from "@/lib/challenges/challenge-mapper";
+import {
+  useActivityFeed,
+  isChallengeSolvedEvent,
+} from "@/hooks/useActivityFeed";
 import { CountryGeometryManager } from "@/lib/globe/country-geometry";
 import { loadGeoJSON, type CountryData } from "@/lib/globe/data/geojson-loader";
 import { getPatternIndexForTeam } from "@/lib/patterns/pattern-selector";
+import { getTeamColor } from "@/lib/patterns/team-colors";
 
 // Polling interval for challenge updates (5 seconds)
 const CHALLENGES_POLLING_INTERVAL = 5000;
@@ -43,6 +48,18 @@ function getThemeColors() {
     secondary: hexToRgb(getCSSVariable("--neon-secondary")),
     glowIntensity: parseFloat(getCSSVariable("--glow-intensity") || "1.5"),
   };
+}
+
+interface TeamSolveEntry {
+  challengeKey: string;
+  solvedAt: string;
+}
+
+interface TeamSolvesResponse {
+  teams: Array<{
+    team: string;
+    solves: TeamSolveEntry[];
+  }>;
 }
 
 interface PreparedGlobeData {
@@ -77,6 +94,11 @@ export default function CtfPage() {
   const hasInitializedRef = useRef(false);
   const challengesRef = useRef<Challenge[] | null>(null);
   const challengeMappingsRef = useRef<ChallengeCountryMapping[]>([]);
+  const teamSolvesRef = useRef<TeamSolvesResponse | null>(null);
+  const preparedDataRef = useRef<PreparedGlobeData | null>(null);
+
+  // Activity feed for incremental arc updates
+  const { data: activityEvents } = useActivityFeed();
 
   // Keep challenges ref updated for use in callbacks
   useEffect(() => {
@@ -119,7 +141,66 @@ export default function CtfPage() {
     if (challengesRef.current && !previousChallengesRef.current) {
       previousChallengesRef.current = challengesRef.current;
     }
+
+    // Build initial arcs from backfill data
+    buildInitialArcs(handle);
   }, []);
+
+  function buildInitialArcs(handle: GlobeHandle) {
+    const teamSolves = teamSolvesRef.current;
+    const data = preparedDataRef.current;
+    if (!teamSolves || !data) return;
+
+    const countryCenters = new Map<string, { lat: number; lon: number }>();
+    // We need to resolve challengeKey → country → lat/lon
+    // Country centers are exposed via the handle's underlying renderer,
+    // but we can't access them directly. Instead, iterate the challengeToCountryMap.
+    // We'll build a local map from country name → coords by reading the geo data.
+    for (const country of data.countries) {
+      const props = country.properties;
+      if (
+        props &&
+        typeof props.capitalLat === "number" &&
+        typeof props.capitalLng === "number"
+      ) {
+        countryCenters.set(country.name, {
+          lat: props.capitalLat,
+          lon: props.capitalLng,
+        });
+      }
+    }
+
+    const teamArcData: Array<{
+      teamName: string;
+      solveCoords: Array<{ lat: number; lon: number }>;
+      colorHex: number;
+    }> = [];
+
+    for (const teamEntry of teamSolves.teams) {
+      const coords: Array<{ lat: number; lon: number }> = [];
+      for (const solve of teamEntry.solves) {
+        const countryName = data.challengeToCountryMap.get(solve.challengeKey);
+        if (!countryName) continue;
+        const center = countryCenters.get(countryName);
+        if (!center) continue;
+        coords.push(center);
+      }
+
+      if (coords.length < 2) continue;
+
+      const patternIndex = getPatternIndexForTeam(teamEntry.team);
+      const { hex } = getTeamColor(patternIndex);
+      teamArcData.push({
+        teamName: teamEntry.team,
+        solveCoords: coords,
+        colorHex: hex,
+      });
+    }
+
+    if (teamArcData.length > 0) {
+      handle.buildAllTeamArcs(teamArcData);
+    }
+  }
 
   // Enrich challenges with cached country mappings and current solve data
   // The country assignment is stable (from preparedData), only solve status changes
@@ -182,6 +263,49 @@ export default function CtfPage() {
     // Update the previous challenges ref
     previousChallengesRef.current = challenges;
   }, [challenges, preparedData]); // preparedData is stable after initial load
+
+  // Process activity feed events for incremental arc updates
+  const lastActivityArcRef = useRef<number>(0);
+  useEffect(() => {
+    if (!activityEvents || !globeHandleRef.current || !preparedDataRef.current)
+      return;
+
+    const data = preparedDataRef.current;
+
+    // Build a quick country → coords lookup
+    const countryCenters = new Map<string, { lat: number; lon: number }>();
+    for (const country of data.countries) {
+      const props = country.properties;
+      if (
+        props &&
+        typeof props.capitalLat === "number" &&
+        typeof props.capitalLng === "number"
+      ) {
+        countryCenters.set(country.name, {
+          lat: props.capitalLat,
+          lon: props.capitalLng,
+        });
+      }
+    }
+
+    // Only process events we haven't seen yet
+    const startIdx = lastActivityArcRef.current;
+    for (let i = startIdx; i < activityEvents.length; i++) {
+      const event = activityEvents[i];
+      if (!isChallengeSolvedEvent(event)) continue;
+
+      const countryName = data.challengeToCountryMap.get(event.challengeKey);
+      if (!countryName) continue;
+      const center = countryCenters.get(countryName);
+      if (!center) continue;
+
+      const patternIndex = getPatternIndexForTeam(event.team);
+      const { hex } = getTeamColor(patternIndex);
+      globeHandleRef.current.appendTeamArc(event.team, center, hex);
+    }
+
+    lastActivityArcRef.current = activityEvents.length;
+  }, [activityEvents]);
 
   // Load all data on mount (runs only once)
   useEffect(() => {
@@ -251,6 +375,17 @@ export default function CtfPage() {
           );
         }
 
+        // Step 3b: Fetch team solve histories for arc backfill
+        try {
+          const res = await fetch("/balancer/api/team-solves");
+          if (res.ok) {
+            teamSolvesRef.current = await res.json();
+          }
+        } catch {
+          // Non-critical — arcs just won't appear on initial load
+          console.warn("Failed to fetch team solves for arc backfill");
+        }
+
         // Step 4: Build geometries
         setLoadingMessage("Building globe...");
         setLoadingProgress(70);
@@ -265,12 +400,14 @@ export default function CtfPage() {
         setLoadingMessage("Setting up effects...");
         setLoadingProgress(90);
 
-        setPreparedData({
+        const prepared = {
           countries,
           geometryManager,
           themeColors,
           challengeToCountryMap,
-        });
+        };
+        preparedDataRef.current = prepared;
+        setPreparedData(prepared);
 
         setLoadingProgress(100);
         setIsLoading(false);

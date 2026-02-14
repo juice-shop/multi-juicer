@@ -3,6 +3,7 @@ import { Scene, Color, PerspectiveCamera, WebGLRenderer, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 
+import { ArcFlightAnimation } from "@/lib/globe/animations/arc-flight";
 import { SolveSequenceAnimation } from "@/lib/globe/animations/solve-sequence";
 import type { CountryGeometryManager } from "@/lib/globe/country-geometry";
 import type { CountryData } from "@/lib/globe/data/geojson-loader";
@@ -39,6 +40,20 @@ export interface GlobeHandle {
    */
   focusAndHighlightCountries(
     solves: Array<{ countryName: string; patternIndex: number }>
+  ): void;
+  /** Build all team arcs at once (initial backfill, no animation). */
+  buildAllTeamArcs(
+    teamSolves: Array<{
+      teamName: string;
+      solveCoords: Array<{ lat: number; lon: number }>;
+      colorHex: number;
+    }>
+  ): void;
+  /** Append a single arc for a team with flight animation. */
+  appendTeamArc(
+    teamName: string,
+    coord: { lat: number; lon: number },
+    colorHex: number
   ): void;
 }
 
@@ -337,6 +352,31 @@ function GlobeInternal({
                   },
                 })
               );
+            }
+          },
+          buildAllTeamArcs: (
+            teamSolves: Array<{
+              teamName: string;
+              solveCoords: Array<{ lat: number; lon: number }>;
+              colorHex: number;
+            }>
+          ) => {
+            for (const { teamName, solveCoords, colorHex } of teamSolves) {
+              globeRenderer.addTeamArcs(teamName, solveCoords, colorHex);
+            }
+          },
+          appendTeamArc: (
+            teamName: string,
+            coord: { lat: number; lon: number },
+            colorHex: number
+          ) => {
+            const line = globeRenderer.appendTeamArc(
+              teamName,
+              coord,
+              colorHex
+            );
+            if (line) {
+              animator.enqueueParallel(new ArcFlightAnimation(line));
             }
           },
         };

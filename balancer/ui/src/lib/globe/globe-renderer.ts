@@ -1,5 +1,7 @@
 import {
   Mesh,
+  Line,
+  Group,
   LineBasicMaterial,
   WireframeGeometry,
   LineSegments,
@@ -7,6 +9,8 @@ import {
   Vector3,
   ShaderMaterial,
 } from "three";
+
+import { createArcGeometry } from "./arc-geometry";
 
 import { getPatternPathByIndex } from "../patterns/pattern-selector";
 import { TextureCache } from "../patterns/texture-cache";
@@ -44,6 +48,14 @@ export class GlobeRenderer {
   private textureCache: TextureCache;
   /** Map of country name → capital {lat, lon} for camera focus animations */
   private countryCenters = new Map<string, { lat: number; lon: number }>();
+
+  /** Arc state — managed imperatively, no React involvement */
+  private arcGroups = new Map<string, Group>();
+  private teamLastSolveCoords = new Map<
+    string,
+    { lat: number; lon: number }
+  >();
+  private arcKeys = new Set<string>();
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -287,6 +299,137 @@ export class GlobeRenderer {
         `Failed to transition country "${countryName}" to pattern:`,
         error
       );
+    }
+  }
+
+  /**
+   * Read-only accessor for country center coordinates.
+   */
+  getCountryCenters(): Map<string, { lat: number; lon: number }> {
+    return this.countryCenters;
+  }
+
+  /**
+   * Build all arcs for a team from an ordered list of solve coordinates.
+   * Returns the created Line objects (for optional animation).
+   */
+  addTeamArcs(
+    teamName: string,
+    solveCoords: Array<{ lat: number; lon: number }>,
+    colorHex: number
+  ): Line[] {
+    if (solveCoords.length < 2) {
+      // Need at least 2 points to draw an arc; record last coord for future appends
+      if (solveCoords.length === 1) {
+        this.teamLastSolveCoords.set(teamName, solveCoords[0]);
+      }
+      return [];
+    }
+
+    let group = this.arcGroups.get(teamName);
+    if (!group) {
+      group = new Group();
+      group.name = `arcs_${teamName}`;
+      this.arcGroups.set(teamName, group);
+      this.scene.add(group);
+    }
+
+    const material = new LineBasicMaterial({
+      color: colorHex,
+      transparent: true,
+      opacity: 0.6,
+    });
+
+    const lines: Line[] = [];
+
+    for (let i = 1; i < solveCoords.length; i++) {
+      const from = solveCoords[i - 1];
+      const to = solveCoords[i];
+      const key = `${teamName}:${from.lat},${from.lon}:${to.lat},${to.lon}`;
+
+      if (this.arcKeys.has(key)) continue;
+      this.arcKeys.add(key);
+
+      const geometry = createArcGeometry(from.lat, from.lon, to.lat, to.lon);
+      const line = new Line(geometry, material);
+      group.add(line);
+      lines.push(line);
+    }
+
+    this.teamLastSolveCoords.set(
+      teamName,
+      solveCoords[solveCoords.length - 1]
+    );
+    return lines;
+  }
+
+  /**
+   * Append a single arc from the team's last known solve position to a new coordinate.
+   * Returns the Line for animation, or null if this is the team's first solve or a duplicate.
+   */
+  appendTeamArc(
+    teamName: string,
+    newCoord: { lat: number; lon: number },
+    colorHex: number
+  ): Line | null {
+    const lastCoord = this.teamLastSolveCoords.get(teamName);
+    this.teamLastSolveCoords.set(teamName, newCoord);
+
+    if (!lastCoord) return null;
+
+    const key = `${teamName}:${lastCoord.lat},${lastCoord.lon}:${newCoord.lat},${newCoord.lon}`;
+    if (this.arcKeys.has(key)) return null;
+    this.arcKeys.add(key);
+
+    let group = this.arcGroups.get(teamName);
+    if (!group) {
+      group = new Group();
+      group.name = `arcs_${teamName}`;
+      this.arcGroups.set(teamName, group);
+      this.scene.add(group);
+    }
+
+    const geometry = createArcGeometry(
+      lastCoord.lat,
+      lastCoord.lon,
+      newCoord.lat,
+      newCoord.lon
+    );
+    const material = new LineBasicMaterial({
+      color: colorHex,
+      transparent: true,
+      opacity: 0.6,
+    });
+    const line = new Line(geometry, material);
+    group.add(line);
+    return line;
+  }
+
+  /**
+   * Remove all arcs for a team and dispose resources.
+   */
+  removeTeamArcs(teamName: string): void {
+    const group = this.arcGroups.get(teamName);
+    if (!group) return;
+
+    group.traverse((child) => {
+      if (child instanceof Line) {
+        child.geometry.dispose();
+        if (child.material instanceof LineBasicMaterial) {
+          child.material.dispose();
+        }
+      }
+    });
+
+    this.scene.remove(group);
+    this.arcGroups.delete(teamName);
+    this.teamLastSolveCoords.delete(teamName);
+
+    // Clean up arc keys for this team
+    for (const key of this.arcKeys) {
+      if (key.startsWith(`${teamName}:`)) {
+        this.arcKeys.delete(key);
+      }
     }
   }
 
