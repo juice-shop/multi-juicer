@@ -21,7 +21,11 @@ default values render correctly:
                 "showHints": true
               },
               "ctf": {
-                "showFlagsInNotifications": false
+                "showFlagsInNotifications": false,
+                "systemWideNotifications": {
+                  "pollFrequencySeconds": 15,
+                  "url": "/balancer/api/notifications"
+                }
               },
               "hackingInstructor": {
                 "isEnabled": true
@@ -99,7 +103,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: c30a8676e92ced759c90eaeaf27af870a18b827ebf7b501fff0a4900ec1907f2
+            checksum/config: 1bf3980bedef7ca75868337a2a3245065cdbadc79170cbee686ff86f856c1038
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -418,6 +422,9 @@ default values render correctly:
           showHints: true
         ctf:
           showFlagsInNotifications: false
+          systemWideNotifications:
+            pollFrequencySeconds: 15
+            url: /balancer/api/notifications
         hackingInstructor:
           isEnabled: true
     kind: ConfigMap
@@ -595,7 +602,11 @@ full values render out correctly:
                 "showHints": true
               },
               "ctf": {
-                "showFlagsInNotifications": false
+                "showFlagsInNotifications": false,
+                "systemWideNotifications": {
+                  "pollFrequencySeconds": 15,
+                  "url": "/balancer/api/notifications"
+                }
               },
               "hackingInstructor": {
                 "isEnabled": true
@@ -673,7 +684,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 5a1d84c11064ed8fdf5f72dc3c847a9df8607b223d86afb726ac1d329f68013a
+            checksum/config: 6f776202cca7e33fa80fa35c0b4442f1b5d012fa8a898f5c157f24417fc31199
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -2676,6 +2687,9 @@ full values render out correctly:
           showHints: true
         ctf:
           showFlagsInNotifications: false
+          systemWideNotifications:
+            pollFrequencySeconds: 15
+            url: /balancer/api/notifications
         hackingInstructor:
           isEnabled: true
     kind: ConfigMap
@@ -2872,7 +2886,11 @@ production notes work correctly:
                 "showHints": true
               },
               "ctf": {
-                "showFlagsInNotifications": false
+                "showFlagsInNotifications": false,
+                "systemWideNotifications": {
+                  "pollFrequencySeconds": 15,
+                  "url": "/balancer/api/notifications"
+                }
               },
               "hackingInstructor": {
                 "isEnabled": true
@@ -2950,7 +2968,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 5a1d84c11064ed8fdf5f72dc3c847a9df8607b223d86afb726ac1d329f68013a
+            checksum/config: 6f776202cca7e33fa80fa35c0b4442f1b5d012fa8a898f5c157f24417fc31199
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -3269,6 +3287,9 @@ production notes work correctly:
           showHints: true
         ctf:
           showFlagsInNotifications: false
+          systemWideNotifications:
+            pollFrequencySeconds: 15
+            url: /balancer/api/notifications
         hackingInstructor:
           isEnabled: true
     kind: ConfigMap
