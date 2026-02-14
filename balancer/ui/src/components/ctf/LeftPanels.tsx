@@ -1,5 +1,7 @@
+import { useNotifications } from "@/hooks/useNotifications";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
+import { CtfNotificationBanner } from "./CtfNotificationBanner";
 import { InfoPanel } from "./InfoPanel";
 import { LiveActivityPanel } from "./LiveActivityPanel";
 import { TeamsPanel } from "./TeamsPanel";
@@ -19,18 +21,25 @@ export function LeftPanels({
   onActivityToggle,
   challengeMappings,
 }: LeftPanelsProps) {
+  const { data: notification } = useNotifications();
+  const hasNotification =
+    notification && notification.enabled && notification.message;
+
   // Determine grid template rows based on which panels are open
-  let gridTemplateRows = "auto auto auto"; // all-collapsed
+  // When notification is present, add an extra "auto" row after the first
+  const notifRow = hasNotification ? " auto" : "";
+
+  let gridTemplateRows = `auto${notifRow} auto auto`; // all-collapsed
   let alignContent = "start";
 
   if (teamsOpen && activityOpen) {
-    gridTemplateRows = "auto 1fr 1fr"; // both-open
+    gridTemplateRows = `auto${notifRow} 1fr 1fr`; // both-open
     alignContent = "stretch";
   } else if (teamsOpen) {
-    gridTemplateRows = "auto 1fr auto"; // teams-open
+    gridTemplateRows = `auto${notifRow} 1fr auto`; // teams-open
     alignContent = "stretch";
   } else if (activityOpen) {
-    gridTemplateRows = "auto auto 1fr"; // activity-open
+    gridTemplateRows = `auto${notifRow} auto 1fr`; // activity-open
     alignContent = "stretch";
   }
 
@@ -40,6 +49,7 @@ export function LeftPanels({
       style={{ gridTemplateRows, alignContent }}
     >
       <InfoPanel />
+      {hasNotification && <CtfNotificationBanner notification={notification} />}
       <TeamsPanel isOpen={teamsOpen} onToggle={onTeamsToggle} />
       <LiveActivityPanel
         isOpen={activityOpen}
