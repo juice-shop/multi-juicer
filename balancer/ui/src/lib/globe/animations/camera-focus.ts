@@ -51,7 +51,7 @@ export class CameraFocusAnimation implements Animation {
     controls.enableRotate = false;
   }
 
-  update(elapsed: number): boolean {
+  update(elapsed: number, _deltaTime: number): boolean {
     const t = Math.min(elapsed / this.duration, 1);
     const eased = easeInOutCubic(t);
 

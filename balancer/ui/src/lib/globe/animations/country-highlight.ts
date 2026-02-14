@@ -33,7 +33,7 @@ export class CountryHighlightAnimation implements Animation {
     this.totalDuration = rampUpMs + holdMs + fadeOutMs;
   }
 
-  update(elapsed: number): boolean {
+  update(elapsed: number, _deltaTime: number): boolean {
     let intensity: number;
 
     if (elapsed < this.rampUpDuration) {
