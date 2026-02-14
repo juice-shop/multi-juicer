@@ -102,7 +102,7 @@ export default {
     "Accesul la clipboard nu este disponibil. Te rugăm să copiezi conținutul manual.",
   "admin.notification.title": "Postează notificări pentru toți utilizatorii",
   "admin.notification.description":
-    "Notificările sunt afișate tuturor utilizatorilor în interfața MultiJuicer. Pot fi folosite pentru a informa utilizatorii despre actualizări sau probleme importante. Notă: nu sunt afișate în interfața JuiceShop.",
+    "Notificările sunt afișate tuturor utilizatorilor în interfața MultiJuicer. Pot fi folosite pentru a informa utilizatorii despre actualizări sau probleme importante.",
   "admin.notification.placeholder": "Introdu mesajul notificării...",
   "admin.notification.characters_remaining": "{count} caractere rămase",
   "admin.notification.markdown_supported": "Markdown de bază acceptat",

@@ -104,7 +104,7 @@ export default {
     "Zugriff auf die Zwischenablage ist nicht verfügbar. Bitte kopiere den Inhalt manuell.",
   "admin.notification.title": "Benachrichtigungen an alle Benutzer senden",
   "admin.notification.description":
-    "Benachrichtigungen werden allen Benutzern in der MultiJuicer-Oberfläche angezeigt. Sie können verwendet werden, um Benutzer über wichtige Updates oder Probleme zu informieren. Hinweis: Sie werden nicht in der JuiceShop-Oberfläche angezeigt.",
+    "Benachrichtigungen werden allen Benutzern in der MultiJuicer-Oberfläche angezeigt. Sie können verwendet werden, um Benutzer über wichtige Updates oder Probleme zu informieren.",
   "admin.notification.placeholder": "Benachrichtigung eingeben...",
   "admin.notification.characters_remaining": "{count} Zeichen übrig",
   "admin.notification.markdown_supported": "Einfaches Markdown unterstützt",

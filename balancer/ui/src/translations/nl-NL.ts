@@ -102,7 +102,7 @@ export default {
     "Toegang tot klembord is niet beschikbaar. Kopieer de inhoud handmatig.",
   "admin.notification.title": "Meldingen plaatsen voor alle gebruikers",
   "admin.notification.description":
-    "Meldingen worden aan alle gebruikers in de MultiJuicer-interface getoond. Ze kunnen worden gebruikt om gebruikers te informeren over belangrijke updates of problemen. Let op: ze worden niet weergegeven in de JuiceShop-interface.",
+    "Meldingen worden aan alle gebruikers in de MultiJuicer-interface getoond. Ze kunnen worden gebruikt om gebruikers te informeren over belangrijke updates of problemen.",
   "admin.notification.placeholder": "Voer melding in...",
   "admin.notification.characters_remaining": "{count} tekens over",
   "admin.notification.markdown_supported": "Basis markdown ondersteund",
