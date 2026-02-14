@@ -45,7 +45,7 @@ export function LeftPanels({
 
   return (
     <div
-      className="absolute top-5 left-5 bottom-5 w-[350px] grid gap-2.5 z-100 max-[1024px]:w-[280px] max-[768px]:hidden"
+      className="absolute top-5 left-5 bottom-5 w-87.5 grid gap-2.5 z-100 max-[1024px]:w-70 max-[768px]:hidden"
       style={{ gridTemplateRows, alignContent }}
     >
       <InfoPanel />
