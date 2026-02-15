@@ -37,20 +37,11 @@ export function createNeonWireframeMaterial(
       uniform vec3 u_cameraPosition;
 
       void main() {
-        // Calculate distance from camera for depth-based effects
-        float dist = length(v_viewPosition);
-
-        // Depth-based fade (closer = brighter)
-        float depthFade = smoothstep(6.0, 2.0, dist);
-
         // Base neon color with intensity boost
         vec3 color = u_neonColor * u_glowIntensity;
 
-        // Final color with depth fade
-        vec3 finalColor = color * depthFade;
-
         // Output with alpha for blending
-        gl_FragColor = vec4(finalColor, depthFade * 0.9);
+        gl_FragColor = vec4(color, 0.9);
       }
     `,
 

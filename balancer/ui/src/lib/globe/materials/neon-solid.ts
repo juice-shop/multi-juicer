@@ -39,12 +39,6 @@ export function createNeonSolidMaterial(
       uniform float u_hoverIntensity;
 
       void main() {
-        // Calculate distance from camera for depth-based effects
-        float dist = length(v_viewPosition);
-
-        // Depth-based fade (closer = brighter)
-        float depthFade = smoothstep(6.0, 2.0, dist);
-
         // Base neon color with intensity
         vec3 normalColor = u_neonColor * u_glowIntensity * 0.5;
 
@@ -54,14 +48,11 @@ export function createNeonSolidMaterial(
         // Blend between normal and hover color
         vec3 color = mix(normalColor, hoverColor, u_hoverIntensity);
 
-        // Final color with depth fade
-        vec3 finalColor = color * depthFade;
-
         // Blend opacity (0.15 normal -> 0.6 hovered)
         float finalOpacity = mix(u_opacity, 0.6, u_hoverIntensity);
 
         // Output with alpha for background effect
-        gl_FragColor = vec4(finalColor, depthFade * finalOpacity);
+        gl_FragColor = vec4(color, finalOpacity);
       }
     `,
 

@@ -91,9 +91,6 @@ export function createNeonPatternMaterial(
           }
         }
 
-        // Calculate distance from camera for depth-based effects
-        float dist = length(v_viewPosition);
-        float depthFade = smoothstep(6.0, 2.0, dist);
 
         // Apply rotation matrix to UV coordinates (45-degree rotation)
         vec2 centeredUV = (v_uv - 0.5) * u_patternScale;
@@ -133,15 +130,12 @@ export function createNeonPatternMaterial(
           color += ringGlow;
         }
 
-        // Final color with depth fade
-        vec3 finalColor = color * depthFade;
-
         // Blend opacity (highlight forces full opacity)
         float baseOpacity = mix(0.9, 1.0, u_hoverIntensity);
         float finalOpacity = mix(baseOpacity, 1.0, u_highlightIntensity);
 
         // Output with alpha for blending
-        gl_FragColor = vec4(finalColor, depthFade * finalOpacity);
+        gl_FragColor = vec4(color, finalOpacity);
       }
     `,
 
