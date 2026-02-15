@@ -360,6 +360,7 @@ function GlobeInternal({
 
         let lastActivityTime = performance.now();
         const IDLE_TIMEOUT = 10_000;
+        const DEFAULT_CAMERA_DISTANCE = 3;
 
         // Reset activity timer on user interaction (drag, scroll, touch)
         controls.addEventListener("start", () => {
@@ -400,6 +401,20 @@ function GlobeInternal({
             } else {
               controls.minPolarAngle = EQUATOR_ANGLE;
               controls.maxPolarAngle = EQUATOR_ANGLE;
+            }
+
+            // Slowly drift the camera distance back to the default
+            const currentDistance = camera.position.length();
+            const distDiff = DEFAULT_CAMERA_DISTANCE - currentDistance;
+            if (Math.abs(distDiff) > 0.01) {
+              const DISTANCE_DRIFT_SPEED = 0.003;
+              const distStep = distDiff * DISTANCE_DRIFT_SPEED;
+              const newDistance = currentDistance + distStep;
+              camera.position.normalize().multiplyScalar(newDistance);
+            } else if (Math.abs(distDiff) > 0.001) {
+              camera.position
+                .normalize()
+                .multiplyScalar(DEFAULT_CAMERA_DISTANCE);
             }
           } else {
             // Free look — allow full polar range

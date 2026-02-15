@@ -18,6 +18,8 @@ export class CameraFocusAnimation implements Animation {
   private readonly duration: number;
   private readonly startPos: Vector3;
   private readonly targetPos: Vector3;
+  private readonly startRadius: number;
+  private readonly targetRadius: number;
   private readonly controls: OrbitControls;
   private readonly camera: PerspectiveCamera;
   private wasRotateEnabled: boolean;
@@ -27,24 +29,27 @@ export class CameraFocusAnimation implements Animation {
    * @param controls - OrbitControls instance (rotation disabled during animation)
    * @param targetPosition - 3D position on the sphere surface to face
    * @param duration - Animation duration in milliseconds (default 1500)
+   * @param targetRadius - Target camera distance from origin (default: zoom in to minDistance)
    */
   constructor(
     camera: PerspectiveCamera,
     controls: OrbitControls,
     targetPosition: Vector3,
-    duration = 1500
+    duration = 1500,
+    targetRadius?: number
   ) {
     this.camera = camera;
     this.controls = controls;
     this.duration = duration;
     this.startPos = camera.position.clone();
+    this.startRadius = camera.position.length();
+    this.targetRadius = targetRadius ?? controls.minDistance;
 
-    // Compute the target camera position: same distance from origin, but facing the target
-    const currentRadius = camera.position.length();
+    // Compute the target camera position direction (unit vector toward target)
     this.targetPos = targetPosition
       .clone()
       .normalize()
-      .multiplyScalar(currentRadius);
+      .multiplyScalar(this.startRadius);
 
     // Disable user rotation during animation
     this.wasRotateEnabled = controls.enableRotate;
@@ -59,8 +64,10 @@ export class CameraFocusAnimation implements Animation {
     const current = new Vector3()
       .copy(this.startPos)
       .lerp(this.targetPos, eased);
-    // Re-normalize to exact radius to avoid drift from linear lerp
-    const radius = this.startPos.length();
+
+    // Interpolate radius between start and target distance
+    const radius =
+      this.startRadius + (this.targetRadius - this.startRadius) * eased;
     current.normalize().multiplyScalar(radius);
 
     this.camera.position.copy(current);
