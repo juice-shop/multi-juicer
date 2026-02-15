@@ -57,8 +57,18 @@ export function createNeonStripedMaterial(
         float radius = length(v_worldPosition);
 
         // Calculate latitude and longitude
-        float lat = asin(v_worldPosition.z / radius);
-        float lon = atan(v_worldPosition.y, v_worldPosition.x);
+        // Tilt the coordinate frame ~15° around X-axis so stripes
+        // don't align rigidly with geographic poles
+        float tiltAngle = 0.26; // ~15 degrees
+        float ct = cos(tiltAngle);
+        float st = sin(tiltAngle);
+        vec3 tilted = vec3(
+          v_worldPosition.x,
+          v_worldPosition.y * ct - v_worldPosition.z * st,
+          v_worldPosition.y * st + v_worldPosition.z * ct
+        );
+        float lat = asin(tilted.y / radius);
+        float lon = atan(tilted.z, tilted.x);
 
         // Create diagonal stripes by combining lat + lon
         float stripeFrequency = 24.0; // Adjust for stripe density

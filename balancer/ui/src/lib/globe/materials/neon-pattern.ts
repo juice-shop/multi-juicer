@@ -20,25 +20,39 @@ export function createNeonPatternMaterial(
       u_patternTexture: { value: patternTexture },
       u_patternRotation: { value: Math.PI / 4 }, // 45 degrees
       u_patternScale: { value: 64.0 }, // Adjust for desired repetition (higher = more repetition)
+      u_revealCenter: { value: new Vector3(0, 1, 0) },
+      u_revealRadius: { value: 999.0 }, // Default: fully revealed
     },
 
     vertexShader: `
       varying vec3 v_viewPosition;
       varying vec2 v_uv;
+      varying vec3 v_worldPosition;
 
       void main() {
         // Transform to world space
         vec4 worldPosition = modelMatrix * vec4(position, 1.0);
         vec3 worldPos = worldPosition.xyz;
+        v_worldPosition = worldPos;
 
         // Transform to view space
         vec4 viewPosition = viewMatrix * worldPosition;
         v_viewPosition = viewPosition.xyz;
 
         // Calculate UV from spherical coordinates
-        float radius = length(worldPos);
-        float lat = asin(worldPos.z / radius);
-        float lon = atan(worldPos.y, worldPos.x);
+        // Tilt the coordinate frame ~15° around X-axis so patterns
+        // don't align rigidly with geographic poles
+        float tiltAngle = 0.26; // ~15 degrees
+        float ct = cos(tiltAngle);
+        float st = sin(tiltAngle);
+        vec3 tilted = vec3(
+          worldPos.x,
+          worldPos.y * ct - worldPos.z * st,
+          worldPos.y * st + worldPos.z * ct
+        );
+        float radius = length(tilted);
+        float lat = asin(tilted.y / radius);
+        float lon = atan(tilted.z, tilted.x);
 
         // Normalize to 0-1 range
         v_uv = vec2(
@@ -56,6 +70,7 @@ export function createNeonPatternMaterial(
 
       varying vec3 v_viewPosition;
       varying vec2 v_uv;
+      varying vec3 v_worldPosition;
 
       uniform vec3 u_neonColor;
       uniform float u_glowIntensity;
@@ -64,8 +79,18 @@ export function createNeonPatternMaterial(
       uniform sampler2D u_patternTexture;
       uniform float u_patternRotation;
       uniform float u_patternScale;
+      uniform vec3 u_revealCenter;
+      uniform float u_revealRadius;
 
       void main() {
+        // Reveal ring check — skip entirely when fully revealed (radius > PI)
+        if (u_revealRadius < 3.14159) {
+          float angularDist = acos(clamp(dot(normalize(v_worldPosition), normalize(u_revealCenter)), -1.0, 1.0));
+          if (angularDist > u_revealRadius) {
+            discard;
+          }
+        }
+
         // Calculate distance from camera for depth-based effects
         float dist = length(v_viewPosition);
         float depthFade = smoothstep(6.0, 2.0, dist);
@@ -98,6 +123,15 @@ export function createNeonPatternMaterial(
         // Highlight effect - bright warm accent blend
         vec3 highlightColor = vec3(1.0, 0.4, 0.0) * u_glowIntensity * 2.5;
         vec3 color = mix(baseColor, highlightColor, u_highlightIntensity);
+
+        // Ring edge glow — bright leading edge when reveal is active
+        if (u_revealRadius < 3.14159) {
+          float angularDist = acos(clamp(dot(normalize(v_worldPosition), normalize(u_revealCenter)), -1.0, 1.0));
+          float edgeBand = 0.04; // Width of the glow band in radians
+          float edgeProximity = smoothstep(u_revealRadius, u_revealRadius - edgeBand, angularDist);
+          vec3 ringGlow = vec3(1.0, 0.8, 0.3) * edgeProximity * 3.0;
+          color += ringGlow;
+        }
 
         // Final color with depth fade
         vec3 finalColor = color * depthFade;

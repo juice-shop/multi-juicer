@@ -241,7 +241,8 @@ export class GlobeRenderer {
   async transitionCountryToSolved(
     countryName: string,
     patternIndex: number,
-    themeColors: { primary: number[]; glowIntensity: number }
+    themeColors: { primary: number[]; glowIntensity: number },
+    animated = false
   ): Promise<void> {
     // Find ALL solid meshes for this country (handles multi-polygon countries like Japan)
     const solidMeshesToTransition = this.solidMeshes.filter(
@@ -267,6 +268,11 @@ export class GlobeRenderer {
         themeColors.glowIntensity,
         texture
       );
+
+      // For animated reveals, start fully hidden (the PatternRevealAnimation will drive the radius)
+      if (animated) {
+        patternMaterial.uniforms.u_revealRadius.value = 0.0;
+      }
 
       // Transition each part (island) of the country
       for (const solidMesh of solidMeshesToTransition) {

@@ -234,15 +234,18 @@ function GlobeInternal({
             const targetPos = latLonToSphere(center.lon, center.lat, 1.0);
             const colors = themeColorsRef.current;
 
+            const capitalWorld = new Vector3(
+              targetPos.x,
+              targetPos.y,
+              targetPos.z
+            );
+
             animator.enqueue(
               new SolveSequenceAnimation({
                 countryName,
                 patternIndex,
-                targetPosition: new Vector3(
-                  targetPos.x,
-                  targetPos.y,
-                  targetPos.z
-                ),
+                targetPosition: capitalWorld,
+                capitalWorldPos: capitalWorld,
                 camera,
                 controls,
                 globeRenderer,
@@ -319,15 +322,17 @@ function GlobeInternal({
             const colors = themeColorsRef.current;
             for (const s of sorted) {
               const targetPos = latLonToSphere(s.lon, s.lat, 1.0);
+              const capitalWorld = new Vector3(
+                targetPos.x,
+                targetPos.y,
+                targetPos.z
+              );
               animator.enqueue(
                 new SolveSequenceAnimation({
                   countryName: s.countryName,
                   patternIndex: s.patternIndex,
-                  targetPosition: new Vector3(
-                    targetPos.x,
-                    targetPos.y,
-                    targetPos.z
-                  ),
+                  targetPosition: capitalWorld,
+                  capitalWorldPos: capitalWorld,
                   camera,
                   controls,
                   globeRenderer,
@@ -384,6 +389,9 @@ function GlobeInternal({
           if (!animator.isIdle) {
             lastActivityTime = currentTime;
             controls.autoRotate = false;
+            // Unlock polar angle so camera can reach any latitude
+            controls.minPolarAngle = 0;
+            controls.maxPolarAngle = Math.PI;
           } else if (currentTime - lastActivityTime > IDLE_TIMEOUT) {
             controls.autoRotate = true;
 
