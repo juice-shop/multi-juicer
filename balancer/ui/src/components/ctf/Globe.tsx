@@ -166,9 +166,9 @@ function GlobeInternal({
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.minDistance = 2.5;
-        controls.maxDistance = 5;
+        controls.maxDistance = 6;
         controls.minZoom = 2.5;
-        controls.maxZoom = 5;
+        controls.maxZoom = 6;
         controls.enablePan = false;
         controls.autoRotate = false;
         controls.autoRotateSpeed = 0.5;
