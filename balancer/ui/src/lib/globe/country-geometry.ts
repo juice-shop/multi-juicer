@@ -13,7 +13,6 @@ interface GeometryWithName {
  */
 export class CountryGeometryManager {
   wireframeGeometries: GeometryWithName[] = [];
-  stripedGeometries: GeometryWithName[] = [];
   patternGeometries: GeometryWithName[] = [];
   solidGeometries: GeometryWithName[] = [];
   highlightedCountries: Set<string> = new Set();

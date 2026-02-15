@@ -16,7 +16,6 @@ export class MouseInteraction {
   private camera: Camera;
   private renderer: WebGLRenderer;
   private solidMeshes: Mesh[];
-  private stripedMeshes: Mesh[];
   private patternMeshes: Mesh[];
   private raycaster: Raycaster;
   private mouse: Vector2;
@@ -31,7 +30,7 @@ export class MouseInteraction {
     camera: Camera,
     _scene: Scene,
     renderer: WebGLRenderer,
-    meshArrays: { solid: Mesh[]; striped: Mesh[]; pattern: Mesh[] },
+    meshArrays: { solid: Mesh[]; pattern: Mesh[] },
     onCountryHover?: (countryName: string | null) => void,
     onCountryClick?: (countryName: string) => void
   ) {
@@ -42,7 +41,6 @@ export class MouseInteraction {
 
     // Arrays of meshes to raycast against
     this.solidMeshes = meshArrays.solid;
-    this.stripedMeshes = meshArrays.striped;
     this.patternMeshes = meshArrays.pattern;
 
     // Raycaster setup
@@ -78,10 +76,9 @@ export class MouseInteraction {
     // Update raycaster
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
-    // Check intersections with ALL fillable meshes (solid + striped + pattern)
+    // Check intersections with ALL fillable meshes (solid + pattern)
     const allMeshes = [
       ...this.solidMeshes,
-      ...this.stripedMeshes,
       ...this.patternMeshes,
     ];
     const intersects = this.raycaster.intersectObjects(allMeshes, false);
@@ -117,16 +114,10 @@ export class MouseInteraction {
   private setHover(countryName: string): void {
     this.currentHoveredCountry = countryName;
 
-    // Find ALL meshes for this country (solid + striped + pattern if applicable)
+    // Find ALL meshes for this country (solid + pattern)
     const meshesToHighlight: Mesh[] = [];
 
     for (const mesh of this.solidMeshes) {
-      if (mesh.userData.countryName === countryName) {
-        meshesToHighlight.push(mesh);
-      }
-    }
-
-    for (const mesh of this.stripedMeshes) {
       if (mesh.userData.countryName === countryName) {
         meshesToHighlight.push(mesh);
       }
@@ -204,10 +195,9 @@ export class MouseInteraction {
     // Update raycaster
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
-    // Check intersections with ALL fillable meshes (solid + striped + pattern)
+    // Check intersections with ALL fillable meshes (solid + pattern)
     const allMeshes = [
       ...this.solidMeshes,
-      ...this.stripedMeshes,
       ...this.patternMeshes,
     ];
     const intersects = this.raycaster.intersectObjects(allMeshes, false);

@@ -16,7 +16,6 @@ import type { CountryGeometryManager } from "./country-geometry";
 import type { CountryData } from "./data/geojson-loader";
 import { createNeonPatternMaterial } from "./materials/neon-pattern";
 import { createNeonSolidMaterial } from "./materials/neon-solid";
-import { createNeonStripedMaterial } from "./materials/neon-striped";
 import { createNeonWireframeMaterial } from "./materials/neon-wireframe";
 
 // DEBUG: Toggle triangle wireframe visualization
@@ -30,12 +29,11 @@ interface ThemeColors {
 }
 
 /**
- * Manages globe rendering objects (wireframe lines, striped meshes, solid meshes, and capital markers)
+ * Manages globe rendering objects (wireframe lines, solid meshes, pattern meshes, and capital markers)
  * Adds all country geometries to the scene with appropriate materials
  */
 export class GlobeRenderer {
   wireframeLines: LineSegments[] = []; // Country border lines as individual segments
-  stripedMeshes: Mesh[] = [];
   patternMeshes: Mesh[] = [];
   solidMeshes: Mesh[] = [];
   triangleWireframes: LineSegments[] = []; // For visualizing triangle edges
@@ -76,38 +74,6 @@ export class GlobeRenderer {
       line.name = name;
       this.wireframeLines.push(line);
       this.scene.add(line);
-    }
-
-    // Create striped meshes for specific countries
-    for (const { geometry, name } of geometryManager.stripedGeometries) {
-      // Create per-country material for individual hover control
-      const stripedMaterial = createNeonStripedMaterial(
-        themeColors.primary,
-        themeColors.glowIntensity
-      );
-
-      const mesh = new Mesh(geometry, stripedMaterial);
-      mesh.name = name;
-      mesh.userData.countryName = name; // For raycasting identification
-      this.stripedMeshes.push(mesh);
-      this.scene.add(mesh);
-
-      // DEBUG: Add wireframe overlay to visualize triangle edges
-      if (SHOW_TRIANGLE_WIREFRAMES) {
-        const wireframeMat = new LineBasicMaterial({
-          color: 0xff00ff, // Magenta for triangle edges
-          linewidth: 1,
-          opacity: 0.8,
-          transparent: true,
-        });
-        // With uniform subdivision, WireframeGeometry works perfectly
-        // because all neighboring triangles subdivide shared edges identically
-        const wireframeGeo = new WireframeGeometry(geometry);
-        const wireframeMesh = new LineSegments(wireframeGeo, wireframeMat);
-        wireframeMesh.name = `${name}_wireframe`;
-        this.triangleWireframes.push(wireframeMesh);
-        this.scene.add(wireframeMesh);
-      }
     }
 
     // Create pattern meshes for solved challenges
@@ -304,14 +270,6 @@ export class GlobeRenderer {
     // Update wireframe materials
     for (const line of this.wireframeLines) {
       const material = line.material as ShaderMaterial;
-      if (material.uniforms?.u_cameraPosition) {
-        material.uniforms.u_cameraPosition.value.copy(cameraPosition);
-      }
-    }
-
-    // Update striped materials
-    for (const mesh of this.stripedMeshes) {
-      const material = mesh.material as ShaderMaterial;
       if (material.uniforms?.u_cameraPosition) {
         material.uniforms.u_cameraPosition.value.copy(cameraPosition);
       }

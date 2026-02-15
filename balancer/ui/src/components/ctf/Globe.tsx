@@ -191,7 +191,6 @@ function GlobeInternal({
           renderer,
           {
             solid: globeRenderer.solidMeshes,
-            striped: globeRenderer.stripedMeshes,
             pattern: globeRenderer.patternMeshes,
           },
           (countryName) => onCountryHoverRef.current?.(countryName),
