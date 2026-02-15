@@ -23,10 +23,7 @@ const RADIUS_PADDING = 0.04; // extra radians beyond the farthest vertex
  * Compute the maximum angular distance (in radians) from a center point
  * to any vertex in a set of mesh geometries.
  */
-function computeAngularExtent(
-  meshes: Mesh[],
-  center: Vector3
-): number {
+function computeAngularExtent(meshes: Mesh[], center: Vector3): number {
   const normalizedCenter = center.clone().normalize();
   const vertex = new Vector3();
   let maxAngle = 0;
@@ -35,11 +32,7 @@ function computeAngularExtent(
     const posAttr = (mesh.geometry as BufferGeometry).getAttribute("position");
     if (!posAttr) continue;
     for (let i = 0; i < posAttr.count; i++) {
-      vertex.set(
-        posAttr.getX(i),
-        posAttr.getY(i),
-        posAttr.getZ(i)
-      );
+      vertex.set(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
       vertex.normalize();
       const angle = Math.acos(
         Math.min(1, Math.max(-1, vertex.dot(normalizedCenter)))
