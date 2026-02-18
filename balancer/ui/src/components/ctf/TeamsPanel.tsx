@@ -14,7 +14,7 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
       className={`bg-ctf-bg-panel border-2 border-ctf-primary backdrop-blur-[5px] flex flex-col transition-all duration-300 overflow-hidden shadow-[0_0_5px_rgba(255,107,107,0.3),inset_0_0_5px_rgba(255,107,107,0.05)] ${isOpen ? "min-h-0" : ""}`}
     >
       <div
-        className="p-[15px_20px] text-base font-bold uppercase tracking-[2px] cursor-pointer select-none text-ctf-primary border-b border-ctf-border flex-shrink-0 hover:text-ctf-accent"
+        className="p-[15px_20px] text-base font-bold uppercase tracking-[2px] cursor-pointer select-none text-ctf-primary border-b border-ctf-border shrink-0 hover:text-ctf-accent"
         style={{
           textShadow: "0 0 3px rgba(255, 107, 107, 0.5)",
         }}
@@ -47,7 +47,7 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
                 return (
                   <div
                     key={index}
-                    className="flex bg-ctf-bg-item border border-ctf-border transition-all duration-300 hover:border-ctf-border-hover hover:bg-ctf-bg-item-hover overflow-hidden min-h-[60px]"
+                    className="flex bg-ctf-bg-item border border-ctf-border transition-all duration-300 hover:border-ctf-border-hover hover:bg-ctf-bg-item-hover overflow-hidden min-h-15"
                   >
                     {/* Content section - left 67% */}
                     <div className="flex-1 p-2.5 flex flex-col justify-center">
@@ -61,7 +61,7 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
                     </div>
 
                     {/* Pattern section - right 33% */}
-                    <div className="w-1/3 flex-shrink-0 relative overflow-hidden bg-black/20">
+                    <div className="w-1/3 shrink-0 relative overflow-hidden bg-black/20">
                       {/* Rotated pattern background */}
                       <div
                         className="absolute inset-0"
@@ -70,7 +70,7 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
                           backgroundSize: "30px 30px",
                           backgroundRepeat: "repeat",
                           backgroundPosition: "center",
-                          transform: "rotate(45deg) scale(1.8)",
+                          transform: "scale(1.4)",
                           transformOrigin: "center",
                           imageRendering: "crisp-edges",
                         }}
