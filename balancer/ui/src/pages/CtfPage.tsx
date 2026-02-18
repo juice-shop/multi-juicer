@@ -17,7 +17,7 @@ import {
 } from "@/lib/challenges/challenge-mapper";
 import { CountryGeometryManager } from "@/lib/globe/country-geometry";
 import { loadGeoJSON, type CountryData } from "@/lib/globe/data/geojson-loader";
-import { getPatternIndexForTeam } from "@/lib/patterns/pattern-selector";
+import { getPatternPathForTeam } from "@/lib/patterns/pattern-selector";
 
 // CSS Color Utilities
 function getCSSVariable(name: string): string {
@@ -165,15 +165,15 @@ export default function CtfPage() {
       const countryName =
         preparedData.challengeToCountryMap.get(challenge.key) ?? null;
       const firstSolver = challenge.firstSolver || null;
-      const patternIndex = firstSolver
-        ? getPatternIndexForTeam(firstSolver)
+      const patternPath = firstSolver
+        ? getPatternPathForTeam(firstSolver)
         : undefined;
 
       return {
         challenge,
         countryName,
         firstSolver,
-        patternIndex,
+        patternPath,
       };
     });
 
@@ -207,7 +207,7 @@ export default function CtfPage() {
     globeHandleRef.current.focusAndHighlightCountries(
       newlySolved.map((s) => ({
         countryName: s.countryName,
-        patternIndex: s.patternIndex,
+        patternPath: s.patternPath,
       }))
     );
 
@@ -256,7 +256,7 @@ export default function CtfPage() {
         setLoadingProgress(60);
         let solved = new Set<string>();
         let countriesWithChallenges = new Set<string>();
-        let solvedWithPatterns = new Map<string, number>();
+        let solvedWithPatterns = new Map<string, string>();
         const challengeToCountryMap = new Map<string, string>();
 
         if (challenges.length > 0) {

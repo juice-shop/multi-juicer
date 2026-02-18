@@ -34,6 +34,9 @@ export function getPatternPathByIndex(index: number): string {
  * Get pattern file path for a team name
  */
 export function getPatternPathForTeam(teamName: string): string {
+  if (teamName === "owasp") {
+    return "/balancer/patterns/special_owasp.png";
+  }
   const index = getPatternIndexForTeam(teamName);
   return getPatternPathByIndex(index);
 }

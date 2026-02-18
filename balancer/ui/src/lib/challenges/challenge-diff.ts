@@ -1,10 +1,10 @@
 import type { Challenge } from "@/hooks/useChallenges";
 
-import { getPatternIndexForTeam } from "../patterns/pattern-selector";
+import { getPatternPathForTeam } from "../patterns/pattern-selector";
 
 export interface NewlySolvedChallenge {
   countryName: string;
-  patternIndex: number;
+  patternPath: string;
   challengeKey: string;
   firstSolver: string;
 }
@@ -48,10 +48,10 @@ export function findNewlySolvedChallenges(
     const isNowSolved = challenge.solveCount > 0;
 
     if (wasUnsolved && isNowSolved && challenge.firstSolver) {
-      const patternIndex = getPatternIndexForTeam(challenge.firstSolver);
+      const patternPath = getPatternPathForTeam(challenge.firstSolver);
       newlySolved.push({
         countryName,
-        patternIndex,
+        patternPath,
         challengeKey: challenge.key,
         firstSolver: challenge.firstSolver,
       });

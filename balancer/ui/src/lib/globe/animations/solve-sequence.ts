@@ -25,7 +25,7 @@ const HIGHLIGHT_START = 1500;
 
 interface SolveSequenceParams {
   countryName: string;
-  patternIndex: number;
+  patternPath: string;
   targetPosition: Vector3;
   capitalWorldPos: Vector3;
   camera: PerspectiveCamera;
@@ -77,7 +77,7 @@ export class SolveSequenceAnimation implements Animation {
       this.params.globeRenderer
         .transitionCountryToSolved(
           this.params.countryName,
-          this.params.patternIndex,
+          this.params.patternPath,
           this.params.themeColors,
           true // animated reveal — starts with u_revealRadius = 0
         )

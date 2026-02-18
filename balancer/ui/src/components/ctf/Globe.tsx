@@ -28,17 +28,17 @@ export interface GlobeHandle {
   /** Transition a country from solid fill to pattern fill */
   transitionCountryToSolved(
     countryName: string,
-    patternIndex: number
+    patternPath: string
   ): Promise<void>;
   /** Rotate camera to the country, transition material, and pulse a highlight glow */
-  focusAndHighlightCountry(countryName: string, patternIndex: number): void;
+  focusAndHighlightCountry(countryName: string, patternPath: string): void;
   /**
    * Enqueue multiple solve animations, sorted by geographic proximity
    * (greedy nearest-neighbor from the current camera position) so the camera
    * traces a short path instead of jumping randomly around the globe.
    */
   focusAndHighlightCountries(
-    solves: Array<{ countryName: string; patternIndex: number }>
+    solves: Array<{ countryName: string; patternPath: string }>
   ): void;
 }
 
@@ -201,12 +201,12 @@ function GlobeInternal({
         const handle: GlobeHandle = {
           transitionCountryToSolved: async (
             countryName: string,
-            patternIndex: number
+            patternPath: string
           ) => {
             const colors = themeColorsRef.current;
             await globeRenderer.transitionCountryToSolved(
               countryName,
-              patternIndex,
+              patternPath,
               {
                 primary: colors.primary,
                 glowIntensity: colors.glowIntensity,
@@ -215,14 +215,14 @@ function GlobeInternal({
           },
           focusAndHighlightCountry: (
             countryName: string,
-            patternIndex: number
+            patternPath: string
           ) => {
             const center = globeRenderer.getCountryCenter(countryName);
             if (!center) {
               // Fallback: just do the material transition without animation
               const colors = themeColorsRef.current;
               globeRenderer
-                .transitionCountryToSolved(countryName, patternIndex, {
+                .transitionCountryToSolved(countryName, patternPath, {
                   primary: colors.primary,
                   glowIntensity: colors.glowIntensity,
                 })
@@ -242,7 +242,7 @@ function GlobeInternal({
             animator.enqueue(
               new SolveSequenceAnimation({
                 countryName,
-                patternIndex,
+                patternPath,
                 targetPosition: capitalWorld,
                 capitalWorldPos: capitalWorld,
                 camera,
@@ -256,14 +256,14 @@ function GlobeInternal({
             );
           },
           focusAndHighlightCountries: (
-            solves: Array<{ countryName: string; patternIndex: number }>
+            solves: Array<{ countryName: string; patternPath: string }>
           ) => {
             if (solves.length === 0) return;
 
             // Resolve centers for all solves, separate those without geo data
             type SolveWithCenter = {
               countryName: string;
-              patternIndex: number;
+              patternPath: string;
               lat: number;
               lon: number;
             };
@@ -276,7 +276,7 @@ function GlobeInternal({
                 // No geo data — transition immediately without animation
                 const colors = themeColorsRef.current;
                 globeRenderer
-                  .transitionCountryToSolved(s.countryName, s.patternIndex, {
+                  .transitionCountryToSolved(s.countryName, s.patternPath, {
                     primary: colors.primary,
                     glowIntensity: colors.glowIntensity,
                   })
@@ -329,7 +329,7 @@ function GlobeInternal({
               animator.enqueue(
                 new SolveSequenceAnimation({
                   countryName: s.countryName,
-                  patternIndex: s.patternIndex,
+                  patternPath: s.patternPath,
                   targetPosition: capitalWorld,
                   capitalWorldPos: capitalWorld,
                   camera,

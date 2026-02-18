@@ -19,13 +19,13 @@ export class CountryGeometryManager {
   totalVertexCount: number = 0;
   countriesWithChallenges: Set<string>;
   solvedCountries: Set<string>;
-  countryPatternMap: Map<string, number>;
+  countryPatternMap: Map<string, string>;
 
   constructor(
     countries: CountryData[],
     solvedCountries: Set<string>,
     countriesWithChallenges: Set<string>,
-    solvedWithPatterns: Map<string, number>
+    solvedWithPatterns: Map<string, string>
   ) {
     this.countriesWithChallenges = countriesWithChallenges;
     this.solvedCountries = solvedCountries;
@@ -106,7 +106,7 @@ export class CountryGeometryManager {
   /**
    * Get the pattern index for a country
    */
-  getPatternIndex(countryName: string): number | undefined {
+  getPatternPath(countryName: string): string | undefined {
     return this.countryPatternMap.get(countryName);
   }
 }

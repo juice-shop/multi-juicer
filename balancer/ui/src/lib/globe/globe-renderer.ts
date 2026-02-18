@@ -8,7 +8,6 @@ import {
   ShaderMaterial,
 } from "three";
 
-import { getPatternPathByIndex } from "../patterns/pattern-selector";
 import { TextureCache } from "../patterns/texture-cache";
 
 import { createCapitalMarkers } from "./capital-markers";
@@ -78,15 +77,12 @@ export class GlobeRenderer {
 
     // Create pattern meshes for solved challenges
     for (const { geometry, name } of geometryManager.patternGeometries) {
-      const patternIndex = geometryManager.getPatternIndex(name);
+      const patternPath = geometryManager.getPatternPath(name);
 
-      if (patternIndex === undefined) {
-        console.warn(`No pattern index for country: ${name}`);
+      if (patternPath === undefined) {
+        console.warn(`No pattern path for country: ${name}`);
         continue;
       }
-
-      // Load texture
-      const patternPath = getPatternPathByIndex(patternIndex);
 
       try {
         const texture = await this.textureCache.loadTexture(patternPath);
@@ -206,7 +202,7 @@ export class GlobeRenderer {
    */
   async transitionCountryToSolved(
     countryName: string,
-    patternIndex: number,
+    patternPath: string,
     themeColors: { primary: number[]; glowIntensity: number },
     animated = false
   ): Promise<void> {
@@ -221,9 +217,6 @@ export class GlobeRenderer {
       );
       return;
     }
-
-    // Load the pattern texture once
-    const patternPath = getPatternPathByIndex(patternIndex);
 
     try {
       const texture = await this.textureCache.loadTexture(patternPath);

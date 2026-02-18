@@ -1,5 +1,5 @@
 import type { CountryData } from "../globe/data/geojson-loader";
-import { getPatternIndexForTeam } from "../patterns/pattern-selector";
+import { getPatternPathForTeam } from "../patterns/pattern-selector";
 
 // Re-export Challenge from the hook
 export type { Challenge } from "../../hooks/useChallenges";
@@ -13,7 +13,7 @@ export interface ChallengeCountryMapping {
   challenge: Challenge;
   countryName: string | null;
   firstSolver?: string | null;
-  patternIndex?: number;
+  patternPath?: string;
 }
 
 /**
@@ -77,15 +77,15 @@ export function mapChallengesToCountries(
     (challenge, index) => {
       const country = sortedCountries[index];
       const firstSolver = challenge.firstSolver || null;
-      const patternIndex = firstSolver
-        ? getPatternIndexForTeam(firstSolver)
+      const patternPath = firstSolver
+        ? getPatternPathForTeam(firstSolver)
         : undefined;
 
       return {
         challenge,
         countryName: country ? country.name : null,
         firstSolver,
-        patternIndex,
+        patternPath,
       };
     }
   );
@@ -103,18 +103,18 @@ export function getCountriesByChallengeStatus(
 ): {
   solved: Set<string>;
   unsolved: Set<string>;
-  solvedWithPatterns: Map<string, number>;
+  solvedWithPatterns: Map<string, string>;
 } {
   const solved = new Set<string>();
   const unsolved = new Set<string>();
-  const solvedWithPatterns = new Map<string, number>();
+  const solvedWithPatterns = new Map<string, string>();
 
   for (const mapping of mappings) {
     if (mapping.countryName) {
       if (mapping.challenge.solveCount > 0) {
         solved.add(mapping.countryName);
-        if (mapping.patternIndex !== undefined) {
-          solvedWithPatterns.set(mapping.countryName, mapping.patternIndex);
+        if (mapping.patternPath !== undefined) {
+          solvedWithPatterns.set(mapping.countryName, mapping.patternPath);
         }
       } else {
         unsolved.add(mapping.countryName);
