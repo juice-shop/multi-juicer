@@ -4,6 +4,10 @@ import { ChallengesPanel } from "@/components/ctf/ChallengesPanel";
 import { Globe, type GlobeHandle } from "@/components/ctf/Globe";
 import { LeftPanels } from "@/components/ctf/LeftPanels";
 import { Loading } from "@/components/ctf/Loading";
+import {
+  useActivityFeed,
+  isChallengeSolvedEvent,
+} from "@/hooks/useActivityFeed";
 import { useChallenges, type Challenge } from "@/hooks/useChallenges";
 import { findNewlySolvedChallenges } from "@/lib/challenges/challenge-diff";
 import {
@@ -14,9 +18,6 @@ import {
 import { CountryGeometryManager } from "@/lib/globe/country-geometry";
 import { loadGeoJSON, type CountryData } from "@/lib/globe/data/geojson-loader";
 import { getPatternIndexForTeam } from "@/lib/patterns/pattern-selector";
-
-// Polling interval for challenge updates (5 seconds)
-const CHALLENGES_POLLING_INTERVAL = 5000;
 
 // CSS Color Utilities
 function getCSSVariable(name: string): string {
@@ -64,9 +65,13 @@ export default function CtfPage() {
     data: challenges,
     isLoading: challengesLoading,
     error: challengesError,
-  } = useChallenges({
-    pollingInterval: CHALLENGES_POLLING_INTERVAL,
-  });
+    applySolveEvent,
+  } = useChallenges();
+  const {
+    data: activities,
+    isLoading: activitiesLoading,
+    error: activitiesError,
+  } = useActivityFeed();
   const [preparedData, setPreparedData] = useState<PreparedGlobeData | null>(
     null
   );
@@ -78,10 +83,37 @@ export default function CtfPage() {
   const challengesRef = useRef<Challenge[] | null>(null);
   const challengeMappingsRef = useRef<ChallengeCountryMapping[]>([]);
 
+  // Track whether we've seen the first activity batch (skip it for incremental updates)
+  const hasSeenInitialActivitiesRef = useRef(false);
+  const previousActivitiesLengthRef = useRef(0);
+
   // Keep challenges ref updated for use in callbacks
   useEffect(() => {
     challengesRef.current = challenges;
   }, [challenges]);
+
+  // Apply solve events from activity feed to challenge data
+  useEffect(() => {
+    if (!activities) return;
+
+    // Skip the first batch — those events are already reflected in the initial challenge counts
+    if (!hasSeenInitialActivitiesRef.current) {
+      hasSeenInitialActivitiesRef.current = true;
+      previousActivitiesLengthRef.current = activities.length;
+      return;
+    }
+
+    // Process only new events (activity feed grows by appending to the front or replacing)
+    const prevLength = previousActivitiesLengthRef.current;
+    const newEvents = activities.slice(0, activities.length - prevLength);
+    previousActivitiesLengthRef.current = activities.length;
+
+    for (const event of newEvents) {
+      if (isChallengeSolvedEvent(event)) {
+        applySolveEvent(event.challengeKey, event.team, event.isFirstSolve);
+      }
+    }
+  }, [activities, applySolveEvent]);
 
   // UI states
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
@@ -315,6 +347,9 @@ export default function CtfPage() {
         onTeamsToggle={handleTeamsToggle}
         onActivityToggle={handleActivityToggle}
         challengeMappings={challengeMappings}
+        activities={activities}
+        activitiesLoading={activitiesLoading}
+        activitiesError={activitiesError}
       />
 
       {challengeMappings.length > 0 && (

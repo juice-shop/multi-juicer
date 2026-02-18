@@ -1,9 +1,9 @@
 import { FormattedMessage } from "react-intl";
 
 import {
-  useActivityFeed,
   isTeamCreatedEvent,
   isChallengeSolvedEvent,
+  type ActivityEvent,
 } from "@/hooks/useActivityFeed";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
@@ -11,6 +11,9 @@ interface LiveActivityPanelProps {
   isOpen: boolean;
   onToggle: () => void;
   challengeMappings: ChallengeCountryMapping[];
+  activities: ActivityEvent[] | null;
+  activitiesLoading: boolean;
+  activitiesError: string | null;
 }
 
 function formatTimeAgo(isoString: string): string {
@@ -31,9 +34,10 @@ export function LiveActivityPanel({
   isOpen,
   onToggle,
   challengeMappings,
+  activities,
+  activitiesLoading,
+  activitiesError,
 }: LiveActivityPanelProps) {
-  const { data: activities, isLoading, error } = useActivityFeed();
-
   // Create a map from challengeKey to countryName for fast lookup
   const challengeToCountry = new Map<string, string | null>();
   for (const mapping of challengeMappings) {
@@ -60,14 +64,14 @@ export function LiveActivityPanel({
       </div>
       {isOpen && (
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2.5 scroll-smooth [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[rgba(0,255,255,0.1)] [&::-webkit-scrollbar-thumb]:bg-ctf-primary [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:shadow-[0_0_3px_rgba(255,107,107,0.4)] [&::-webkit-scrollbar-thumb:hover]:bg-ctf-accent [&::-webkit-scrollbar-thumb:hover]:shadow-[0_0_5px_rgba(255,0,255,0.5)]">
-          {isLoading && (
+          {activitiesLoading && (
             <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
               Loading activity...
             </div>
           )}
-          {error && (
+          {activitiesError && (
             <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
-              Error: {error}
+              Error: {activitiesError}
             </div>
           )}
           {activities && (

@@ -14,37 +14,26 @@ interface ChallengesResponse {
   challenges: Challenge[];
 }
 
-interface UseChallengesOptions {
-  /** Polling interval in milliseconds. Set to 0 to disable polling. Default: 0 (disabled) */
-  pollingInterval?: number;
-}
-
 /**
  * Custom hook for fetching challenges from the API.
+ * Challenges are fetched once on mount. Solve counts and first-solver data
+ * are updated incrementally via `applySolveEvent` (driven by the activity feed).
  *
- * @param options - Configuration options
- * @param options.pollingInterval - Interval in ms to poll for updates. Default: 0 (disabled)
  * @returns An object containing:
  *   - data: The array of challenges, or null if not yet loaded
  *   - isLoading: True during the initial load
  *   - error: Error message if the fetch failed, or null
  *   - refetch: Function to manually trigger a refetch
+ *   - applySolveEvent: Function to incrementally update solve data
  */
-export function useChallenges(options: UseChallengesOptions = {}) {
-  const { pollingInterval = 0 } = options;
-
+export function useChallenges() {
   const [data, setData] = useState<Challenge[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const isInitialFetch = useRef(true);
 
   const fetchChallenges = useCallback(async () => {
-    const isFirst = isInitialFetch.current;
     try {
-      // Only show loading state for initial fetch
-      if (isFirst) {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
       setError(null);
 
       const response = await fetch("/balancer/api/challenges");
@@ -60,10 +49,7 @@ export function useChallenges(options: UseChallengesOptions = {}) {
       setError(errorMessage);
       console.error("Error fetching challenges:", err);
     } finally {
-      if (isFirst) {
-        setIsLoading(false);
-        isInitialFetch.current = false;
-      }
+      setIsLoading(false);
     }
   }, []);
 
@@ -72,16 +58,28 @@ export function useChallenges(options: UseChallengesOptions = {}) {
     fetchChallenges();
   }, [fetchChallenges]);
 
-  // Polling
-  useEffect(() => {
-    if (pollingInterval <= 0) return;
+  const appliedSolvesRef = useRef(new Set<string>());
 
-    const intervalId = setInterval(fetchChallenges, pollingInterval);
+  const applySolveEvent = useCallback(
+    (challengeKey: string, solver: string, isFirstSolve: boolean) => {
+      const dedupeKey = `${challengeKey}:${solver}`;
+      if (appliedSolvesRef.current.has(dedupeKey)) return;
+      appliedSolvesRef.current.add(dedupeKey);
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [pollingInterval, fetchChallenges]);
+      setData((prev) => {
+        if (!prev) return prev;
+        return prev.map((challenge) => {
+          if (challenge.key !== challengeKey) return challenge;
+          return {
+            ...challenge,
+            solveCount: challenge.solveCount + 1,
+            firstSolver: isFirstSolve ? solver : challenge.firstSolver,
+          };
+        });
+      });
+    },
+    []
+  );
 
-  return { data, isLoading, error, refetch: fetchChallenges };
+  return { data, isLoading, error, refetch: fetchChallenges, applySolveEvent };
 }

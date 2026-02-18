@@ -1,3 +1,4 @@
+import type { ActivityEvent } from "@/hooks/useActivityFeed";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
@@ -12,6 +13,9 @@ interface LeftPanelsProps {
   onTeamsToggle: () => void;
   onActivityToggle: () => void;
   challengeMappings: ChallengeCountryMapping[];
+  activities: ActivityEvent[] | null;
+  activitiesLoading: boolean;
+  activitiesError: string | null;
 }
 
 export function LeftPanels({
@@ -20,6 +24,9 @@ export function LeftPanels({
   onTeamsToggle,
   onActivityToggle,
   challengeMappings,
+  activities,
+  activitiesLoading,
+  activitiesError,
 }: LeftPanelsProps) {
   const { data: notification } = useNotifications();
   const hasNotification =
@@ -55,6 +62,9 @@ export function LeftPanels({
         isOpen={activityOpen}
         onToggle={onActivityToggle}
         challengeMappings={challengeMappings}
+        activities={activities}
+        activitiesLoading={activitiesLoading}
+        activitiesError={activitiesError}
       />
     </div>
   );
