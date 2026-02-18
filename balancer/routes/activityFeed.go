@@ -151,11 +151,8 @@ func buildActivityFeed(
 	// 4. Sort all events chronologically (newest first)
 	sort.Sort(ByTimestamp(allEvents))
 
-	// 5. Limit to the 15 most recent events
-	limit := 15
-	if len(allEvents) < limit {
-		limit = len(allEvents)
-	}
+	// 5. Limit to the 30 most recent events
+	limit := min(len(allEvents), 30)
 	recentEvents := allEvents[:limit]
 
 	return recentEvents

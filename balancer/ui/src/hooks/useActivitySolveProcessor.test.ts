@@ -209,7 +209,7 @@ describe("useActivitySolveProcessor", () => {
     expect(applySolveEvent).not.toHaveBeenCalled();
   });
 
-  test("works when array length stays the same (capped at 15)", () => {
+  test("works when array length stays the same", () => {
     const applySolveEvent = vi.fn();
 
     // Initial batch of 3 events (simulating capped list)

@@ -177,7 +177,7 @@ func TestActivityFeedHandler(t *testing.T) {
 		assert.True(t, ok2, "Second event should be a team created event")
 	})
 
-	t.Run("with more than 15 solves, should return only the 15 newest events", func(t *testing.T) {
+	t.Run("with more than 30 solves, should return only the 30 newest events", func(t *testing.T) {
 		var mockDeployments []runtime.Object
 		var newestSolveTime time.Time
 		// Create 20 solve events
@@ -206,8 +206,8 @@ func TestActivityFeedHandler(t *testing.T) {
 		feed, err := unmarshalActivityFeed(rr.Body.Bytes())
 		require.NoError(t, err)
 
-		// Assert that the feed is limited to 15 items
-		assert.Len(t, feed, 15, "Feed should be limited to 15 events")
+		// Assert that the feed is limited to 30 items
+		assert.Len(t, feed, 30, "Feed should be limited to 30 events")
 		assert.Equal(t, newestSolveTime.UTC().Truncate(time.Second), feed[0].GetTimestamp().UTC().Truncate(time.Second))
 	})
 }

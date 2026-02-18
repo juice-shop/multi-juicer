@@ -196,7 +196,7 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 ### Activity Feed Updates
 
 1. Frontend establishes a long polling connection to `/balancer/api/activity-feed`
-2. Server returns the 15 most recent challenge solve events with team names, challenge details, and timestamps
+2. Server returns the 30 most recent challenge solve events with team names, challenge details, and timestamps
 3. When new challenges are solved (scores update), the long poll request completes with fresh activity data
 4. Frontend displays the new activity in the live activity sidebar
 5. Client automatically re-establishes the long polling connection with the last update timestamp
