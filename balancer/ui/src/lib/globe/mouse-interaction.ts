@@ -77,10 +77,7 @@ export class MouseInteraction {
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
     // Check intersections with ALL fillable meshes (solid + pattern)
-    const allMeshes = [
-      ...this.solidMeshes,
-      ...this.patternMeshes,
-    ];
+    const allMeshes = [...this.solidMeshes, ...this.patternMeshes];
     const intersects = this.raycaster.intersectObjects(allMeshes, false);
 
     if (intersects.length > 0) {
@@ -196,10 +193,7 @@ export class MouseInteraction {
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
     // Check intersections with ALL fillable meshes (solid + pattern)
-    const allMeshes = [
-      ...this.solidMeshes,
-      ...this.patternMeshes,
-    ];
+    const allMeshes = [...this.solidMeshes, ...this.patternMeshes];
     const intersects = this.raycaster.intersectObjects(allMeshes, false);
 
     if (intersects.length > 0) {
