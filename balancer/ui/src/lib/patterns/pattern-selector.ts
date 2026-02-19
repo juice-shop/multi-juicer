@@ -13,10 +13,10 @@ function simpleHash(str: string): number {
 }
 
 /**
- * Get pattern index (0-120) for a team name
+ * Get pattern index (0-83) for a team name
  * Uses consistent hashing for deterministic assignment
  */
-export function getPatternIndexForTeam(teamName: string): number {
+function getPatternIndexForTeam(teamName: string): number {
   const hash = simpleHash(teamName);
   return hash % 84; // 84 patterns (01-84)
 }
@@ -25,7 +25,7 @@ export function getPatternIndexForTeam(teamName: string): number {
  * Get pattern file path from a pattern index
  * @param index - Pattern index (0-83)
  */
-export function getPatternPathByIndex(index: number): string {
+function getPatternPathByIndex(index: number): string {
   const paddedIndex = String(index + 1).padStart(2, "0");
   return `/balancer/patterns/pattern_${paddedIndex}.png`;
 }
