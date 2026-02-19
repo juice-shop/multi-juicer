@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import {
@@ -6,6 +7,13 @@ import {
   type ActivityEvent,
 } from "@/hooks/useActivityFeed";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
+
+function activityKey(event: ActivityEvent): string {
+  if (isChallengeSolvedEvent(event)) {
+    return `${event.eventType}:${event.team}:${event.challengeKey}:${event.timestamp}`;
+  }
+  return `${event.eventType}:${event.team}:${event.timestamp}`;
+}
 
 interface LiveActivityPanelProps {
   isOpen: boolean;
@@ -38,6 +46,13 @@ export function LiveActivityPanel({
   activitiesLoading,
   activitiesError,
 }: LiveActivityPanelProps) {
+  // Re-render every 5s so relative timestamps stay fresh.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 3000);
+    return () => clearInterval(id);
+  }, []);
+
   // Create a map from challengeKey to countryName for fast lookup
   const challengeToCountry = new Map<string, string | null>();
   for (const mapping of challengeMappings) {
@@ -76,10 +91,17 @@ export function LiveActivityPanel({
           )}
           {activities && (
             <div className="flex flex-col gap-1.5">
-              {activities.map((activity, index) => {
+              {activities.map((activity) => {
+                const key = activityKey(activity);
+                const isRecent =
+                  Date.now() - new Date(activity.timestamp).getTime() < 60_000;
+                const radiateClass = isRecent
+                  ? "animate-radiate rounded"
+                  : "";
+
                 if (isTeamCreatedEvent(activity)) {
                   return (
-                    <div key={index} className="py-1.5">
+                    <div key={key} className={`py-1.5 ${radiateClass}`}>
                       <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
                         <FormattedMessage
                           id="activity.team_joined"
@@ -103,7 +125,7 @@ export function LiveActivityPanel({
                     : activity.challengeName;
 
                   return (
-                    <div key={index} className="py-1.5">
+                    <div key={key} className={`py-1.5 ${radiateClass}`}>
                       <div className="text-[11px] text-ctf-primary mb-0.5 leading-[1.4]">
                         {activity.team} solved {challengeDisplay} (+
                         {activity.points} pts)

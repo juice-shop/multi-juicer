@@ -1,6 +1,18 @@
 @import "tailwindcss";
 
+@keyframes radiate {
+  0% {
+    background-color: rgba(255, 107, 107, 0.25);
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
 @theme {
+  --animate-radiate: radiate 3s ease-out forwards;
   /* CTF-specific color palette */
   --color-ctf-primary: #ff6b6b;
   --color-ctf-accent: #fdd84e;
