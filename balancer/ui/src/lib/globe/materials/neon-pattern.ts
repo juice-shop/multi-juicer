@@ -19,46 +19,23 @@ export function createNeonPatternMaterial(
       u_highlightIntensity: { value: 0.0 },
       u_patternTexture: { value: patternTexture },
       u_patternRotation: { value: Math.PI / 4 }, // 45 degrees
-      u_patternScale: { value: 64.0 }, // Adjust for desired repetition (higher = more repetition)
+      u_patternScale: { value: 45.0 * Math.SQRT2 }, // ≈63.64 — chosen so scale×cos(45°) is integer, eliminating seam at longitude wrap
       u_revealCenter: { value: new Vector3(0, 1, 0) },
       u_revealRadius: { value: 999.0 }, // Default: fully revealed
     },
 
     vertexShader: `
       varying vec3 v_viewPosition;
-      varying vec2 v_uv;
       varying vec3 v_worldPosition;
 
       void main() {
         // Transform to world space
         vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        vec3 worldPos = worldPosition.xyz;
-        v_worldPosition = worldPos;
+        v_worldPosition = worldPosition.xyz;
 
         // Transform to view space
         vec4 viewPosition = viewMatrix * worldPosition;
         v_viewPosition = viewPosition.xyz;
-
-        // Calculate UV from spherical coordinates
-        // Tilt the coordinate frame ~15° around X-axis so patterns
-        // don't align rigidly with geographic poles
-        float tiltAngle = 0.26; // ~15 degrees
-        float ct = cos(tiltAngle);
-        float st = sin(tiltAngle);
-        vec3 tilted = vec3(
-          worldPos.x,
-          worldPos.y * ct - worldPos.z * st,
-          worldPos.y * st + worldPos.z * ct
-        );
-        float radius = length(tilted);
-        float lat = asin(tilted.y / radius);
-        float lon = atan(tilted.z, tilted.x);
-
-        // Normalize to 0-1 range
-        v_uv = vec2(
-          (lon + 3.14159) / (2.0 * 3.14159),
-          (lat + 1.5708) / 3.14159
-        );
 
         // Transform to clip space
         gl_Position = projectionMatrix * viewPosition;
@@ -69,7 +46,6 @@ export function createNeonPatternMaterial(
       precision mediump float;
 
       varying vec3 v_viewPosition;
-      varying vec2 v_uv;
       varying vec3 v_worldPosition;
 
       uniform vec3 u_neonColor;
@@ -91,9 +67,28 @@ export function createNeonPatternMaterial(
           }
         }
 
+        // Compute spherical UV per-fragment to avoid atan2 seam artifacts.
+        // When computed per-vertex, triangles straddling the ±π longitude
+        // discontinuity get interpolated UVs that sweep through the entire
+        // texture, creating a visible torn line.
+        float tiltAngle = 0.26; // ~15 degrees
+        float ct = cos(tiltAngle);
+        float st = sin(tiltAngle);
+        vec3 tilted = vec3(
+          v_worldPosition.x,
+          v_worldPosition.y * ct - v_worldPosition.z * st,
+          v_worldPosition.y * st + v_worldPosition.z * ct
+        );
+        float radius = length(tilted);
+        float lat = asin(tilted.y / radius);
+        float lon = atan(tilted.z, tilted.x);
+        vec2 sphereUV = vec2(
+          (lon + 3.14159) / (2.0 * 3.14159),
+          (lat + 1.5708) / 3.14159
+        );
 
         // Apply rotation matrix to UV coordinates (45-degree rotation)
-        vec2 centeredUV = (v_uv - 0.5) * u_patternScale;
+        vec2 centeredUV = (sphereUV - 0.5) * u_patternScale;
         float cosR = cos(u_patternRotation);
         float sinR = sin(u_patternRotation);
         vec2 rotatedUV = vec2(
