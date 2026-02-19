@@ -4,9 +4,9 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import App from "./App";
 
-// Clean up the DOM after each test
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
 });
 
 beforeEach(() => {
@@ -26,6 +26,9 @@ beforeEach(() => {
     clear: vi.fn(),
   };
   globalThis.localStorage = localStorageMock as unknown as Storage;
+
+  // Suppress Router basename warning in test environment
+  vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 
 test("renders without crashing", () => {

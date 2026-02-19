@@ -182,6 +182,9 @@ describe("useGlobeDataLoader", () => {
   });
 
   test("handles GeoJSON loading error", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     vi.mocked(loadGeoJSON).mockRejectedValue(new Error("Failed to fetch"));
 
     const { result } = renderHook(() =>
@@ -194,6 +197,7 @@ describe("useGlobeDataLoader", () => {
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.preparedData).toBeNull();
+    consoleErrorSpy.mockRestore();
   });
 
   test("waits for challenges before loading globe data", async () => {
