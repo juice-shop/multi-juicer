@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useIntl } from "react-intl";
 
 import type { Challenge } from "@/hooks/useChallenges";
 import {
@@ -62,8 +63,14 @@ export function useGlobeDataLoader(
   challengesLoading: boolean,
   challengesError: string | null
 ): UseGlobeDataLoaderResult {
+  const intl = useIntl();
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingMessage, setLoadingMessage] = useState("Initializing...");
+  const [loadingMessage, setLoadingMessage] = useState(
+    intl.formatMessage({
+      id: "ctf.loading.initializing",
+      defaultMessage: "Initializing...",
+    })
+  );
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [preparedData, setPreparedData] = useState<PreparedGlobeData | null>(
     null
@@ -79,7 +86,12 @@ export function useGlobeDataLoader(
       try {
         // Wait for challenges to load
         if (challengesLoading) {
-          setLoadingMessage("Loading challenges...");
+          setLoadingMessage(
+            intl.formatMessage({
+              id: "ctf.loading.challenges",
+              defaultMessage: "Loading challenges...",
+            })
+          );
           setLoadingProgress(0);
           return;
         }
@@ -94,12 +106,22 @@ export function useGlobeDataLoader(
         }
 
         // Step 1: Load theme colors
-        setLoadingMessage("Loading theme colors...");
+        setLoadingMessage(
+          intl.formatMessage({
+            id: "ctf.loading.theme_colors",
+            defaultMessage: "Loading theme colors...",
+          })
+        );
         setLoadingProgress(10);
         const themeColors = getThemeColors();
 
         // Step 2: Load GeoJSON data
-        setLoadingMessage("Loading world data...");
+        setLoadingMessage(
+          intl.formatMessage({
+            id: "ctf.loading.world_data",
+            defaultMessage: "Loading world data...",
+          })
+        );
         const countries = await loadGeoJSON((progress) => {
           setLoadingProgress(10 + progress * 50);
         });
@@ -169,7 +191,7 @@ export function useGlobeDataLoader(
     }
 
     loadAllData();
-  }, [challenges, challengesLoading, challengesError]);
+  }, [challenges, challengesLoading, challengesError, intl]);
 
   return { isLoading, loadingMessage, loadingProgress, preparedData };
 }

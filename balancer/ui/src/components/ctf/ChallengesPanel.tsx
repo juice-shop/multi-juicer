@@ -1,3 +1,5 @@
+import { FormattedMessage } from "react-intl";
+
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
 import { ChallengeDetailView } from "./ChallengeDetailView";
@@ -39,7 +41,11 @@ export function ChallengesPanel({
         className="p-[15px_20px] text-base font-bold uppercase tracking-[2px] cursor-pointer select-none text-ctf-primary border-b border-ctf-border shrink-0"
         style={{ textShadow: "0 0 3px rgba(255, 107, 107, 0.5)" }}
       >
-        CHALLENGES ({mappings.length})
+        <FormattedMessage
+          id="ctf.challenges_panel.title"
+          defaultMessage="CHALLENGES ({count})"
+          values={{ count: mappings.length }}
+        />
       </div>
       <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
         <ChallengesList

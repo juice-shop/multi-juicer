@@ -116,4 +116,49 @@ export default {
   "admin.notification.submitting": "Оновлення...",
   "admin.notification.submit": "Опублікувати повідомлення",
   "admin.notification.clear": "Видалити повідомлення",
+  "ctf.loading.geodata": "ЗАВАНТАЖЕННЯ ГЕОДАНИХ...",
+  "ctf.loading.initializing": "Ініціалізація...",
+  "ctf.loading.challenges": "Завантаження завдань...",
+  "ctf.loading.theme_colors": "Завантаження кольорів теми...",
+  "ctf.loading.world_data": "Завантаження даних світу...",
+  "ctf.globe.error": "ПОМИЛКА: {error}",
+  "ctf.info_panel.title": "MultiJuicer CTF",
+  "ctf.info_panel.logo_alt": "Логотип MultiJuicer",
+  "ctf.teams_panel.title": "КОМАНДИ",
+  "ctf.teams_panel.loading": "Завантаження команд...",
+  "ctf.teams_panel.error": "Помилка: {error}",
+  "ctf.teams_panel.score_solves":
+    "{score}бал. - {solveCount, plural, one {# рішення} few {# рішення} other {# рішень}}",
+  "ctf.activity_panel.title": "ЖИВА АКТИВНІСТЬ",
+  "ctf.activity_panel.loading": "Завантаження активності...",
+  "ctf.activity_panel.error": "Помилка: {error}",
+  "ctf.activity_panel.challenge_solved":
+    "{team} вирішив(ла) {challenge} (+{points} бал.)",
+  "ctf.activity_panel.challenge_solved_country":
+    "{team} вирішив(ла) {challenge} ({country}) (+{points} бал.)",
+  "ctf.time_ago.seconds":
+    "{count, plural, one {# секунду тому} few {# секунди тому} other {# секунд тому}}",
+  "ctf.time_ago.minutes":
+    "{count, plural, one {# хвилину тому} few {# хвилини тому} other {# хвилин тому}}",
+  "ctf.time_ago.hours":
+    "{count, plural, one {# годину тому} few {# години тому} other {# годин тому}}",
+  "ctf.time_ago.days":
+    "{count, plural, one {# день тому} few {# дні тому} other {# днів тому}}",
+  "ctf.challenges_panel.title": "ЗАВДАННЯ ({count})",
+  "ctf.challenge.unassigned": "Не призначено",
+  "ctf.challenge.unsolved": "Не вирішено",
+  "ctf.challenge.solve_count":
+    "{solveCount, plural, one {# рішення} few {# рішення} other {# рішень}}",
+  "ctf.challenge_detail.back": "← Назад",
+  "ctf.challenge_detail.solves_label": "Рішення:",
+  "ctf.challenge_detail.loading_solves": "Завантаження рішень...",
+  "ctf.challenge_detail.error": "Помилка: {error}",
+  "ctf.challenge_detail.no_solves": "Ще немає рішень",
+  "ctf.challenge_detail.solved_just_now": "вирішено щойно",
+  "ctf.challenge_detail.solved_mins_ago":
+    "вирішено {count, plural, one {# хв.} few {# хв.} other {# хв.}} тому",
+  "ctf.challenge_detail.solved_hours_ago":
+    "вирішено {count, plural, one {# годину} few {# години} other {# годин}} тому",
+  "ctf.challenge_detail.solved_days_ago":
+    "вирішено {count, plural, one {# день} few {# дні} other {# днів}} тому",
 };

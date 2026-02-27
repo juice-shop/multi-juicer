@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
 import { Scene, Color, PerspectiveCamera, WebGLRenderer, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -520,7 +521,11 @@ function GlobeInternal({
             textShadow: "0 0 10px #FF0000, 0 0 20px #FF0000",
           }}
         >
-          ERROR: {error}
+          <FormattedMessage
+            id="ctf.globe.error"
+            defaultMessage="ERROR: {error}"
+            values={{ error }}
+          />
         </div>
       </div>
     );

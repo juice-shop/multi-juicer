@@ -116,4 +116,48 @@ export default {
   "admin.notification.submitting": "Wird aktualisiert...",
   "admin.notification.submit": "Benachrichtigung senden",
   "admin.notification.clear": "Benachrichtigung löschen",
+  "ctf.loading.geodata": "LADE GEODATEN...",
+  "ctf.loading.initializing": "Initialisiere...",
+  "ctf.loading.challenges": "Lade Herausforderungen...",
+  "ctf.loading.theme_colors": "Lade Designfarben...",
+  "ctf.loading.world_data": "Lade Weltdaten...",
+  "ctf.globe.error": "FEHLER: {error}",
+  "ctf.info_panel.title": "MultiJuicer CTF",
+  "ctf.info_panel.logo_alt": "MultiJuicer-Logo",
+  "ctf.teams_panel.title": "TEAMS",
+  "ctf.teams_panel.loading": "Lade Teams...",
+  "ctf.teams_panel.error": "Fehler: {error}",
+  "ctf.teams_panel.score_solves":
+    "{score}Pkt. - {solveCount, plural, one {# Lösung} other {# Lösungen}}",
+  "ctf.activity_panel.title": "LIVE-AKTIVITÄT",
+  "ctf.activity_panel.loading": "Lade Aktivität...",
+  "ctf.activity_panel.error": "Fehler: {error}",
+  "ctf.activity_panel.challenge_solved":
+    "{team} hat {challenge} gelöst (+{points} Pkt.)",
+  "ctf.activity_panel.challenge_solved_country":
+    "{team} hat {challenge} ({country}) gelöst (+{points} Pkt.)",
+  "ctf.time_ago.seconds":
+    "{count, plural, one {vor # Sekunde} other {vor # Sekunden}}",
+  "ctf.time_ago.minutes":
+    "{count, plural, one {vor # Minute} other {vor # Minuten}}",
+  "ctf.time_ago.hours":
+    "{count, plural, one {vor # Stunde} other {vor # Stunden}}",
+  "ctf.time_ago.days": "{count, plural, one {vor # Tag} other {vor # Tagen}}",
+  "ctf.challenges_panel.title": "HERAUSFORDERUNGEN ({count})",
+  "ctf.challenge.unassigned": "Nicht zugewiesen",
+  "ctf.challenge.unsolved": "Ungelöst",
+  "ctf.challenge.solve_count":
+    "{solveCount, plural, one {# Lösung} other {# Lösungen}}",
+  "ctf.challenge_detail.back": "← Zurück",
+  "ctf.challenge_detail.solves_label": "Lösungen:",
+  "ctf.challenge_detail.loading_solves": "Lade Lösungen...",
+  "ctf.challenge_detail.error": "Fehler: {error}",
+  "ctf.challenge_detail.no_solves": "Noch keine Lösungen",
+  "ctf.challenge_detail.solved_just_now": "gerade gelöst",
+  "ctf.challenge_detail.solved_mins_ago":
+    "vor {count, plural, one {# Min.} other {# Min.}} gelöst",
+  "ctf.challenge_detail.solved_hours_ago":
+    "vor {count, plural, one {# Stunde} other {# Stunden}} gelöst",
+  "ctf.challenge_detail.solved_days_ago":
+    "vor {count, plural, one {# Tag} other {# Tagen}} gelöst",
 };

@@ -1,14 +1,19 @@
+import { useIntl } from "react-intl";
+
 interface LoadingProps {
   isLoading: boolean;
   message?: string;
   progress?: number;
 }
 
-export function Loading({
-  isLoading,
-  message = "LOADING GEODATA...",
-  progress = 0,
-}: LoadingProps) {
+export function Loading({ isLoading, message, progress = 0 }: LoadingProps) {
+  const intl = useIntl();
+  const displayMessage =
+    message ??
+    intl.formatMessage({
+      id: "ctf.loading.geodata",
+      defaultMessage: "LOADING GEODATA...",
+    });
   if (!isLoading) {
     return null;
   }
@@ -22,7 +27,7 @@ export function Loading({
             "0 0 10px var(--color-ctf-primary), 0 0 20px var(--color-ctf-primary)",
         }}
       >
-        {message}
+        {displayMessage}
       </div>
       <div className="w-[300px] h-1 bg-[rgba(0,255,255,0.2)] border border-ctf-primary overflow-hidden shadow-[0_0_10px_var(--color-ctf-primary)]">
         <div

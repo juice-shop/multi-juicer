@@ -114,4 +114,47 @@ export default {
   "admin.notification.submitting": "Se actualizează...",
   "admin.notification.submit": "Postează notificare",
   "admin.notification.clear": "Șterge notificarea",
+  "ctf.loading.geodata": "SE ÎNCARCĂ GEODATELE...",
+  "ctf.loading.initializing": "Se inițializează...",
+  "ctf.loading.challenges": "Se încarcă provocările...",
+  "ctf.loading.theme_colors": "Se încarcă culorile temei...",
+  "ctf.loading.world_data": "Se încarcă datele lumii...",
+  "ctf.globe.error": "EROARE: {error}",
+  "ctf.info_panel.title": "MultiJuicer CTF",
+  "ctf.info_panel.logo_alt": "Logo MultiJuicer",
+  "ctf.teams_panel.title": "ECHIPE",
+  "ctf.teams_panel.loading": "Se încarcă echipele...",
+  "ctf.teams_panel.error": "Eroare: {error}",
+  "ctf.teams_panel.score_solves":
+    "{score}pct - {solveCount, plural, one {# rezolvare} other {# rezolvări}}",
+  "ctf.activity_panel.title": "ACTIVITATE LIVE",
+  "ctf.activity_panel.loading": "Se încarcă activitatea...",
+  "ctf.activity_panel.error": "Eroare: {error}",
+  "ctf.activity_panel.challenge_solved":
+    "{team} a rezolvat {challenge} (+{points} pct)",
+  "ctf.activity_panel.challenge_solved_country":
+    "{team} a rezolvat {challenge} ({country}) (+{points} pct)",
+  "ctf.time_ago.seconds":
+    "{count, plural, one {acum # secundă} other {acum # secunde}}",
+  "ctf.time_ago.minutes":
+    "{count, plural, one {acum # minut} other {acum # minute}}",
+  "ctf.time_ago.hours": "{count, plural, one {acum # oră} other {acum # ore}}",
+  "ctf.time_ago.days": "{count, plural, one {acum # zi} other {acum # zile}}",
+  "ctf.challenges_panel.title": "PROVOCĂRI ({count})",
+  "ctf.challenge.unassigned": "Neatribuită",
+  "ctf.challenge.unsolved": "Nerezolvată",
+  "ctf.challenge.solve_count":
+    "{solveCount, plural, one {# rezolvare} other {# rezolvări}}",
+  "ctf.challenge_detail.back": "← Înapoi",
+  "ctf.challenge_detail.solves_label": "Rezolvări:",
+  "ctf.challenge_detail.loading_solves": "Se încarcă rezolvările...",
+  "ctf.challenge_detail.error": "Eroare: {error}",
+  "ctf.challenge_detail.no_solves": "Nicio rezolvare încă",
+  "ctf.challenge_detail.solved_just_now": "rezolvat chiar acum",
+  "ctf.challenge_detail.solved_mins_ago":
+    "rezolvat acum {count, plural, one {# min.} other {# min.}}",
+  "ctf.challenge_detail.solved_hours_ago":
+    "rezolvat acum {count, plural, one {# oră} other {# ore}}",
+  "ctf.challenge_detail.solved_days_ago":
+    "rezolvat acum {count, plural, one {# zi} other {# zile}}",
 };

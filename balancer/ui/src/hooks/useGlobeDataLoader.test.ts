@@ -1,4 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
+import type { ReactNode } from "react";
+import { createElement } from "react";
+import { IntlProvider } from "react-intl";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { Challenge } from "@/hooks/useChallenges";
@@ -18,6 +21,10 @@ vi.mock("@/lib/globe/country-geometry", () => ({
 }));
 
 import { useGlobeDataLoader } from "./useGlobeDataLoader";
+
+function intlWrapper({ children }: { children: ReactNode }) {
+  return createElement(IntlProvider, { locale: "en" }, children);
+}
 
 const mockCountries = [
   {
@@ -81,7 +88,9 @@ describe("useGlobeDataLoader", () => {
   test("starts in loading state", () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() => useGlobeDataLoader(null, true, null));
+    const { result } = renderHook(() => useGlobeDataLoader(null, true, null), {
+      wrapper: intlWrapper,
+    });
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.preparedData).toBeNull();
@@ -91,7 +100,9 @@ describe("useGlobeDataLoader", () => {
   test("shows loading message while challenges are loading", () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() => useGlobeDataLoader(null, true, null));
+    const { result } = renderHook(() => useGlobeDataLoader(null, true, null), {
+      wrapper: intlWrapper,
+    });
 
     expect(result.current.loadingMessage).toBe("Loading challenges...");
   });
@@ -99,8 +110,9 @@ describe("useGlobeDataLoader", () => {
   test("shows error message when challenges fail to load", () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() =>
-      useGlobeDataLoader(null, false, "Network error")
+    const { result } = renderHook(
+      () => useGlobeDataLoader(null, false, "Network error"),
+      { wrapper: intlWrapper }
     );
 
     expect(result.current.loadingMessage).toBe(
@@ -112,8 +124,9 @@ describe("useGlobeDataLoader", () => {
   test("loads globe data successfully when challenges are available", async () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() =>
-      useGlobeDataLoader(mockChallenges, false, null)
+    const { result } = renderHook(
+      () => useGlobeDataLoader(mockChallenges, false, null),
+      { wrapper: intlWrapper }
     );
 
     await waitFor(() => {
@@ -129,8 +142,9 @@ describe("useGlobeDataLoader", () => {
   test("builds challengeToCountryMap from challenge-country mappings", async () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() =>
-      useGlobeDataLoader(mockChallenges, false, null)
+    const { result } = renderHook(
+      () => useGlobeDataLoader(mockChallenges, false, null),
+      { wrapper: intlWrapper }
     );
 
     await waitFor(() => {
@@ -150,7 +164,7 @@ describe("useGlobeDataLoader", () => {
 
     const { result, rerender } = renderHook(
       ({ challenges }) => useGlobeDataLoader(challenges, false, null),
-      { initialProps: { challenges: mockChallenges } }
+      { initialProps: { challenges: mockChallenges }, wrapper: intlWrapper }
     );
 
     await waitFor(() => {
@@ -171,7 +185,9 @@ describe("useGlobeDataLoader", () => {
   test("handles empty challenges array", async () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() => useGlobeDataLoader([], false, null));
+    const { result } = renderHook(() => useGlobeDataLoader([], false, null), {
+      wrapper: intlWrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -187,8 +203,9 @@ describe("useGlobeDataLoader", () => {
       .mockImplementation(() => {});
     vi.mocked(loadGeoJSON).mockRejectedValue(new Error("Failed to fetch"));
 
-    const { result } = renderHook(() =>
-      useGlobeDataLoader(mockChallenges, false, null)
+    const { result } = renderHook(
+      () => useGlobeDataLoader(mockChallenges, false, null),
+      { wrapper: intlWrapper }
     );
 
     await waitFor(() => {
@@ -209,6 +226,7 @@ describe("useGlobeDataLoader", () => {
         useGlobeDataLoader(challenges, loading, null),
       {
         initialProps: { challenges: null as Challenge[] | null, loading: true },
+        wrapper: intlWrapper,
       }
     );
 
@@ -229,8 +247,9 @@ describe("useGlobeDataLoader", () => {
   test("passes solved countries and patterns to CountryGeometryManager", async () => {
     setupGeoJSONMock();
 
-    const { result } = renderHook(() =>
-      useGlobeDataLoader(mockChallenges, false, null)
+    const { result } = renderHook(
+      () => useGlobeDataLoader(mockChallenges, false, null),
+      { wrapper: intlWrapper }
     );
 
     await waitFor(() => {

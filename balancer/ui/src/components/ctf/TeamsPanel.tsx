@@ -1,3 +1,5 @@
+import { FormattedMessage } from "react-intl";
+
 import { useScoreboard } from "@/hooks/useScoreboard";
 import { getPatternPathForTeam } from "@/lib/patterns/pattern-selector";
 
@@ -25,18 +27,25 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
         >
           ▼
         </span>{" "}
-        TEAMS
+        <FormattedMessage id="ctf.teams_panel.title" defaultMessage="TEAMS" />
       </div>
       {isOpen && (
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2.5 scroll-smooth [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[rgba(0,255,255,0.1)] [&::-webkit-scrollbar-thumb]:bg-ctf-primary [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:shadow-[0_0_3px_rgba(255,107,107,0.4)] [&::-webkit-scrollbar-thumb:hover]:bg-ctf-accent [&::-webkit-scrollbar-thumb:hover]:shadow-[0_0_5px_rgba(255,0,255,0.5)]">
           {isLoading && (
             <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
-              Loading teams...
+              <FormattedMessage
+                id="ctf.teams_panel.loading"
+                defaultMessage="Loading teams..."
+              />
             </div>
           )}
           {error && (
             <div className="text-xs opacity-70 p-2.5 text-ctf-neutral">
-              Error: {error}
+              <FormattedMessage
+                id="ctf.teams_panel.error"
+                defaultMessage="Error: {error}"
+                values={{ error }}
+              />
             </div>
           )}
           {teams && (
@@ -55,8 +64,14 @@ export function TeamsPanel({ isOpen, onToggle }: TeamsPanelProps) {
                         #{team.position} {team.name}
                       </div>
                       <div className="text-[10px] text-ctf-neutral opacity-90 uppercase tracking-[1px]">
-                        {team.score}pts - {team.solvedChallengeCount}{" "}
-                        {team.solvedChallengeCount === 1 ? "Solve" : "Solves"}
+                        <FormattedMessage
+                          id="ctf.teams_panel.score_solves"
+                          defaultMessage="{score}pts - {solveCount, plural, one {# Solve} other {# Solves}}"
+                          values={{
+                            score: team.score,
+                            solveCount: team.solvedChallengeCount,
+                          }}
+                        />
                       </div>
                     </div>
 

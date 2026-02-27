@@ -1,3 +1,5 @@
+import { useIntl } from "react-intl";
+
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
 interface ChallengeItemProps {
@@ -11,6 +13,7 @@ export function ChallengeItem({
   isHighlighted,
   onClick,
 }: ChallengeItemProps) {
+  const intl = useIntl();
   const { challenge, countryName } = mapping;
 
   // Generate difficulty stars
@@ -19,8 +22,18 @@ export function ChallengeItem({
   // Format solve count
   const solveText =
     challenge.solveCount === 0
-      ? "Unsolved"
-      : `${challenge.solveCount} ${challenge.solveCount === 1 ? "Solve" : "Solves"}`;
+      ? intl.formatMessage({
+          id: "ctf.challenge.unsolved",
+          defaultMessage: "Unsolved",
+        })
+      : intl.formatMessage(
+          {
+            id: "ctf.challenge.solve_count",
+            defaultMessage:
+              "{solveCount, plural, one {# Solve} other {# Solves}}",
+          },
+          { solveCount: challenge.solveCount }
+        );
 
   const isSolved = challenge.solveCount > 0;
 
@@ -36,7 +49,12 @@ export function ChallengeItem({
       onClick={() => onClick?.(mapping)}
     >
       <div className="text-xs font-bold uppercase tracking-[1px] text-ctf-primary mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis">
-        {challenge.name} - {countryName || "Unassigned"}
+        {challenge.name} -{" "}
+        {countryName ||
+          intl.formatMessage({
+            id: "ctf.challenge.unassigned",
+            defaultMessage: "Unassigned",
+          })}
       </div>
       <div
         className={`text-[10px] opacity-90 uppercase tracking-[1px] ${isSolved ? "text-ctf-secondary" : "text-ctf-neutral"}`}

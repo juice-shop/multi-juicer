@@ -1,10 +1,16 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { IntlProvider } from "react-intl";
 import { describe, expect, test } from "vitest";
 
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 
 import { ChallengesList } from "./ChallengesList";
+
+function renderWithIntl(ui: ReactElement) {
+  return render(<IntlProvider locale="en">{ui}</IntlProvider>);
+}
 
 function makeMapping(
   overrides: Partial<ChallengeCountryMapping["challenge"]> & { key: string },
@@ -30,7 +36,9 @@ describe("ChallengesList", () => {
       makeMapping({ key: "c1", name: "Challenge One", solveCount: 0 }),
     ];
 
-    render(<ChallengesList mappings={mappings} hoveredCountry={null} />);
+    renderWithIntl(
+      <ChallengesList mappings={mappings} hoveredCountry={null} />
+    );
 
     expect(screen.getByText(/Unsolved/)).toBeInTheDocument();
   });
@@ -40,7 +48,9 @@ describe("ChallengesList", () => {
       makeMapping({ key: "c1", name: "Challenge One", solveCount: 1 }),
     ];
 
-    render(<ChallengesList mappings={mappings} hoveredCountry={null} />);
+    renderWithIntl(
+      <ChallengesList mappings={mappings} hoveredCountry={null} />
+    );
 
     expect(screen.getByText(/1 Solve\b/)).toBeInTheDocument();
   });
@@ -50,7 +60,9 @@ describe("ChallengesList", () => {
       makeMapping({ key: "c1", name: "Challenge One", solveCount: 2 }),
     ];
 
-    render(<ChallengesList mappings={mappings} hoveredCountry={null} />);
+    renderWithIntl(
+      <ChallengesList mappings={mappings} hoveredCountry={null} />
+    );
 
     expect(screen.getByText(/2 Solves/)).toBeInTheDocument();
   });
@@ -64,7 +76,9 @@ describe("ChallengesList", () => {
       ),
     ];
 
-    render(<ChallengesList mappings={mappings} hoveredCountry={null} />);
+    renderWithIntl(
+      <ChallengesList mappings={mappings} hoveredCountry={null} />
+    );
 
     expect(screen.getByText(/3 Solves/)).toBeInTheDocument();
     // "Unsolved" appears both in the challenge name and the status text

@@ -114,4 +114,49 @@ export default {
   "admin.notification.submitting": "Bijwerken...",
   "admin.notification.submit": "Melding plaatsen",
   "admin.notification.clear": "Melding wissen",
+  "ctf.loading.geodata": "GEODATA LADEN...",
+  "ctf.loading.initializing": "Initialiseren...",
+  "ctf.loading.challenges": "Uitdagingen laden...",
+  "ctf.loading.theme_colors": "Themakleuren laden...",
+  "ctf.loading.world_data": "Werelddata laden...",
+  "ctf.globe.error": "FOUT: {error}",
+  "ctf.info_panel.title": "MultiJuicer CTF",
+  "ctf.info_panel.logo_alt": "MultiJuicer-logo",
+  "ctf.teams_panel.title": "TEAMS",
+  "ctf.teams_panel.loading": "Teams laden...",
+  "ctf.teams_panel.error": "Fout: {error}",
+  "ctf.teams_panel.score_solves":
+    "{score}pt - {solveCount, plural, one {# oplossing} other {# oplossingen}}",
+  "ctf.activity_panel.title": "LIVE ACTIVITEIT",
+  "ctf.activity_panel.loading": "Activiteit laden...",
+  "ctf.activity_panel.error": "Fout: {error}",
+  "ctf.activity_panel.challenge_solved":
+    "{team} heeft {challenge} opgelost (+{points} pt)",
+  "ctf.activity_panel.challenge_solved_country":
+    "{team} heeft {challenge} ({country}) opgelost (+{points} pt)",
+  "ctf.time_ago.seconds":
+    "{count, plural, one {# seconde geleden} other {# seconden geleden}}",
+  "ctf.time_ago.minutes":
+    "{count, plural, one {# minuut geleden} other {# minuten geleden}}",
+  "ctf.time_ago.hours":
+    "{count, plural, one {# uur geleden} other {# uur geleden}}",
+  "ctf.time_ago.days":
+    "{count, plural, one {# dag geleden} other {# dagen geleden}}",
+  "ctf.challenges_panel.title": "UITDAGINGEN ({count})",
+  "ctf.challenge.unassigned": "Niet toegewezen",
+  "ctf.challenge.unsolved": "Onopgelost",
+  "ctf.challenge.solve_count":
+    "{solveCount, plural, one {# oplossing} other {# oplossingen}}",
+  "ctf.challenge_detail.back": "← Terug",
+  "ctf.challenge_detail.solves_label": "Oplossingen:",
+  "ctf.challenge_detail.loading_solves": "Oplossingen laden...",
+  "ctf.challenge_detail.error": "Fout: {error}",
+  "ctf.challenge_detail.no_solves": "Nog geen oplossingen",
+  "ctf.challenge_detail.solved_just_now": "zojuist opgelost",
+  "ctf.challenge_detail.solved_mins_ago":
+    "{count, plural, one {# min.} other {# min.}} geleden opgelost",
+  "ctf.challenge_detail.solved_hours_ago":
+    "{count, plural, one {# uur} other {# uur}} geleden opgelost",
+  "ctf.challenge_detail.solved_days_ago":
+    "{count, plural, one {# dag} other {# dagen}} geleden opgelost",
 };
