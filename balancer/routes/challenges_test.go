@@ -175,6 +175,61 @@ func TestChallengesHandler(t *testing.T) {
 		}
 	})
 
+	t.Run("should replace HTML icons with emojis in challenge descriptions", func(t *testing.T) {
+		clientset := fake.NewClientset()
+
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := scoring.NewScoringService(bundle)
+		err := scoringService.CalculateAndCacheScoreBoard(context.Background())
+		require.NoError(t, err, "Setup: failed to calculate initial scoreboard")
+
+		server := http.NewServeMux()
+		bundle.ScoringService = scoringService
+		AddRoutes(server, bundle)
+
+		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		rr := httptest.NewRecorder()
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChallengesListResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		require.NoError(t, err)
+
+		// Find challenges with icon replacements
+		var gemChallenge, btcChallenge, bothChallenge *ChallengeListItem
+		for i := range response.Challenges {
+			switch response.Challenges[i].Key {
+			case "gemIconChallenge":
+				gemChallenge = &response.Challenges[i]
+			case "btcIconChallenge":
+				btcChallenge = &response.Challenges[i]
+			case "bothIconsChallenge":
+				bothChallenge = &response.Challenges[i]
+			}
+		}
+
+		require.NotNil(t, gemChallenge)
+		assert.Equal(t, "Find the hidden 💎 in the application.", gemChallenge.Description)
+
+		require.NotNil(t, btcChallenge)
+		assert.Equal(t, "Earn 💰 by solving this challenge.", btcChallenge.Description)
+
+		require.NotNil(t, bothChallenge)
+		assert.Equal(t, "Get 💎 and 💰 rewards!", bothChallenge.Description)
+
+		// Verify descriptions without icons are unchanged
+		var plainChallenge *ChallengeListItem
+		for i := range response.Challenges {
+			if response.Challenges[i].Key == "scoreBoardChallenge" {
+				plainChallenge = &response.Challenges[i]
+			}
+		}
+		require.NotNil(t, plainChallenge)
+		assert.Equal(t, "Find the carefully hidden 'Score Board' page.", plainChallenge.Description)
+	})
+
 	t.Run("should correctly identify first solver based on earliest timestamp", func(t *testing.T) {
 		const challengeKey = "scoreBoardChallenge"
 

@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 )
@@ -60,11 +61,14 @@ func handleChallenges(bundle *b.Bundle) http.Handler {
 				firstSolver = &info.team
 			}
 
+			description := strings.ReplaceAll(challenge.Description, "<i class=\"far fa-gem\"></i>", "💎")
+			description = strings.ReplaceAll(description, "<i class=\"fab fa-btc fa-sm\"></i>", "💰")
+
 			challenges = append(challenges, ChallengeListItem{
 				Key:         challenge.Key,
 				Name:        challenge.Name,
 				Category:    challenge.Category,
-				Description: challenge.Description,
+				Description: description,
 				Difficulty:  challenge.Difficulty,
 				SolveCount:  solveCounts[challenge.Key],
 				FirstSolver: firstSolver,
