@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
@@ -130,13 +131,13 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 	})
 
 	t.Run("rejects messages longer than 128 characters", func(t *testing.T) {
-		longMessage := ""
-		for i := 0; i < 129; i++ {
-			longMessage += "a"
+		var longMessage strings.Builder
+		for range 129 {
+			longMessage.WriteString("a")
 		}
 
 		requestBody := AdminNotificationRequest{
-			Message: longMessage,
+			Message: longMessage.String(),
 			Enabled: true,
 		}
 		bodyBytes, _ := json.Marshal(requestBody)

@@ -50,7 +50,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 				return
 			}
 
-		var topTeams []*b.TeamScore
+			var topTeams []*b.TeamScore
 			// limit score-board to calculate score for the top 24 teams only
 			if len(totalTeams) > 24 {
 				topTeams = totalTeams[:24]

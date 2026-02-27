@@ -1,9 +1,9 @@
 package notification
 
 import (
-b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"context"
 	"encoding/json"
+	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"testing"
 	"time"
 

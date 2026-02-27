@@ -36,9 +36,9 @@ func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 			}
 			passcodeHash := string(passcodeHashBytes)
 
-			patch, err := json.Marshal(map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"annotations": map[string]interface{}{
+			patch, err := json.Marshal(map[string]any{
+				"metadata": map[string]any{
+					"annotations": map[string]any{
 						"multi-juicer.owasp-juice.shop/passcode": passcodeHash,
 					},
 				},

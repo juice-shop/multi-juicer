@@ -180,8 +180,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		scoringService.CalculateAndCacheScoreBoard(context.Background())
 
 		// Start the scoring watcher in the background
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
+		ctx := t.Context()
 		go scoringService.StartingScoringWorker(ctx)
 
 		// Give the watcher time to start

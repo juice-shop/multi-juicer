@@ -51,7 +51,7 @@ func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
 	progressUpdateJobs := make(chan ProgressUpdateJobs)
 
 	// Start 10 workers which fetch and update ContinueCodes based on the `progressUpdateJobs` queue / channel
-	for i := 0; i < workerCount; i++ {
+	for range workerCount {
 		go workOnProgressUpdates(progressUpdateJobs, clientset)
 	}
 

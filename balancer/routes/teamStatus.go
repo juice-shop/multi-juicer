@@ -82,39 +82,39 @@ func handleTeamStatus(b *bundle.Bundle) http.Handler {
 			}
 
 			// Define the fetch function for long polling
-		fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*bundle.TeamScore, time.Time, bool, error) {
-			if waitAfter != nil {
-				teamScore := b.ScoringService.WaitForTeamUpdatesNewerThan(ctx, team, *waitAfter)
-				if teamScore == nil {
-					return nil, time.Time{}, false, nil
+			fetchFunc := func(ctx context.Context, waitAfter *time.Time) (*bundle.TeamScore, time.Time, bool, error) {
+				if waitAfter != nil {
+					teamScore := b.ScoringService.WaitForTeamUpdatesNewerThan(ctx, team, *waitAfter)
+					if teamScore == nil {
+						return nil, time.Time{}, false, nil
+					}
+					return teamScore, teamScore.LastUpdate, true, nil
+				}
+				teamScore, ok := b.ScoringService.GetScoreForTeam(team)
+				if !ok {
+					// Return error to trigger 404
+					return nil, time.Time{}, false, &teamNotFoundError{}
 				}
 				return teamScore, teamScore.LastUpdate, true, nil
 			}
-			teamScore, ok := b.ScoringService.GetScoreForTeam(team)
-			if !ok {
-				// Return error to trigger 404
-				return nil, time.Time{}, false, &teamNotFoundError{}
-			}
-			return teamScore, teamScore.LastUpdate, true, nil
-		}
 
-		teamScore, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
-		if err != nil {
-			if _, ok := err.(*teamNotFoundError); ok {
-				http.Error(responseWriter, "team not found", http.StatusNotFound)
+			teamScore, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
+			if err != nil {
+				if _, ok := err.(*teamNotFoundError); ok {
+					http.Error(responseWriter, "team not found", http.StatusNotFound)
+					return
+				}
+				b.Log.Printf("Long poll error: %s", err)
+				http.Error(responseWriter, "Invalid time format", statusCode)
 				return
 			}
-			b.Log.Printf("Long poll error: %s", err)
-			http.Error(responseWriter, "Invalid time format", statusCode)
-			return
-		}
-		if statusCode == http.StatusNoContent {
-			responseWriter.WriteHeader(http.StatusNoContent)
-			responseWriter.Write([]byte{})
-			return
-		}
+			if statusCode == http.StatusNoContent {
+				responseWriter.WriteHeader(http.StatusNoContent)
+				responseWriter.Write([]byte{})
+				return
+			}
 
-		teamCount := len(b.ScoringService.GetScores())
+			teamCount := len(b.ScoringService.GetScores())
 			// Build solved challenges array
 			solvedChallenges := make([]SolvedChallenge, len(teamScore.Challenges))
 			for i, challenge := range teamScore.Challenges {

@@ -29,6 +29,9 @@ tasks:
     desc: Runs the linters which support auto fixing errors
     aliases: [lf]
     cmds:
+      - task: balancer:api:lint:fix
+      - task: progress-watchdog:lint:fix
+      - task: cleaner:lint:fix
       - task: balancer:ui:lint:fix
 
   test:
@@ -103,6 +106,12 @@ tasks:
       - staticcheck ./...
     dir: balancer/
 
+  balancer:api:lint:fix:
+    cmds:
+      - go fmt ./...
+      - go fix ./...
+    dir: balancer/
+
   progress-watchdog:test:
     preconditions:
       - sh: which go
@@ -120,6 +129,12 @@ tasks:
       - staticcheck ./...
     dir: progress-watchdog/
 
+  progress-watchdog:lint:fix:
+    cmds:
+      - go fmt ./...
+      - go fix ./...
+    dir: progress-watchdog/
+
   cleaner:test:
     cmds:
       - go test ./...
@@ -132,6 +147,12 @@ tasks:
     cmds:
       - go vet ./...
       - staticcheck ./...
+    dir: cleaner/
+
+  cleaner:lint:fix:
+    cmds:
+      - go fmt ./...
+      - go fix ./...
     dir: cleaner/
 
   helm:test:

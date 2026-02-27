@@ -35,9 +35,9 @@ func handleChallenges(bundle *b.Bundle) http.Handler {
 		// Track first solver for each challenge (key -> team name and earliest solve time)
 		type solveInfo struct {
 			team     string
-		solvedAt b.ChallengeProgress
-	}
-	firstSolvers := make(map[string]solveInfo)
+			solvedAt b.ChallengeProgress
+		}
+		firstSolvers := make(map[string]solveInfo)
 
 		for _, teamScore := range allTeamScores {
 			for _, solvedChallenge := range teamScore.Challenges {

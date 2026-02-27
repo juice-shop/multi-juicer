@@ -14,11 +14,11 @@ import (
 
 func main() {
 	b := bundle.New()
-	
+
 	// Initialize services
 	scoringService := scoring.NewScoringService(b)
 	notificationService := notification.NewNotificationService(b)
-	
+
 	// Wire services into bundle
 	b.ScoringService = scoringService
 	b.NotificationService = notificationService
