@@ -36,6 +36,7 @@ jobs:
         run: go vet ./...
       - uses: dominikh/staticcheck-action@v1.4.0
         with:
+          install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
           working-directory: cleaner
       - name: "Test"
@@ -76,6 +77,7 @@ jobs:
         run: go vet ./...
       - uses: dominikh/staticcheck-action@v1.4.0
         with:
+          install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
           working-directory: balancer
       - name: "Test"
@@ -130,6 +132,7 @@ jobs:
         run: go vet ./...
       - uses: dominikh/staticcheck-action@v1.4.0
         with:
+          install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
           working-directory: progress-watchdog
       - name: "Test"
