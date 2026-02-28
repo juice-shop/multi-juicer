@@ -370,7 +370,8 @@ export function Layout({
 }) {
   const { data: notification } = useNotifications();
   const hasNotification =
-    notification && notification.enabled && notification.message;
+    notification &&
+    ((notification.enabled && notification.message) || notification.endDate);
 
   let primaryBackLink = "/";
   if (activeTeam === "admin") {

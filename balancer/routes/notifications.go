@@ -28,8 +28,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 					// Timeout, no updates
 					return nil, time.Time{}, false, nil
 				}
-				// Return disabled notification if it doesn't exist or is disabled
-				if notification == nil || !notification.Enabled {
+				if notification == nil {
 					return &NotificationResponse{
 						Message:   "",
 						Enabled:   false,
@@ -38,7 +37,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 				}
 				return &NotificationResponse{
 					Message:   notification.Message,
-					Enabled:   true,
+					Enabled:   notification.Enabled,
 					UpdatedAt: lastUpdateTime,
 					EndDate:   notification.EndDate,
 				}, lastUpdateTime, true, nil
@@ -46,7 +45,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 
 			// Initial fetch: return current notification immediately
 			notification, lastUpdateTime := b.NotificationService.GetNotificationWithTimestamp()
-			if notification == nil || !notification.Enabled {
+			if notification == nil {
 				return &NotificationResponse{
 					Message:   "",
 					Enabled:   false,
@@ -55,7 +54,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 			}
 			return &NotificationResponse{
 				Message:   notification.Message,
-				Enabled:   true,
+				Enabled:   notification.Enabled,
 				UpdatedAt: lastUpdateTime,
 				EndDate:   notification.EndDate,
 			}, lastUpdateTime, true, nil

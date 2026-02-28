@@ -33,12 +33,6 @@ func NewNotificationService(b *bundle.Bundle) *NotificationService {
 func (s *NotificationService) GetNotificationWithTimestamp() (*bundle.Notification, time.Time) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-
-	// Return nil if notification is disabled or doesn't exist
-	if s.currentNotification == nil || !s.currentNotification.Enabled {
-		return nil, s.lastUpdate
-	}
-
 	return s.currentNotification, s.lastUpdate
 }
 
@@ -49,11 +43,6 @@ func (s *NotificationService) WaitForUpdatesNewerThan(ctx context.Context, lastS
 		notification := s.currentNotification
 		lastUpdate := s.lastUpdate
 		s.mutex.RUnlock()
-
-		// Return nil if disabled
-		if notification == nil || !notification.Enabled {
-			return nil, lastUpdate, true
-		}
 		return notification, lastUpdate, true
 	}
 	s.mutex.RUnlock()
@@ -73,11 +62,6 @@ func (s *NotificationService) WaitForUpdatesNewerThan(ctx context.Context, lastS
 				notification := s.currentNotification
 				lastUpdate := s.lastUpdate
 				s.mutex.RUnlock()
-
-				// Return nil if disabled
-				if notification == nil || !notification.Enabled {
-					return nil, lastUpdate, true
-				}
 				return notification, lastUpdate, true
 			}
 			s.mutex.RUnlock()

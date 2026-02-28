@@ -29,9 +29,7 @@ export function LeftPanels({
   activitiesError,
 }: LeftPanelsProps) {
   const { data: notification } = useNotifications();
-  const hasNotification =
-    notification && notification.enabled && notification.message;
-  const hasEndDate = hasNotification && notification.endDate;
+  const hasEndDate = notification != null && notification.endDate != null;
 
   // Determine grid template rows based on which panels are open
   // When endDate is present, add an "auto" row for the game clock

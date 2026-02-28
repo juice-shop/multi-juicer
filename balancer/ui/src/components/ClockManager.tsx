@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -6,6 +6,14 @@ import { Card } from "@/components/Card";
 
 const buttonClasses =
   "inline m-0 bg-gray-700 text-white p-2 px-3 text-sm rounded-sm disabled:cursor-wait disabled:opacity-50 hover:bg-gray-600";
+
+/**
+ * Converts a UTC Date to a string suitable for datetime-local input (YYYY-MM-DDTHH:mm).
+ */
+function toDatetimeLocalString(date: Date): string {
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
 
 function formatRelativeTime(date: Date): {
   key: string;
@@ -39,6 +47,17 @@ export function ClockManager() {
   const intl = useIntl();
   const [endDateStr, setEndDateStr] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("/balancer/api/notifications")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.endDate) {
+          setEndDateStr(toDatetimeLocalString(new Date(data.endDate)));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const endDateHint = useMemo(() => {
     if (!endDateStr) return null;

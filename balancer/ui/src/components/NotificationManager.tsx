@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -11,6 +11,17 @@ export function NotificationManager() {
   const intl = useIntl();
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("/balancer/api/notifications")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.message) {
+          setMessage(data.message);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

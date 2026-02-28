@@ -80,9 +80,10 @@ func TestParseAndUpdateNotification(t *testing.T) {
 
 		service.parseAndUpdateNotification(cm)
 
-		// Should return nil for disabled notifications
+		// Should return the notification even when disabled
 		notification, _ := service.GetNotificationWithTimestamp()
-		assert.Nil(t, notification)
+		assert.NotNil(t, notification)
+		assert.False(t, notification.Enabled)
 	})
 
 	t.Run("handles invalid JSON", func(t *testing.T) {
