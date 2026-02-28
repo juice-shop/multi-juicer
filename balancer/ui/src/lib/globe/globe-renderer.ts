@@ -10,7 +10,6 @@ import {
 
 import { TextureCache } from "../patterns/texture-cache";
 
-import { createCapitalMarkers } from "./capital-markers";
 import type { CountryGeometryManager } from "./country-geometry";
 import type { CountryData } from "./data/geojson-loader";
 import { createNeonPatternMaterial } from "./materials/neon-pattern";
@@ -28,7 +27,7 @@ interface ThemeColors {
 }
 
 /**
- * Manages globe rendering objects (wireframe lines, solid meshes, pattern meshes, and capital markers)
+ * Manages globe rendering objects (wireframe lines, solid meshes, and pattern meshes)
  * Adds all country geometries to the scene with appropriate materials
  */
 export class GlobeRenderer {
@@ -36,7 +35,6 @@ export class GlobeRenderer {
   patternMeshes: Mesh[] = [];
   solidMeshes: Mesh[] = [];
   triangleWireframes: LineSegments[] = []; // For visualizing triangle edges
-  capitalMarkers: Mesh[] = []; // Yellow donut markers for capitals
   private scene: Scene;
   private textureCache: TextureCache;
   /** Map of country name → capital {lat, lon} for camera focus animations */
@@ -144,15 +142,6 @@ export class GlobeRenderer {
         this.triangleWireframes.push(wireframeMesh);
         this.scene.add(wireframeMesh);
       }
-    }
-
-    // Create capital markers for highlighted countries
-    this.capitalMarkers = createCapitalMarkers(
-      countries,
-      geometryManager.highlightedCountries
-    );
-    for (const marker of this.capitalMarkers) {
-      this.scene.add(marker);
     }
 
     // Build country center lookup from capital coordinates
