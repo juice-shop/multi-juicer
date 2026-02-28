@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { FormattedMessage, useIntl, type IntlShape } from "react-intl";
 
 import { useChallengeDetail } from "@/hooks/useChallengeDetail";
@@ -99,9 +100,12 @@ export function ChallengeDetailView({
           </span>
         </div>
 
-        <p className="text-ctf-primary text-base leading-relaxed m-0">
-          {challenge.description}
-        </p>
+        <p
+          className="text-ctf-primary text-base leading-relaxed m-0"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(challenge.description),
+          }}
+        />
 
         <div className="flex flex-col gap-2.5">
           <div className="text-ctf-primary/70 text-base font-bold uppercase">
