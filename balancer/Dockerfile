@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build
 RUN chmod +x balancer
 
-FROM --platform=$BUILDPLATFORM node:24-alpine AS ui
+FROM --platform=$BUILDPLATFORM docker.io/library/node:24-alpine AS ui
 RUN mkdir -p /home/app
 WORKDIR /home/app
 COPY ui/package.json ui/package-lock.json ./
@@ -26,9 +26,9 @@ RUN --mount=type=cache,target=/root/.npm \
     npm run build
 
 # get the challenges from the juice-shop image
-FROM bkimminich/juice-shop:${JUICE_SHOP_VERSION} AS juice-shop
+FROM docker.io/bkimminich/juice-shop:${JUICE_SHOP_VERSION} AS juice-shop
 # convert them to json so that we don't need to pull in a yaml lib
-FROM mikefarah/yq:4 AS challenges-json
+FROM docker.io/mikefarah/yq:4 AS challenges-json
 COPY --from=juice-shop /juice-shop/data/static/challenges.yml /workdir/challenges.yaml
 RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challenges.json
 
