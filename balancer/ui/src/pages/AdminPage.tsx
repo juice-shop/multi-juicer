@@ -6,6 +6,7 @@ import type { PopupActions } from "reactjs-popup/dist/types";
 import { PasscodeDisplayCard } from "@/cards/PassCodeDisplayCard";
 import { Card } from "@/components/Card";
 import { CheatScoreGraph } from "@/components/CheatScoreGraph/CheatScoreGraph";
+import { ClockManager } from "@/components/ClockManager";
 import { NotificationManager } from "@/components/NotificationManager";
 import { ReadableTimestamp } from "@/components/ReadableTimestamp";
 
@@ -344,6 +345,7 @@ export default function AdminPage() {
   return (
     <div className="flex flex-col gap-4 w-full lg:max-w-4xl">
       <NotificationManager />
+      <ClockManager />
 
       <h1 className="text-xl font-semibold">
         <FormattedMessage

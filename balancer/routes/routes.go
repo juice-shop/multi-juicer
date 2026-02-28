@@ -42,6 +42,7 @@ func AddRoutes(
 	router.Handle("DELETE /balancer/api/admin/teams/{team}/delete", requireAdmin(bundle, handleAdminDeleteInstance(bundle)))
 	router.Handle("POST /balancer/api/admin/teams/{team}/restart", requireAdmin(bundle, handleAdminRestartInstance(bundle)))
 	router.Handle("POST /balancer/api/admin/notifications", requireAdmin(bundle, handleAdminPostNotification(bundle)))
+	router.Handle("POST /balancer/api/admin/clock", requireAdmin(bundle, handleAdminSetClock(bundle)))
 	router.Handle("POST /balancer/api/admin/teams/{team}/reset-passcode", requireAdmin(bundle, handleAdminResetPasscode(bundle)))
 
 	router.HandleFunc("GET /balancer/api/health", func(w http.ResponseWriter, r *http.Request) {

@@ -145,9 +145,10 @@ type ChallengeProgress struct {
 
 // Notification represents a system-wide notification
 type Notification struct {
-	Message   string    `json:"message"`
-	Enabled   bool      `json:"enabled"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	Message   string     `json:"message"`
+	Enabled   bool       `json:"enabled"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	EndDate   *time.Time `json:"endDate,omitempty"`
 }
 
 // ScoringService defines the interface for the scoring service
@@ -169,6 +170,7 @@ type NotificationService interface {
 	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) (*Notification, time.Time, bool)
 	StartNotificationWatcher(ctx context.Context)
 	SetNotification(ctx context.Context, message string, enabled bool) error
+	SetEndDate(ctx context.Context, endDate *time.Time) error
 }
 
 func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {

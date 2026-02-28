@@ -1,9 +1,28 @@
+import DOMPurify from "dompurify";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import snarkdown from "snarkdown";
 
-export function InfoPanel() {
+import type { NotificationData } from "@/hooks/useNotifications";
+
+interface InfoPanelProps {
+  notification?: NotificationData | null;
+}
+
+export function InfoPanel({ notification }: InfoPanelProps) {
   const intl = useIntl();
+
+  const hasNotification =
+    notification && notification.enabled && notification.message;
+
+  const sanitizedHtml = useMemo(() => {
+    if (!hasNotification) return "";
+    const rawHtml = snarkdown(notification.message);
+    return DOMPurify.sanitize(rawHtml);
+  }, [hasNotification, notification?.message]);
+
   return (
-    <div className="p-5 bg-ctf-bg-panel border-2 border-ctf-primary backdrop-blur-[5px] uppercase tracking-[2px] flex flex-col items-center justify-center shadow-[0_0_5px_rgba(255,107,107,0.3),inset_0_0_5px_rgba(255,107,107,0.05)]">
+    <div className="p-5 bg-ctf-bg-panel border-2 border-ctf-primary backdrop-blur-[5px] uppercase tracking-[2px] flex flex-col items-center justify-center gap-3 shadow-[0_0_5px_rgba(255,107,107,0.3),inset_0_0_5px_rgba(255,107,107,0.05)]">
       <h1
         className="text-2xl font-bold m-0 text-center flex items-center gap-2.5 text-ctf-primary"
         style={{
@@ -24,6 +43,14 @@ export function InfoPanel() {
           defaultMessage="MultiJuicer CTF"
         />
       </h1>
+      {hasNotification && (
+        <div className="w-full border-t border-ctf-primary/30 pt-3 normal-case tracking-normal text-ctf-primary text-sm text-center font-medium">
+          <span
+            className="[&_a]:underline [&_a]:font-semibold [&_strong]:font-bold [&_em]:italic [&_code]:bg-ctf-primary/20 [&_code]:px-1 [&_code]:rounded"
+            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+          />
+        </div>
+      )}
     </div>
   );
 }

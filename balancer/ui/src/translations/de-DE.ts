@@ -116,6 +116,13 @@ export default {
   "admin.notification.submitting": "Wird aktualisiert...",
   "admin.notification.submit": "Benachrichtigung senden",
   "admin.notification.clear": "Benachrichtigung löschen",
+  "admin.notification.end_date.label": "Veranstaltungs-Enddatum (optional)",
+  "admin.notification.end_date.hint_future": "{time} ab jetzt",
+  "admin.notification.end_date.hint_past":
+    "Dieses Datum liegt in der Vergangenheit",
+  "notification.event_ended": "Die Veranstaltung ist beendet",
+  "ctf.game_clock.title": "Spieluhr",
+  "ctf.game_clock.ended": "Die Veranstaltung ist beendet",
   "ctf.loading.geodata": "LADE GEODATEN...",
   "ctf.loading.initializing": "Initialisiere...",
   "ctf.loading.challenges": "Lade Herausforderungen...",

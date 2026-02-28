@@ -8,6 +8,7 @@ export interface NotificationData {
   message: string;
   enabled: boolean;
   updatedAt: string; // ISO String
+  endDate?: string; // ISO String, optional
 }
 
 /**

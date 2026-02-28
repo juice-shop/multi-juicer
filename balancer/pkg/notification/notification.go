@@ -195,62 +195,100 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 	s.bundle.Log.Printf("Updated notification: enabled=%v, message=%q", notification.Enabled, notification.Message)
 }
 
-// SetNotification updates or creates the notification ConfigMap
-func (s *NotificationService) SetNotification(ctx context.Context, message string, enabled bool) error {
+// getOrCreateConfigMap retrieves the existing notification ConfigMap or returns a new empty one.
+// The boolean indicates whether the ConfigMap already existed.
+func (s *NotificationService) getOrCreateConfigMap(ctx context.Context) (*corev1.ConfigMap, bool, error) {
 	const configMapName = "multi-juicer-notification"
 
-	// Build notification data
-	notificationData := bundle.Notification{
-		Message:   message,
-		Enabled:   enabled,
-		UpdatedAt: timeutil.TruncateToMillisecond(time.Now()),
-	}
-
-	notificationJSON, err := json.Marshal(notificationData)
-	if err != nil {
-		return err
-	}
-
-	// Try to get existing ConfigMap
 	existingCM, err := s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Get(
 		ctx,
 		configMapName,
 		metav1.GetOptions{},
 	)
-
 	if err != nil {
 		if errors.IsNotFound(err) {
-			// Create new ConfigMap
-			configMap := &corev1.ConfigMap{
+			return &corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      configMapName,
 					Namespace: s.bundle.RuntimeEnvironment.Namespace,
 				},
-				Data: map[string]string{
-					"notification.json": string(notificationJSON),
-				},
-			}
-
-			_, err = s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Create(
-				ctx,
-				configMap,
-				metav1.CreateOptions{},
-			)
-			return err
+				Data: map[string]string{},
+			}, false, nil
 		}
+		return nil, false, err
+	}
+	return existingCM, true, nil
+}
+
+// readNotification parses the existing notification from a ConfigMap, returning a zero-value Notification if missing/invalid.
+func (s *NotificationService) readNotification(cm *corev1.ConfigMap) bundle.Notification {
+	if cm.Data == nil {
+		return bundle.Notification{}
+	}
+	jsonData, ok := cm.Data["notification.json"]
+	if !ok {
+		return bundle.Notification{}
+	}
+	var n bundle.Notification
+	if err := json.Unmarshal([]byte(jsonData), &n); err != nil {
+		return bundle.Notification{}
+	}
+	return n
+}
+
+// saveConfigMap creates or updates the ConfigMap with the given notification data.
+func (s *NotificationService) saveConfigMap(ctx context.Context, cm *corev1.ConfigMap, existed bool, data bundle.Notification) error {
+	notificationJSON, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	if cm.Data == nil {
+		cm.Data = make(map[string]string)
+	}
+	cm.Data["notification.json"] = string(notificationJSON)
+
+	if existed {
+		_, err = s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Update(ctx, cm, metav1.UpdateOptions{})
+	} else {
+		_, err = s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Create(ctx, cm, metav1.CreateOptions{})
+	}
+	return err
+}
+
+// SetNotification updates or creates the notification ConfigMap, preserving the existing endDate.
+func (s *NotificationService) SetNotification(ctx context.Context, message string, enabled bool) error {
+	cm, existed, err := s.getOrCreateConfigMap(ctx)
+	if err != nil {
 		return err
 	}
 
-	// Update existing ConfigMap
-	if existingCM.Data == nil {
-		existingCM.Data = make(map[string]string)
-	}
-	existingCM.Data["notification.json"] = string(notificationJSON)
+	existing := s.readNotification(cm)
 
-	_, err = s.bundle.ClientSet.CoreV1().ConfigMaps(s.bundle.RuntimeEnvironment.Namespace).Update(
-		ctx,
-		existingCM,
-		metav1.UpdateOptions{},
-	)
-	return err
+	notificationData := bundle.Notification{
+		Message:   message,
+		Enabled:   enabled,
+		UpdatedAt: timeutil.TruncateToMillisecond(time.Now()),
+		EndDate:   existing.EndDate,
+	}
+
+	return s.saveConfigMap(ctx, cm, existed, notificationData)
+}
+
+// SetEndDate updates or creates the notification ConfigMap, preserving the existing message and enabled fields.
+func (s *NotificationService) SetEndDate(ctx context.Context, endDate *time.Time) error {
+	cm, existed, err := s.getOrCreateConfigMap(ctx)
+	if err != nil {
+		return err
+	}
+
+	existing := s.readNotification(cm)
+
+	notificationData := bundle.Notification{
+		Message:   existing.Message,
+		Enabled:   existing.Enabled,
+		UpdatedAt: timeutil.TruncateToMillisecond(time.Now()),
+		EndDate:   endDate,
+	}
+
+	return s.saveConfigMap(ctx, cm, existed, notificationData)
 }

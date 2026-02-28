@@ -114,6 +114,13 @@ export default {
   "admin.notification.submitting": "Se actualizează...",
   "admin.notification.submit": "Postează notificare",
   "admin.notification.clear": "Șterge notificarea",
+  "admin.notification.end_date.label":
+    "Data de încheiere a evenimentului (opțional)",
+  "admin.notification.end_date.hint_future": "{time} de acum",
+  "admin.notification.end_date.hint_past": "Această dată este în trecut",
+  "notification.event_ended": "Evenimentul s-a încheiat",
+  "ctf.game_clock.title": "Ceasul jocului",
+  "ctf.game_clock.ended": "Evenimentul s-a încheiat",
   "ctf.loading.geodata": "SE ÎNCARCĂ GEODATELE...",
   "ctf.loading.initializing": "Se inițializează...",
   "ctf.loading.challenges": "Se încarcă provocările...",
