@@ -56,6 +56,26 @@ func TestProxyHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusFound, rr.Result().StatusCode)
 		assert.Equal(t, "/balancer", rr.Header().Get("Location"))
+		assert.Equal(t, "balancer=; Path=/; Max-Age=0", rr.Header().Get("Set-Cookie"))
+		assert.Empty(t, rr.Body.String())
+	})
+
+	t.Run("redirects to /balancer and sets Secure on cookie when configured", func(t *testing.T) {
+		defer clearInstanceUpCache()
+		req, _ := http.NewRequest("POST", "/hello-world", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+
+		bundle := testutil.NewTestBundle()
+		bundle.Config.CookieConfig.Secure = true
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusFound, rr.Result().StatusCode)
+		assert.Equal(t, "/balancer", rr.Header().Get("Location"))
+		assert.Equal(t, "balancer=; Path=/; Max-Age=0; Secure", rr.Header().Get("Set-Cookie"))
 		assert.Empty(t, rr.Body.String())
 	})
 

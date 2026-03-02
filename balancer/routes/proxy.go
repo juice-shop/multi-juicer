@@ -42,22 +42,23 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team, err := teamcookie.GetTeamFromRequest(bundle, req)
 			if err != nil {
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1})
+				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1, Secure: bundle.Config.CookieConfig.Secure})
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}
 
 			if !wasInstanceUptimeStatusCheckedRecently(team) {
 				status := isInstanceUp(req.Context(), bundle, team)
-				if status == instanceUp {
+				switch status {
+				case instanceUp:
 					cacheMutex.Lock()
 					instanceUpCache[team] = time.Now().UnixMilli()
 					cacheMutex.Unlock()
-				} else if status == instanceMissing {
+				case instanceMissing:
 					bundle.Log.Printf("Instance for team (%s) is missing. Redirecting to balancer page.", team)
 					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-not-found&team=%s", team), http.StatusFound)
 					return
-				} else {
+				default:
 					bundle.Log.Printf("Instance for team (%s) is down. Redirecting to balancer page.", team)
 					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&team=%s", team), http.StatusFound)
 					return
