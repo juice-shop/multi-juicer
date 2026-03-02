@@ -4,8 +4,12 @@ This is a short guide on how to install MultiJuicer together with Prometheus, Gr
 
 After you have everything installed you can locally port forward the grafana port by running: `kubectl -n monitoring port-forward service/monitoring-grafana 8080:80` and access Grafana in your browser on [http://localhost:8080](http://localhost:8080).
 
-The default credentials for grafana are username: `admin`, password: `prom-operator`.
-You can overwrite these by adding `set="grafana.adminPassword=yourPasswordHere"` to the helm install command for the `kube-prometheus-stack`.
+The default credentials for grafana are username: `admin` with a random generated password.
+You can retrieve the auto-generated password by running:
+```sh
+kubectl -n monitoring get secret monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
+```
+You can set a custom password by adding `--set="grafana.adminPassword=yourPasswordHere"` to the helm install command for the `kube-prometheus-stack`.
 
 ```sh
 # Install Prometheus and Grafana
@@ -18,7 +22,7 @@ helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
 
 echo "Installing MultiJuicer"
 helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer \
-  --set="balancer.metrics.enabled=true" --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
+  --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
 ```
 
 The Grafana instance automatically includes a MultiJuicer Dashboard.
