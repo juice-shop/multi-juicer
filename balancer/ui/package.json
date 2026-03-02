@@ -22,7 +22,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
-    "@types/node": "^25.3.2",
+    "@types/node": "^25.3.3",
     "@types/three": "^0.183.1",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.3",
@@ -34,7 +34,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "globals": "^17.3.0",
+    "globals": "^17.4.0",
     "jsdom": "^28.1.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
