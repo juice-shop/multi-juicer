@@ -27,4 +27,5 @@ RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challen
 FROM gcr.io/distroless/static:nonroot
 COPY --from=challenges-json --chown=root:root --chmod=755 /workdir/challenges.json /challenges.json
 COPY --from=builder --chown=root:root --chmod=755 /src/progress-watchdog /progress-watchdog
+# nosemgrep: dockerfile.security.missing-user.missing-user
 CMD ["/progress-watchdog"]

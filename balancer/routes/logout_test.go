@@ -21,7 +21,7 @@ func TestLogoutHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, rr.Code, http.StatusOK)
-		assert.Equal(t, fmt.Sprintf("%s=; Path=/; Max-Age=0", bundle.Config.CookieConfig.Name), rr.Header().Get("Set-Cookie"))
+		assert.Equal(t, fmt.Sprintf("%s=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict", bundle.Config.CookieConfig.Name), rr.Header().Get("Set-Cookie"))
 		assert.Equal(t, `"cookies"`, rr.Header().Get("Clear-Site-Data"))
 	})
 }

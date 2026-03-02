@@ -42,7 +42,8 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team, err := teamcookie.GetTeamFromRequest(bundle, req)
 			if err != nil {
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1, Secure: bundle.Config.CookieConfig.Secure})
+				// nosemgrep: go.lang.security.audit.net.cookie-missing-secure.cookie-missing-secure
+				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteStrictMode, Secure: bundle.Config.CookieConfig.Secure})
 				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
 				return
 			}

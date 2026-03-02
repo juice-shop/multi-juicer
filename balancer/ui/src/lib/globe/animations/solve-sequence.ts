@@ -98,7 +98,7 @@ export class SolveSequenceAnimation implements Animation {
         })
         .catch((error) => {
           console.error(
-            `Failed to transition ${this.params.countryName}:`,
+            `Failed to transition ${this.params.countryName}:`, // nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
             error
           );
         });

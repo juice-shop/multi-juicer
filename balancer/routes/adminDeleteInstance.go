@@ -32,7 +32,7 @@ func handleAdminDeleteInstance(bundle *bundle.Bundle) http.Handler {
 			}
 
 			responseWriter.WriteHeader(http.StatusOK)
-			responseWriter.Write([]byte{})
+			responseWriter.Write([]byte{}) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 		},
 	)
 }

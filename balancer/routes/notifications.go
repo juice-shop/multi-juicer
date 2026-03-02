@@ -69,7 +69,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 
 		if statusCode == http.StatusNoContent {
 			w.WriteHeader(http.StatusNoContent)
-			w.Write([]byte{})
+			w.Write([]byte{}) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 			return
 		}
 
@@ -83,6 +83,6 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 		w.WriteHeader(http.StatusOK)
-		w.Write(responseBytes)
+		w.Write(responseBytes) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 	})
 }

@@ -42,6 +42,14 @@ tasks:
       - task: balancer:api:test
       - task: cleaner:test
       - task: progress-watchdog:test
+      - task: semgrep:scan
+
+  semgrep:scan:
+    preconditions:
+      - sh: which semgrep
+        msg: "semgrep is not installed. Install it from https://semgrep.dev/ to run static analysis scanning."
+    cmds:
+      - semgrep scan --config=auto --quiet
 
   balancer:ui:build:
     preconditions:

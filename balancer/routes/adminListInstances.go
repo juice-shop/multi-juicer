@@ -84,7 +84,7 @@ func handleAdminListInstances(bundle *bundle.Bundle) http.Handler {
 			responseBody, _ := json.Marshal(response)
 			responseWriter.Header().Set("Content-Type", "application/json")
 			responseWriter.WriteHeader(http.StatusOK)
-			responseWriter.Write(responseBody)
+			responseWriter.Write(responseBody) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 		},
 	)
 }

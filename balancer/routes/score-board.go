@@ -46,7 +46,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 			}
 			if statusCode == http.StatusNoContent {
 				responseWriter.WriteHeader(http.StatusNoContent)
-				responseWriter.Write([]byte{})
+				responseWriter.Write([]byte{}) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 				return
 			}
 
@@ -84,7 +84,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 			responseWriter.Header().Set("Last-Modified", lastUpdateTime.UTC().Format(time.RFC1123))
 			responseWriter.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 			responseWriter.WriteHeader(http.StatusOK)
-			responseWriter.Write(responseBytes)
+			responseWriter.Write(responseBytes) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 		},
 	)
 }

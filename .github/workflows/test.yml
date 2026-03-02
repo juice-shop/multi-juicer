@@ -138,6 +138,16 @@ jobs:
       - name: "Test"
         run: go test -cover ./...
 
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v6
+      - name: "Run Semgrep"
+        run: semgrep scan --config=auto
+
   helm:
     name: Helm
     runs-on: ubuntu-latest

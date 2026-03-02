@@ -77,7 +77,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 
 			responseWriter.WriteHeader(http.StatusOK)
 			responseWriter.Header().Set("Content-Type", "application/json")
-			responseWriter.Write(responseBodyEncoded)
+			responseWriter.Write(responseBodyEncoded) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 		},
 	)
 }

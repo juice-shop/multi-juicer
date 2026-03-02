@@ -1,5 +1,4 @@
 import DOMPurify from "dompurify";
-import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import snarkdown from "snarkdown";
 
@@ -15,11 +14,9 @@ export function InfoPanel({ notification }: InfoPanelProps) {
   const hasNotification =
     notification && notification.enabled && notification.message;
 
-  const sanitizedHtml = useMemo(() => {
-    if (!hasNotification) return "";
-    const rawHtml = snarkdown(notification.message);
-    return DOMPurify.sanitize(rawHtml);
-  }, [hasNotification, notification?.message]);
+  const sanitizedHtml = hasNotification
+    ? DOMPurify.sanitize(snarkdown(notification.message))
+    : "";
 
   return (
     <div className="p-5 bg-ctf-bg-panel border-2 border-ctf-primary backdrop-blur-[5px] uppercase tracking-[2px] flex flex-col items-center justify-center gap-3 shadow-[0_0_5px_rgba(255,107,107,0.3),inset_0_0_5px_rgba(255,107,107,0.05)]">

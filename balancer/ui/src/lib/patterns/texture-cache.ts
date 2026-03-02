@@ -42,7 +42,7 @@ export class TextureCache {
         },
         undefined,
         (error) => {
-          console.error(`Failed to load texture: ${path}`, error);
+          console.error(`Failed to load texture: ${path}`, error); // nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
           reject(error);
         }
       );

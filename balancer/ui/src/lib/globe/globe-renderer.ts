@@ -98,7 +98,7 @@ export class GlobeRenderer {
         this.patternMeshes.push(mesh);
         this.scene.add(mesh);
       } catch (error) {
-        console.error(`Failed to load pattern for ${name}:`, error);
+        console.error(`Failed to load pattern for ${name}:`, error); // nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
         // Fallback: use solid material
         const solidMaterial = createNeonSolidMaterial(
           themeColors.primary,
@@ -238,7 +238,7 @@ export class GlobeRenderer {
       }
     } catch (error) {
       console.error(
-        `Failed to transition country "${countryName}" to pattern:`,
+        `Failed to transition country "${countryName}" to pattern:`, // nosemgrep: javascript.lang.security.audit.unsafe-formatstring.unsafe-formatstring
         error
       );
     }

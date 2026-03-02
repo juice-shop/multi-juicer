@@ -211,7 +211,7 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 		}
 		if statusCode == http.StatusNoContent {
 			w.WriteHeader(http.StatusNoContent)
-			w.Write([]byte{})
+			w.Write([]byte{}) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 			return
 		}
 
@@ -226,6 +226,6 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 		w.Header().Set("Last-Modified", lastUpdateTime.UTC().Format(time.RFC1123))
 		w.Header().Set("X-Last-Update", lastUpdateTime.UTC().Format(time.RFC3339Nano))
 		w.WriteHeader(http.StatusOK)
-		w.Write(responseBytes)
+		w.Write(responseBytes) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 	})
 }
