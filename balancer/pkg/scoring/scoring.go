@@ -91,8 +91,7 @@ func (s *ScoringService) WaitForUpdatesNewerThanWithTimestamp(ctx context.Contex
 	}
 	s.currentScoresMutex.Unlock()
 
-	const maxWaitTime = 25 * time.Second
-	timeout := time.NewTimer(maxWaitTime)
+	timeout := time.NewTimer(s.bundle.LongPollDefaultWaitTimeout)
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer timeout.Stop()
 	defer ticker.Stop()
@@ -129,8 +128,7 @@ func (s *ScoringService) WaitForTeamUpdatesNewerThan(ctx context.Context, team s
 	}
 	s.currentScoresMutex.Unlock()
 
-	const maxWaitTime = 25 * time.Second
-	timeout := time.NewTimer(maxWaitTime)
+	timeout := time.NewTimer(s.bundle.LongPollDefaultWaitTimeout)
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer timeout.Stop()
 	defer ticker.Stop()

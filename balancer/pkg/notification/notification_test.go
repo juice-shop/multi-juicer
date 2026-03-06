@@ -3,9 +3,10 @@ package notification
 import (
 	"context"
 	"encoding/json"
-	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"testing"
 	"time"
+
+	b "github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/testutil"
 	"github.com/stretchr/testify/assert"
@@ -163,8 +164,8 @@ func TestWaitForUpdatesNewerThan(t *testing.T) {
 		elapsed := time.Since(start)
 
 		assert.False(t, hasUpdate)
-		// Should wait for full timeout (25 seconds)
-		assert.GreaterOrEqual(t, elapsed, 24*time.Second)
+		// Should wait for full timeout (3 seconds in test config)
+		assert.GreaterOrEqual(t, elapsed, 2*time.Second)
 	})
 
 	t.Run("respects context cancellation", func(t *testing.T) {

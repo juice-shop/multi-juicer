@@ -30,6 +30,9 @@ type Bundle struct {
 	Config                 *Config
 	Log                    *log.Logger
 
+	// LongPollDefaultWaitTimeout amount of time that HTTP Long Polling Endpoints wait for new data to arrive before returning a empty no changes response
+	LongPollDefaultWaitTimeout time.Duration
+
 	JuiceShopChallenges []JuiceShopChallenge
 
 	// Services - set after Bundle creation to avoid cyclic dependencies
@@ -237,12 +240,13 @@ func New() *Bundle {
 		RuntimeEnvironment: RuntimeEnvironment{
 			Namespace: namespace,
 		},
-		GeneratePasscode:       passcode.GetPasscodeGeneratorWithPasscodeLength(config.TeamPasscodeLength),
-		GetJuiceShopUrlForTeam: getJuiceShopUrlForTeam,
-		BcryptRounds:           bcrypt.DefaultCost,
-		Log:                    log.New(os.Stdout, "", log.LstdFlags),
-		Config:                 config,
-		JuiceShopChallenges:    challenges,
+		GeneratePasscode:           passcode.GetPasscodeGeneratorWithPasscodeLength(config.TeamPasscodeLength),
+		GetJuiceShopUrlForTeam:     getJuiceShopUrlForTeam,
+		BcryptRounds:               bcrypt.DefaultCost,
+		Log:                        log.New(os.Stdout, "", log.LstdFlags),
+		LongPollDefaultWaitTimeout: 25 * time.Second,
+		Config:                     config,
+		JuiceShopChallenges:        challenges,
 	}
 }
 

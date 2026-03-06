@@ -3,6 +3,7 @@ package testutil
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/signutil"
@@ -69,8 +70,9 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 				Category:    "Security Misconfiguration",
 			},
 		},
-		BcryptRounds: 2,
-		Log:          log.New(os.Stdout, "", log.LstdFlags),
+		BcryptRounds:               2,
+		Log:                        log.New(os.Stdout, "", log.LstdFlags),
+		LongPollDefaultWaitTimeout: 3 * time.Second,
 		Config: &bundle.Config{
 			MaxInstances: 100,
 			JuiceShopConfig: bundle.JuiceShopConfig{

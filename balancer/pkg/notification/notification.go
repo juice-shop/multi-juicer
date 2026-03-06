@@ -48,8 +48,7 @@ func (s *NotificationService) WaitForUpdatesNewerThan(ctx context.Context, lastS
 	s.mutex.RUnlock()
 
 	// Slow path: poll for updates
-	const maxWaitTime = 25 * time.Second
-	timeout := time.NewTimer(maxWaitTime)
+	timeout := time.NewTimer(s.bundle.LongPollDefaultWaitTimeout)
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer timeout.Stop()
 	defer ticker.Stop()
