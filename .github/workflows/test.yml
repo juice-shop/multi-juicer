@@ -34,7 +34,7 @@ jobs:
           fi
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.4.0
+      - uses: dominikh/staticcheck-action@v1.4.1
         with:
           install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
@@ -75,7 +75,7 @@ jobs:
           fi
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.4.0
+      - uses: dominikh/staticcheck-action@v1.4.1
         with:
           install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
@@ -130,7 +130,7 @@ jobs:
           fi
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.4.0
+      - uses: dominikh/staticcheck-action@v1.4.1
         with:
           install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
