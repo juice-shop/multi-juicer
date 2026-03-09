@@ -5,8 +5,8 @@
   "type": "module",
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.1",
-    "dompurify": "^3.3.1",
-    "motion": "^12.34.3",
+    "dompurify": "^3.3.2",
+    "motion": "^12.35.2",
     "promise-retry": "^2.0.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -22,7 +22,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
-    "@types/node": "^25.3.3",
+    "@types/node": "^25.3.5",
     "@types/three": "^0.183.1",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.3",
@@ -36,7 +36,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
     "jsdom": "^28.1.0",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.8",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "vite": "^7.3.0",
