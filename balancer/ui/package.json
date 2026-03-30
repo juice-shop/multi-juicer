@@ -11,7 +11,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hot-toast": "^2.6.0",
-    "react-intl": "^10.1.0",
+    "react-intl": "^10.1.1",
     "react-router-dom": "^7.13.2",
     "reactjs-popup": "^2.0.6",
     "tailwindcss": "^4.1.11",
@@ -40,7 +40,7 @@
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "vite": "^8.0.3",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.2"
   },
   "scripts": {
     "start": "vite",
