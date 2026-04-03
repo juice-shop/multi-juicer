@@ -14,8 +14,8 @@
 @theme {
   --animate-radiate: radiate 3s ease-out forwards;
   /* CTF-specific color palette */
-  --color-ctf-primary: #ff6b6b;
-  --color-ctf-accent: #fdd84e;
+  --color-ctf-primary: #ff2d55;
+  --color-ctf-accent: #ffcc00;
   --color-ctf-secondary: #00ff66;
   --color-ctf-neutral: #b8b8b8;
   --color-ctf-bg: #101010;
@@ -36,8 +36,8 @@
     --font-color-highlight: #000;
 
     /* Neon color palette for CTF page - kept for getCSSVariable() compatibility */
-    --neon-primary: #ff6b6b;
-    --neon-accent: #fdd84e;
+    --neon-primary: #ff2d55;
+    --neon-accent: #ffcc00;
     --neon-secondary: #00ff66;
     --glow-intensity: 1.5;
   }
