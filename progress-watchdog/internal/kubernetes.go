@@ -25,7 +25,7 @@ type ChallengeStatus struct {
 type ChallengeStatuses []ChallengeStatus
 
 func (a ChallengeStatuses) Len() int           { return len(a) }
-func (a ChallengeStatuses) Less(i, j int) bool { return strings.Compare(a[i].Key, a[j].Key) >= 0 }
+func (a ChallengeStatuses) Less(i, j int) bool { return strings.Compare(a[i].Key, a[j].Key) > 0 }
 func (a ChallengeStatuses) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 type UpdateProgressDeploymentDiff struct {
