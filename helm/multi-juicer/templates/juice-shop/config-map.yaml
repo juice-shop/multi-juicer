@@ -6,4 +6,9 @@ metadata:
     {{- include "multi-juicer.juice-shop.labels" . | nindent 4 }}
 data:
   multi-juicer.yaml: |-
-    {{ .Values.config.juiceShop.config | toYaml | nindent 4 }}
+    {{- $config := deepCopy .Values.config.juiceShop.config }}
+    {{- if .Values.config.juiceShop.llm.enabled }}
+    {{- $chatBot := dict "chatBot" (dict "model" .Values.config.juiceShop.llm.model "llmApiUrl" (printf "http://multijuicer-llm-gateway.%s.svc.cluster.local:8082" .Release.Namespace)) }}
+    {{- $_ := merge ($config).application $chatBot }}
+    {{- end }}
+    {{ $config | toYaml | nindent 4 }}

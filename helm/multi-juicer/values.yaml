@@ -179,6 +179,21 @@ config:
       labels: {}
     # -- Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/)
     runtimeClassName: null
+    # -- Optional LLM / AI chatbot gateway configuration. When enabled, MultiJuicer proxies LLM requests
+    # from JuiceShop instances through an internal gateway, keeping the real API key out of JuiceShop pods.
+    llm:
+      # -- Set to true to enable the LLM gateway
+      enabled: false
+      # -- The model identifier passed to JuiceShop's chatBot config, e.g. "qwen/qwen3.5-9b"
+      model: ""
+      # -- The upstream OpenAI-compatible API base URL, including the path prefix (e.g. https://api.openai.com/v1, https://openrouter.ai/api/v1, http://ollama:11434/v1)
+      apiUrl: ""
+      # -- Reference to an existing Kubernetes Secret containing the LLM API key
+      existingSecret:
+        # -- Name of the secret
+        name: "multi-juicer-llm"
+        # -- Key within the secret that holds the API key
+        key: "token"
 
 # Collects JuiceShop progress and sends and backs it up to the related kubernetes deployment
 progressWatchdog:

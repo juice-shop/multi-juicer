@@ -31,6 +31,11 @@ func handleAdminDeleteInstance(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
+			err = bundle.ClientSet.CoreV1().Secrets(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), fmt.Sprintf("juiceshop-%s", teamToDelete), metav1.DeleteOptions{})
+			if err != nil && !errors.IsNotFound(err) {
+				bundle.Log.Printf("Failed to delete secret for team '%s': %s", teamToDelete, err)
+			}
+
 			responseWriter.WriteHeader(http.StatusOK)
 			responseWriter.Write([]byte{}) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 		},

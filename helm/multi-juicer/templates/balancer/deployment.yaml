@@ -54,11 +54,24 @@ spec:
                 name: balancer-secret
           - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
             value: {{ .Values.balancer.contentSecurityPolicy | quote }}
+          {{- if .Values.config.juiceShop.llm.enabled }}
+          - name: LLM_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.config.juiceShop.llm.existingSecret.name }}
+                key: {{ .Values.config.juiceShop.llm.existingSecret.key }}
+          - name: LLM_API_URL
+            value: {{ .Values.config.juiceShop.llm.apiUrl | quote }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080
             - name: metrics
               containerPort: 8081
+            {{- if .Values.config.juiceShop.llm.enabled }}
+            - name: llm-gateway
+              containerPort: 8082
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /balancer/api/health

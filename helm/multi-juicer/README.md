@@ -52,6 +52,13 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.image | string | `"bkimminich/juice-shop"` | Juice Shop Image to use |
 | config.juiceShop.imagePullPolicy | string | `"IfNotPresent"` |  |
 | config.juiceShop.imagePullSecrets | list | `[]` |  |
+| config.juiceShop.llm | object | `{"apiUrl":"","enabled":false,"existingSecret":{"key":"token","name":"multi-juicer-llm"},"model":""}` | Optional LLM / AI chatbot gateway configuration. When enabled, MultiJuicer proxies LLM requests from JuiceShop instances through an internal gateway, keeping the real API key out of JuiceShop pods. |
+| config.juiceShop.llm.apiUrl | string | `""` | The upstream OpenAI-compatible API base URL, including the path prefix (e.g. https://api.openai.com/v1, https://openrouter.ai/api/v1, http://ollama:11434/v1) |
+| config.juiceShop.llm.enabled | bool | `false` | Set to true to enable the LLM gateway |
+| config.juiceShop.llm.existingSecret | object | `{"key":"token","name":"multi-juicer-llm"}` | Reference to an existing Kubernetes Secret containing the LLM API key |
+| config.juiceShop.llm.existingSecret.key | string | `"token"` | Key within the secret that holds the API key |
+| config.juiceShop.llm.existingSecret.name | string | `"multi-juicer-llm"` | Name of the secret |
+| config.juiceShop.llm.model | string | `""` | The model identifier passed to JuiceShop's chatBot config, e.g. "qwen/qwen3.5-9b" |
 | config.juiceShop.nodeEnv | string | `"multi-juicer"` | Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`. |
 | config.juiceShop.pod.annotations | object | `{}` | Optional Additional annotations for the Juice Shop pods. |
 | config.juiceShop.pod.labels | object | `{}` | Optional Additional labels for the Juice Shop pods. |

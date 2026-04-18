@@ -28,6 +28,8 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 
 See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
 
+To setup MultiJuicer with support for the JuiceShop v20+ AI/LLM realted challenges, see [AI/LLM configuration guide](./guides/llm/llm.md)
+
 ### Installation Guides for specific Cloud Providers / Environments
 
 Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it easier for anybody who is new to kubernetes we got some guides on how to setup a kubernetes cluster with MultiJuicer installed for some specific Cloud providers.

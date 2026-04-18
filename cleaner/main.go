@@ -103,6 +103,11 @@ func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInacti
 			}
 			summary.SuccessfulServiceDeletions++
 
+			err = clientset.CoreV1().Secrets(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+			if err != nil && !errors.IsNotFound(err) {
+				logger.Printf("Failed to delete kubernetes secret for %s: %v", name, err)
+			}
+
 			logger.Printf("Successfully deleted instance %s", name)
 		} else {
 			logger.Printf("Skipping deployment %s as it has been active recently", name)
