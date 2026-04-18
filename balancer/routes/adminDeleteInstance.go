@@ -18,22 +18,13 @@ func handleAdminDeleteInstance(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
+			// Only the deployment needs to be deleted explicitly.
+			// The service and secret are owned by the deployment via OwnerReferences and will be garbage collected by Kubernetes.
 			err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), fmt.Sprintf("juiceshop-%s", teamToDelete), metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {
 				bundle.Log.Printf("Failed to delete deployment for team '%s': %s", teamToDelete, err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
-			}
-			err = bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), fmt.Sprintf("juiceshop-%s", teamToDelete), metav1.DeleteOptions{})
-			if err != nil && !errors.IsNotFound(err) {
-				bundle.Log.Printf("Failed to delete service for team '%s': %s", teamToDelete, err)
-				http.Error(responseWriter, "", http.StatusInternalServerError)
-				return
-			}
-
-			err = bundle.ClientSet.CoreV1().Secrets(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), fmt.Sprintf("juiceshop-%s", teamToDelete), metav1.DeleteOptions{})
-			if err != nil && !errors.IsNotFound(err) {
-				bundle.Log.Printf("Failed to delete secret for team '%s': %s", teamToDelete, err)
 			}
 
 			responseWriter.WriteHeader(http.StatusOK)

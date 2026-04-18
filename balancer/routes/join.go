@@ -145,8 +145,15 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 		return
 	}
 
+	deployment, err := createDeploymentForTeam(context, bundle, team, passcodeHash)
+	if err != nil {
+		bundle.Log.Printf("Failed to create deployment: %s", err)
+		http.Error(w, "failed to create deployment", http.StatusInternalServerError)
+		return
+	}
+
 	if bundle.Config.JuiceShopConfig.LLM.Enabled {
-		err = createLLMTokenSecretForTeam(context, bundle, team)
+		err = createLLMTokenSecretForTeam(context, bundle, team, deployment)
 		if err != nil {
 			bundle.Log.Printf("Failed to create LLM token secret: %s", err)
 			http.Error(w, "failed to create LLM token secret", http.StatusInternalServerError)
@@ -154,14 +161,7 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 		}
 	}
 
-	err = createDeploymentForTeam(context, bundle, team, passcodeHash)
-	if err != nil {
-		bundle.Log.Printf("Failed to create deployment: %s", err)
-		http.Error(w, "failed to create deployment", http.StatusInternalServerError)
-		return
-	}
-
-	err = createServiceForTeam(context, bundle, team)
+	err = createServiceForTeam(context, bundle, team, deployment)
 	if err != nil {
 		bundle.Log.Printf("Failed to create service: %s", err)
 		http.Error(w, "failed to create service", http.StatusInternalServerError)
@@ -272,7 +272,21 @@ func writeUnauthorizedResponse(responseWriter http.ResponseWriter) {
 	responseWriter.Write(errorResponseBody) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 }
 
-// uid of the balancer kubernetes deployment resource. used to "attach" created juice shop deployments and services to the balancer deployment so that they get deleted when the balancer gets deleted
+func getDeploymentOwnerReferences(deployment *appsv1.Deployment) []metav1.OwnerReference {
+	truePointer := true
+	return []metav1.OwnerReference{
+		{
+			APIVersion:         "apps/v1",
+			Kind:               "Deployment",
+			Name:               deployment.Name,
+			UID:                deployment.UID,
+			Controller:         &truePointer,
+			BlockOwnerDeletion: &truePointer,
+		},
+	}
+}
+
+// uid of the balancer kubernetes deployment resource. used to "attach" created juice shop deployments to the balancer deployment so that they get deleted when the balancer gets deleted
 var deploymentUid types.UID
 
 func getOwnerReferences(context context.Context, bundle *bundle.Bundle) ([]metav1.OwnerReference, error) {
@@ -302,10 +316,10 @@ func getOwnerReferences(context context.Context, bundle *bundle.Bundle) ([]metav
 	return ownerReferences, nil
 }
 
-func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, team string, passcodeHash string) error {
+func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, team string, passcodeHash string) (*appsv1.Deployment, error) {
 	ownerReferences, err := getOwnerReferences(context, bundle)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	podLabels := map[string]string{}
@@ -433,16 +447,11 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 		},
 	}
 
-	_, err = bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context, deployment, metav1.CreateOptions{})
-	return err
+	created, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Create(context, deployment, metav1.CreateOptions{})
+	return created, err
 }
 
-func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team string) error {
-	ownerReferences, err := getOwnerReferences(context, bundle)
-	if err != nil {
-		return err
-	}
-
+func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team string, ownerDeployment *appsv1.Deployment) error {
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("juiceshop-%s", team),
@@ -454,7 +463,7 @@ func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team s
 				"app.kubernetes.io/instance":  fmt.Sprintf("juice-shop-%s", team),
 				"app.kubernetes.io/part-of":   "multi-juicer",
 			},
-			OwnerReferences: ownerReferences,
+			OwnerReferences: getDeploymentOwnerReferences(ownerDeployment),
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: map[string]string{
@@ -469,7 +478,7 @@ func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team s
 		},
 	}
 
-	_, err = bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context, service, metav1.CreateOptions{})
+	_, err := bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context, service, metav1.CreateOptions{})
 	return err
 }
 
@@ -507,15 +516,10 @@ func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
 	return envVars
 }
 
-func createLLMTokenSecretForTeam(ctx context.Context, bundle *bundle.Bundle, team string) error {
+func createLLMTokenSecretForTeam(ctx context.Context, bundle *bundle.Bundle, team string, ownerDeployment *appsv1.Deployment) error {
 	token, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
 	if err != nil {
 		return fmt.Errorf("failed to sign LLM token: %w", err)
-	}
-
-	ownerReferences, err := getOwnerReferences(ctx, bundle)
-	if err != nil {
-		return err
 	}
 
 	secret := &corev1.Secret{
@@ -526,7 +530,7 @@ func createLLMTokenSecretForTeam(ctx context.Context, bundle *bundle.Bundle, tea
 				"app.kubernetes.io/component": "llm-token",
 				"app.kubernetes.io/part-of":   "multi-juicer",
 			},
-			OwnerReferences: ownerReferences,
+			OwnerReferences: getDeploymentOwnerReferences(ownerDeployment),
 		},
 		Data: map[string][]byte{
 			"token": []byte(token),

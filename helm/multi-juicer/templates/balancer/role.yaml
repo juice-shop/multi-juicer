@@ -10,7 +10,7 @@ rules:
     verbs: ["get", "create", "list", "delete", "patch", "update", "watch"]
   - apiGroups: [""] # "" indicates the core API group
     resources: ["services"]
-    verbs: ["get", "create", "delete"]
+    verbs: ["get", "create"]
   - apiGroups: [""] # "" indicates the core API group
     resources: ["pods"]
     verbs: ["get", "list", "delete"]
@@ -24,5 +24,5 @@ rules:
 {{- if .Values.config.juiceShop.llm.enabled }}
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "create", "delete", "list"]
+    verbs: ["create"]
 {{- end }}

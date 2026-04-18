@@ -119,8 +119,8 @@ func TestJoinHandler(t *testing.T) {
 			{
 				APIVersion:         "apps/v1",
 				Kind:               "Deployment",
-				Name:               "balancer",
-				UID:                "34c0bb8a-240b-4f2a-84ae-2eb2258298f9",
+				Name:               deployment.Name,
+				UID:                deployment.UID,
 				Controller:         &truePointer,
 				BlockOwnerDeletion: &truePointer,
 			},
