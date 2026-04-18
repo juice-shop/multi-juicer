@@ -4,8 +4,10 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/bundle"
+	"github.com/juice-shop/multi-juicer/balancer/pkg/llmgateway"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/notification"
 	"github.com/juice-shop/multi-juicer/balancer/pkg/scoring"
 	"github.com/juice-shop/multi-juicer/balancer/routes"
@@ -29,6 +31,20 @@ func main() {
 	scoringService.CalculateAndCacheScoreBoard(ctx)
 	go scoringService.StartingScoringWorker(ctx)
 	go notificationService.StartNotificationWatcher(ctx)
+
+	if b.Config.JuiceShopConfig.LLM.Enabled {
+		llmAPIKey := os.Getenv("LLM_API_KEY")
+		llmAPIURL := os.Getenv("LLM_API_URL")
+
+		usage := llmgateway.NewUsageTracker()
+		gateway, err := llmgateway.NewGateway(b.Config.CookieConfig.SigningKey, llmAPIURL, llmAPIKey, usage, b.Log)
+		if err != nil {
+			log.Fatalf("Failed to create LLM gateway: %v", err)
+		}
+		go usage.StartFlusher(ctx, b.ClientSet, b.RuntimeEnvironment.Namespace, b.Log)
+		go StartLLMGatewayServer(gateway, b.Log)
+	}
+
 	StartBalancerServer(b)
 }
 
@@ -44,6 +60,19 @@ func StartBalancerServer(b *bundle.Bundle) {
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to start balancer server: %v", err)
+	}
+}
+
+func StartLLMGatewayServer(gateway *llmgateway.Gateway, logger *log.Logger) {
+	router := http.NewServeMux()
+	router.Handle("/", gateway)
+	server := &http.Server{
+		Addr:    ":8082",
+		Handler: router,
+	}
+	logger.Println("Starting LLM gateway on :8082")
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatalf("Failed to start LLM gateway server: %v", err)
 	}
 }
 

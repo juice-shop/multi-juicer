@@ -45,6 +45,15 @@ default values render correctly:
             "image": "bkimminich/juice-shop",
             "imagePullPolicy": "IfNotPresent",
             "imagePullSecrets": [],
+            "llm": {
+              "apiUrl": "",
+              "enabled": false,
+              "existingSecret": {
+                "key": "token",
+                "name": "multi-juicer-llm"
+              },
+              "model": ""
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -103,7 +112,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1bf3980bedef7ca75868337a2a3245065cdbadc79170cbee686ff86f856c1038
+            checksum/config: 133a44727c3dfc0ff62edb724bfac4e095d1858318a8c6618e448b42152c28e9
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -215,6 +224,7 @@ default values render correctly:
           - list
           - delete
           - patch
+          - update
           - watch
       - apiGroups:
           - ""
@@ -626,6 +636,15 @@ full values render out correctly:
             "image": "bkimminich/juice-shop",
             "imagePullPolicy": "IfNotPresent",
             "imagePullSecrets": [],
+            "llm": {
+              "apiUrl": "",
+              "enabled": false,
+              "existingSecret": {
+                "key": "token",
+                "name": "multi-juicer-llm"
+              },
+              "model": ""
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -684,7 +703,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 6f776202cca7e33fa80fa35c0b4442f1b5d012fa8a898f5c157f24417fc31199
+            checksum/config: 061ccb4e474296618f1511b93e11d2e7051e83b5ea07008144de2cd1ea94baf5
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -849,6 +868,7 @@ full values render out correctly:
           - list
           - delete
           - patch
+          - update
           - watch
       - apiGroups:
           - ""
@@ -2910,6 +2930,15 @@ production notes work correctly:
             "image": "bkimminich/juice-shop",
             "imagePullPolicy": "IfNotPresent",
             "imagePullSecrets": [],
+            "llm": {
+              "apiUrl": "",
+              "enabled": false,
+              "existingSecret": {
+                "key": "token",
+                "name": "multi-juicer-llm"
+              },
+              "model": ""
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -2968,7 +2997,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 6f776202cca7e33fa80fa35c0b4442f1b5d012fa8a898f5c157f24417fc31199
+            checksum/config: 061ccb4e474296618f1511b93e11d2e7051e83b5ea07008144de2cd1ea94baf5
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -3080,6 +3109,7 @@ production notes work correctly:
           - list
           - delete
           - patch
+          - update
           - watch
       - apiGroups:
           - ""

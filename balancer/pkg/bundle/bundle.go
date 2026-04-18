@@ -68,6 +68,12 @@ type CookieConfig struct {
 	Secure bool `json:"secure"`
 }
 
+type LLMConfig struct {
+	Enabled bool   `json:"enabled"`
+	Model   string `json:"model"`
+	ApiUrl  string `json:"apiUrl"`
+}
+
 type JuiceShopConfig struct {
 	Image            string                        `json:"image"`
 	Tag              string                        `json:"tag"`
@@ -86,6 +92,8 @@ type JuiceShopConfig struct {
 	Volumes                  []corev1.Volume             `json:"volumes"`
 	VolumeMounts             []corev1.VolumeMount        `json:"volumeMounts"`
 	RuntimeClassName         *string                     `json:"runtimeClassName"`
+
+	LLM LLMConfig `json:"llm"`
 
 	JuiceShopPodConfig JuiceShopPodConfig `json:"pod"`
 }

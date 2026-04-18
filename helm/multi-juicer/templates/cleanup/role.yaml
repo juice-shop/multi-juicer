@@ -13,4 +13,9 @@ rules:
   - apiGroups: [''] # "" indicates the core API group
     resources: ['services']
     verbs: ['get', 'delete']
+{{- if .Values.config.juiceShop.llm.enabled }}
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'delete']
+{{- end }}
 {{- end }}

@@ -145,6 +145,15 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 		return
 	}
 
+	if bundle.Config.JuiceShopConfig.LLM.Enabled {
+		err = createLLMTokenSecretForTeam(context, bundle, team)
+		if err != nil {
+			bundle.Log.Printf("Failed to create LLM token secret: %s", err)
+			http.Error(w, "failed to create LLM token secret", http.StatusInternalServerError)
+			return
+		}
+	}
+
 	err = createDeploymentForTeam(context, bundle, team, passcodeHash)
 	if err != nil {
 		bundle.Log.Printf("Failed to create deployment: %s", err)
@@ -388,21 +397,7 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 								InitialDelaySeconds: 30,
 								PeriodSeconds:       15,
 							},
-							Env: append(
-								bundle.Config.JuiceShopConfig.Env,
-								corev1.EnvVar{
-									Name:  "NODE_ENV",
-									Value: bundle.Config.JuiceShopConfig.NodeEnv,
-								},
-								corev1.EnvVar{
-									Name:  "CTF_KEY",
-									Value: bundle.Config.JuiceShopConfig.CtfKey,
-								},
-								corev1.EnvVar{
-									Name:  "SOLUTIONS_WEBHOOK",
-									Value: fmt.Sprintf("http://progress-watchdog.%s.svc/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
-								},
-							),
+							Env: buildJuiceShopEnv(bundle, team),
 							EnvFrom: bundle.Config.JuiceShopConfig.EnvFrom,
 							VolumeMounts: append(
 								bundle.Config.JuiceShopConfig.VolumeMounts,
@@ -476,4 +471,71 @@ func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team s
 
 	_, err = bundle.ClientSet.CoreV1().Services(bundle.RuntimeEnvironment.Namespace).Create(context, service, metav1.CreateOptions{})
 	return err
+}
+
+func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
+	envVars := append(
+		bundle.Config.JuiceShopConfig.Env,
+		corev1.EnvVar{
+			Name:  "NODE_ENV",
+			Value: bundle.Config.JuiceShopConfig.NodeEnv,
+		},
+		corev1.EnvVar{
+			Name:  "CTF_KEY",
+			Value: bundle.Config.JuiceShopConfig.CtfKey,
+		},
+		corev1.EnvVar{
+			Name:  "SOLUTIONS_WEBHOOK",
+			Value: fmt.Sprintf("http://progress-watchdog.%s.svc/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
+		},
+	)
+
+	if bundle.Config.JuiceShopConfig.LLM.Enabled {
+		envVars = append(envVars, corev1.EnvVar{
+			Name: "LLM_API_KEY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: fmt.Sprintf("juiceshop-%s", team),
+					},
+					Key: "token",
+				},
+			},
+		})
+	}
+
+	return envVars
+}
+
+func createLLMTokenSecretForTeam(ctx context.Context, bundle *bundle.Bundle, team string) error {
+	token, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
+	if err != nil {
+		return fmt.Errorf("failed to sign LLM token: %w", err)
+	}
+
+	ownerReferences, err := getOwnerReferences(ctx, bundle)
+	if err != nil {
+		return err
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: fmt.Sprintf("juiceshop-%s", team),
+			Labels: map[string]string{
+				"team":                        team,
+				"app.kubernetes.io/component": "llm-token",
+				"app.kubernetes.io/part-of":   "multi-juicer",
+			},
+			OwnerReferences: ownerReferences,
+		},
+		Data: map[string][]byte{
+			"token": []byte(token),
+		},
+	}
+
+	_, err = bundle.ClientSet.CoreV1().Secrets(bundle.RuntimeEnvironment.Namespace).Create(ctx, secret, metav1.CreateOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to create LLM token secret: %w", err)
+	}
+	return nil
 }
