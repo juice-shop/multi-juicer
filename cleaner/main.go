@@ -40,17 +40,15 @@ func main() {
 	cleanupSummary := runCleanup(clientset, currentTime, maxInactiveTime)
 
 	logger.Println("Finished cleaning up JuiceShop deployments.")
-	logger.Printf("Deleted %d deployment(s) and %d service(s) successfully", cleanupSummary.SuccessfulDeploymentDeletions, cleanupSummary.SuccessfulServiceDeletions)
-	if (cleanupSummary.FailedDeploymentDeletions + cleanupSummary.FailedServiceDeletions) > 0 {
-		logger.Printf("Failed to delete %d deployment(s) and %d service(s)", cleanupSummary.FailedDeploymentDeletions, cleanupSummary.FailedServiceDeletions)
+	logger.Printf("Deleted %d deployment(s) successfully", cleanupSummary.SuccessfulDeletions)
+	if cleanupSummary.FailedDeletions > 0 {
+		logger.Printf("Failed to delete %d deployment(s)", cleanupSummary.FailedDeletions)
 	}
 }
 
 type CleanupSummary struct {
-	SuccessfulDeploymentDeletions int
-	SuccessfulServiceDeletions    int
-	FailedDeploymentDeletions     int
-	FailedServiceDeletions        int
+	SuccessfulDeletions int
+	FailedDeletions     int
 }
 
 func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInactive time.Duration) CleanupSummary {
@@ -66,12 +64,7 @@ func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInacti
 		logger.Println("No JuiceShop deployments found. Nothing to do.")
 	}
 
-	summary := CleanupSummary{
-		SuccessfulDeploymentDeletions: 0,
-		SuccessfulServiceDeletions:    0,
-		FailedDeploymentDeletions:     0,
-		FailedServiceDeletions:        0,
-	}
+	summary := CleanupSummary{}
 
 	for _, deployment := range deployments.Items {
 		lastConnectedTimestampString, hasAnnotation := deployment.Annotations["multi-juicer.owasp-juice.shop/lastRequest"]
@@ -88,26 +81,15 @@ func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInacti
 		name := deployment.Name
 		if currentTime.Sub(time.UnixMilli(lastConnectedTimestamp)) > maxInactive {
 			logger.Printf("Deleting instance '%s' as it has been inactive for longer than %s", name, maxInactive.String())
+			// Only the deployment needs to be deleted explicitly.
+			// The service and secret are owned by the deployment via OwnerReferences and will be garbage collected by Kubernetes.
 			err = clientset.AppsV1().Deployments(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {
 				logger.Printf("Failed to delete deployment %s: %v", name, err)
-				summary.FailedDeploymentDeletions++
+				summary.FailedDeletions++
 				continue
 			}
-			summary.SuccessfulDeploymentDeletions++
-			err = clientset.CoreV1().Services(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
-			if err != nil && !errors.IsNotFound(err) {
-				logger.Printf("Failed to delete service %s: %v", name, err)
-				summary.FailedServiceDeletions++
-				continue
-			}
-			summary.SuccessfulServiceDeletions++
-
-			err = clientset.CoreV1().Secrets(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
-			if err != nil && !errors.IsNotFound(err) {
-				logger.Printf("Failed to delete kubernetes secret for %s: %v", name, err)
-			}
-
+			summary.SuccessfulDeletions++
 			logger.Printf("Successfully deleted instance %s", name)
 		} else {
 			logger.Printf("Skipping deployment %s as it has been active recently", name)

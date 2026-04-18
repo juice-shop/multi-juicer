@@ -233,7 +233,6 @@ default values render correctly:
         verbs:
           - get
           - create
-          - delete
       - apiGroups:
           - ""
         resources:
@@ -400,13 +399,6 @@ default values render correctly:
           - get
           - delete
           - list
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - delete
   11: |
     apiVersion: v1
     kind: ServiceAccount
@@ -877,7 +869,6 @@ full values render out correctly:
         verbs:
           - get
           - create
-          - delete
       - apiGroups:
           - ""
         resources:
@@ -1066,13 +1057,6 @@ full values render out correctly:
           - get
           - delete
           - list
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - delete
   15: |
     apiVersion: v1
     kind: ServiceAccount
@@ -3118,7 +3102,6 @@ production notes work correctly:
         verbs:
           - get
           - create
-          - delete
       - apiGroups:
           - ""
         resources:
@@ -3285,13 +3268,6 @@ production notes work correctly:
           - get
           - delete
           - list
-      - apiGroups:
-          - ""
-        resources:
-          - services
-        verbs:
-          - get
-          - delete
   11: |
     apiVersion: v1
     kind: ServiceAccount
