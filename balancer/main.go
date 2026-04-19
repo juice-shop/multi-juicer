@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -52,7 +53,7 @@ func StartBalancerServer(b *bundle.Bundle) {
 	router := http.NewServeMux()
 	routes.AddRoutes(router, b)
 
-	b.Log.Println("Starting MultiJuicer balancer on :8080")
+	b.Log.Info("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
@@ -63,14 +64,14 @@ func StartBalancerServer(b *bundle.Bundle) {
 	}
 }
 
-func StartLLMGatewayServer(gateway *llmgateway.Gateway, logger *log.Logger) {
+func StartLLMGatewayServer(gateway *llmgateway.Gateway, logger *slog.Logger) {
 	router := http.NewServeMux()
 	router.Handle("/", gateway)
 	server := &http.Server{
 		Addr:    ":8082",
 		Handler: router,
 	}
-	logger.Println("Starting LLM gateway on :8082")
+	logger.Info("Starting LLM gateway on :8082")
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Failed to start LLM gateway server: %v", err)
 	}

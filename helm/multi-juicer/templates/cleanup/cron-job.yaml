@@ -38,6 +38,8 @@ spec:
                   value: {{ .Release.Namespace | quote }}
                 - name: MAX_INACTIVE_DURATION
                   value: {{ .Values.juiceShopCleanup.gracePeriod }}
+                - name: LOG_LEVEL
+                  value: {{ .Values.juiceShopCleanup.logLevel | default "info" | quote }}
           restartPolicy: Never
           {{- with .Values.nodeSelector }}
           nodeSelector:

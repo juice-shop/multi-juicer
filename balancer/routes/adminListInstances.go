@@ -35,7 +35,7 @@ func handleAdminListInstances(bundle *bundle.Bundle) http.Handler {
 				LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 			})
 			if err != nil {
-				bundle.Log.Printf("Failed to list deployments: %s", err)
+				bundle.Log.Error("Failed to list deployments", "error", err)
 				http.Error(responseWriter, "unable to get instances", http.StatusInternalServerError)
 				return
 			}

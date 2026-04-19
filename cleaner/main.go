@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -14,16 +14,30 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-var logger = log.New(os.Stdout, "", log.LstdFlags)
+var logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: parseLogLevel(os.Getenv("LOG_LEVEL"))}))
 var namespace = os.Getenv("NAMESPACE")
 
+func parseLogLevel(level string) slog.Level {
+	switch strings.ToLower(level) {
+	case "debug":
+		return slog.LevelDebug
+	case "warn", "warning":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
+
 func main() {
-	logger.Println("Starting cleaner")
+	logger.Info("Starting cleaner")
 
 	maxInactiveTimeString := os.Getenv("MAX_INACTIVE_DURATION")
 	maxInactiveTime, err := time.ParseDuration(maxInactiveTimeString)
 	if err != nil {
-		logger.Fatalf("Could not parse configured MAX_INACTIVE_DURATION: '%s'. Duration has to formatted like the following examples: \"12h\" for 12 hours, \"30m\" for 30 minutes.", maxInactiveTimeString)
+		logger.Error("Could not parse configured MAX_INACTIVE_DURATION. Duration has to be formatted like: \"12h\" for 12 hours, \"30m\" for 30 minutes.", "value", maxInactiveTimeString)
+		os.Exit(1)
 	}
 
 	config, err := rest.InClusterConfig()
@@ -39,10 +53,10 @@ func main() {
 
 	cleanupSummary := runCleanup(clientset, currentTime, maxInactiveTime)
 
-	logger.Println("Finished cleaning up JuiceShop deployments.")
-	logger.Printf("Deleted %d deployment(s) successfully", cleanupSummary.SuccessfulDeletions)
+	logger.Info("Finished cleaning up JuiceShop deployments.")
+	logger.Info("Deleted deployment(s) successfully", "count", cleanupSummary.SuccessfulDeletions)
 	if cleanupSummary.FailedDeletions > 0 {
-		logger.Printf("Failed to delete %d deployment(s)", cleanupSummary.FailedDeletions)
+		logger.Warn("Failed to delete some deployments", "count", cleanupSummary.FailedDeletions)
 	}
 }
 
@@ -57,11 +71,12 @@ func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInacti
 	})
 
 	if err != nil {
-		logger.Fatal(fmt.Errorf("failed to list deployments to find JuiceShop instances to cleanup: %w", err))
+		logger.Error("failed to list deployments to find JuiceShop instances to cleanup", "error", err)
+		os.Exit(1)
 	}
 
 	if len(deployments.Items) == 0 {
-		logger.Println("No JuiceShop deployments found. Nothing to do.")
+		logger.Info("No JuiceShop deployments found. Nothing to do.")
 	}
 
 	summary := CleanupSummary{}
@@ -69,30 +84,30 @@ func runCleanup(clientset kubernetes.Interface, currentTime time.Time, maxInacti
 	for _, deployment := range deployments.Items {
 		lastConnectedTimestampString, hasAnnotation := deployment.Annotations["multi-juicer.owasp-juice.shop/lastRequest"]
 		if !hasAnnotation || lastConnectedTimestampString == "" {
-			logger.Printf("Skipping deployment %s as it has no lastRequest annotation", deployment.Name)
+			logger.Warn("Skipping deployment as it has no lastRequest annotation", "deployment", deployment.Name)
 			continue
 		}
 		lastConnectedTimestamp, err := strconv.ParseInt(lastConnectedTimestampString, 10, 64)
 		if err != nil {
-			logger.Printf("Skipping deployment %s as it has an invalid lastRequest annotation: %v", deployment.Name, err)
+			logger.Warn("Skipping deployment as it has an invalid lastRequest annotation", "deployment", deployment.Name, "error", err)
 			continue
 		}
 
 		name := deployment.Name
 		if currentTime.Sub(time.UnixMilli(lastConnectedTimestamp)) > maxInactive {
-			logger.Printf("Deleting instance '%s' as it has been inactive for longer than %s", name, maxInactive.String())
+			logger.Info("Deleting instance as it has been inactive for too long", "instance", name, "maxInactive", maxInactive.String())
 			// Only the deployment needs to be deleted explicitly.
 			// The service and secret are owned by the deployment via OwnerReferences and will be garbage collected by Kubernetes.
 			err = clientset.AppsV1().Deployments(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {
-				logger.Printf("Failed to delete deployment %s: %v", name, err)
+				logger.Error("Failed to delete deployment", "deployment", name, "error", err)
 				summary.FailedDeletions++
 				continue
 			}
 			summary.SuccessfulDeletions++
-			logger.Printf("Successfully deleted instance %s", name)
+			logger.Info("Successfully deleted instance", "instance", name)
 		} else {
-			logger.Printf("Skipping deployment %s as it has been active recently", name)
+			logger.Debug("Skipping deployment as it has been active recently", "deployment", name)
 		}
 	}
 

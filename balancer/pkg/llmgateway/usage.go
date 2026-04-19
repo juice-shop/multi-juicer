@@ -3,7 +3,7 @@ package llmgateway
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"strconv"
 	"sync"
 	"time"
@@ -52,7 +52,7 @@ func (t *UsageTracker) Add(team string, inputTokens, outputTokens int64) {
 }
 
 // FlushToAnnotations writes accumulated usage to deployment annotations and resets the counters.
-func (t *UsageTracker) FlushToAnnotations(ctx context.Context, clientset kubernetes.Interface, namespace string, logger *log.Logger) {
+func (t *UsageTracker) FlushToAnnotations(ctx context.Context, clientset kubernetes.Interface, namespace string, logger *slog.Logger) {
 	t.mu.Lock()
 	pending := t.usage
 	t.usage = make(map[string]*TeamUsage)
@@ -60,7 +60,7 @@ func (t *UsageTracker) FlushToAnnotations(ctx context.Context, clientset kuberne
 
 	for team, usage := range pending {
 		if err := t.updateTeamAnnotations(ctx, clientset, namespace, team, usage, logger); err != nil {
-			logger.Printf("Failed to flush LLM usage for team '%s': %v", team, err)
+			logger.Error("Failed to flush LLM usage", "team", team, "error", err)
 			// Put the usage back so it's not lost
 			t.Add(team, usage.InputTokens, usage.OutputTokens)
 		}
@@ -69,7 +69,7 @@ func (t *UsageTracker) FlushToAnnotations(ctx context.Context, clientset kuberne
 
 // updateTeamAnnotations uses optimistic concurrency (read resourceVersion, retry on conflict)
 // to safely increment token counters even when multiple balancer replicas are running.
-func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, clientset kubernetes.Interface, namespace, team string, delta *TeamUsage, logger *log.Logger) error {
+func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, clientset kubernetes.Interface, namespace, team string, delta *TeamUsage, logger *slog.Logger) error {
 	deploymentName := fmt.Sprintf("juiceshop-%s", team)
 
 	for attempt := range maxRetries {
@@ -109,14 +109,14 @@ func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, clientset kube
 		if !errors.IsConflict(err) {
 			return fmt.Errorf("failed to update deployment: %w", err)
 		}
-		logger.Printf("LLM usage update conflict for team '%s' (attempt %d/%d), retrying", team, attempt+1, maxRetries)
+		logger.Warn("LLM usage update conflict, retrying", "team", team, "attempt", attempt+1, "maxRetries", maxRetries)
 	}
 
 	return fmt.Errorf("failed to update deployment after %d retries due to conflicts", maxRetries)
 }
 
 // StartFlusher periodically flushes accumulated usage to deployment annotations.
-func (t *UsageTracker) StartFlusher(ctx context.Context, clientset kubernetes.Interface, namespace string, logger *log.Logger) {
+func (t *UsageTracker) StartFlusher(ctx context.Context, clientset kubernetes.Interface, namespace string, logger *slog.Logger) {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 	for {

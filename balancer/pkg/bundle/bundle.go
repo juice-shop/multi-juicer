@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/juice-shop/multi-juicer/balancer/pkg/passcode"
@@ -28,7 +29,7 @@ type Bundle struct {
 	BcryptRounds           int
 	StaticAssetsDirectory  string `json:"staticAssetsDirectory"`
 	Config                 *Config
-	Log                    *log.Logger
+	Log                    *slog.Logger
 
 	// LongPollDefaultWaitTimeout amount of time that HTTP Long Polling Endpoints wait for new data to arrive before returning a empty no changes response
 	LongPollDefaultWaitTimeout time.Duration
@@ -184,6 +185,21 @@ type NotificationService interface {
 	SetEndDate(ctx context.Context, endDate *time.Time) error
 }
 
+// ParseLogLevel converts a log level string to a slog.Level.
+// Valid values: "debug", "info", "warn"/"warning", "error". Defaults to info.
+func ParseLogLevel(level string) slog.Level {
+	switch strings.ToLower(level) {
+	case "debug":
+		return slog.LevelDebug
+	case "warn", "warning":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
+
 func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {
 	return fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
 }
@@ -251,7 +267,7 @@ func New() *Bundle {
 		GeneratePasscode:           passcode.GetPasscodeGeneratorWithPasscodeLength(config.TeamPasscodeLength),
 		GetJuiceShopUrlForTeam:     getJuiceShopUrlForTeam,
 		BcryptRounds:               bcrypt.DefaultCost,
-		Log:                        log.New(os.Stdout, "", log.LstdFlags),
+		Log:                        slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: ParseLogLevel(os.Getenv("LOG_LEVEL"))})),
 		LongPollDefaultWaitTimeout: 25 * time.Second,
 		Config:                     config,
 		JuiceShopChallenges:        challenges,

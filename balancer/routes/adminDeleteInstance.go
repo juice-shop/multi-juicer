@@ -22,7 +22,7 @@ func handleAdminDeleteInstance(bundle *bundle.Bundle) http.Handler {
 			// The service and secret are owned by the deployment via OwnerReferences and will be garbage collected by Kubernetes.
 			err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), fmt.Sprintf("juiceshop-%s", teamToDelete), metav1.DeleteOptions{})
 			if err != nil && !errors.IsNotFound(err) {
-				bundle.Log.Printf("Failed to delete deployment for team '%s': %s", teamToDelete, err)
+				bundle.Log.Error("Failed to delete deployment", "team", teamToDelete, "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}

@@ -30,7 +30,7 @@ func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 
 			passcodeHashBytes, err := bcrypt.GenerateFromPassword([]byte(newPasscode), bundle.BcryptRounds)
 			if err != nil {
-				bundle.Log.Printf("Failed to hash passcode!: %s", err)
+				bundle.Log.Error("Failed to hash passcode", "team", teamToReset, "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}
@@ -45,7 +45,7 @@ func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 			})
 
 			if err != nil {
-				bundle.Log.Printf("Failed to convert passcode update patch to json: %v", err)
+				bundle.Log.Error("Failed to convert passcode update patch to json", "team", teamToReset, "error", err)
 				http.Error(responseWriter, "Failed to update passcode", http.StatusInternalServerError)
 				return
 			}
@@ -57,7 +57,7 @@ func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 				metav1.PatchOptions{},
 			)
 			if err != nil {
-				bundle.Log.Printf("Failed to update passcode for team '%s': %v", teamToReset, err)
+				bundle.Log.Error("Failed to update passcode", "team", teamToReset, "error", err)
 				http.Error(responseWriter, "Failed to update passcode", http.StatusInternalServerError)
 				return
 			}
@@ -68,7 +68,7 @@ func handleAdminResetPasscode(bundle *bundle.Bundle) http.Handler {
 			}
 			responseBodyEncoded, err := json.Marshal(responseBody)
 			if err != nil {
-				bundle.Log.Printf("Failed to encode passcode reset response: %v", err)
+				bundle.Log.Error("Failed to encode passcode reset response", "team", teamToReset, "error", err)
 				http.Error(responseWriter, "Failed to reset passcode", http.StatusInternalServerError)
 				return
 			}

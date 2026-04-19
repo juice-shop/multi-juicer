@@ -3,7 +3,7 @@ package llmgateway
 import (
 	"encoding/json"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -22,7 +22,7 @@ func signToken(team string) string {
 
 func TestGateway_MissingAuth(t *testing.T) {
 	usage := NewUsageTracker()
-	gw, _ := NewGateway(testSigningKey, "http://localhost:11434", "real-key", usage, log.New(os.Stdout, "", 0))
+	gw, _ := NewGateway(testSigningKey, "http://localhost:11434", "real-key", usage, slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", nil)
 	w := httptest.NewRecorder()
@@ -35,7 +35,7 @@ func TestGateway_MissingAuth(t *testing.T) {
 
 func TestGateway_InvalidToken(t *testing.T) {
 	usage := NewUsageTracker()
-	gw, _ := NewGateway(testSigningKey, "http://localhost:11434", "real-key", usage, log.New(os.Stdout, "", 0))
+	gw, _ := NewGateway(testSigningKey, "http://localhost:11434", "real-key", usage, slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", nil)
 	req.Header.Set("Authorization", "Bearer bad-token")
@@ -63,7 +63,7 @@ func TestGateway_ProxiesWithRealKey(t *testing.T) {
 	defer upstream.Close()
 
 	usage := NewUsageTracker()
-	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, log.New(os.Stdout, "", 0))
+	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", strings.NewReader(`{"model":"test","messages":[]}`))
 	req.Header.Set("Authorization", "Bearer "+signToken("team-a"))
@@ -99,7 +99,7 @@ func TestGateway_NonCompletionEndpoint_NoUsageTracking(t *testing.T) {
 	defer upstream.Close()
 
 	usage := NewUsageTracker()
-	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, log.New(os.Stdout, "", 0))
+	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	req := httptest.NewRequest("GET", "/v1/models", nil)
 	req.Header.Set("Authorization", "Bearer "+signToken("team-a"))
@@ -128,7 +128,7 @@ func TestGateway_ResponseBodyPassedThrough(t *testing.T) {
 	defer upstream.Close()
 
 	usage := NewUsageTracker()
-	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, log.New(os.Stdout, "", 0))
+	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", strings.NewReader(`{"model":"test","messages":[]}`))
 	req.Header.Set("Authorization", "Bearer "+signToken("team-a"))
@@ -158,7 +158,7 @@ data: [DONE]
 	defer upstream.Close()
 
 	usage := NewUsageTracker()
-	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, log.New(os.Stdout, "", 0))
+	gw, _ := NewGateway(testSigningKey, upstream.URL, "real-api-key", usage, slog.New(slog.NewTextHandler(os.Stdout, nil)))
 
 	req := httptest.NewRequest("POST", "/v1/chat/completions", strings.NewReader(`{"model":"test","messages":[]}`))
 	req.Header.Set("Authorization", "Bearer "+signToken("team-a"))

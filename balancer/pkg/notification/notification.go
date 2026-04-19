@@ -78,7 +78,7 @@ func (s *NotificationService) StartNotificationWatcher(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			s.bundle.Log.Printf("MultiJuicer context canceled. Exiting notification watcher.")
+			s.bundle.Log.Info("MultiJuicer context canceled. Exiting notification watcher.")
 			return
 		default:
 			s.watchConfigMap(ctx)
@@ -99,10 +99,10 @@ func (s *NotificationService) watchConfigMap(ctx context.Context) {
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			s.bundle.Log.Printf("Notification ConfigMap not found. Treating as no notification.")
+			s.bundle.Log.Debug("Notification ConfigMap not found. Treating as no notification.")
 			s.parseAndUpdateNotification(nil)
 		} else {
-			s.bundle.Log.Printf("Failed to get notification ConfigMap: %v", err)
+			s.bundle.Log.Error("Failed to get notification ConfigMap", "error", err)
 			return
 		}
 	} else {
@@ -117,18 +117,18 @@ func (s *NotificationService) watchConfigMap(ctx context.Context) {
 		},
 	)
 	if err != nil {
-		s.bundle.Log.Printf("Failed to start watch for notification ConfigMap: %v", err)
+		s.bundle.Log.Error("Failed to start watch for notification ConfigMap", "error", err)
 		return
 	}
 	defer watcher.Stop()
 
-	s.bundle.Log.Printf("Started watching notification ConfigMap")
+	s.bundle.Log.Debug("Started watching notification ConfigMap")
 
 	for {
 		select {
 		case event, ok := <-watcher.ResultChan():
 			if !ok {
-				s.bundle.Log.Printf("Notification ConfigMap watcher closed. Reconnecting...")
+				s.bundle.Log.Warn("Notification ConfigMap watcher closed. Reconnecting...")
 				return
 			}
 
@@ -137,11 +137,11 @@ func (s *NotificationService) watchConfigMap(ctx context.Context) {
 				configMap := event.Object.(*corev1.ConfigMap)
 				s.parseAndUpdateNotification(configMap)
 			case watch.Deleted:
-				s.bundle.Log.Printf("Notification ConfigMap deleted")
+				s.bundle.Log.Info("Notification ConfigMap deleted")
 				s.parseAndUpdateNotification(nil)
 			}
 		case <-ctx.Done():
-			s.bundle.Log.Printf("Context canceled. Exiting notification watcher.")
+			s.bundle.Log.Info("Context canceled. Exiting notification watcher.")
 			return
 		}
 	}
@@ -159,7 +159,7 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 
 	jsonData, ok := cm.Data["notification.json"]
 	if !ok {
-		s.bundle.Log.Printf("Notification ConfigMap missing 'notification.json' key")
+		s.bundle.Log.Warn("Notification ConfigMap missing 'notification.json' key")
 		s.currentNotification = nil
 		s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 		return
@@ -167,7 +167,7 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 
 	var notification bundle.Notification
 	if err := json.Unmarshal([]byte(jsonData), &notification); err != nil {
-		s.bundle.Log.Printf("Failed to parse notification JSON: %v", err)
+		s.bundle.Log.Error("Failed to parse notification JSON", "error", err)
 		s.currentNotification = nil
 		s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
 		return
@@ -175,7 +175,7 @@ func (s *NotificationService) parseAndUpdateNotification(cm *corev1.ConfigMap) {
 
 	s.currentNotification = &notification
 	s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
-	s.bundle.Log.Printf("Updated notification: enabled=%v, message=%q", notification.Enabled, notification.Message)
+	s.bundle.Log.Info("Updated notification", "enabled", notification.Enabled, "message", notification.Message)
 }
 
 // getOrCreateConfigMap retrieves the existing notification ConfigMap or returns a new empty one.

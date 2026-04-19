@@ -171,7 +171,7 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 					LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",
 				})
 			if err != nil {
-				bundle.Log.Printf("Failed to list deployments for activity feed: %s", err)
+				bundle.Log.Error("Failed to list deployments for activity feed", "error", err)
 				return nil, time.Time{}, false, err
 			}
 
@@ -205,7 +205,7 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 
 		recentEvents, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(r, fetchFunc)
 		if err != nil {
-			bundle.Log.Printf("Long poll error: %s", err)
+			bundle.Log.Error("Long poll error", "error", err)
 			http.Error(w, "Invalid time format", statusCode)
 			return
 		}
@@ -217,7 +217,7 @@ func handleActivityFeed(bundle *b.Bundle) http.Handler {
 
 		responseBytes, marshalErr := json.Marshal(recentEvents)
 		if marshalErr != nil {
-			bundle.Log.Printf("Failed to marshal response: %s", marshalErr)
+			bundle.Log.Error("Failed to marshal response", "error", marshalErr)
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}

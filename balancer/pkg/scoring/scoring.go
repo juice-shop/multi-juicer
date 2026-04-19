@@ -159,7 +159,7 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			s.bundle.Log.Printf("MultiJuicer context canceled. Exiting the scoring watcher.")
+			s.bundle.Log.Info("MultiJuicer context canceled. Exiting the scoring watcher.")
 			return
 		default:
 			s.startScoringWatcher(ctx)
@@ -173,7 +173,7 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 	})
 
 	if err != nil {
-		s.bundle.Log.Printf("Failed to start the watcher for JuiceShop deployments: %v", err)
+		s.bundle.Log.Error("Failed to start the watcher for JuiceShop deployments", "error", err)
 		panic(err)
 	}
 	defer watcher.Stop()
@@ -182,7 +182,7 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 		select {
 		case event, ok := <-watcher.ResultChan():
 			if !ok {
-				s.bundle.Log.Printf("Watcher for JuiceShop deployments has been closed. Restarting the watcher.")
+				s.bundle.Log.Warn("Watcher for JuiceShop deployments has been closed. Restarting the watcher.")
 				return
 			}
 			switch event.Type {
@@ -213,7 +213,7 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 			default:
 			}
 		case <-ctx.Done():
-			s.bundle.Log.Printf("MultiJuicer context canceled. Exiting the scoring watcher.")
+			s.bundle.Log.Info("MultiJuicer context canceled. Exiting the scoring watcher.")
 			return
 		}
 	}
@@ -265,7 +265,7 @@ func calculateScore(b *bundle.Bundle, teamDeployment *appsv1.Deployment, challen
 	err := json.Unmarshal([]byte(solvedChallengesString), &solvedChallenges)
 
 	if err != nil {
-		b.Log.Printf("JuiceShop deployment '%s' has an invalid 'multi-juicer.owasp-juice.shop/challenges' annotation. Assuming 0 solved challenges for it as the score can't be calculated.", team)
+		b.Log.Warn("JuiceShop deployment has an invalid challenges annotation. Assuming 0 solved challenges.", "team", team)
 		return &bundle.TeamScore{
 			Name:              team,
 			Score:             0,
@@ -280,7 +280,7 @@ func calculateScore(b *bundle.Bundle, teamDeployment *appsv1.Deployment, challen
 	for _, challengeSolved := range solvedChallenges {
 		challenge, ok := challengesMap[challengeSolved.Key]
 		if !ok {
-			b.Log.Printf("JuiceShop deployment '%s' has a solved challenge '%s' that is not in the challenges map. The used JuiceShop version might be incompatible with this MultiJuicer version.", team, challengeSolved.Key)
+			b.Log.Warn("JuiceShop deployment has a solved challenge not in the challenges map. The JuiceShop version might be incompatible.", "team", team, "challenge", challengeSolved.Key)
 			continue
 		}
 		score += challenge.Difficulty * 10

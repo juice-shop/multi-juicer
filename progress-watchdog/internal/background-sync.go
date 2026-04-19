@@ -44,7 +44,7 @@ type JuiceShopChallenge struct {
 }
 
 func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
-	logger.Printf("Starting background-sync looking for JuiceShop challenge progress changes with %d workers", workerCount)
+	Logger.Info("Starting background-sync looking for JuiceShop challenge progress changes", "workers", workerCount)
 
 	createChallengeIdLookup()
 
@@ -88,7 +88,7 @@ func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clie
 			panic(err.Error())
 		}
 
-		logger.Printf("Background-sync started syncing %d instances", len(juiceShops.Items))
+		Logger.Debug("Background-sync started syncing instances", "count", len(juiceShops.Items))
 
 		for _, instance := range juiceShops.Items {
 			Team := instance.Labels["team"]
@@ -115,19 +115,19 @@ func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clients
 		challengeProgress, err := getCurrentChallengeProgress(job.Team)
 
 		if err != nil {
-			logger.Println(fmt.Errorf("failed to fetch current Challenge Progress for team '%s' from Juice Shop: %w", job.Team, err))
+			Logger.Error("failed to fetch current Challenge Progress from Juice Shop", "team", job.Team, "error", err)
 			continue
 		}
 
 		switch CompareChallengeStates(challengeProgress, lastChallengeProgress) {
 		case ApplyCode:
-			logger.Printf("Last ContinueCode for team '%s' contains unsolved challenges", job.Team)
+			Logger.Debug("Last ContinueCode contains unsolved challenges", "team", job.Team)
 			applyChallengeProgress(job.Team, lastChallengeProgress)
 
 			challengeProgress, err = getCurrentChallengeProgress(job.Team)
 
 			if err != nil {
-				logger.Println(fmt.Errorf("failed to re-fetch challenge progress from Juice Shop for team '%s' to reapply it: %w", job.Team, err))
+				Logger.Error("failed to re-fetch challenge progress from Juice Shop to reapply it", "team", job.Team, "error", err)
 				continue
 			}
 			PersistProgress(clientset, job.Team, challengeProgress, nil)
@@ -184,7 +184,7 @@ func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
 func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
 	continueCode, err := GenerateContinueCode(challengeProgress)
 	if err != nil {
-		logger.Println(fmt.Errorf("failed to encode challenge progress into continue code: %w", err))
+		Logger.Error("failed to encode challenge progress into continue code", "error", err)
 		return
 	}
 
@@ -192,12 +192,12 @@ func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
 
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		logger.Println(fmt.Errorf("failed to create http request to set the current ContinueCode: %w", err))
+		Logger.Error("failed to create http request to set the current ContinueCode", "error", err)
 		return
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logger.Println(fmt.Errorf("failed to set the current ContinueCode to juice shop: %w", err))
+		Logger.Error("failed to set the current ContinueCode to juice shop", "error", err)
 		return
 	}
 	defer res.Body.Close()

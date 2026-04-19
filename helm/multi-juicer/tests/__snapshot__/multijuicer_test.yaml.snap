@@ -137,6 +137,8 @@ default values render correctly:
                       name: balancer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
                   value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+                - name: LOG_LEVEL
+                  value: info
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -340,6 +342,8 @@ default values render correctly:
                       value: NAMESPACE
                     - name: MAX_INACTIVE_DURATION
                       value: 24h
+                    - name: LOG_LEVEL
+                      value: info
                   image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
                   imagePullPolicy: IfNotPresent
                   name: cleanup-job
@@ -473,6 +477,8 @@ default values render correctly:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.namespace
+                - name: LOG_LEVEL
+                  value: info
               image: ghcr.io/juice-shop/multi-juicer/progress-watchdog:v42.0.0
               imagePullPolicy: IfNotPresent
               name: progress-watchdog
@@ -720,6 +726,8 @@ full values render out correctly:
                       name: balancer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
                   value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+                - name: LOG_LEVEL
+                  value: info
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -998,6 +1006,8 @@ full values render out correctly:
                       value: NAMESPACE
                     - name: MAX_INACTIVE_DURATION
                       value: 24h
+                    - name: LOG_LEVEL
+                      value: info
                   image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
                   imagePullPolicy: IfNotPresent
                   name: cleanup-job
@@ -2761,6 +2771,8 @@ full values render out correctly:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.namespace
+                - name: LOG_LEVEL
+                  value: info
               image: ghcr.io/juice-shop/multi-juicer/progress-watchdog:v42.0.0
               imagePullPolicy: IfNotPresent
               name: progress-watchdog
@@ -3006,6 +3018,8 @@ production notes work correctly:
                       name: balancer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
                   value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+                - name: LOG_LEVEL
+                  value: info
               image: ghcr.io/juice-shop/multi-juicer/balancer:v42.0.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
@@ -3209,6 +3223,8 @@ production notes work correctly:
                       value: NAMESPACE
                     - name: MAX_INACTIVE_DURATION
                       value: 24h
+                    - name: LOG_LEVEL
+                      value: info
                   image: ghcr.io/juice-shop/multi-juicer/cleaner:v42.0.0
                   imagePullPolicy: IfNotPresent
                   name: cleanup-job
@@ -3342,6 +3358,8 @@ production notes work correctly:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.namespace
+                - name: LOG_LEVEL
+                  value: info
               image: ghcr.io/juice-shop/multi-juicer/progress-watchdog:v42.0.0
               imagePullPolicy: IfNotPresent
               name: progress-watchdog

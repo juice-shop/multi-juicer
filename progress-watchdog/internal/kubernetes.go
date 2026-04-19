@@ -45,7 +45,7 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 }
 
 func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus, cheatScores []CheatScoreEntry) {
-	logger.Printf("Updating saved ContinueCode of team '%s'", team)
+	Logger.Debug("Updating saved ContinueCode", "team", team)
 
 	encodedSolvedChallenges, err := json.Marshal(solvedChallenges)
 	if err != nil {
@@ -61,7 +61,7 @@ func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallen
 	if len(cheatScores) > 0 {
 		encodedCheatScores, err := json.Marshal(cheatScores)
 		if err != nil {
-			logger.Println(fmt.Errorf("failed to encode cheat scores for team %s: %w", team, err))
+			Logger.Error("failed to encode cheat scores", "team", team, "error", err)
 		} else {
 			annotations.CheatScores = string(encodedCheatScores)
 		}
@@ -81,6 +81,6 @@ func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallen
 	namespace := os.Getenv("NAMESPACE")
 	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
 	if err != nil {
-		logger.Println(fmt.Errorf("failed to patch new ContinueCode into deployment for team %s: %w", team, err))
+		Logger.Error("failed to patch new ContinueCode into deployment", "team", team, "error", err)
 	}
 }
