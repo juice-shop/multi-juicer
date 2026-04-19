@@ -1,7 +1,7 @@
 package testutil
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -71,7 +71,7 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 			},
 		},
 		BcryptRounds:               2,
-		Log:                        log.New(os.Stdout, "", log.LstdFlags),
+		Log:                        slog.New(slog.NewTextHandler(os.Stdout, nil)),
 		LongPollDefaultWaitTimeout: 3 * time.Second,
 		Config: &bundle.Config{
 			MaxInstances: 100,

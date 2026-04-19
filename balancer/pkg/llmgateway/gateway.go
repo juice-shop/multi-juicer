@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -29,11 +29,11 @@ type Gateway struct {
 	upstreamURL *url.URL
 	apiKey      string
 	usage       *UsageTracker
-	logger      *log.Logger
+	logger      *slog.Logger
 }
 
 // NewGateway creates a new LLM gateway.
-func NewGateway(signingKey string, upstreamURL string, apiKey string, usage *UsageTracker, logger *log.Logger) (*Gateway, error) {
+func NewGateway(signingKey string, upstreamURL string, apiKey string, usage *UsageTracker, logger *slog.Logger) (*Gateway, error) {
 	u, err := url.Parse(upstreamURL)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Check if this is a chat completions request (for usage tracking)
 	isChatCompletion := strings.Contains(r.URL.Path, "/chat/completions")
-	g.logger.Printf("LLM gateway: request from team '%s': %s %s (isChatCompletion=%v)", team, r.Method, r.URL.Path, isChatCompletion)
+	g.logger.Debug("LLM gateway: request", "team", team, "method", r.Method, "path", r.URL.Path, "isChatCompletion", isChatCompletion)
 
 	// Create reverse proxy
 	proxy := &httputil.ReverseProxy{
@@ -84,7 +84,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-		g.logger.Printf("LLM gateway proxy error for team '%s': %v", team, err)
+		g.logger.Error("LLM gateway proxy error", "team", team, "error", err)
 		http.Error(w, `{"error":"upstream LLM API error"}`, http.StatusBadGateway)
 	}
 
@@ -102,7 +102,7 @@ func (g *Gateway) extractUsage(resp *http.Response, team string) error {
 	body, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		g.logger.Printf("LLM gateway: failed to read response body for team '%s': %v", team, err)
+		g.logger.Error("LLM gateway: failed to read response body", "team", team, "error", err)
 		resp.Body = io.NopCloser(bytes.NewReader(body))
 		return nil
 	}
@@ -124,7 +124,7 @@ func (g *Gateway) extractUsageFromJSON(body []byte, team string) {
 		return
 	}
 	if result.Usage != nil {
-		g.logger.Printf("LLM gateway: usage for team '%s': input_tokens=%d, output_tokens=%d", team, result.Usage.InputTokens, result.Usage.OutputTokens)
+		g.logger.Debug("LLM gateway: usage", "team", team, "input_tokens", result.Usage.InputTokens, "output_tokens", result.Usage.OutputTokens)
 		g.usage.Add(team, result.Usage.InputTokens, result.Usage.OutputTokens)
 	}
 }
@@ -148,10 +148,10 @@ func (g *Gateway) extractUsageFromSSE(body []byte, team string) {
 			continue
 		}
 		if chunk.Usage != nil {
-			g.logger.Printf("LLM gateway: SSE usage for team '%s': input_tokens=%d, output_tokens=%d", team, chunk.Usage.InputTokens, chunk.Usage.OutputTokens)
+			g.logger.Debug("LLM gateway: SSE usage", "team", team, "input_tokens", chunk.Usage.InputTokens, "output_tokens", chunk.Usage.OutputTokens)
 			g.usage.Add(team, chunk.Usage.InputTokens, chunk.Usage.OutputTokens)
 			return
 		}
 	}
-	g.logger.Printf("LLM gateway: no usage data found in SSE stream for team '%s'", team)
+	g.logger.Debug("LLM gateway: no usage data found in SSE stream", "team", team)
 }

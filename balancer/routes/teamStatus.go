@@ -62,7 +62,7 @@ func handleTeamStatus(b *bundle.Bundle) http.Handler {
 				if team == "admin" {
 					responseBytes, err := json.Marshal(AdminTeamStatus{Name: "admin"})
 					if err != nil {
-						b.Log.Printf("Failed to marshal response: %s", err)
+						b.Log.Error("Failed to marshal response", "error", err)
 						http.Error(responseWriter, "", http.StatusInternalServerError)
 						return
 					}
@@ -104,7 +104,7 @@ func handleTeamStatus(b *bundle.Bundle) http.Handler {
 					http.Error(responseWriter, "team not found", http.StatusNotFound)
 					return
 				}
-				b.Log.Printf("Long poll error: %s", err)
+				b.Log.Error("Long poll error", "error", err)
 				http.Error(responseWriter, "Invalid time format", statusCode)
 				return
 			}
@@ -137,7 +137,7 @@ func handleTeamStatus(b *bundle.Bundle) http.Handler {
 
 			responseBytes, err := json.Marshal(response)
 			if err != nil {
-				b.Log.Printf("Failed to marshal response: %s", err)
+				b.Log.Error("Failed to marshal response", "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}

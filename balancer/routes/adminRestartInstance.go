@@ -24,7 +24,7 @@ func handleAdminRestartInstance(bundle *bundle.Bundle) http.Handler {
 			})
 
 			if err != nil {
-				bundle.Log.Printf("Failed to list pods for team '%s': %s", teamToRestart, err)
+				bundle.Log.Error("Failed to list pods", "team", teamToRestart, "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}
@@ -40,7 +40,7 @@ func handleAdminRestartInstance(bundle *bundle.Bundle) http.Handler {
 			err = bundle.ClientSet.CoreV1().Pods(bundle.RuntimeEnvironment.Namespace).Delete(req.Context(), pod.Name, metav1.DeleteOptions{})
 
 			if err != nil {
-				bundle.Log.Printf("Failed to restart pods for team '%s': %s", teamToRestart, err)
+				bundle.Log.Error("Failed to restart pod", "team", teamToRestart, "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}

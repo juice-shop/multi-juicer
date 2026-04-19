@@ -34,7 +34,7 @@ func handleAdminPostNotification(bundle *bundle.Bundle) http.Handler {
 
 			// Use the NotificationService to set the notification
 			if err := bundle.NotificationService.SetNotification(req.Context(), notificationReq.Message, notificationReq.Enabled); err != nil {
-				bundle.Log.Printf("Failed to set notification: %v", err)
+				bundle.Log.Error("Failed to set notification", "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}

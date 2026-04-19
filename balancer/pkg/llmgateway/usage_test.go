@@ -2,7 +2,7 @@ package llmgateway
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"os"
 	"testing"
 
@@ -45,7 +45,7 @@ func TestUsageTracker_FlushToAnnotations(t *testing.T) {
 	tracker := NewUsageTracker()
 	tracker.Add("team-a", 10, 20)
 
-	logger := log.New(os.Stdout, "", 0)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	tracker.FlushToAnnotations(context.Background(), clientset, "default", logger)
 
 	// Verify annotations were updated
@@ -76,7 +76,7 @@ func TestUsageTracker_FlushRetainsOnError(t *testing.T) {
 	tracker := NewUsageTracker()
 	tracker.Add("nonexistent", 10, 20)
 
-	logger := log.New(os.Stdout, "", 0)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	tracker.FlushToAnnotations(context.Background(), clientset, "default", logger)
 
 	// Usage should be retained

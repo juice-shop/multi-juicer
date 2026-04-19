@@ -56,18 +56,18 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 					instanceUpCache[team] = time.Now().UnixMilli()
 					cacheMutex.Unlock()
 				case instanceMissing:
-					bundle.Log.Printf("Instance for team (%s) is missing. Redirecting to balancer page.", team)
+					bundle.Log.Info("Instance for team is missing. Redirecting to balancer page.", "team", team)
 					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-not-found&team=%s", team), http.StatusFound)
 					return
 				default:
-					bundle.Log.Printf("Instance for team (%s) is down. Redirecting to balancer page.", team)
+					bundle.Log.Info("Instance for team is down. Redirecting to balancer page.", "team", team)
 					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&team=%s", team), http.StatusFound)
 					return
 				}
 			}
 
 			target := bundle.GetJuiceShopUrlForTeam(team, bundle)
-			bundle.Log.Printf("Proxy for team (%s): %s %s", team, req.Method, req.URL)
+			bundle.Log.Debug("Proxying request", "team", team, "method", req.Method, "path", req.URL)
 			// Rewrite the request to the target server
 			newReverseProxy(target).ServeHTTP(responseWriter, req)
 		},
@@ -94,13 +94,13 @@ func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) i
 	if errors.IsNotFound(err) {
 		return instanceMissing
 	} else if err != nil {
-		bundle.Log.Printf("Failed to lookup if a instance is up in the kubernetes api. Assuming it's missing: %s", err)
+		bundle.Log.Error("Failed to lookup if an instance is up in the kubernetes api. Assuming it's missing.", "error", err)
 		return instanceMissing
 	} else if deployment.Status.ReadyReplicas > 0 {
 		err = updateLastRequestTimestamp(context, bundle, team)
 		if err != nil {
 			// we will continue here, as a working proxy is more important than a up to date timestamp.
-			bundle.Log.Printf("failed to update last request time stamp on deployment. last request timestamps shown on the admin page might be out of sync.")
+			bundle.Log.Warn("failed to update last request time stamp on deployment. last request timestamps shown on the admin page might be out of sync.")
 		}
 		return instanceUp
 	}
@@ -123,7 +123,7 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 }
 
 func updateLastRequestTimestamp(context context.Context, bundle *bundle.Bundle, team string) error {
-	bundle.Log.Printf("Updating last request timestamp for team '%s'", team)
+	bundle.Log.Debug("Updating last request timestamp", "team", team)
 
 	diff := UpdateProgressDeploymentDiff{
 		Metadata: UpdateProgressDeploymentMetadata{

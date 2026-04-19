@@ -40,7 +40,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 
 			totalTeams, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(req, fetchFunc)
 			if err != nil {
-				bundle.Log.Printf("Long poll error: %s", err)
+				bundle.Log.Error("Long poll error", "error", err)
 				http.Error(responseWriter, "Invalid time format", statusCode)
 				return
 			}
@@ -75,7 +75,7 @@ func handleScoreBoard(bundle *b.Bundle) http.Handler {
 
 			responseBytes, marshalErr := json.Marshal(response)
 			if marshalErr != nil {
-				bundle.Log.Printf("Failed to marshal response: %s", marshalErr)
+				bundle.Log.Error("Failed to marshal response", "error", marshalErr)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}

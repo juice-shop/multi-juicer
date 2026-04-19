@@ -30,7 +30,7 @@ func handleAdminSetClock(bundle *bundle.Bundle) http.Handler {
 
 			// Use the NotificationService to set the end date
 			if err := bundle.NotificationService.SetEndDate(req.Context(), clockReq.EndDate); err != nil {
-				bundle.Log.Printf("Failed to set clock: %v", err)
+				bundle.Log.Error("Failed to set clock", "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}

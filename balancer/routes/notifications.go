@@ -62,7 +62,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 
 		response, lastUpdateTime, statusCode, err := longpoll.HandleLongPoll(r, fetchFunc)
 		if err != nil {
-			b.Log.Printf("Long poll error: %s", err)
+			b.Log.Error("Long poll error", "error", err)
 			http.Error(w, "Invalid time format", statusCode)
 			return
 		}
@@ -75,7 +75,7 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 
 		responseBytes, marshalErr := json.Marshal(response)
 		if marshalErr != nil {
-			b.Log.Printf("Failed to marshal notification response: %s", marshalErr)
+			b.Log.Error("Failed to marshal notification response", "error", marshalErr)
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}

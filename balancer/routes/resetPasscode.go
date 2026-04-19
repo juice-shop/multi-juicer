@@ -37,7 +37,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 
 			passcodeHashBytes, err := bcrypt.GenerateFromPassword([]byte(newPasscode), bundle.BcryptRounds)
 			if err != nil {
-				bundle.Log.Printf("Failed to hash passcode!: %s", err)
+				bundle.Log.Error("Failed to hash passcode", "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return
 			}
@@ -52,7 +52,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 			})
 
 			if err != nil {
-				bundle.Log.Printf("Failed to convert passcode update patch to json: %v", err)
+				bundle.Log.Error("Failed to convert passcode update patch to json", "error", err)
 				http.Error(responseWriter, "Failed to update passcode", http.StatusInternalServerError)
 				return
 			}
@@ -70,7 +70,7 @@ func handleResetPasscode(bundle *bundle.Bundle) http.Handler {
 			}
 			responseBodyEncoded, err := json.Marshal(responseBody)
 			if err != nil {
-				bundle.Log.Printf("Failed to encode passcode reset response: %v", err)
+				bundle.Log.Error("Failed to encode passcode reset response", "error", err)
 				http.Error(responseWriter, "Failed to reset passcode", http.StatusInternalServerError)
 				return
 			}

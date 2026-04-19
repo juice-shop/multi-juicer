@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"sort"
@@ -49,11 +48,10 @@ type JuiceShopWebhook struct {
 	Issuer   JuiceShopWebhookIssuer   `json:"issuer"`
 }
 
-var logger = log.New(os.Stdout, "", log.LstdFlags)
 var namespace = os.Getenv("NAMESPACE")
 
 func main() {
-	logger.Println("Starting ProgressWatchdog")
+	internal.Logger.Info("Starting ProgressWatchdog")
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -82,7 +80,7 @@ func main() {
 
 		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 		if err != nil {
-			logger.Print(fmt.Errorf("failed to get deployment for team: '%s' received via in webhook: %w", team, err))
+			internal.Logger.Error("failed to get deployment for team received via webhook", "team", team, "error", err)
 		}
 
 		challengeStatusJson := "[]"
@@ -93,7 +91,7 @@ func main() {
 		challengeStatus := make(internal.ChallengeStatuses, 0)
 		err = json.Unmarshal([]byte(challengeStatusJson), &challengeStatus)
 		if err != nil {
-			logger.Print(fmt.Errorf("failed to decode json from juice shop deployment annotation: %w", err))
+			internal.Logger.Error("failed to decode json from juice shop deployment annotation", "error", err)
 		}
 
 		// Read existing cheat scores from the deployment annotation
@@ -105,14 +103,14 @@ func main() {
 		cheatScores := make([]internal.CheatScoreEntry, 0)
 		err = json.Unmarshal([]byte(cheatScoresJson), &cheatScores)
 		if err != nil {
-			logger.Print(fmt.Errorf("failed to decode cheat scores from juice shop deployment annotation: %w", err))
+			internal.Logger.Error("failed to decode cheat scores from juice shop deployment annotation", "error", err)
 			cheatScores = make([]internal.CheatScoreEntry, 0)
 		}
 
 		// check if the challenge is already solved
 		for _, status := range challengeStatus {
 			if status.Key == webhook.Solution.Challenge {
-				logger.Printf("Challenge '%s' already solved by team '%s', ignoring webhook", webhook.Solution.Challenge, team)
+				internal.Logger.Info("Challenge already solved, ignoring webhook", "challenge", webhook.Solution.Challenge, "team", team)
 				responseWriter.WriteHeader(http.StatusOK)
 				responseWriter.Write([]byte("ok"))
 				return
@@ -122,7 +120,7 @@ func main() {
 		// Parse and normalize the timestamp to UTC to ensure consistency
 		solvedAtTime, err := time.Parse(time.RFC3339, webhook.Solution.IssuedOn)
 		if err != nil {
-			logger.Printf("Warning: Failed to parse timestamp '%s', using current time in UTC: %v", webhook.Solution.IssuedOn, err)
+			internal.Logger.Warn("Failed to parse timestamp, using current time in UTC", "timestamp", webhook.Solution.IssuedOn, "error", err)
 			solvedAtTime = time.Now().UTC()
 		}
 		// Always store timestamps in UTC with RFC3339 format
@@ -147,7 +145,7 @@ func main() {
 
 		internal.PersistProgress(clientset, team, challengeStatus, cheatScores)
 
-		logger.Printf("Received webhook for team '%s' for challenge '%s'", team, webhook.Solution.Challenge)
+		internal.Logger.Info("Received webhook", "team", team, "challenge", webhook.Solution.Challenge)
 
 		responseWriter.WriteHeader(http.StatusOK)
 		responseWriter.Write([]byte("ok"))
@@ -162,6 +160,6 @@ func main() {
 		Addr:    ":8080",
 		Handler: router,
 	}
-	logger.Println("Starting web server listening for Solution Webhooks on :8080")
+	internal.Logger.Info("Starting web server listening for Solution Webhooks on :8080")
 	server.ListenAndServe()
 }

@@ -54,6 +54,8 @@ spec:
                 name: balancer-secret
           - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
             value: {{ .Values.balancer.contentSecurityPolicy | quote }}
+          - name: LOG_LEVEL
+            value: {{ .Values.balancer.logLevel | default "info" | quote }}
           {{- if .Values.config.juiceShop.llm.enabled }}
           - name: LLM_API_KEY
             valueFrom:

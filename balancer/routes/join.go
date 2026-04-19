@@ -58,7 +58,7 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 				http.Error(w, "failed to check max instance limit", http.StatusInternalServerError)
 				return
 			} else if isMaxLimitReached {
-				bundle.Log.Printf("Max instance limit reached! Cannot create any more new teams. Increase the count via the helm values or delete existing teams.")
+				bundle.Log.Warn("Max instance limit reached! Cannot create any more new teams. Increase the count via the helm values or delete existing teams.")
 				http.Error(w, `{"message":"Reached Maximum Instance Count","description":"Find an admin to handle this."}`, http.StatusInternalServerError)
 				return
 			}
@@ -140,14 +140,14 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 
 	passcode, passcodeHash, err := generatePasscode(bundle)
 	if err != nil {
-		bundle.Log.Printf("Failed to hash passcode!: %s", err)
+		bundle.Log.Error("Failed to hash passcode", "team", team, "error", err)
 		http.Error(w, "failed to generate passcode", http.StatusInternalServerError)
 		return
 	}
 
 	deployment, err := createDeploymentForTeam(context, bundle, team, passcodeHash)
 	if err != nil {
-		bundle.Log.Printf("Failed to create deployment: %s", err)
+		bundle.Log.Error("Failed to create deployment", "team", team, "error", err)
 		http.Error(w, "failed to create deployment", http.StatusInternalServerError)
 		return
 	}
@@ -155,7 +155,7 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 	if bundle.Config.JuiceShopConfig.LLM.Enabled {
 		err = createLLMTokenSecretForTeam(context, bundle, team, deployment)
 		if err != nil {
-			bundle.Log.Printf("Failed to create LLM token secret: %s", err)
+			bundle.Log.Error("Failed to create LLM token secret", "team", team, "error", err)
 			http.Error(w, "failed to create LLM token secret", http.StatusInternalServerError)
 			return
 		}
@@ -163,7 +163,7 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 
 	err = createServiceForTeam(context, bundle, team, deployment)
 	if err != nil {
-		bundle.Log.Printf("Failed to create service: %s", err)
+		bundle.Log.Error("Failed to create service", "team", team, "error", err)
 		http.Error(w, "failed to create service", http.StatusInternalServerError)
 		return
 	}
