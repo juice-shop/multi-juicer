@@ -21,9 +21,9 @@ tasks:
       VERSION: '{{uuid}}'
     cmds:
       - |
-        docker build --progress plain -f containers/cleaner/Dockerfile -t local/cleaner:{{.VERSION}} . &
-        docker build --progress plain -f containers/progress-watchdog/Dockerfile -t local/progress-watchdog:{{.VERSION}} . &
-        docker build --progress plain -f containers/balancer/Dockerfile -t local/balancer:{{.VERSION}} . &
+        docker build --progress quiet -f containers/cleaner/Dockerfile -t local/cleaner:{{.VERSION}} . &
+        docker build --progress quiet -f containers/progress-watchdog/Dockerfile -t local/progress-watchdog:{{.VERSION}} . &
+        docker build --progress quiet -f containers/balancer/Dockerfile -t local/balancer:{{.VERSION}} . &
         wait
       - |
         if [ "$(kubectl config current-context)" = "kind-kind" ]; then
