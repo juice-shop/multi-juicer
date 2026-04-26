@@ -8,9 +8,40 @@ tasks:
       Builds and Deploys MultiJuicer to the default kubernetes context.
       Then forwards the balancer service to localhost:8080
     cmds:
-      - ./build-and-deploy.sh
+      - task: build-and-deploy
       - kubectl rollout status deployment balancer
       - kubectl port-forward deployment/balancer 8080:8080
+
+  build-and-deploy:
+    desc: |
+      Builds all MultiJuicer components and installs them to a local kubernetes cluster.
+      For this to work the local kubernetes cluster must have access to the same local registry / image cache which 'docker build ...' writes its image to.
+      For example docker-desktop with its included k8s cluster.
+    vars:
+      VERSION: '{{uuid}}'
+    cmds:
+      - |
+        docker build --progress plain -f containers/cleaner/Dockerfile -t local/cleaner:{{.VERSION}} . &
+        docker build --progress plain -f containers/progress-watchdog/Dockerfile -t local/progress-watchdog:{{.VERSION}} . &
+        docker build --progress plain -f containers/balancer/Dockerfile -t local/balancer:{{.VERSION}} . &
+        wait
+      - |
+        if [ "$(kubectl config current-context)" = "kind-kind" ]; then
+          kind load docker-image "local/progress-watchdog:{{.VERSION}}" &
+          kind load docker-image "local/cleaner:{{.VERSION}}" &
+          kind load docker-image "local/balancer:{{.VERSION}}" &
+          wait
+        fi
+      - |
+        helm upgrade --install multi-juicer ./helm/multi-juicer \
+          --set="imagePullPolicy=IfNotPresent" \
+          --set="balancer.repository=local/balancer" \
+          --set="balancer.tag={{.VERSION}}" \
+          --set="progressWatchdog.repository=local/progress-watchdog" \
+          --set="progressWatchdog.tag={{.VERSION}}" \
+          --set="juiceShopCleanup.repository=local/cleaner" \
+          --set="juiceShopCleanup.tag={{.VERSION}}" \
+          --set="balancer.cookie.cookieParserSecret=dev-secret"
 
   build:
     aliases: [b]
