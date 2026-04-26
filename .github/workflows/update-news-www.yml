@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           token: ${{ secrets.BOT_TOKEN }}
           repository: OWASP/www-project-juice-shop
@@ -20,7 +20,7 @@ jobs:
       - name: Update tab_news.md
         run: |
           sed -i 's/<!-- next:multi-juicer -->/<!-- next:multi-juicer -->\n* ${{ github.event.release.published_at }}: multi-juicer [`${{ github.event.release.tag_name }}`](https:\/\/github.com\/juice-shop\/multi-juicer\/releases\/tag\/${{ github.event.release.tag_name }})/' tab_news.md
-      - uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 #v7.1.0
+      - uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
           commit_message: "Add multi-juicer ${{ github.event.release.tag_name }} release notes to tab_news.md"
           branch: master
