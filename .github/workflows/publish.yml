@@ -84,8 +84,8 @@ jobs:
         name: Build and Push
         uses: docker/build-push-action@v7
         with:
-          context: ./${{ matrix.component }}
-          file: ./${{ matrix.component }}/Dockerfile
+          context: .
+          file: ./containers/${{ matrix.component }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.image-metadata.outputs.tags }}

@@ -12,7 +12,7 @@ default values render correctly:
             "affinity": {},
             "config": {
               "application": {
-                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico",
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico",
                 "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
                 "showGitHubLinks": false,
                 "showVersionNumber": false
@@ -112,7 +112,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 133a44727c3dfc0ff62edb724bfac4e095d1858318a8c6618e448b42152c28e9
+            checksum/config: 26468bfbc470a8b587c63f48f7422e11d79696f7652a3dec35792a7e04ded338
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -420,7 +420,7 @@ default values render correctly:
     data:
       multi-juicer.yaml: |-
         application:
-          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           showGitHubLinks: false
           showVersionNumber: false
@@ -601,7 +601,7 @@ full values render out correctly:
             "affinity": {},
             "config": {
               "application": {
-                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico",
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico",
                 "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
                 "showGitHubLinks": false,
                 "showVersionNumber": false
@@ -701,7 +701,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 061ccb4e474296618f1511b93e11d2e7051e83b5ea07008144de2cd1ea94baf5
+            checksum/config: ce1ba63c630ae951d9a6fa4e832dfd896718525d5e6558f56b50d3a398fec3bf
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -2693,7 +2693,7 @@ full values render out correctly:
     data:
       multi-juicer.yaml: |-
         application:
-          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           showGitHubLinks: false
           showVersionNumber: false
@@ -2893,7 +2893,7 @@ production notes work correctly:
             "affinity": {},
             "config": {
               "application": {
-                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico",
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico",
                 "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
                 "showGitHubLinks": false,
                 "showVersionNumber": false
@@ -2993,7 +2993,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 061ccb4e474296618f1511b93e11d2e7051e83b5ea07008144de2cd1ea94baf5
+            checksum/config: ce1ba63c630ae951d9a6fa4e832dfd896718525d5e6558f56b50d3a398fec3bf
             checksum/secret: 7c430d8f6cf074b992d9f63d9f6fc51256eef05865623b5f19c6c12cef547179
           labels:
             app.kubernetes.io/instance: balancer-RELEASE-NAME
@@ -3301,7 +3301,7 @@ production notes work correctly:
     data:
       multi-juicer.yaml: |-
         application:
-          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
+          favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico
           logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
           showGitHubLinks: false
           showVersionNumber: false

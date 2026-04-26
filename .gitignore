@@ -1,3 +1,10 @@
 # IntelliJ project files
 *.iml
 .idea/
+
+# Node / UI build artifacts
+node_modules/
+ui/build/
+
+# Go binaries / test outputs
+*.test

@@ -111,7 +111,7 @@ config:
     config:
       application:
         logo: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png
-        favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/balancer/ui/public/favicon.ico
+        favicon: https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico
         showVersionNumber: false
         showGitHubLinks: false
       challenges:

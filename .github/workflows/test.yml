@@ -5,58 +5,18 @@ permissions:
 env:
   GO_STATIC_CHECK_VERSION: "2025.1.1"
 jobs:
-  cleaner:
-    name: Cleaner
+  go:
+    name: Go
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: cleaner
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
-          go-version-file: "cleaner/go.mod"
-          cache-dependency-path: "cleaner/go.sum"
-      - name: "Ensure go code is properly formatted"
-        run: |
-          unformatted=$(go fmt ./...)
-          if [ -n "$unformatted" ]; then
-            echo "::error::The following files are not properly formatted: $unformatted"
-            echo "Run 'go fmt ./...' to fix."
-            exit 1
-          fi
-      - name: "Ensure go code is properly modernized / fixed"
-        run: |
-          go fix ./...
-          if ! git diff --exit-code; then
-            echo "::error::go fix produced changes. Run 'go fix ./...' to fix."
-            exit 1
-          fi
-      - name: "Lint"
-        run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.4.1
-        with:
-          install-go: false
-          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
-          working-directory: cleaner
-      - name: "Test"
-        run: go test -cover ./...
-
-  balancer:
-    name: Balancer
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: balancer
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: "balancer/go.mod"
-          cache-dependency-path: "balancer/go.sum"
+          go-version-file: "go.mod"
+          cache-dependency-path: "go.sum"
       - name: "Place index.html file into ui build folder"
         run: |
-          mkdir ui/build/
+          mkdir -p ui/build/
           cp ui/index.html ui/build/index.html
       - name: "Ensure go code is properly formatted"
         run: |
@@ -79,7 +39,6 @@ jobs:
         with:
           install-go: false
           version: "${{ env.GO_STATIC_CHECK_VERSION }}"
-          working-directory: balancer
       - name: "Test"
         run: go test -cover ./...
 
@@ -88,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: balancer/ui
+        working-directory: ui
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -100,43 +59,6 @@ jobs:
         run: npm run lint
       - name: "Test"
         run: npm run test -- --run
-
-  progress-watchdog:
-    name: ProgressWatchdog
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: progress-watchdog
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: "progress-watchdog/go.mod"
-          cache-dependency-path: "progress-watchdog/go.sum"
-      - name: "Ensure go code is properly formatted"
-        run: |
-          unformatted=$(go fmt ./...)
-          if [ -n "$unformatted" ]; then
-            echo "::error::The following files are not properly formatted: $unformatted"
-            echo "Run 'go fmt ./...' to fix."
-            exit 1
-          fi
-      - name: "Ensure go code is properly modernized / fixed"
-        run: |
-          go fix ./...
-          if ! git diff --exit-code; then
-            echo "::error::go fix produced changes. Run 'go fix ./...' to fix."
-            exit 1
-          fi
-      - name: "Lint"
-        run: go vet ./...
-      - uses: dominikh/staticcheck-action@v1.4.1
-        with:
-          install-go: false
-          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
-          working-directory: progress-watchdog
-      - name: "Test"
-        run: go test -cover ./...
 
   semgrep:
     name: Semgrep

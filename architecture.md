@@ -128,9 +128,9 @@ The Progress Watchdog is responsible for tracking and persisting challenge progr
 - Ensures teams don't lose progress due to pod crashes or cluster events
 
 **Key Components**
-- `internal/background-sync.go` - Worker pool and synchronization logic
-- `internal/kubernetes.go` - Kubernetes API interactions for progress persistence
-- `internal/compare-progress.go` - Logic for comparing and merging progress states
+- `internal/progresswatchdog/background-sync.go` - Worker pool and synchronization logic
+- `internal/progresswatchdog/kubernetes.go` - Kubernetes API interactions for progress persistence
+- `internal/progresswatchdog/compare-progress.go` - Logic for comparing and merging progress states
 
 ---
 

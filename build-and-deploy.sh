@@ -8,9 +8,9 @@ echo "Usage: ./build-and-deploy.sh"
 
 version="$(uuidgen)"
 
-docker build --progress plain -t local/cleaner:$version ./cleaner &
-docker build --progress plain -t local/progress-watchdog:$version ./progress-watchdog &
-docker build --progress plain -t local/balancer:$version ./balancer &
+docker build --progress plain -f containers/cleaner/Dockerfile -t local/cleaner:$version . &
+docker build --progress plain -f containers/progress-watchdog/Dockerfile -t local/progress-watchdog:$version . &
+docker build --progress plain -f containers/balancer/Dockerfile -t local/balancer:$version . &
 
 wait
 

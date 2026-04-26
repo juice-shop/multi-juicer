@@ -1,0 +1,31 @@
+.git
+.github
+.gitignore
+.idea
+.vscode
+.dockerignore
+
+# Build artifacts
+**/node_modules
+ui/build
+
+# Test files inside containers (Go tests aren't run from Dockerfiles)
+**/*_test.go
+
+# Documentation and unrelated assets
+guides
+images
+helm
+architecture.md
+readme.md
+ATTRIBUTION
+LICENSE
+CODE_OF_CONDUCT.md
+*.md
+
+# Tooling and local dev
+Taskfile.yaml
+build-and-deploy.sh
+
+# OS junk
+.DS_Store

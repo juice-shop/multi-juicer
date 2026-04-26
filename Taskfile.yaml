@@ -15,33 +15,27 @@ tasks:
   build:
     aliases: [b]
     cmds:
-      - task: balancer:ui:build
+      - task: ui:build
 
   lint:
     aliases: [l]
     cmds:
-      - task: cleaner:lint
-      - task: balancer:api:lint
-      - task: progress-watchdog:lint
-      - task: balancer:ui:lint
+      - task: go:lint
+      - task: ui:lint
 
   lint:fix:
     desc: Runs the linters which support auto fixing errors
     aliases: [lf]
     cmds:
-      - task: balancer:api:lint:fix
-      - task: progress-watchdog:lint:fix
-      - task: cleaner:lint:fix
-      - task: balancer:ui:lint:fix
+      - task: go:lint:fix
+      - task: ui:lint:fix
 
   test:
     aliases: [t]
     cmds:
       - task: helm:test
-      - task: balancer:ui:test
-      - task: balancer:api:test
-      - task: cleaner:test
-      - task: progress-watchdog:test
+      - task: ui:test
+      - task: go:test
       - task: semgrep:scan
 
   semgrep:scan:
@@ -51,42 +45,42 @@ tasks:
     cmds:
       - semgrep scan --config=auto --quiet
 
-  balancer:ui:build:
+  ui:build:
     preconditions:
       - sh: test -d node_modules/
-        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
     cmds:
       - npm run build
-    dir: balancer/ui/
+    dir: ui/
 
-  balancer:ui:lint:
+  ui:lint:
     preconditions:
       - sh: test -d node_modules/
-        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
     cmds:
       - npm run lint
-    dir: balancer/ui/
+    dir: ui/
 
-  balancer:ui:lint:fix:
+  ui:lint:fix:
     preconditions:
       - sh: test -d node_modules/
-        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
     cmds:
       - npm run lint:fix
-    dir: balancer/ui/
+    dir: ui/
 
-  balancer:ui:bundle-analyzer:
+  ui:bundle-analyzer:
     preconditions:
       - sh: test -d node_modules/
-        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
     cmds:
       - npx vite-bundle-visualizer
-    dir: balancer/ui/
+    dir: ui/
 
-  balancer:ui:test:
+  ui:test:
     preconditions:
       - sh: test -d node_modules/
-        msg: "balancer ui dependencies are not installed. run 'npm ci' in balancer/ui/ to install them."
+        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
     cmds:
       - |
         # run with bun if installed, otherwise use npm
@@ -95,73 +89,27 @@ tasks:
         else
           npm test -- --run
         fi
-    dir: balancer/ui/
+    dir: ui/
 
-  balancer:api:test:
+  go:test:
     preconditions:
       - sh: test -f ui/build/index.html
-        msg: "juice balancer ui needs to be compiled for the api tests to work properly. run 'task build' to compile it."
+        msg: "ui needs to be compiled for the api tests to work properly. run 'task build' to compile it."
     cmds:
-      - go test ./...
-    dir: balancer/
+      - go test -cover ./...
 
-  balancer:api:lint:
+  go:lint:
     preconditions:
       - sh: which staticcheck
-        msg: "staticcheck needs to be installed for running the balancer api linter."
+        msg: "staticcheck needs to be installed for running the go linter."
     cmds:
       - go vet ./...
       - staticcheck ./...
-    dir: balancer/
 
-  balancer:api:lint:fix:
+  go:lint:fix:
     cmds:
       - go fmt ./...
       - go fix ./...
-    dir: balancer/
-
-  progress-watchdog:test:
-    preconditions:
-      - sh: which go
-        msg: "go needs to be installed for running the progress-watchdog tests."
-    cmds:
-      - go test ./...
-    dir: progress-watchdog/
-
-  progress-watchdog:lint:
-    preconditions:
-      - sh: which staticcheck
-        msg: "staticcheck needs to be installed for running the progress-watchdog linter."
-    cmds:
-      - go vet ./...
-      - staticcheck ./...
-    dir: progress-watchdog/
-
-  progress-watchdog:lint:fix:
-    cmds:
-      - go fmt ./...
-      - go fix ./...
-    dir: progress-watchdog/
-
-  cleaner:test:
-    cmds:
-      - go test ./...
-    dir: cleaner/
-
-  cleaner:lint:
-    preconditions:
-      - sh: which staticcheck
-        msg: "staticcheck needs to be installed for running the cleaner linter."
-    cmds:
-      - go vet ./...
-      - staticcheck ./...
-    dir: cleaner/
-
-  cleaner:lint:fix:
-    cmds:
-      - go fmt ./...
-      - go fix ./...
-    dir: cleaner/
 
   helm:test:
     preconditions:

@@ -1,0 +1,292 @@
+package bundle
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log/slog"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/juice-shop/multi-juicer/internal/passcode"
+	"golang.org/x/crypto/bcrypt"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+)
+
+// Bundle holds all the dependencies and configuration that are used by the routes
+// for testing it can be mocked out, see testutil/testUtils.go for helper functions to easily mock out the bundle
+type Bundle struct {
+	RuntimeEnvironment RuntimeEnvironment
+	ClientSet          kubernetes.Interface
+	// generates a random passcode. On the bundle to have a static passcode in tests for easier assertions
+	GeneratePasscode func() string
+	// returns the (cluster internal) url for a team used by the balancer to proxy the request to. On the bundle to allow the tests to proxy requests to a local testing server
+	GetJuiceShopUrlForTeam func(team string, bundle *Bundle) string
+	BcryptRounds           int
+	StaticAssetsDirectory  string `json:"staticAssetsDirectory"`
+	Config                 *Config
+	Log                    *slog.Logger
+
+	// LongPollDefaultWaitTimeout amount of time that HTTP Long Polling Endpoints wait for new data to arrive before returning a empty no changes response
+	LongPollDefaultWaitTimeout time.Duration
+
+	JuiceShopChallenges []JuiceShopChallenge
+
+	// Services - set after Bundle creation to avoid cyclic dependencies
+	ScoringService      ScoringService
+	NotificationService NotificationService
+}
+
+type RuntimeEnvironment struct {
+	Namespace string `json:"namespace"`
+}
+
+type Config struct {
+	JuiceShopConfig       JuiceShopConfig `json:"juiceShop"`
+	MaxInstances          int             `json:"maxInstances"`
+	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
+	CookieConfig          CookieConfig    `json:"cookie"`
+	AdminConfig           *AdminConfig
+	ContentSecurityPolicy string
+}
+
+type AdminConfig struct {
+	Password string `json:"password"`
+}
+
+type CookieConfig struct {
+	// CookieSigningKey is used to create a hmac signature of the team name to have  readable but cryptographically secure cookie name to identify the team
+	SigningKey string `json:"signingKey"`
+
+	// CookieName is the name of the cookie that is used to store the team name
+	Name string `json:"name"`
+
+	// Secure controls if the Secure attribute is set on the cookie.
+	Secure bool `json:"secure"`
+}
+
+type LLMConfig struct {
+	Enabled bool   `json:"enabled"`
+	Model   string `json:"model"`
+	ApiUrl  string `json:"apiUrl"`
+}
+
+type JuiceShopConfig struct {
+	Image            string                        `json:"image"`
+	Tag              string                        `json:"tag"`
+	ImagePullPolicy  corev1.PullPolicy             `json:"imagePullPolicy"`
+	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets"`
+	CtfKey           string                        `json:"ctfKey"`
+	NodeEnv          string                        `json:"nodeEnv"`
+
+	PodSecurityContext       corev1.PodSecurityContext   `json:"podSecurityContext"`
+	ContainerSecurityContext corev1.SecurityContext      `json:"containerSecurityContext"`
+	Resources                corev1.ResourceRequirements `json:"resources"`
+	Tolerations              []corev1.Toleration         `json:"tolerations"`
+	Affinity                 corev1.Affinity             `json:"affinity"`
+	Env                      []corev1.EnvVar             `json:"env"`
+	EnvFrom                  []corev1.EnvFromSource      `json:"envFrom"`
+	Volumes                  []corev1.Volume             `json:"volumes"`
+	VolumeMounts             []corev1.VolumeMount        `json:"volumeMounts"`
+	RuntimeClassName         *string                     `json:"runtimeClassName"`
+
+	LLM LLMConfig `json:"llm"`
+
+	JuiceShopPodConfig JuiceShopPodConfig `json:"pod"`
+}
+
+type JuiceShopPodConfig struct {
+	Annotations map[string]string `json:"annotations"`
+	Labels      map[string]string `json:"labels"`
+}
+
+// JuiceShopChallenge represents a challenge in the Juice Shop that can be solved by the participants
+type JuiceShopChallenge struct {
+	Name          string   `json:"name"`
+	Category      string   `json:"category"`
+	Tags          []string `json:"tags"`
+	Description   string   `json:"description"`
+	Difficulty    int      `json:"difficulty"`
+	Hint          string   `json:"hint"`
+	HintUrl       string   `json:"hintUrl"`
+	MitigationUrl string   `json:"mitigationUrl"`
+	Key           string   `json:"key"`
+	DisabledEnv   []string `json:"disabledEnv"`
+}
+
+// TeamScore represents a team's current score and challenge progress
+type TeamScore struct {
+	Name              string              `json:"name"`
+	Score             int                 `json:"score"`
+	Position          int                 `json:"position"`
+	Challenges        []ChallengeProgress `json:"challenges"`
+	LastUpdate        time.Time           `json:"lastUpdate"`
+	InstanceReadiness bool                `json:"readiness"`
+}
+
+func (t *TeamScore) EqualsIgnoringLastUpdate(other *TeamScore) bool {
+	if t.Name != other.Name {
+		return false
+	}
+	if t.Score != other.Score {
+		return false
+	}
+	if t.Position != other.Position {
+		return false
+	}
+	if len(t.Challenges) != len(other.Challenges) {
+		return false
+	}
+	for i := range t.Challenges {
+		if t.Challenges[i].Key != other.Challenges[i].Key {
+			return false
+		}
+	}
+	return t.InstanceReadiness == other.InstanceReadiness
+}
+
+// ChallengeProgress represents a solved challenge
+type ChallengeProgress struct {
+	Key      string    `json:"key"`
+	SolvedAt time.Time `json:"solvedAt"`
+}
+
+// Notification represents a system-wide notification
+type Notification struct {
+	Message   string     `json:"message"`
+	Enabled   bool       `json:"enabled"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	EndDate   *time.Time `json:"endDate,omitempty"`
+}
+
+// ScoringService defines the interface for the scoring service
+type ScoringService interface {
+	GetScores() map[string]*TeamScore
+	GetScoreForTeam(team string) (*TeamScore, bool)
+	GetTopScores() []*TeamScore
+	GetTopScoresWithTimestamp() ([]*TeamScore, time.Time)
+	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore
+	WaitForUpdatesNewerThanWithTimestamp(ctx context.Context, lastSeenUpdate time.Time) ([]*TeamScore, time.Time)
+	WaitForTeamUpdatesNewerThan(ctx context.Context, team string, lastSeenUpdate time.Time) *TeamScore
+	CalculateAndCacheScoreBoard(ctx context.Context) error
+	StartingScoringWorker(ctx context.Context)
+}
+
+// NotificationService defines the interface for the notification service
+type NotificationService interface {
+	GetNotificationWithTimestamp() (*Notification, time.Time)
+	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) (*Notification, time.Time, bool)
+	StartNotificationWatcher(ctx context.Context)
+	SetNotification(ctx context.Context, message string, enabled bool) error
+	SetEndDate(ctx context.Context, endDate *time.Time) error
+}
+
+// ParseLogLevel converts a log level string to a slog.Level.
+// Valid values: "debug", "info", "warn"/"warning", "error". Defaults to info.
+func ParseLogLevel(level string) slog.Level {
+	switch strings.ToLower(level) {
+	case "debug":
+		return slog.LevelDebug
+	case "warn", "warning":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
+
+func getJuiceShopUrlForTeam(team string, bundle *Bundle) string {
+	return fmt.Sprintf("http://juiceshop-%s.%s.svc.cluster.local:3000", team, bundle.RuntimeEnvironment.Namespace)
+}
+
+func New() *Bundle {
+	kubeClientConfig, err := rest.InClusterConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+	clientset, err := kubernetes.NewForConfig(kubeClientConfig)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	namespace := os.Getenv("NAMESPACE")
+	if namespace == "" {
+		panic(errors.New("environment variable 'NAMESPACE' must be set"))
+	}
+
+	cookieSigningKey := os.Getenv("MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY")
+	if cookieSigningKey == "" {
+		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' must be set"))
+	}
+
+	adminPasswordKey := os.Getenv("MULTI_JUICER_CONFIG_ADMIN_PASSWORD")
+	if adminPasswordKey == "" {
+		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_ADMIN_PASSWORD' must be set"))
+	}
+
+	config, err := readConfigFromFile("/config/config.json")
+	if err != nil {
+		panic(err)
+	}
+
+	if config.TeamPasscodeLength == 0 {
+		config.TeamPasscodeLength = 12
+	} else if config.TeamPasscodeLength < 8 {
+		panic(errors.New("teamPasscodeLength must be at least 8"))
+	} else if config.TeamPasscodeLength%4 != 0 {
+		panic(errors.New("teamPasscodeLength must be a multiple of 4. e.g. 8, 12, 16"))
+	}
+
+	config.CookieConfig.SigningKey = cookieSigningKey
+	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
+	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
+
+	// read /challenges.json file
+	challengesBytes, err := os.ReadFile("/challenges.json")
+	if err != nil {
+		panic(err)
+	}
+
+	var challenges []JuiceShopChallenge
+	err = json.Unmarshal(challengesBytes, &challenges)
+	if err != nil {
+		panic(err)
+	}
+
+	return &Bundle{
+		ClientSet:             clientset,
+		StaticAssetsDirectory: "/public/",
+		RuntimeEnvironment: RuntimeEnvironment{
+			Namespace: namespace,
+		},
+		GeneratePasscode:           passcode.GetPasscodeGeneratorWithPasscodeLength(config.TeamPasscodeLength),
+		GetJuiceShopUrlForTeam:     getJuiceShopUrlForTeam,
+		BcryptRounds:               bcrypt.DefaultCost,
+		Log:                        slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: ParseLogLevel(os.Getenv("LOG_LEVEL"))})),
+		LongPollDefaultWaitTimeout: 25 * time.Second,
+		Config:                     config,
+		JuiceShopChallenges:        challenges,
+	}
+}
+
+func readConfigFromFile(filePath string) (*Config, error) {
+	var config Config
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open config file: %w", err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		return nil, fmt.Errorf("failed to decode config file: %w", err)
+	}
+
+	return &config, err
+}
