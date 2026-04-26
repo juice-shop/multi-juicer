@@ -1,76 +1,30 @@
-# Contributor Covenant Code of Conduct
+# OWASP Juice Shop Code of Conduct
 
-## Our Pledge
+## Overview
 
-In the interest of fostering an open and welcoming environment, we as
-contributors and maintainers pledge to making participation in our project and
-our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, sex characteristics, gender identity and expression,
-level of experience, education, socio-economic status, nationality, personal
-appearance, race, religion, or sexual identity and orientation.
+This project adheres to the [OWASP Code of Conduct](https://policy.owasp.org/operational/code-of-conduct.html). All community members, contributors, and leaders are expected to follow these guidelines to maintain a respectful, inclusive, and professional environment.
 
-## Our Standards
+## OWASP Code of Conduct
 
-Examples of behavior that contributes to creating a positive environment
-include:
+For comprehensive information on expected behavior, community standards, and enforcement procedures, please refer to the official [OWASP Code of Conduct policy](https://policy.owasp.org/operational/code-of-conduct.html).
 
-- Using welcoming and inclusive language
-- Being respectful of differing viewpoints and experiences
-- Gracefully accepting constructive criticism
-- Focusing on what is best for the community
-- Showing empathy towards other community members
+## Reporting Violations
 
-Examples of unacceptable behavior by participants include:
+If you witness or experience a violation of the Code of Conduct within the OWASP Juice Shop community, please report it to the Project Leads [via email](mailto:bjoern.kimminich@owasp.org,jannik.hollenbach@owasp.org). All reports will be reviewed promptly and handled with appropriate confidentiality.
 
-- The use of sexualized language or imagery and unwelcome sexual attention or
-  advances
-- Trolling, insulting/derogatory comments, and personal or political attacks
-- Public or private harassment
-- Publishing others' private information, such as a physical or electronic
-  address, without explicit permission
-- Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+## Whistleblower Policy
 
-## Our Responsibilities
-
-Project maintainers are responsible for clarifying the standards of acceptable
-behavior and are expected to take appropriate and fair corrective action in
-response to any instances of unacceptable behavior.
-
-Project maintainers have the right and responsibility to remove, edit, or
-reject comments, commits, code, wiki edits, issues, and other contributions
-that are not aligned to this Code of Conduct, or to ban temporarily or
-permanently any contributor for other behaviors that they deem inappropriate,
-threatening, offensive, or harmful.
+For concerns that cannot be resolved through standard reporting channels, the [OWASP Whistleblower Policy](https://policy.owasp.org/operational/whistleblower.html) provides additional guidance and protection for reporters.
 
 ## Scope
 
-This Code of Conduct applies within all project spaces, and it also applies when
-an individual is representing the project or its community in public spaces.
-Examples of representing a project or community include using an official
-project e-mail address, posting via an official social media account, or acting
-as an appointed representative at an online or offline event. Representation of
-a project may be further defined and clarified by project maintainers.
+This Code of Conduct applies to all community spaces associated with OWASP Juice Shop, including but not limited to:
 
-## Enforcement
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at slack. All
-complaints will be reviewed and investigated and will result in a response that
-is deemed necessary and appropriate to the circumstances. The project team is
-obligated to maintain confidentiality with regard to the reporter of an incident.
-Further details of specific enforcement policies may be posted separately.
-
-Project maintainers who do not follow or enforce the Code of Conduct in good
-faith may face temporary or permanent repercussions as determined by other
-members of the project's leadership.
+- GitHub repositories, issues and pull requests
+- Community forums and chat channels (Slack, Gitter, Reddit etc.)
+- Official project events and communications
+- Any spaces where individuals represent the project
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4,
-available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
-
-[homepage]: https://www.contributor-covenant.org
-
-For answers to common questions about this code of conduct, see
-https://www.contributor-covenant.org/faq
+This Code of Conduct is based on the [OWASP Code of Conduct](https://policy.owasp.org/operational/code-of-conduct.html).
