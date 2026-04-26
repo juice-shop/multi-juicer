@@ -27,7 +27,7 @@ tasks:
     desc: Runs the linters which support auto fixing errors
     aliases: [lf]
     cmds:
-      - task: go:lint:fix
+      - task: go:lint
       - task: ui:lint:fix
 
   test:
@@ -103,13 +103,10 @@ tasks:
       - sh: which staticcheck
         msg: "staticcheck needs to be installed for running the go linter."
     cmds:
-      - go vet ./...
-      - staticcheck ./...
-
-  go:lint:fix:
-    cmds:
       - go fmt ./...
       - go fix ./...
+      - go vet ./...
+      - staticcheck ./...
 
   helm:test:
     preconditions:
