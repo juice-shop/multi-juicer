@@ -411,7 +411,7 @@ func createDeploymentForTeam(context context.Context, bundle *bundle.Bundle, tea
 								InitialDelaySeconds: 30,
 								PeriodSeconds:       15,
 							},
-							Env: buildJuiceShopEnv(bundle, team),
+							Env:     buildJuiceShopEnv(bundle, team),
 							EnvFrom: bundle.Config.JuiceShopConfig.EnvFrom,
 							VolumeMounts: append(
 								bundle.Config.JuiceShopConfig.VolumeMounts,
