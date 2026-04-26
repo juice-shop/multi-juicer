@@ -28,7 +28,7 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 
 See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
 
-To setup MultiJuicer with support for the JuiceShop v20+ AI/LLM realted challenges, see [AI/LLM configuration guide](./guides/llm/llm.md)
+To setup MultiJuicer with support for the JuiceShop v20+ AI/LLM realted challenges, see [AI/LLM configuration guide](./guides/llm/llm.md) (Coming 🔜 with the upcoming MultiJuicer v10 & JuiceShop v20 release)
 
 ### Installation Guides for specific Cloud Providers / Environments
 

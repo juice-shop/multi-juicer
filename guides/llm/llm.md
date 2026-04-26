@@ -1,5 +1,7 @@
 # AI / LLM Chatbot Setup
 
+Note: Only available with MultiJuicer >= v10 & JuiceShop >= v20. Currently not yet available.
+
 Juice Shop includes an AI chatbot powered by an external LLM via an OpenAI-compatible API. MultiJuicer supports this through a built-in **LLM Gateway** that proxies requests from JuiceShop instances to your LLM provider, without exposing the real API key to participants.
 
 ## Why a gateway?
