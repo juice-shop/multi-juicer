@@ -29,7 +29,7 @@ export function NavbarPill({
           "px-4 py-2 rounded-md text-sm font-medium transition-colors",
           isActive
             ? "bg-orange-500 text-white"
-            : "text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            : "text-black hover:bg-green-200"
         )
       }
     >
@@ -327,7 +327,7 @@ function Navigation({
 }) {
   return (
     <div className="flex items-center gap-4">
-      <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg gap-2">
+      <div className="flex items-center p-1 bg-ctf-accent dark:bg-ctf-accent rounded-lg gap-2">
         {activeTeam && activeTeam !== "admin" && (
           <NavbarPill to={`/teams/${activeTeam}/status`}>
             <FormattedMessage id="navigation.team" defaultMessage="Your Team" />
@@ -393,10 +393,11 @@ export function Layout({
           >
             <Link to={primaryBackLink} className="flex items-center gap-3">
               <img
-                src="/balancer/multi-juicer.svg"
+                src="/balancer/ufo.png"
                 alt="MultiJuicer Logo"
                 className="h-12"
               />
+              <span className="text-xl font-player font-bold">Star Port</span>
             </Link>
 
             <Navigation

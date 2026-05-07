@@ -3,38 +3,8 @@ on:
   release:
     types: [published]
 env:
-  CONTAINER_REGISTRY: ghcr.io/juice-shop
+  CONTAINER_REGISTRY: ghcr.io/phl-code-club
 jobs:
-  helmRelease:
-    name: "Publish Helm Chart"
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v6
-
-      - id: release-version
-        name: Parse Release Version
-        run: |
-          RELEASE_VERSION="${GITHUB_REF#refs/*/}"
-          # Remove leading 'v' from git tag to create valid semver
-          RELEASE_VERSION="${RELEASE_VERSION//v}"
-          echo "version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: "Login to Package Registry"
-        run: 'echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login --username ${{ github.actor }} --password-stdin ${{ env.CONTAINER_REGISTRY }}'
-
-      - name: "Package Helm Chart"
-        working-directory: helm/multi-juicer/
-        run: |
-          helm package --version "${{ steps.release-version.outputs.version }}" --app-version "${{ steps.release-version.outputs.version }}" .
-
-      - name: "Push Helm Chart"
-        working-directory: helm/multi-juicer/
-        run: |
-          helm push "multi-juicer-${{ steps.release-version.outputs.version }}.tgz" oci://${{ env.CONTAINER_REGISTRY }}/multi-juicer/helm
-
   dockerBuilds:
     name: "Build"
     runs-on: ubuntu-latest
@@ -42,12 +12,6 @@ jobs:
       contents: read
       packages: write
       id-token: write # needed for signing the images with GitHub OIDC Token
-    strategy:
-      matrix:
-        component:
-          - progress-watchdog
-          - cleaner
-          - balancer
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -59,7 +23,7 @@ jobs:
         name: Container Image Metadata
         uses: docker/metadata-action@v6
         with:
-          images: ${{ env.CONTAINER_REGISTRY }}/multi-juicer/${{ matrix.component }}
+          images: ${{ env.CONTAINER_REGISTRY }}/multi-juicer/balancer
           tags: |
             type=semver,pattern={{raw}}
 

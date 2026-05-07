@@ -10,7 +10,7 @@ export const Card = ({
 }) => (
   <div
     className={classNames(
-      "rounded-lg shadow-md bg-white dark:bg-gray-800",
+      "rounded-lg shadow-md bg-ctf-primary dark:bg-ctf-primary",
       className
     )}
     {...props}

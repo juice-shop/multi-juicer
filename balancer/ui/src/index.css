@@ -1,24 +1,114 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Player Sans Mono';
+  font-style: normal;
+  font-weight: 100 300;
+  src: url("/balancer/fonts/PlayerSansMono8x8-Light.woff2") format("woff2"),
+    url("/balancer/fonts/PlayerSansMono8x8-Light.woff") format("woff"),
+    url("/fonts/PlayerSansMono8x8-Light.woff2") format("woff2"),
+    url("/fonts/PlayerSansMono8x8-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'fonts/Player Sans Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  src: url("/balancer/fonts/PlayerSansMono8x8-Classic.woff2") format("woff2"),
+    url("/balancer/fonts/PlayerSansMono8x8-Classic.woff") format("woff"),
+    url("/fonts/PlayerSansMono8x8-Classic.woff2") format("woff2"),
+    url("/fonts/PlayerSansMono8x8-Classic.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'fonts/Player Sans Mono';
+  font-style: normal;
+  font-weight: 700 900;
+  src: url("/balancer/fonts/PlayerSansMono8x8-Bold.woff2") format("woff2"),
+    url("/balancer/fonts/PlayerSansMono8x8-Bold.woff") format("woff"),
+    url("/fonts/PlayerSansMono8x8-Bold.woff2") format("woff2"),
+    url("/fonts/PlayerSansMono8x8-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'fonts/Player Sans Mono';
+  font-style: italic;
+  font-weight: 400 600;
+  src: url("/balancer/fonts/PlayerSansMono8x8-Italic.woff2") format("woff2"),
+    url("/balancer/fonts/PlayerSansMono8x8-Italic.woff") format("woff"),
+    url("/fonts/PlayerSansMono8x8-Italic.woff2") format("woff2"),
+    url("/fonts/PlayerSansMono8x8-Italic.woff") format("woff");
+}
+
 @keyframes radiate {
   0% {
     background-color: rgba(255, 107, 107, 0.25);
     box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
   }
+
   100% {
     background-color: transparent;
     box-shadow: none;
   }
 }
 
+/* --theme-primary: ; */
+/*   --theme-primary-lighter: rgb(142.5015544041, 35.9150259067, 187.6849740933); */
+/*   --theme-primary-light: rgb(155.5025906736, 39.1917098446, 204.8082901554); */
+/*   --theme-primary-darker: rgb(103.4984455959, 26.0849740933, 136.3150259067); */
+/*   --theme-primary-dark: rgb(90.4974093264, 22.8082901554, 119.1917098446); */
+/*   --theme-primary-fade-10: #7b1fa2; */
+/*   --theme-primary-fade-20: #7b1fa2; */
+/*   --theme-primary-fade-30: #7b1fa2; */
+/*   --theme-primary-fade-40: #7b1fa2; */
+/*   --theme-primary-fade-50: #7b1fa2; */
+/*   --theme-accent: #00e676; */
+/*   --theme-accent-lighter: rgb(5.6, 255, 133.5530434783); */
+/*   --theme-accent-light: rgb(26, 255, 143.4869565217); */
+/*   --theme-accent-darker: rgb(0, 199.4, 102.3008695652); */
+/*   --theme-accent-dark: rgb(0, 179, 91.8347826087); */
+/*   --theme-accent-fade-10: #00e676; */
+/*   --theme-accent-fade-20: #00e676; */
+/*   --theme-accent-fade-30: #00e676; */
+/*   --theme-accent-fade-40: #00e676; */
+/*   --theme-accent-fade-50: #00e676; */
+/*   --theme-warn: #f44336; */
+/*   --theme-warn-lighter: rgb(245.5877358491, 94.1358490566, 83.0122641509); */
+/*   --theme-warn-light: rgb(246.6462264151, 112.2264150943, 102.3537735849); */
+/*   --theme-warn-darker: rgb(242.4122641509, 39.8641509434, 24.9877358491); */
+/*   --theme-warn-dark: rgb(234.1839622642, 27.9622641509, 12.8160377358); */
+/*   --theme-warn-fade-10: #f44336; */
+/*   --theme-warn-fade-20: #f44336; */
+/*   --theme-warn-fade-30: #f44336; */
+/*   --theme-warn-fade-40: #f44336; */
+/*   --theme-warn-fade-50: #f44336; */
+/*   --theme-text: white; */
+/*   --theme-text-lighter: hsl(0, 0%, 106%); */
+/*   --theme-text-light: hsl(0, 0%, 110%); */
+/*   --theme-text-darker: rgb(229.5, 229.5, 229.5); */
+/*   --theme-text-dark: rgb(191.25, 191.25, 191.25); */
+/*   --theme-text-fade-10: white; */
+/*   --theme-text-fade-20: white; */
+/*   --theme-text-fade-30: white; */
+/*   --theme-text-fade-40: white; */
+/*   --theme-text-fade-50: white; */
+/*   --theme-text-invert-15: rgb(216.75, 216.75, 216.75); */
+/*   --theme-text-invert-30: rgb(178.5, 178.5, 178.5); */
+/*   --theme-background: #424242; */
+/*   --theme-background-lighter: rgb(81.3, 81.3, 81.3); */
+/*   --theme-background-light: rgb(91.5, 91.5, 91.5); */
+/*   --theme-background-darker: rgb(50.7, 50.7, 50.7); */
+/*   --theme-background-dark: rgb(40.5, 40.5, 40.5); */
+/*   --theme-background-darkest: rgb(30.3, 30.3, 30.3); */
+
 @theme {
   --animate-radiate: radiate 3s ease-out forwards;
   /* CTF-specific color palette */
-  --color-ctf-primary: #ff2d55;
-  --color-ctf-accent: #ffcc00;
-  --color-ctf-secondary: #00ff66;
+  --color-ctf-primary: #7b1fa2;
+  --color-ctf-accent: #00e676;
+  --color-ctf-secondary: #f44336;
   --color-ctf-neutral: #b8b8b8;
-  --color-ctf-bg: #101010;
+  --color-ctf-bg: #424242;
   --color-ctf-bg-panel: rgb(0 0 0 / 0.8);
   --color-ctf-bg-item: rgb(20 20 20 / 0.6);
   --color-ctf-bg-item-hover: rgb(40 20 20 / 0.8);
@@ -26,6 +116,7 @@
   --color-ctf-border-hover: rgb(255 107 107 / 0.4);
   --color-ctf-gold: #ffd700;
   --color-ctf-magenta: rgb(255 0 255 / 0.1);
+  --font-player: "Player Sans Mono", sans-serif;
 }
 
 @layer base {
@@ -41,9 +132,11 @@
     --neon-secondary: #00ff66;
     --glow-intensity: 1.5;
   }
+
   @media (prefers-color-scheme: dark) {
     :root {
-      --background: #1a202c;
+      --background: #424242;
+      ;
       --background-highlight: #2d3848;
       --font-color: #fefefe;
       --font-color-highlight: #cbd5df;
