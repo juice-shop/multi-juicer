@@ -51,6 +51,8 @@ Download & Save the file and tell helm to use your config file over the default 
 helm install -f values.yaml multi-juicer ./multi-juicer/helm/multi-juicer/
 ```
 
+To customize the JuiceShop instances themselves (theme, logo, enabled challenges, ...), see the [JuiceShop customization guide](./guides/customization/customization.md).
+
 ### Deinstallation
 
 ```sh
