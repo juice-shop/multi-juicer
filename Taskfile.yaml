@@ -76,42 +76,44 @@ tasks:
     cmds:
       - semgrep scan --config=auto --quiet
 
+  ui:install-dependencies:
+    status:
+      - "npm ls --depth=0" # will return an error if node_modules is not installed
+    cmds:
+      - npm ci --ignore-scripts
+    dir: ui/
+
   ui:build:
-    preconditions:
-      - sh: test -d node_modules/
-        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
+    deps:
+      - ui:install-dependencies
     cmds:
       - npm run build
     dir: ui/
 
   ui:lint:
-    preconditions:
-      - sh: test -d node_modules/
-        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
+    deps:
+      - ui:install-dependencies
     cmds:
       - npm run lint
     dir: ui/
 
   ui:lint:fix:
-    preconditions:
-      - sh: test -d node_modules/
-        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
+    deps:
+      - ui:install-dependencies
     cmds:
       - npm run lint:fix
     dir: ui/
 
   ui:bundle-analyzer:
-    preconditions:
-      - sh: test -d node_modules/
-        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
+    deps:
+      - ui:install-dependencies
     cmds:
       - npx vite-bundle-visualizer
     dir: ui/
 
   ui:test:
-    preconditions:
-      - sh: test -d node_modules/
-        msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
+    deps:
+      - ui:install-dependencies
     cmds:
       - silent: true
         cmd: |
