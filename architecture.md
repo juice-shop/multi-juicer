@@ -51,6 +51,14 @@ The backend server is responsible for:
 - Admin endpoints for instance management (list, delete, restart)
 - Health and readiness probes for Kubernetes orchestration
 
+**LLM Gateway (optional)**
+- When `config.juiceShop.llm.enabled` is true, the balancer process runs an additional HTTP server on port `:8082` that proxies AI chatbot requests from Juice Shop instances to an upstream OpenAI-compatible API
+- Keeps the real LLM API key inside the balancer so it cannot be extracted via Juice Shop RCE challenges
+- On team creation, an HMAC-signed team token is stored in a per-team Kubernetes Secret and mounted as `LLM_API_KEY` in the Juice Shop pod; the gateway validates the token via the balancer's signing key, derives the team name, and substitutes the real API key before forwarding the request upstream
+- Extracts token usage from both JSON and SSE chat-completion responses and accumulates per-team input/output token counts in memory
+- A background flusher periodically writes accumulated usage to the team's deployment annotations (`multi-juicer.owasp-juice.shop/llmInputTokens`, `multi-juicer.owasp-juice.shop/llmOutputTokens`) using optimistic concurrency so multiple balancer replicas can coexist
+- Exposed cluster-internally only via the `multijuicer-llm-gateway` ClusterIP service; Juice Shop's `chatBot.llmApiUrl` is automatically rewritten to point at it
+
 **Observability**
 - Prometheus metrics endpoint for monitoring HTTP request counts and other metrics
 - Structured logging for operational visibility
@@ -61,6 +69,7 @@ The backend server is responsible for:
 - `pkg/longpoll/` - Unified HTTP long polling implementation
 - `pkg/bundle/` - Configuration and shared dependencies
 - `pkg/teamcookie/` - Secure cookie management
+- `pkg/llmgateway/` - LLM proxy gateway and per-team token usage tracking
 
 #### Frontend (React/TypeScript)
 
@@ -146,7 +155,7 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 - Compares the last activity timestamp against a configurable inactivity threshold
 
 **Cleanup Operations**
-- Deletes both the Kubernetes deployment and service for inactive instances
+- Deletes the Kubernetes deployment for inactive instances. The associated Service and (when the LLM gateway is enabled) the per-team LLM token Secret reference the deployment via `OwnerReferences`, so Kubernetes garbage collects them automatically — the cleaner does not need (or have) permission to delete those resources directly
 - Configurable inactivity duration via the `MAX_INACTIVE_DURATION` environment variable (e.g., "12h", "30m")
 - Provides detailed logging of cleanup operations including success/failure counts
 - Gracefully handles edge cases like missing annotations or parse errors
@@ -172,8 +181,9 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 1. User accesses the Balancer web interface
 2. User submits team name and passcode to the join endpoint
 3. Balancer validates credentials and creates a Kubernetes deployment/service for the team
-4. Balancer sets a signed cookie associating the user with their team
-5. User is redirected to their team's Juice Shop instance via the Balancer proxy
+4. If the LLM gateway is enabled, Balancer also creates a per-team Kubernetes Secret containing an HMAC-signed team token, which is mounted into the Juice Shop pod as `LLM_API_KEY`
+5. Balancer sets a signed cookie associating the user with their team
+6. User is redirected to their team's Juice Shop instance via the Balancer proxy
 
 ### Challenge Solution Tracking
 
@@ -202,12 +212,20 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 5. Client automatically re-establishes the long polling connection with the last update timestamp
 6. If no updates occur within 25 seconds, server returns 204 No Content and client retries
 
+### LLM Chatbot Requests (when enabled)
+
+1. The Juice Shop chatbot is configured to call the cluster-internal `multijuicer-llm-gateway` service with the team's `LLM_API_KEY` (the signed team token) as a bearer token
+2. The LLM gateway running inside the balancer validates the bearer token against the cookie signing key and derives the team name
+3. The gateway substitutes the real upstream API key into the request and reverse-proxies it to the configured upstream LLM API
+4. For chat completion responses (JSON or SSE), the gateway parses the `usage` field and adds the input/output token counts to an in-memory per-team accumulator
+5. A periodic flusher writes the accumulated counts to the team's deployment annotations using optimistic concurrency (retry on conflict), then resets the in-memory counters
+
 ### Instance Cleanup
 
 1. Cleaner CronJob starts on schedule
 2. Queries all Juice Shop deployments from Kubernetes
 3. Checks each deployment's last activity timestamp
-4. Deletes deployments and services that exceed the inactivity threshold
+4. Deletes the Juice Shop instances that exceed the inactivity threshold
 5. Reports cleanup summary and exits
 
 ---
@@ -218,6 +236,12 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 - Creates/deletes deployments and services for team instances
 - Reads deployment annotations to track challenge progress and calculate scores
 - Updates deployment annotations to record instance activity timestamps
+- When the LLM gateway is enabled, also creates per-team Secrets holding signed LLM tokens and updates deployments with accumulated LLM token usage annotations
+
+### Balancer LLM Gateway ↔ Upstream LLM API (when enabled)
+- Reverse-proxies OpenAI-compatible requests from Juice Shop instances to the configured upstream API
+- Substitutes the real API key (held only in the balancer process) into outgoing requests
+- Parses chat-completion responses (JSON and SSE) to attribute token usage back to the requesting team
 
 ### Progress Watchdog ↔ Kubernetes
 - Reads and writes deployment annotations for progress persistence
@@ -232,7 +256,7 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 ### Cleaner ↔ Kubernetes
 - Lists deployments with specific label selectors
 - Reads deployment annotations for activity timestamps
-- Deletes inactive deployments and services
+- Deletes inactive Juice Shop deployments. The matching Service and (when present) Secrets are owned by the deployment via `OwnerReferences` and garbage collected by Kubernetes
 
 ### Frontend ↔ Balancer Backend
 - HTTP API calls for team management and data retrieval
@@ -245,9 +269,9 @@ The Cleaner is a periodic job that removes inactive Juice Shop instances to free
 
 All components are deployed as Kubernetes resources:
 
-- **Balancer**: Deployment with multiple replicas behind a LoadBalancer/Ingress service
+- **Balancer**: Deployment with multiple replicas behind a LoadBalancer/Ingress service. When the LLM gateway is enabled, the same pods also exposes the gateway on port `:8082` via the cluster-internal `multijuicer-llm-gateway` ClusterIP service
 - **Progress Watchdog**: Single deployment (no need for multiple replicas)
-- **Cleaner**: CronJob running on a scheduled interval
+- **Cleaner**: CronJob running on a scheduled interval deleting inactive Juice Shop instances
 - **Juice Shop Instances**: Individual deployments and services per team
 
 The entire stack is typically deployed via Helm charts, which handle all Kubernetes resource creation, configuration, and lifecycle management.
