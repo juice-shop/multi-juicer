@@ -1,7 +1,8 @@
 import "@testing-library/jest-dom";
-import { renderHook, waitFor, act } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import { flushPromises } from "./test-helpers";
 import { useChallenges } from "./useChallenges";
 
 const mockChallenges = [
@@ -42,10 +43,9 @@ describe("useChallenges", () => {
 
     const { result } = renderHook(() => useChallenges());
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.data).toHaveLength(2);
     expect(result.current.data![0].key).toBe("sqlInjectionChallenge");
   });
@@ -55,9 +55,8 @@ describe("useChallenges", () => {
 
     const { result } = renderHook(() => useChallenges());
 
-    await waitFor(() => {
-      expect(result.current.data).not.toBeNull();
-    });
+    await flushPromises();
+    expect(result.current.data).not.toBeNull();
 
     act(() => {
       result.current.applySolveEvent("sqlInjectionChallenge", "team-a", true);
@@ -75,9 +74,8 @@ describe("useChallenges", () => {
 
     const { result } = renderHook(() => useChallenges());
 
-    await waitFor(() => {
-      expect(result.current.data).not.toBeNull();
-    });
+    await flushPromises();
+    expect(result.current.data).not.toBeNull();
 
     act(() => {
       result.current.applySolveEvent("sqlInjectionChallenge", "team-a", true);
@@ -97,9 +95,8 @@ describe("useChallenges", () => {
 
     const { result } = renderHook(() => useChallenges());
 
-    await waitFor(() => {
-      expect(result.current.data).not.toBeNull();
-    });
+    await flushPromises();
+    expect(result.current.data).not.toBeNull();
 
     act(() => {
       result.current.applySolveEvent("sqlInjectionChallenge", "team-a", true);
@@ -119,9 +116,8 @@ describe("useChallenges", () => {
 
     const { result } = renderHook(() => useChallenges());
 
-    await waitFor(() => {
-      expect(result.current.data).not.toBeNull();
-    });
+    await flushPromises();
+    expect(result.current.data).not.toBeNull();
 
     act(() => {
       result.current.applySolveEvent("sqlInjectionChallenge", "team-a", true);

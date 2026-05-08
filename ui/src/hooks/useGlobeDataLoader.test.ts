@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { createElement } from "react";
 import { IntlProvider } from "react-intl";
@@ -20,6 +20,7 @@ vi.mock("@/lib/globe/country-geometry", () => ({
   CountryGeometryManager: MockCountryGeometryManager,
 }));
 
+import { flushPromises } from "./test-helpers";
 import { useGlobeDataLoader } from "./useGlobeDataLoader";
 
 function intlWrapper({ children }: { children: ReactNode }) {
@@ -129,10 +130,9 @@ describe("useGlobeDataLoader", () => {
       { wrapper: intlWrapper }
     );
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.preparedData).not.toBeNull();
     expect(result.current.loadingProgress).toBe(100);
     expect(loadGeoJSON).toHaveBeenCalledOnce();
@@ -147,9 +147,8 @@ describe("useGlobeDataLoader", () => {
       { wrapper: intlWrapper }
     );
 
-    await waitFor(() => {
-      expect(result.current.preparedData).not.toBeNull();
-    });
+    await flushPromises();
+    expect(result.current.preparedData).not.toBeNull();
 
     const map = result.current.preparedData!.challengeToCountryMap;
     // Challenges are mapped to countries by difficulty ASC then key ASC
@@ -167,9 +166,8 @@ describe("useGlobeDataLoader", () => {
       { initialProps: { challenges: mockChallenges }, wrapper: intlWrapper }
     );
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
+    expect(result.current.isLoading).toBe(false);
 
     // Rerender with different challenges
     const updatedChallenges = mockChallenges.map((c) => ({
@@ -189,10 +187,9 @@ describe("useGlobeDataLoader", () => {
       wrapper: intlWrapper,
     });
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.preparedData).not.toBeNull();
     expect(result.current.preparedData!.challengeToCountryMap.size).toBe(0);
   });
@@ -208,10 +205,9 @@ describe("useGlobeDataLoader", () => {
       { wrapper: intlWrapper }
     );
 
-    await waitFor(() => {
-      expect(result.current.loadingMessage).toBe("Error: Failed to fetch");
-    });
+    await flushPromises();
 
+    expect(result.current.loadingMessage).toBe("Error: Failed to fetch");
     expect(result.current.isLoading).toBe(true);
     expect(result.current.preparedData).toBeNull();
     consoleErrorSpy.mockRestore();
@@ -236,10 +232,9 @@ describe("useGlobeDataLoader", () => {
     // Challenges arrive
     rerender({ challenges: mockChallenges, loading: false });
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(loadGeoJSON).toHaveBeenCalledOnce();
     expect(result.current.preparedData).not.toBeNull();
   });
@@ -252,9 +247,8 @@ describe("useGlobeDataLoader", () => {
       { wrapper: intlWrapper }
     );
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
+    expect(result.current.isLoading).toBe(false);
 
     // xssChallenge has solveCount=1 and firstSolver="team-a", mapped to France
     const constructorCall = MockCountryGeometryManager.mock.calls[0];

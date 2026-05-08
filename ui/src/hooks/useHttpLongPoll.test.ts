@@ -1,11 +1,17 @@
 import "@testing-library/jest-dom";
-import { renderHook, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import { flushPromises } from "./test-helpers";
 import { useHttpLongPoll } from "./useHttpLongPoll";
 
 describe("useHttpLongPoll", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -27,10 +33,9 @@ describe("useHttpLongPoll", () => {
 
     const { result, unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.data).toEqual(mockData);
     expect(result.current.error).toBe(null);
     expect(fetchFn).toHaveBeenCalledWith(null, expect.any(AbortSignal));
@@ -43,10 +48,9 @@ describe("useHttpLongPoll", () => {
 
     const { result, unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.data).toBe(null);
     expect(result.current.error).toBe(null);
     expect(fetchFn).toHaveBeenCalledTimes(1);
@@ -64,15 +68,13 @@ describe("useHttpLongPoll", () => {
 
     const { result, unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    await flushPromises();
 
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBe("Network error");
     expect(result.current.data).toBe(null);
     expect(consoleErrorSpy).toHaveBeenCalled();
 
-    consoleErrorSpy.mockRestore();
     unmount();
   });
 
@@ -84,33 +86,26 @@ describe("useHttpLongPoll", () => {
       .mockRejectedValueOnce(error)
       .mockResolvedValue({ data: mockData });
 
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
+    const errorRetryDelay = 500;
     const { result, unmount } = renderHook(() =>
-      useHttpLongPoll({
-        fetchFn,
-        errorRetryDelay: 500, // Faster retry for test
-      })
+      useHttpLongPoll({ fetchFn, errorRetryDelay })
     );
 
-    await waitFor(() => {
-      expect(result.current.error).toBe("Network error");
+    // First fetch rejects → error state set, retry timer scheduled
+    await flushPromises();
+    expect(result.current.error).toBe("Network error");
+
+    // Advance past errorRetryDelay → retry runs and resolves
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(errorRetryDelay);
     });
 
-    // Wait for retry (will happen after errorRetryDelay)
-    await waitFor(
-      () => {
-        expect(result.current.error).toBe(null);
-      },
-      { timeout: 2000 }
-    );
-
+    expect(result.current.error).toBe(null);
     expect(result.current.data).toEqual(mockData);
     expect(fetchFn).toHaveBeenCalledTimes(2);
 
-    consoleErrorSpy.mockRestore();
     unmount();
   });
 
@@ -125,15 +120,14 @@ describe("useHttpLongPoll", () => {
 
     const { result, unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    // Give it a moment to process
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Flush microtasks so the rejection is handled
+    await flushPromises();
 
     // Should not set error state for AbortError
     expect(result.current.error).toBe(null);
     expect(consoleErrorSpy).not.toHaveBeenCalled();
 
     unmount();
-    consoleErrorSpy.mockRestore();
   });
 
   test("should use custom calculateWaitTime function", async () => {
@@ -148,10 +142,9 @@ describe("useHttpLongPoll", () => {
       })
     );
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalledTimes(1);
-    });
+    await flushPromises();
 
+    expect(fetchFn).toHaveBeenCalledTimes(1);
     expect(calculateWaitTime).toHaveBeenCalledWith(expect.any(Date), mockData);
 
     unmount();
@@ -168,10 +161,9 @@ describe("useHttpLongPoll", () => {
       })
     );
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalledTimes(1);
-    });
+    await flushPromises();
 
+    expect(fetchFn).toHaveBeenCalledTimes(1);
     expect(calculateWaitTime).toHaveBeenCalledWith(expect.any(Date), null);
 
     unmount();
@@ -187,8 +179,10 @@ describe("useHttpLongPoll", () => {
       })
     );
 
-    // Wait a bit to ensure it doesn't call
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    // Advance time well past any plausible poll interval
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10000);
+    });
 
     expect(fetchFn).not.toHaveBeenCalled();
     expect(result.current.isLoading).toBe(true);
@@ -210,10 +204,9 @@ describe("useHttpLongPoll", () => {
 
     expect(onStart).toHaveBeenCalledTimes(1);
 
-    // Wait for the async fetch to complete before unmounting
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalled();
-    });
+    // Let pending fetch resolve before unmounting
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalled();
 
     unmount();
   });
@@ -229,9 +222,8 @@ describe("useHttpLongPoll", () => {
       })
     );
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalled();
-    });
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalled();
 
     unmount();
 
@@ -239,26 +231,28 @@ describe("useHttpLongPoll", () => {
   });
 
   test("should abort ongoing request on unmount", async () => {
-    let capturedSignal: AbortSignal | null = null;
-    const fetchFn = vi.fn().mockImplementation((_lastSeen, signal) => {
-      capturedSignal = signal;
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ data: "test" }), 10000)
-      );
-    });
+    const signalRef: { current: AbortSignal | null } = { current: null };
+    const fetchFn = vi
+      .fn()
+      .mockImplementation((_lastSeen, signal: AbortSignal) => {
+        signalRef.current = signal;
+        return new Promise((resolve) =>
+          setTimeout(() => resolve({ data: "test" }), 10000)
+        );
+      });
 
     const { unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalled();
-    });
+    // Let the fetch start (but its setTimeout hasn't fired yet under fake timers)
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalled();
 
-    expect(capturedSignal).not.toBe(null);
-    expect(capturedSignal?.aborted).toBe(false);
+    expect(signalRef.current).not.toBe(null);
+    expect(signalRef.current?.aborted).toBe(false);
 
     unmount();
 
-    expect(capturedSignal?.aborted).toBe(true);
+    expect(signalRef.current?.aborted).toBe(true);
   });
 
   test("should clear timeout on unmount", async () => {
@@ -267,9 +261,8 @@ describe("useHttpLongPoll", () => {
 
     const { unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalledTimes(1);
-    });
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalledTimes(1);
 
     unmount();
 
@@ -286,22 +279,20 @@ describe("useHttpLongPoll", () => {
     const { result, unmount } = renderHook(() =>
       useHttpLongPoll({
         fetchFn,
-        calculateWaitTime: () => 200, // Faster polling for test
+        calculateWaitTime: () => 200,
       })
     );
 
-    await waitFor(() => {
-      expect(result.current.data).toEqual(mockData1);
+    // First fetch resolves with data
+    await flushPromises();
+    expect(result.current.data).toEqual(mockData1);
+
+    // Advance past the 200ms wait so the second poll runs
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
     });
 
-    // Wait for next poll
-    await waitFor(
-      () => {
-        expect(fetchFn).toHaveBeenCalledTimes(2);
-      },
-      { timeout: 2000 }
-    );
-
+    expect(fetchFn).toHaveBeenCalledTimes(2);
     // Data should remain the same when server returns null
     expect(result.current.data).toEqual(mockData1);
 
@@ -313,9 +304,8 @@ describe("useHttpLongPoll", () => {
 
     const { unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalledTimes(1);
-    });
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalledTimes(1);
 
     const firstCall = fetchFn.mock.calls[0];
     expect(firstCall[0]).toBe(null);
@@ -329,25 +319,22 @@ describe("useHttpLongPoll", () => {
     const { unmount } = renderHook(() =>
       useHttpLongPoll({
         fetchFn,
-        calculateWaitTime: () => 100, // Short wait for faster test
+        calculateWaitTime: () => 100,
       })
     );
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalledTimes(1);
-    });
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalledTimes(1);
 
     const firstCall = fetchFn.mock.calls[0];
     expect(firstCall[0]).toBe(null);
 
-    // Wait for second poll
-    await waitFor(
-      () => {
-        expect(fetchFn).toHaveBeenCalledTimes(2);
-      },
-      { timeout: 5000 }
-    );
+    // Advance past the 100ms wait so the second poll runs
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(100);
+    });
 
+    expect(fetchFn).toHaveBeenCalledTimes(2);
     const secondCall = fetchFn.mock.calls[1];
     expect(secondCall[0]).toBeInstanceOf(Date);
 
@@ -359,10 +346,8 @@ describe("useHttpLongPoll", () => {
 
     const { unmount } = renderHook(() => useHttpLongPoll({ fetchFn }));
 
-    await waitFor(() => {
-      expect(fetchFn).toHaveBeenCalled();
-    });
-
+    await flushPromises();
+    expect(fetchFn).toHaveBeenCalled();
     expect(fetchFn).toHaveBeenCalledWith(null, expect.any(AbortSignal));
 
     unmount();
