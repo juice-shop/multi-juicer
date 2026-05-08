@@ -344,6 +344,12 @@ function Navigation({
             defaultMessage="Score Overview"
           />
         </NavbarPill>
+        <NavbarPill to="/ctf" activeMatchingExact={true}>
+          <FormattedMessage
+            id="navigation.ctf-view"
+            defaultMessage="CTF View"
+          />
+        </NavbarPill>
       </div>
       <ContextMenu
         switchLanguage={switchLanguage}
