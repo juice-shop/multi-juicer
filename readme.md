@@ -18,6 +18,8 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 
 For a detailed description of the architecture and individual components, see the [Architecture Documentation](./architecture.md).
 
+> 👉 **New to MultiJuicer?** See the [visual walkthrough](./guides/walkthrough/walkthrough.md) for how participants register, get their JuiceShop instances and how the scores are tracked on the scoreboard.
+
 ## Installation
 
 MultiJuicer runs on kubernetes, to install it you'll need [helm](https://helm.sh)
