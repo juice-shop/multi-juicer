@@ -113,13 +113,14 @@ tasks:
       - sh: test -d node_modules/
         msg: "ui dependencies are not installed. run 'npm ci' in ui/ to install them."
     cmds:
-      - |
-        # run with bun if installed, otherwise use npm
-        if command -v bun &> /dev/null; then
-          bun run test -- --run
-        else
-          npm test -- --run
-        fi
+      - silent: true
+        cmd: |
+          # run with bun if installed, otherwise use npm
+          if command -v bun &> /dev/null; then
+            bun run test -- --run
+          else
+            npm test -- --run
+          fi
     dir: ui/
 
   go:test:
