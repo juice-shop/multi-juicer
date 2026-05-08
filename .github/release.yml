@@ -10,8 +10,11 @@ changelog:
         - "bugfix"
         - "bug"
     - title: "📚 Docs"
-      label: "documentation"
+      labels:
+        - "documentation"
     - title: "🌐 I18N"
-      label: "i18n"
+      labels:
+        - "i18n"
     - title: "🧰 Maintenance"
-      label: "maintenance"
+      labels:
+        - "maintenance"
