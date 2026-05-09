@@ -21,10 +21,8 @@ tasks:
       VERSION: '{{uuid}}'
     cmds:
       - docker build --progress quiet -t local/balancer:{{.VERSION}} .
-      - |
-        if [ "$(kubectl config current-context)" = "kind-kind" ]; then
-          kind load docker-image "local/balancer:{{.VERSION}}"
-        fi
+      - if: '[ $(kubectl config current-context) == "kind-kind" ]'
+        cmd: kind load docker-image "local/balancer:{{.VERSION}}"
       - |
         helm upgrade --install multi-juicer ./helm/multi-juicer \
           --set="imagePullPolicy=IfNotPresent" \
