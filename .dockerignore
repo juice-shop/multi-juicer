@@ -25,7 +25,6 @@ CODE_OF_CONDUCT.md
 
 # Tooling and local dev
 Taskfile.yaml
-build-and-deploy.sh
 
 # OS junk
 .DS_Store
