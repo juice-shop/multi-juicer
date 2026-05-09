@@ -31,8 +31,8 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you two pods a balancer pod and a progress-watchdog pod
-# Wait until both pods are ready
+# This should show you the balancer pod
+# Wait until it is ready
 ```
 
 If the balancer pods is still pending status after a couple of minutes, the cluster may not have the necessary resources to provision the pods.

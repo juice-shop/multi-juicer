@@ -16,6 +16,33 @@ type Summary struct {
 	FailedDeletions     int
 }
 
+// StartPeriodicCleanup runs RunCleanup on the given interval until ctx is cancelled.
+// Must run on at most one balancer replica at a time (gated via leader election).
+func StartPeriodicCleanup(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace string, interval, maxInactive time.Duration) {
+	log.Info("Starting periodic cleanup of inactive JuiceShop deployments", "interval", interval, "maxInactive", maxInactive)
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		summary, err := RunCleanup(ctx, log, clientset, namespace, time.Now(), maxInactive)
+		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			log.Error("Failed to list deployments during cleanup", "error", err)
+		} else if summary.SuccessfulDeletions > 0 || summary.FailedDeletions > 0 {
+			log.Info("Cleanup pass finished", "deleted", summary.SuccessfulDeletions, "failed", summary.FailedDeletions)
+		}
+
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
+	}
+}
+
 func RunCleanup(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace string, currentTime time.Time, maxInactive time.Duration) (Summary, error) {
 	deployments, err := clientset.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name=juice-shop,app.kubernetes.io/part-of=multi-juicer",

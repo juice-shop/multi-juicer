@@ -37,8 +37,8 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you two pods a balancer pod and a progress-watchdog pod
-# Wait until both pods are ready
+# This should show you the balancer pod
+# Wait until it is ready
 ```
 
 ## Step 3. Verify the app is running correctly
@@ -88,9 +88,7 @@ Use `kubectl get pods`to see the pods you have successfully running, which shoul
 ```sh
 kubectl get pods
 # NAME                                 READY   STATUS      RESTARTS   AGE
-# cleanup-job-ID-ID                    0/1     Completed   0          48m
 # balancer-ID-ID                 1/1     Running     0          80m
-# progress-watchdog-ID-ID              1/1     Running     0          80m
 
 
 kubectl get pods -n kube-system

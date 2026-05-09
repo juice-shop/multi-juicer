@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
+	"log/slog"
 	"strings"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,8 +44,8 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 	CheatScores      string `json:"multi-juicer.owasp-juice.shop/cheatScores,omitempty"`
 }
 
-func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallenges []ChallengeStatus, cheatScores []CheatScoreEntry) {
-	Logger.Debug("Updating saved ContinueCode", "team", team)
+func PersistProgress(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace, team string, solvedChallenges []ChallengeStatus, cheatScores []CheatScoreEntry) {
+	log.Debug("Updating saved ContinueCode", "team", team)
 
 	encodedSolvedChallenges, err := json.Marshal(solvedChallenges)
 	if err != nil {
@@ -57,11 +57,10 @@ func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallen
 		ChallengesSolved: fmt.Sprintf("%d", len(solvedChallenges)),
 	}
 
-	// If cheat scores are provided, encode and add them to the annotations
 	if len(cheatScores) > 0 {
 		encodedCheatScores, err := json.Marshal(cheatScores)
 		if err != nil {
-			Logger.Error("failed to encode cheat scores", "team", team, "error", err)
+			log.Error("failed to encode cheat scores", "team", team, "error", err)
 		} else {
 			annotations.CheatScores = string(encodedCheatScores)
 		}
@@ -78,9 +77,8 @@ func PersistProgress(clientset *kubernetes.Clientset, team string, solvedChallen
 		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
 	}
 
-	namespace := os.Getenv("NAMESPACE")
-	_, err = clientset.AppsV1().Deployments(namespace).Patch(context.TODO(), fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
+	_, err = clientset.AppsV1().Deployments(namespace).Patch(ctx, fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
 	if err != nil {
-		Logger.Error("failed to patch new ContinueCode into deployment", "team", team, "error", err)
+		log.Error("failed to patch new ContinueCode into deployment", "team", team, "error", err)
 	}
 }

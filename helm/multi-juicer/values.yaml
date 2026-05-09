@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 imagePullPolicy: IfNotPresent
-# -- imagePullSecrets used for balancer, progress-watchdog and cleaner. You'll also need to set `config.juiceShop.imagePullSecrets`` to set the imagePullSecrets if you are using a private registry for all images
+# -- imagePullSecrets used for the balancer image. You'll also need to set `config.juiceShop.imagePullSecrets` to set the imagePullSecrets if you are using a private registry for all images
 imagePullSecrets: []
 nodeSelector: {}
 
@@ -104,6 +104,8 @@ config:
     tag: v19.1.1
     imagePullSecrets: []
     imagePullPolicy: IfNotPresent
+    # -- How long a Juice Shop instance may sit idle (no end-user requests) before the balancer deletes it. Accepts Go duration strings, e.g. "24h", "30m", "90m".
+    deleteInactiveAfter: 24h
     # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/companion-guide/latest/part4/ctf.html#_overriding_the_ctf_key
     ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
     # -- Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/companion-guide/latest/part4/customization.html#_yaml_configuration_file
@@ -196,69 +198,3 @@ config:
         name: "multi-juicer-llm"
         # -- Key within the secret that holds the API key
         key: "token"
-
-# Collects JuiceShop progress and sends and backs it up to the related kubernetes deployment
-progressWatchdog:
-  repository: ghcr.io/juice-shop/multi-juicer/progress-watchdog
-  tag: null
-  resources:
-    requests:
-      memory: 48Mi
-      cpu: 20m
-    limits:
-      memory: 48Mi
-      cpu: 20m
-  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext:
-    runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
-  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
-
-  # -- Optional Configure kubernetes scheduling affinity for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-  # -- Optional Configure kubernetes toleration for the ProgressWatchdog (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
-  # -- Log level for the progress watchdog service. One of: debug, info, warn, error
-  logLevel: "info"
-
-# Deletes unused JuiceShop instances after a configurable period of inactivity
-juiceShopCleanup:
-  repository: ghcr.io/juice-shop/multi-juicer/cleaner
-  tag: null
-  enabled: true
-  # -- Log level for the cleanup job. One of: debug, info, warn, error
-  logLevel: "info"
-  # -- Specifies when Juice Shop instances will be deleted when unused for that period.
-  gracePeriod: 24h
-  # -- Cron in which the clean up job is run. Defaults to once in an hour. Change this if your grace period if shorter than 1 hour
-  cron: "0 * * * *"
-  successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 1
-  resources:
-    requests:
-      memory: 256Mi
-    limits:
-      memory: 256Mi
-  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext:
-    runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
-  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
-  # -- Optional Configure kubernetes scheduling affinity for the JuiceShopCleanup Job(see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-  # -- Optional Configure kubernetes toleration for the JuiceShopCleanup Job (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []

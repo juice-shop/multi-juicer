@@ -495,7 +495,7 @@ func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
 		},
 		corev1.EnvVar{
 			Name:  "SOLUTIONS_WEBHOOK",
-			Value: fmt.Sprintf("http://progress-watchdog.%s.svc/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
+			Value: fmt.Sprintf("http://multijuicer-internal.%s.svc.cluster.local:8082/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
 		},
 	)
 

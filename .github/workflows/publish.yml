@@ -42,12 +42,6 @@ jobs:
       contents: read
       packages: write
       id-token: write # needed for signing the images with GitHub OIDC Token
-    strategy:
-      matrix:
-        component:
-          - progress-watchdog
-          - cleaner
-          - balancer
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -59,7 +53,7 @@ jobs:
         name: Container Image Metadata
         uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
-          images: ${{ env.CONTAINER_REGISTRY }}/multi-juicer/${{ matrix.component }}
+          images: ${{ env.CONTAINER_REGISTRY }}/multi-juicer/balancer
           tags: |
             type=semver,pattern={{raw}}
 
@@ -85,7 +79,6 @@ jobs:
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
-          file: ./containers/${{ matrix.component }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.image-metadata.outputs.tags }}

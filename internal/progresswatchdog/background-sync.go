@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/speps/go-hashids/v2"
@@ -37,25 +39,34 @@ type Challenge struct {
 }
 
 var challengeIdLookup = map[string]int{}
+var challengeIdLookupOnce sync.Once
 
 // JuiceShopChallenge represents a challenge in the Juice Shop config file. reduced to just the key, everything else is not needed
 type JuiceShopChallenge struct {
 	Key string `json:"key"`
 }
 
-func StartBackgroundSync(clientset *kubernetes.Clientset, workerCount int) {
-	Logger.Info("Starting background-sync looking for JuiceShop challenge progress changes", "workers", workerCount)
+// StartBackgroundSync runs the JuiceShop progress reconciliation loop. It blocks until ctx is cancelled.
+// It must run on at most one balancer replica at a time (gated via leader election).
+func StartBackgroundSync(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace string, workerCount int) {
+	log.Info("Starting background-sync looking for JuiceShop challenge progress changes", "workers", workerCount)
 
-	createChallengeIdLookup()
+	challengeIdLookupOnce.Do(createChallengeIdLookup)
 
 	progressUpdateJobs := make(chan ProgressUpdateJobs)
 
-	// Start 10 workers which fetch and update ContinueCodes based on the `progressUpdateJobs` queue / channel
+	var wg sync.WaitGroup
 	for range workerCount {
-		go workOnProgressUpdates(progressUpdateJobs, clientset)
+		wg.Go(func() {
+			workOnProgressUpdates(ctx, log, progressUpdateJobs, clientset, namespace)
+		})
 	}
 
-	go createProgressUpdateJobs(progressUpdateJobs, clientset)
+	createProgressUpdateJobs(ctx, log, progressUpdateJobs, clientset, namespace)
+
+	close(progressUpdateJobs)
+	wg.Wait()
+	log.Info("Background-sync stopped")
 }
 
 func createChallengeIdLookup() {
@@ -75,64 +86,74 @@ func createChallengeIdLookup() {
 	}
 }
 
-// Constantly lists all JuiceShops in managed by MultiJuicer and queues progressUpdatesJobs for them
-func createProgressUpdateJobs(progressUpdateJobs chan<- ProgressUpdateJobs, clientset *kubernetes.Clientset) {
-	namespace := os.Getenv("NAMESPACE")
+// Lists all JuiceShops managed by MultiJuicer and queues progressUpdateJobs for them, looping until ctx is cancelled.
+func createProgressUpdateJobs(ctx context.Context, log *slog.Logger, progressUpdateJobs chan<- ProgressUpdateJobs, clientset kubernetes.Interface, namespace string) {
 	for {
-		// Get Instances
 		opts := metav1.ListOptions{
 			LabelSelector: "app.kubernetes.io/name=juice-shop",
 		}
-		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(context.TODO(), opts)
+		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(ctx, opts)
 		if err != nil {
-			panic(err.Error())
+			if ctx.Err() != nil {
+				return
+			}
+			log.Error("Failed to list JuiceShop deployments", "error", err)
+		} else {
+			log.Debug("Background-sync started syncing instances", "count", len(juiceShops.Items))
+
+			for _, instance := range juiceShops.Items {
+				team := instance.Labels["team"]
+
+				if instance.Status.ReadyReplicas != 1 {
+					continue
+				}
+
+				var lastChallengeProgress []ChallengeStatus
+				json.Unmarshal([]byte(instance.Annotations["multi-juicer.owasp-juice.shop/challenges"]), &lastChallengeProgress)
+
+				select {
+				case <-ctx.Done():
+					return
+				case progressUpdateJobs <- ProgressUpdateJobs{
+					Team:                  team,
+					LastChallengeProgress: lastChallengeProgress,
+				}:
+				}
+			}
 		}
 
-		Logger.Debug("Background-sync started syncing instances", "count", len(juiceShops.Items))
-
-		for _, instance := range juiceShops.Items {
-			Team := instance.Labels["team"]
-
-			if instance.Status.ReadyReplicas != 1 {
-				continue
-			}
-
-			var lastChallengeProgress []ChallengeStatus
-			json.Unmarshal([]byte(instance.Annotations["multi-juicer.owasp-juice.shop/challenges"]), &lastChallengeProgress)
-
-			progressUpdateJobs <- ProgressUpdateJobs{
-				Team:                  Team,
-				LastChallengeProgress: lastChallengeProgress,
-			}
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(60 * time.Second):
 		}
-		time.Sleep(60 * time.Second)
 	}
 }
 
-func workOnProgressUpdates(progressUpdateJobs <-chan ProgressUpdateJobs, clientset *kubernetes.Clientset) {
+func workOnProgressUpdates(ctx context.Context, log *slog.Logger, progressUpdateJobs <-chan ProgressUpdateJobs, clientset kubernetes.Interface, namespace string) {
 	for job := range progressUpdateJobs {
 		lastChallengeProgress := job.LastChallengeProgress
 		challengeProgress, err := getCurrentChallengeProgress(job.Team)
 
 		if err != nil {
-			Logger.Error("failed to fetch current Challenge Progress from Juice Shop", "team", job.Team, "error", err)
+			log.Error("failed to fetch current Challenge Progress from Juice Shop", "team", job.Team, "error", err)
 			continue
 		}
 
 		switch CompareChallengeStates(challengeProgress, lastChallengeProgress) {
 		case ApplyCode:
-			Logger.Debug("Last ContinueCode contains unsolved challenges", "team", job.Team)
-			applyChallengeProgress(job.Team, lastChallengeProgress)
+			log.Debug("Last ContinueCode contains unsolved challenges", "team", job.Team)
+			applyChallengeProgress(log, job.Team, lastChallengeProgress)
 
 			challengeProgress, err = getCurrentChallengeProgress(job.Team)
 
 			if err != nil {
-				Logger.Error("failed to re-fetch challenge progress from Juice Shop to reapply it", "team", job.Team, "error", err)
+				log.Error("failed to re-fetch challenge progress from Juice Shop to reapply it", "team", job.Team, "error", err)
 				continue
 			}
-			PersistProgress(clientset, job.Team, challengeProgress, nil)
+			PersistProgress(ctx, log, clientset, namespace, job.Team, challengeProgress, nil)
 		case UpdateCache:
-			PersistProgress(clientset, job.Team, challengeProgress, nil)
+			PersistProgress(ctx, log, clientset, namespace, job.Team, challengeProgress, nil)
 		case NoOp:
 		}
 	}
@@ -153,8 +174,6 @@ func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
 
 	switch res.StatusCode {
 	case 200:
-		defer res.Body.Close()
-
 		challengeResponse := ChallengeResponse{}
 
 		err = json.NewDecoder(res.Body).Decode(&challengeResponse)
@@ -181,10 +200,10 @@ func getCurrentChallengeProgress(team string) ([]ChallengeStatus, error) {
 	}
 }
 
-func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
+func applyChallengeProgress(log *slog.Logger, team string, challengeProgress []ChallengeStatus) {
 	continueCode, err := GenerateContinueCode(challengeProgress)
 	if err != nil {
-		Logger.Error("failed to encode challenge progress into continue code", "error", err)
+		log.Error("failed to encode challenge progress into continue code", "error", err)
 		return
 	}
 
@@ -192,12 +211,12 @@ func applyChallengeProgress(team string, challengeProgress []ChallengeStatus) {
 
 	req, err := http.NewRequest("PUT", url, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		Logger.Error("failed to create http request to set the current ContinueCode", "error", err)
+		log.Error("failed to create http request to set the current ContinueCode", "error", err)
 		return
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		Logger.Error("failed to set the current ContinueCode to juice shop", "error", err)
+		log.Error("failed to set the current ContinueCode to juice shop", "error", err)
 		return
 	}
 	defer res.Body.Close()

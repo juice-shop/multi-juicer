@@ -20,27 +20,16 @@ tasks:
     vars:
       VERSION: '{{uuid}}'
     cmds:
-      - |
-        docker build --progress quiet -f containers/cleaner/Dockerfile -t local/cleaner:{{.VERSION}} . &
-        docker build --progress quiet -f containers/progress-watchdog/Dockerfile -t local/progress-watchdog:{{.VERSION}} . &
-        docker build --progress quiet -f containers/balancer/Dockerfile -t local/balancer:{{.VERSION}} . &
-        wait
+      - docker build --progress quiet -t local/balancer:{{.VERSION}} .
       - |
         if [ "$(kubectl config current-context)" = "kind-kind" ]; then
-          kind load docker-image "local/progress-watchdog:{{.VERSION}}" &
-          kind load docker-image "local/cleaner:{{.VERSION}}" &
-          kind load docker-image "local/balancer:{{.VERSION}}" &
-          wait
+          kind load docker-image "local/balancer:{{.VERSION}}"
         fi
       - |
         helm upgrade --install multi-juicer ./helm/multi-juicer \
           --set="imagePullPolicy=IfNotPresent" \
           --set="balancer.repository=local/balancer" \
           --set="balancer.tag={{.VERSION}}" \
-          --set="progressWatchdog.repository=local/progress-watchdog" \
-          --set="progressWatchdog.tag={{.VERSION}}" \
-          --set="juiceShopCleanup.repository=local/cleaner" \
-          --set="juiceShopCleanup.tag={{.VERSION}}" \
           --set="balancer.cookie.cookieParserSecret=dev-secret"
 
   build:

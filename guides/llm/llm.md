@@ -17,9 +17,9 @@ The LLM Gateway solves this by keeping the real API key inside the balancer and 
 
 ```
 JuiceShop Pod (team-a)                    Balancer Process
-  LLM_API_KEY=<unique-team-token>  -->  :8082 (LLM Gateway)
+  LLM_API_KEY=<unique-team-token>  -->  :8082 (internal port, LLM Gateway)
   chatBot.llmApiUrl=http://                 | validates team token
-    multijuicer-llm-gateway:8082            | swaps in real API key
+    multijuicer-internal:8082               | swaps in real API key
                                             | tracks token usage
                                             v
                                        Upstream LLM API
@@ -27,7 +27,7 @@ JuiceShop Pod (team-a)                    Balancer Process
 ```
 
 1. When a team is created, the balancer generates a random token and stores it in a Kubernetes Secret. This token is mounted as the `LLM_API_KEY` environment variable in the JuiceShop pod.
-2. The JuiceShop chatbot config is automatically set to point at the internal `multijuicer-llm-gateway` service instead of the real LLM API.
+2. The JuiceShop chatbot config is automatically set to point at the internal `multijuicer-internal` service instead of the real LLM API.
 3. When JuiceShop makes a chat completion request, the gateway validates the team token, replaces it with the real API key, and forwards the request upstream.
 4. The gateway extracts token usage from responses (including SSE streams) and periodically writes per-team input/output token counts to the team's deployment annotations (`multi-juicer.owasp-juice.shop/llmInputTokens` and `multi-juicer.owasp-juice.shop/llmOutputTokens`).
 
@@ -84,7 +84,7 @@ kubectl get deployments -l app.kubernetes.io/part-of=multi-juicer,app.kubernetes
 
 ## RBAC note
 
-Enabling the LLM gateway grants the balancer's service account additional permissions: it can **create, get, delete, and list Secrets** in the namespace. This is required to manage the per-team LLM tokens. The cleaner job also gets permissions to **get and delete Secrets** so it can clean up tokens when removing inactive teams.
+Enabling the LLM gateway grants the balancer's service account additional permissions: it can **create Secrets** in the namespace. This is required to provision the per-team LLM tokens. Per-team Secrets are owned by the team's deployment via `OwnerReferences`, so they are garbage-collected automatically when the deployment is deleted — no separate cleanup permissions are required.
 
 If you are running MultiJuicer in a namespace shared with other workloads, be aware that the balancer will have read access to all Secrets in that namespace. Running MultiJuicer in a dedicated namespace (which is recommended regardless) avoids this concern.
 

@@ -40,36 +40,6 @@ app.kubernetes.io/part-of: multi-juicer
 {{- end -}}
 
 {{/*
-progress-watchdog labels
-*/}}
-{{- define "multi-juicer.progress-watchdog.labels" -}}
-{{ include "multi-juicer.progress-watchdog.selectorLabels" . }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-app.kubernetes.io/component: progress-tracker
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-{{- define "multi-juicer.progress-watchdog.selectorLabels" -}}
-app.kubernetes.io/name: progress-watchdog
-app.kubernetes.io/instance: progress-watchdog-{{ .Release.Name }}
-app.kubernetes.io/part-of: multi-juicer
-{{- end -}}
-
-{{/*
-cleaner labels
-*/}}
-{{- define "multi-juicer.cleaner.labels" -}}
-{{ include "multi-juicer.cleaner.selectorLabels" . }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-app.kubernetes.io/component: garbage-collector
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-{{- define "multi-juicer.cleaner.selectorLabels" -}}
-app.kubernetes.io/name: cleaner
-app.kubernetes.io/instance: cleaner-{{ .Release.Name }}
-app.kubernetes.io/part-of: multi-juicer
-{{- end -}}
-
-{{/*
 juice-shop labels
 */}}
 {{- define "multi-juicer.juice-shop.labels" -}}

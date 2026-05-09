@@ -5,6 +5,9 @@ metadata:
   name: balancer
   labels: {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
 rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "create", "update"]
   - apiGroups: ["apps"]
     resources: ["deployments"]
     verbs: ["get", "create", "list", "delete", "patch", "update", "watch"]

@@ -42,6 +42,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MAX_INACTIVE_DURATION
+            value: {{ .Values.config.juiceShop.deleteInactiveAfter | quote }}
           - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -70,10 +76,8 @@ spec:
               containerPort: 8080
             - name: metrics
               containerPort: 8081
-            {{- if .Values.config.juiceShop.llm.enabled }}
-            - name: llm-gateway
+            - name: internal
               containerPort: 8082
-            {{- end }}
           livenessProbe:
             httpGet:
               path: /balancer/api/health

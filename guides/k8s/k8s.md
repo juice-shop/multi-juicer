@@ -26,8 +26,8 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 # to verify every thing is starting up, run:
 kubectl get pods
 
-# This should show you two pods a balancer pod and a progress-watchdog pod
-# Wait until both pods are ready
+# This should show you the balancer pod
+# Wait until it is ready
 ```
 
 ## Step 3. Verify the app is running correctly
