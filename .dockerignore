@@ -16,9 +16,9 @@ ui/build
 guides
 images
 helm
-architecture.md
-readme.md
-ATTRIBUTION
+ARCHITECTURE.md
+README.md
+ATTRIBUTION.md
 LICENSE
 CODE_OF_CONDUCT.md
 *.md

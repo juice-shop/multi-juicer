@@ -2,7 +2,7 @@
 
 Thanks for your interest in contributing! This guide covers getting MultiJuicer running on your machine and using the project's task runner to develop, test, and lint.
 
-For an overview of how the codebase is structured and how the components fit together, see [architecture.md](./architecture.md).
+For an overview of how the codebase is structured and how the components fit together, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Required Tools
 
