@@ -14,18 +14,19 @@
     "react-intl": "^10.1.5",
     "react-router-dom": "^7.15.0",
     "reactjs-popup": "^2.0.6",
+    "snarkdown": "^2.0.0",
     "tailwindcss": "^4.1.11",
     "three": "^0.184.0",
-    "three-conic-polygon-geometry": "^2.1.2",
-    "snarkdown": "^2.0.0"
+    "three-conic-polygon-geometry": "^2.1.2"
   },
   "devDependencies": {
+    "@rolldown/plugin-babel": "^0.2.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@types/node": "^25.6.2",
-    "@types/three": "^0.184.1",
     "@types/promise-retry": "^1.1.6",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.1",
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^6.0.1",
