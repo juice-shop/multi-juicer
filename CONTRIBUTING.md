@@ -10,7 +10,6 @@ You'll need the following installed locally before working on MultiJuicer:
 
 - **[Task](https://taskfile.dev/installation/)** — task runner used to drive all dev/test/lint commands
 - **[Go](https://go.dev/doc/install)** (matching the version in [`go.mod`](./go.mod)) — backend services
-- **[staticcheck](https://staticcheck.dev/docs/getting-started/)** — Go linter (`go install honnef.co/go/tools/cmd/staticcheck@latest`)
 - **[Node.js](https://nodejs.org/)** with [npm](https://docs.npmjs.com/) (or optionally [Bun](https://bun.sh/) for faster UI tests) — frontend toolchain
 - **[Docker](https://docs.docker.com/get-docker/)** — builds the component images
 - **A local Kubernetes cluster** sharing Docker's image cache, e.g. [Docker Desktop's built-in cluster](https://docs.docker.com/desktop/features/kubernetes/) or [kind - recommended](https://kind.sigs.k8s.io/docs/user/quick-start/)

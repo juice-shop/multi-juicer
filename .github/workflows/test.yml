@@ -2,8 +2,6 @@ on: [push, pull_request]
 name: "Tests"
 permissions:
   contents: read
-env:
-  GO_STATIC_CHECK_VERSION: "2026.1"
 jobs:
   go:
     name: Go
@@ -35,10 +33,8 @@ jobs:
           fi
       - name: "Lint"
         run: go vet ./...
-      - uses: dominikh/staticcheck-action@9716614d4101e79b4340dd97b10e54d68234e431 # v1.4.1
-        with:
-          install-go: false
-          version: "${{ env.GO_STATIC_CHECK_VERSION }}"
+      - name: "Staticcheck"
+        run: go tool staticcheck ./...
       - name: "Test"
         run: go test -cover ./...
 
