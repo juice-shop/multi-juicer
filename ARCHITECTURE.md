@@ -55,7 +55,7 @@ The backend server is responsible for:
 - Health and readiness probes for Kubernetes orchestration
 
 **Internal Port (`:8082`)**
-- The balancer pod always exposes a cluster-internal HTTP listener on `:8082`, fronted by the `multijuicer-internal` ClusterIP service. The public `balancer` Service only forwards `:8080`, so traffic on `:8082` cannot reach the cluster from outside
+- The balancer pod always exposes a cluster-internal HTTP listener on `:8082`, fronted by the `multijuicer-private` ClusterIP service. The public `balancer` Service only forwards `:8080`, so traffic on `:8082` cannot reach the cluster from outside
 - It always serves `POST /team/{team}/webhook`, the endpoint Juice Shop pods call when a challenge is solved
 - When `config.juiceShop.llm.enabled` is true, the same listener also acts as a catch-all LLM gateway: it proxies AI chatbot requests from Juice Shop instances to an upstream OpenAI-compatible API and keeps the real LLM API key inside the balancer process so it cannot be extracted via Juice Shop RCE challenges
 - On team creation, an HMAC-signed team token is stored in a per-team Kubernetes Secret and mounted as `LLM_API_KEY` in the Juice Shop pod; the gateway validates the token via the balancer's signing key, derives the team name, and substitutes the real API key before forwarding the request upstream
@@ -65,7 +65,7 @@ The backend server is responsible for:
 **Progress Reconciliation**
 - Webhooks received on the internal port are persisted as JSON annotations on the team's deployment. The handler is idempotent and runs on every replica
 - A leader-only background loop lists every Juice Shop deployment every 60 seconds, fetches the live challenge state, compares it with the persisted state, and re-applies the saved continue code when the live state has regressed (e.g. after a pod restart). 10 worker goroutines drain the queue concurrently
-- Implemented in `internal/progresswatchdog/` with the route handler in `internal/balancer/routes/webhook.go`
+- Implemented in `internal/progresswatchdog/` with the route handler in `internal/routes/private/webhook.go`
 
 **Inactive-Instance Cleanup**
 - A leader-only ticker (default 1 minute) lists Juice Shop deployments and deletes the ones whose `multi-juicer.owasp-juice.shop/lastRequest` annotation exceeds the configured inactivity threshold (`config.juiceShop.deleteInactiveAfter`, default `24h`)
@@ -82,7 +82,8 @@ The backend server is responsible for:
 - Structured logging for operational visibility
 
 **Key Packages**
-- `internal/balancer/routes/` - HTTP handlers for all API endpoints, including the cluster-internal `/team/{team}/webhook`
+- `internal/routes/public/` - HTTP handlers for the public `:8080` API
+- `internal/routes/private/` - HTTP handlers for the cluster-internal `:8082` listener (`/team/{team}/webhook` and the optional LLM gateway mount)
 - `internal/scoring/` - Score calculation and caching logic
 - `internal/longpoll/` - Unified HTTP long polling implementation
 - `internal/bundle/` - Configuration and shared dependencies
@@ -143,7 +144,7 @@ The web frontend provides a user-friendly interface for participants and organiz
 ### Challenge Solution Tracking
 
 1. User solves a challenge in their Juice Shop instance
-2. Juice Shop sends a webhook to `http://multijuicer-internal.{ns}.svc.cluster.local:8082/team/{team}/webhook` (any balancer replica handles it)
+2. Juice Shop sends a webhook to `http://multijuicer-private.{ns}.svc.cluster.local:8082/team/{team}/webhook` (any balancer replica handles it)
 3. The webhook handler validates the payload and patches the new solution onto the team's deployment annotation
 4. The leader-only background sync loop periodically reconciles persisted progress with live Juice Shop state, re-applying continue codes if a pod restarted with empty progress
 5. The scoring service detects the annotation change and recalculates team scores
@@ -168,7 +169,7 @@ The web frontend provides a user-friendly interface for participants and organiz
 
 ### LLM Chatbot Requests (when enabled)
 
-1. The Juice Shop chatbot is configured to call the cluster-internal `multijuicer-internal` service with the team's `LLM_API_KEY` (the signed team token) as a bearer token
+1. The Juice Shop chatbot is configured to call the cluster-internal `multijuicer-private` service with the team's `LLM_API_KEY` (the signed team token) as a bearer token
 2. The LLM gateway running inside the balancer validates the bearer token against the cookie signing key and derives the team name
 3. The gateway substitutes the real upstream API key into the request and reverse-proxies it to the configured upstream LLM API
 4. For chat completion responses (JSON or SSE), the gateway parses the `usage` field and adds the input/output token counts to an in-memory per-team accumulator
@@ -212,7 +213,7 @@ The web frontend provides a user-friendly interface for participants and organiz
 
 The chart deploys two kinds of long-running workloads:
 
-- **Balancer**: Deployment (1+ replicas) behind a LoadBalancer/Ingress Service on `:8080` for end-user traffic. The same pods also expose `:8082` via the cluster-internal `multijuicer-internal` ClusterIP Service for solution webhooks and (when enabled) the LLM gateway. Singleton background work (progress reconciliation, cleanup) is gated by a `Lease`-based leader election so multi-replica deployments don't duplicate it
+- **Balancer**: Deployment (1+ replicas) behind a LoadBalancer/Ingress Service on `:8080` for end-user traffic. The same pods also expose `:8082` via the cluster-internal `multijuicer-private` ClusterIP Service for solution webhooks and (when enabled) the LLM gateway. Singleton background work (progress reconciliation, cleanup) is gated by a `Lease`-based leader election so multi-replica deployments don't duplicate it
 - **Juice Shop Instances**: Individual Deployments and Services per team, created on demand by the balancer
 
 The entire stack is deployed via the Helm chart in `helm/multi-juicer/`, which handles Kubernetes resource creation, configuration, and lifecycle management.

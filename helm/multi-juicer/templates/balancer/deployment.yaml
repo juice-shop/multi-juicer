@@ -76,7 +76,7 @@ spec:
               containerPort: 8080
             - name: metrics
               containerPort: 8081
-            - name: internal
+            - name: private
               containerPort: 8082
           livenessProbe:
             httpGet:

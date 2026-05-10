@@ -159,7 +159,7 @@ default values render correctly:
                 - containerPort: 8081
                   name: metrics
                 - containerPort: 8082
-                  name: internal
+                  name: private
               readinessProbe:
                 httpGet:
                   path: /balancer/api/readiness
@@ -202,12 +202,12 @@ default values render correctly:
         app.kubernetes.io/name: balancer
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: multijuicer-internal
+      name: multijuicer-private
     spec:
       ports:
-        - name: internal
+        - name: private
           port: 8082
-          targetPort: internal
+          targetPort: private
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer
@@ -540,7 +540,7 @@ full values render out correctly:
                 - containerPort: 8081
                   name: metrics
                 - containerPort: 8082
-                  name: internal
+                  name: private
               readinessProbe:
                 httpGet:
                   path: /balancer/api/readiness
@@ -614,12 +614,12 @@ full values render out correctly:
         app.kubernetes.io/name: balancer
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: multijuicer-internal
+        type: metrics
+      name: balancer-metrics
     spec:
       ports:
-        - name: internal
-          port: 8082
-          targetPort: internal
+        - name: metrics
+          port: 80
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer
@@ -636,12 +636,12 @@ full values render out correctly:
         app.kubernetes.io/name: balancer
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-        type: metrics
-      name: balancer-metrics
+      name: multijuicer-private
     spec:
       ports:
-        - name: metrics
-          port: 80
+        - name: private
+          port: 8082
+          targetPort: private
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer
@@ -2624,7 +2624,7 @@ production notes work correctly:
                 - containerPort: 8081
                   name: metrics
                 - containerPort: 8082
-                  name: internal
+                  name: private
               readinessProbe:
                 httpGet:
                   path: /balancer/api/readiness
@@ -2667,12 +2667,12 @@ production notes work correctly:
         app.kubernetes.io/name: balancer
         app.kubernetes.io/part-of: multi-juicer
         app.kubernetes.io/version: 42.0.0
-      name: multijuicer-internal
+      name: multijuicer-private
     spec:
       ports:
-        - name: internal
+        - name: private
           port: 8082
-          targetPort: internal
+          targetPort: private
       selector:
         app.kubernetes.io/instance: balancer-RELEASE-NAME
         app.kubernetes.io/name: balancer

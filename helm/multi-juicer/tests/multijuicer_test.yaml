@@ -8,7 +8,7 @@ tests:
 
       - templates/balancer/config-map.yaml
       - templates/balancer/deployment.yaml
-      - templates/balancer/internal-service.yaml
+      - templates/balancer/private-service.yaml
       - templates/balancer/role-binding.yaml
       - templates/balancer/role.yaml
       - templates/balancer/secret.yaml
@@ -34,7 +34,7 @@ tests:
 
       - templates/balancer/config-map.yaml
       - templates/balancer/deployment.yaml
-      - templates/balancer/internal-service.yaml
+      - templates/balancer/private-service.yaml
       - templates/balancer/role-binding.yaml
       - templates/balancer/role.yaml
       - templates/balancer/secret.yaml

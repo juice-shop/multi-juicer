@@ -9,13 +9,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/juice-shop/multi-juicer/internal/balancer/routes"
 	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/cleaner"
 	"github.com/juice-shop/multi-juicer/internal/leader"
-	"github.com/juice-shop/multi-juicer/internal/llmgateway"
 	"github.com/juice-shop/multi-juicer/internal/notification"
 	"github.com/juice-shop/multi-juicer/internal/progresswatchdog"
+	private_routes "github.com/juice-shop/multi-juicer/internal/routes/private"
+	public_routes "github.com/juice-shop/multi-juicer/internal/routes/public"
 	"github.com/juice-shop/multi-juicer/internal/scoring"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"k8s.io/klog/v2"
@@ -48,22 +48,7 @@ func main() {
 	go notificationService.StartNotificationWatcher(ctx)
 
 	internalMux := http.NewServeMux()
-	internalMux.Handle("POST /team/{team}/webhook", routes.NewSolutionsWebhookHandler(b))
-
-	if b.Config.JuiceShopConfig.LLM.Enabled {
-		llmAPIKey := os.Getenv("LLM_API_KEY")
-		llmAPIURL := os.Getenv("LLM_API_URL")
-
-		usage := llmgateway.NewUsageTracker()
-		gateway, err := llmgateway.NewGateway(b.Config.CookieConfig.SigningKey, llmAPIURL, llmAPIKey, usage, b.Log)
-		if err != nil {
-			log.Fatalf("Failed to create LLM gateway: %v", err)
-		}
-		go usage.StartFlusher(ctx, b.ClientSet, b.RuntimeEnvironment.Namespace, b.Log)
-		// Catch-all — must be registered last so the more specific webhook route wins.
-		internalMux.Handle("/", gateway)
-		b.Log.Info("LLM gateway mounted on internal port :8082")
-	}
+	private_routes.AddRoutes(ctx, internalMux, b)
 
 	go StartInternalServer(internalMux, b.Log)
 
@@ -113,7 +98,7 @@ func runLeaderLoop(ctx context.Context, b *bundle.Bundle) {
 
 func StartBalancerServer(b *bundle.Bundle) {
 	router := http.NewServeMux()
-	routes.AddRoutes(router, b)
+	public_routes.AddRoutes(router, b)
 
 	b.Log.Info("Starting MultiJuicer balancer on :8080")
 	server := &http.Server{
