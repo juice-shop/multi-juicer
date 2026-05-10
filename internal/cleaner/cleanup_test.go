@@ -9,20 +9,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/juice-shop/multi-juicer/internal/bundle"
+	"github.com/juice-shop/multi-juicer/internal/testutil"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	clientgotesting "k8s.io/client-go/testing"
 )
 
-var testNamespace = "test-namespace"
-
-func newTestLogger() *slog.Logger {
-	return slog.New(slog.NewTextHandler(io.Discard, nil))
+func newTestBundle(clientset kubernetes.Interface, maxInactive time.Duration) *bundle.Bundle {
+	b := testutil.NewTestBundleWithCustomFakeClient(clientset)
+	b.Log = slog.New(slog.NewTextHandler(io.Discard, nil))
+	b.Config.Cleanup.MaxInactive = maxInactive
+	return b
 }
 
 func TestRunCleanup(t *testing.T) {
+	testNamespace := "test-namespace"
 	createDeployment := func(team string, lastRequest string) *appsv1.Deployment {
 		return &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
@@ -40,14 +45,12 @@ func TestRunCleanup(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	log := newTestLogger()
 
 	t.Run("No Deployments Found", func(t *testing.T) {
 		clientset := fake.NewClientset()
-		currentTime := time.Now()
-		maxInactive := 30 * time.Minute
+		b := newTestBundle(clientset, 30*time.Minute)
 
-		summary, err := RunCleanup(ctx, log, clientset, testNamespace, currentTime, maxInactive)
+		summary, err := RunCleanup(ctx, b, time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -69,11 +72,9 @@ func TestRunCleanup(t *testing.T) {
 				},
 			},
 		})
+		b := newTestBundle(clientset, 30*time.Minute)
 
-		currentTime := time.Now()
-		maxInactive := 30 * time.Minute
-
-		summary, err := RunCleanup(ctx, log, clientset, testNamespace, currentTime, maxInactive)
+		summary, err := RunCleanup(ctx, b, time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -85,11 +86,9 @@ func TestRunCleanup(t *testing.T) {
 
 	t.Run("Deployment With Invalid LastRequest Annotation", func(t *testing.T) {
 		clientset := fake.NewClientset(createDeployment("team1", "invalid"))
+		b := newTestBundle(clientset, 30*time.Minute)
 
-		currentTime := time.Now()
-		maxInactive := 30 * time.Minute
-
-		summary, err := RunCleanup(ctx, log, clientset, testNamespace, currentTime, maxInactive)
+		summary, err := RunCleanup(ctx, b, time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -102,11 +101,9 @@ func TestRunCleanup(t *testing.T) {
 	t.Run("Active Deployment - Should Not Be Deleted", func(t *testing.T) {
 		lastRequestTime := strconv.FormatInt(time.Now().Add(-10*time.Minute).UnixMilli(), 10)
 		clientset := fake.NewClientset(createDeployment("team1", lastRequestTime))
+		b := newTestBundle(clientset, 30*time.Minute)
 
-		currentTime := time.Now()
-		maxInactive := 30 * time.Minute
-
-		summary, err := RunCleanup(ctx, log, clientset, testNamespace, currentTime, maxInactive)
+		summary, err := RunCleanup(ctx, b, time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -119,11 +116,9 @@ func TestRunCleanup(t *testing.T) {
 	t.Run("Inactive Deployment - Should Be Deleted", func(t *testing.T) {
 		lastRequestTime := strconv.FormatInt(time.Now().Add(-60*time.Minute).UnixMilli(), 10)
 		clientset := fake.NewClientset(createDeployment("team1", lastRequestTime))
+		b := newTestBundle(clientset, 30*time.Minute)
 
-		currentTime := time.Now()
-		maxInactive := 30 * time.Minute
-
-		summary, err := RunCleanup(ctx, log, clientset, testNamespace, currentTime, maxInactive)
+		summary, err := RunCleanup(ctx, b, time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -140,10 +135,9 @@ func TestRunCleanup(t *testing.T) {
 			return true, nil, fmt.Errorf("failed to delete deployment")
 		})
 
-		currentTime := time.Now()
-		maxInactive := 30 * time.Minute
+		b := newTestBundle(clientset, 30*time.Minute)
 
-		summary, err := RunCleanup(ctx, log, clientset, testNamespace, currentTime, maxInactive)
+		summary, err := RunCleanup(ctx, b, time.Now())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}

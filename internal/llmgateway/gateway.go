@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
 
+	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/signutil"
 )
 
@@ -25,25 +25,22 @@ type openAIUsage struct {
 
 // Gateway proxies LLM requests from JuiceShop instances to an upstream LLM API.
 type Gateway struct {
-	signingKey  string
+	b           *bundle.Bundle
 	upstreamURL *url.URL
-	apiKey      string
 	usage       *UsageTracker
-	logger      *slog.Logger
 }
 
-// NewGateway creates a new LLM gateway.
-func NewGateway(signingKey string, upstreamURL string, apiKey string, usage *UsageTracker, logger *slog.Logger) (*Gateway, error) {
-	u, err := url.Parse(upstreamURL)
+// NewGateway creates a new LLM gateway. The signing key, upstream URL, API key, and logger
+// are all sourced from the bundle.
+func NewGateway(b *bundle.Bundle, usage *UsageTracker) (*Gateway, error) {
+	u, err := url.Parse(b.Config.JuiceShopConfig.LLM.ApiUrl)
 	if err != nil {
 		return nil, err
 	}
 	return &Gateway{
-		signingKey:  signingKey,
+		b:           b,
 		upstreamURL: u,
-		apiKey:      apiKey,
 		usage:       usage,
-		logger:      logger,
 	}, nil
 }
 
@@ -57,7 +54,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	teamToken := strings.TrimPrefix(authHeader, "Bearer ")
 
 	// Validate token by verifying the HMAC signature and extracting the team name
-	team, err := signutil.Unsign(teamToken, g.signingKey)
+	team, err := signutil.Unsign(teamToken, g.b.Config.CookieConfig.SigningKey)
 	if err != nil {
 		http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
 		return
@@ -65,7 +62,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Check if this is a chat completions request (for usage tracking)
 	isChatCompletion := strings.Contains(r.URL.Path, "/chat/completions")
-	g.logger.Debug("LLM gateway: request", "team", team, "method", r.Method, "path", r.URL.Path, "isChatCompletion", isChatCompletion)
+	g.b.Log.Debug("LLM gateway: request", "team", team, "method", r.Method, "path", r.URL.Path, "isChatCompletion", isChatCompletion)
 
 	// Create reverse proxy
 	proxy := &httputil.ReverseProxy{
@@ -73,7 +70,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			pr.SetURL(g.upstreamURL)
 			pr.Out.Host = g.upstreamURL.Host
 			// Replace the authorization header with the real API key
-			pr.Out.Header.Set("Authorization", "Bearer "+g.apiKey)
+			pr.Out.Header.Set("Authorization", "Bearer "+g.b.Config.JuiceShopConfig.LLM.ApiKey)
 		},
 	}
 
@@ -84,7 +81,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-		g.logger.Error("LLM gateway proxy error", "team", team, "error", err)
+		g.b.Log.Error("LLM gateway proxy error", "team", team, "error", err)
 		http.Error(w, `{"error":"upstream LLM API error"}`, http.StatusBadGateway)
 	}
 
@@ -102,7 +99,7 @@ func (g *Gateway) extractUsage(resp *http.Response, team string) error {
 	body, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		g.logger.Error("LLM gateway: failed to read response body", "team", team, "error", err)
+		g.b.Log.Error("LLM gateway: failed to read response body", "team", team, "error", err)
 		resp.Body = io.NopCloser(bytes.NewReader(body))
 		return nil
 	}
@@ -124,7 +121,7 @@ func (g *Gateway) extractUsageFromJSON(body []byte, team string) {
 		return
 	}
 	if result.Usage != nil {
-		g.logger.Debug("LLM gateway: usage", "team", team, "input_tokens", result.Usage.InputTokens, "output_tokens", result.Usage.OutputTokens)
+		g.b.Log.Debug("LLM gateway: usage", "team", team, "input_tokens", result.Usage.InputTokens, "output_tokens", result.Usage.OutputTokens)
 		g.usage.Add(team, result.Usage.InputTokens, result.Usage.OutputTokens)
 	}
 }
@@ -148,10 +145,10 @@ func (g *Gateway) extractUsageFromSSE(body []byte, team string) {
 			continue
 		}
 		if chunk.Usage != nil {
-			g.logger.Debug("LLM gateway: SSE usage", "team", team, "input_tokens", chunk.Usage.InputTokens, "output_tokens", chunk.Usage.OutputTokens)
+			g.b.Log.Debug("LLM gateway: SSE usage", "team", team, "input_tokens", chunk.Usage.InputTokens, "output_tokens", chunk.Usage.OutputTokens)
 			g.usage.Add(team, chunk.Usage.InputTokens, chunk.Usage.OutputTokens)
 			return
 		}
 	}
-	g.logger.Debug("LLM gateway: no usage data found in SSE stream", "team", team)
+	g.b.Log.Debug("LLM gateway: no usage data found in SSE stream", "team", team)
 }

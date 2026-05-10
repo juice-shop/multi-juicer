@@ -105,7 +105,7 @@ func NewSolutionsWebhookHandler(b *bundle.Bundle) http.HandlerFunc {
 			})
 		}
 
-		progresswatchdog.PersistProgress(ctx, b.Log, b.ClientSet, b.RuntimeEnvironment.Namespace, team, challengeStatus, cheatScores)
+		progresswatchdog.PersistProgress(ctx, b, team, challengeStatus, cheatScores)
 
 		b.Log.Info("Received webhook", "team", team, "challenge", webhook.Solution.Challenge)
 

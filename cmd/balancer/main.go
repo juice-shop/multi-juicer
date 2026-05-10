@@ -21,11 +21,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-const (
-	progressWatchdogWorkers = 10
-	cleanupInterval         = 1 * time.Minute
-	leaderReacquireBackoff  = 5 * time.Second
-)
+const leaderReacquireBackoff = 5 * time.Second
 
 func main() {
 	b := bundle.New()
@@ -70,14 +66,8 @@ func runLeaderLoop(ctx context.Context, b *bundle.Bundle) {
 	}
 
 	onStartedLeading := func(leaderCtx context.Context) {
-		go progresswatchdog.StartBackgroundSync(leaderCtx, b.Log, b.ClientSet, b.RuntimeEnvironment.Namespace, progressWatchdogWorkers)
-
-		maxInactive, err := time.ParseDuration(os.Getenv("MAX_INACTIVE_DURATION"))
-		if err != nil {
-			b.Log.Error("Could not parse MAX_INACTIVE_DURATION; cleanup loop will not run", "value", os.Getenv("MAX_INACTIVE_DURATION"), "error", err)
-			return
-		}
-		go cleaner.StartPeriodicCleanup(leaderCtx, b.Log, b.ClientSet, b.RuntimeEnvironment.Namespace, cleanupInterval, maxInactive)
+		go progresswatchdog.StartBackgroundSync(leaderCtx, b)
+		go cleaner.StartPeriodicCleanup(leaderCtx, b)
 	}
 
 	// leader.Run returns when leadership is lost; re-enter the election so a transient renewal failure

@@ -2,10 +2,9 @@ package llmgateway
 
 import (
 	"context"
-	"log/slog"
-	"os"
 	"testing"
 
+	"github.com/juice-shop/multi-juicer/internal/testutil"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -42,11 +41,12 @@ func TestUsageTracker_FlushToAnnotations(t *testing.T) {
 		},
 	)
 
+	b := testutil.NewTestBundleWithCustomFakeClient(clientset)
+	b.RuntimeEnvironment.Namespace = "default"
+
 	tracker := NewUsageTracker()
 	tracker.Add("team-a", 10, 20)
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	tracker.FlushToAnnotations(context.Background(), clientset, "default", logger)
+	tracker.FlushToAnnotations(context.Background(), b)
 
 	// Verify annotations were updated
 	dep, err := clientset.AppsV1().Deployments("default").Get(context.Background(), "juiceshop-team-a", metav1.GetOptions{})
@@ -72,12 +72,12 @@ func TestUsageTracker_FlushToAnnotations(t *testing.T) {
 func TestUsageTracker_FlushRetainsOnError(t *testing.T) {
 	// No deployment exists — flush should fail and retain usage
 	clientset := fake.NewSimpleClientset()
+	b := testutil.NewTestBundleWithCustomFakeClient(clientset)
+	b.RuntimeEnvironment.Namespace = "default"
 
 	tracker := NewUsageTracker()
 	tracker.Add("nonexistent", 10, 20)
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	tracker.FlushToAnnotations(context.Background(), clientset, "default", logger)
+	tracker.FlushToAnnotations(context.Background(), b)
 
 	// Usage should be retained
 	tracker.mu.Lock()

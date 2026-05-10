@@ -13,10 +13,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/speps/go-hashids/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
+
+const workerCount = 10
 
 type ProgressUpdateJobs struct {
 	Team                  string
@@ -48,8 +50,8 @@ type JuiceShopChallenge struct {
 
 // StartBackgroundSync runs the JuiceShop progress reconciliation loop. It blocks until ctx is cancelled.
 // It must run on at most one balancer replica at a time (gated via leader election).
-func StartBackgroundSync(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace string, workerCount int) {
-	log.Info("Starting background-sync looking for JuiceShop challenge progress changes", "workers", workerCount)
+func StartBackgroundSync(ctx context.Context, b *bundle.Bundle) {
+	b.Log.Info("Starting background-sync looking for JuiceShop challenge progress changes", "workers", workerCount)
 
 	challengeIdLookupOnce.Do(createChallengeIdLookup)
 
@@ -58,15 +60,15 @@ func StartBackgroundSync(ctx context.Context, log *slog.Logger, clientset kubern
 	var wg sync.WaitGroup
 	for range workerCount {
 		wg.Go(func() {
-			workOnProgressUpdates(ctx, log, progressUpdateJobs, clientset, namespace)
+			workOnProgressUpdates(ctx, b, progressUpdateJobs)
 		})
 	}
 
-	createProgressUpdateJobs(ctx, log, progressUpdateJobs, clientset, namespace)
+	createProgressUpdateJobs(ctx, b, progressUpdateJobs)
 
 	close(progressUpdateJobs)
 	wg.Wait()
-	log.Info("Background-sync stopped")
+	b.Log.Info("Background-sync stopped")
 }
 
 func createChallengeIdLookup() {
@@ -87,19 +89,19 @@ func createChallengeIdLookup() {
 }
 
 // Lists all JuiceShops managed by MultiJuicer and queues progressUpdateJobs for them, looping until ctx is cancelled.
-func createProgressUpdateJobs(ctx context.Context, log *slog.Logger, progressUpdateJobs chan<- ProgressUpdateJobs, clientset kubernetes.Interface, namespace string) {
+func createProgressUpdateJobs(ctx context.Context, b *bundle.Bundle, progressUpdateJobs chan<- ProgressUpdateJobs) {
 	for {
 		opts := metav1.ListOptions{
 			LabelSelector: "app.kubernetes.io/name=juice-shop",
 		}
-		juiceShops, err := clientset.AppsV1().Deployments(namespace).List(ctx, opts)
+		juiceShops, err := b.ClientSet.AppsV1().Deployments(b.RuntimeEnvironment.Namespace).List(ctx, opts)
 		if err != nil {
 			if ctx.Err() != nil {
 				return
 			}
-			log.Error("Failed to list JuiceShop deployments", "error", err)
+			b.Log.Error("Failed to list JuiceShop deployments", "error", err)
 		} else {
-			log.Debug("Background-sync started syncing instances", "count", len(juiceShops.Items))
+			b.Log.Debug("Background-sync started syncing instances", "count", len(juiceShops.Items))
 
 			for _, instance := range juiceShops.Items {
 				team := instance.Labels["team"]
@@ -130,30 +132,30 @@ func createProgressUpdateJobs(ctx context.Context, log *slog.Logger, progressUpd
 	}
 }
 
-func workOnProgressUpdates(ctx context.Context, log *slog.Logger, progressUpdateJobs <-chan ProgressUpdateJobs, clientset kubernetes.Interface, namespace string) {
+func workOnProgressUpdates(ctx context.Context, b *bundle.Bundle, progressUpdateJobs <-chan ProgressUpdateJobs) {
 	for job := range progressUpdateJobs {
 		lastChallengeProgress := job.LastChallengeProgress
 		challengeProgress, err := getCurrentChallengeProgress(job.Team)
 
 		if err != nil {
-			log.Error("failed to fetch current Challenge Progress from Juice Shop", "team", job.Team, "error", err)
+			b.Log.Error("failed to fetch current Challenge Progress from Juice Shop", "team", job.Team, "error", err)
 			continue
 		}
 
 		switch CompareChallengeStates(challengeProgress, lastChallengeProgress) {
 		case ApplyCode:
-			log.Debug("Last ContinueCode contains unsolved challenges", "team", job.Team)
-			applyChallengeProgress(log, job.Team, lastChallengeProgress)
+			b.Log.Debug("Last ContinueCode contains unsolved challenges", "team", job.Team)
+			applyChallengeProgress(b.Log, job.Team, lastChallengeProgress)
 
 			challengeProgress, err = getCurrentChallengeProgress(job.Team)
 
 			if err != nil {
-				log.Error("failed to re-fetch challenge progress from Juice Shop to reapply it", "team", job.Team, "error", err)
+				b.Log.Error("failed to re-fetch challenge progress from Juice Shop to reapply it", "team", job.Team, "error", err)
 				continue
 			}
-			PersistProgress(ctx, log, clientset, namespace, job.Team, challengeProgress, nil)
+			PersistProgress(ctx, b, job.Team, challengeProgress, nil)
 		case UpdateCache:
-			PersistProgress(ctx, log, clientset, namespace, job.Team, challengeProgress, nil)
+			PersistProgress(ctx, b, job.Team, challengeProgress, nil)
 		case NoOp:
 		}
 	}

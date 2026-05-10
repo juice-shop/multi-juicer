@@ -3,15 +3,14 @@ package llmgateway
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"maps"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -53,15 +52,15 @@ func (t *UsageTracker) Add(team string, inputTokens, outputTokens int64) {
 }
 
 // FlushToAnnotations writes accumulated usage to deployment annotations and resets the counters.
-func (t *UsageTracker) FlushToAnnotations(ctx context.Context, clientset kubernetes.Interface, namespace string, logger *slog.Logger) {
+func (t *UsageTracker) FlushToAnnotations(ctx context.Context, b *bundle.Bundle) {
 	t.mu.Lock()
 	pending := t.usage
 	t.usage = make(map[string]*TeamUsage)
 	t.mu.Unlock()
 
 	for team, usage := range pending {
-		if err := t.updateTeamAnnotations(ctx, clientset, namespace, team, usage, logger); err != nil {
-			logger.Error("Failed to flush LLM usage", "team", team, "error", err)
+		if err := t.updateTeamAnnotations(ctx, b, team, usage); err != nil {
+			b.Log.Error("Failed to flush LLM usage", "team", team, "error", err)
 			// Put the usage back so it's not lost
 			t.Add(team, usage.InputTokens, usage.OutputTokens)
 		}
@@ -70,11 +69,12 @@ func (t *UsageTracker) FlushToAnnotations(ctx context.Context, clientset kuberne
 
 // updateTeamAnnotations uses optimistic concurrency (read resourceVersion, retry on conflict)
 // to safely increment token counters even when multiple balancer replicas are running.
-func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, clientset kubernetes.Interface, namespace, team string, delta *TeamUsage, logger *slog.Logger) error {
+func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, b *bundle.Bundle, team string, delta *TeamUsage) error {
 	deploymentName := fmt.Sprintf("juiceshop-%s", team)
+	namespace := b.RuntimeEnvironment.Namespace
 
 	for attempt := range maxRetries {
-		deployment, err := clientset.AppsV1().Deployments(namespace).Get(ctx, deploymentName, metav1.GetOptions{})
+		deployment, err := b.ClientSet.AppsV1().Deployments(namespace).Get(ctx, deploymentName, metav1.GetOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to get deployment: %w", err)
 		}
@@ -99,30 +99,30 @@ func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, clientset kube
 		maps.Copy(updatedAnnotations, newAnnotations)
 		deployment.Annotations = updatedAnnotations
 
-		_, err = clientset.AppsV1().Deployments(namespace).Update(ctx, deployment, metav1.UpdateOptions{})
+		_, err = b.ClientSet.AppsV1().Deployments(namespace).Update(ctx, deployment, metav1.UpdateOptions{})
 		if err == nil {
 			return nil
 		}
 		if !errors.IsConflict(err) {
 			return fmt.Errorf("failed to update deployment: %w", err)
 		}
-		logger.Warn("LLM usage update conflict, retrying", "team", team, "attempt", attempt+1, "maxRetries", maxRetries)
+		b.Log.Warn("LLM usage update conflict, retrying", "team", team, "attempt", attempt+1, "maxRetries", maxRetries)
 	}
 
 	return fmt.Errorf("failed to update deployment after %d retries due to conflicts", maxRetries)
 }
 
 // StartFlusher periodically flushes accumulated usage to deployment annotations.
-func (t *UsageTracker) StartFlusher(ctx context.Context, clientset kubernetes.Interface, namespace string, logger *slog.Logger) {
+func (t *UsageTracker) StartFlusher(ctx context.Context, b *bundle.Bundle) {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			t.FlushToAnnotations(ctx, clientset, namespace, logger)
+			t.FlushToAnnotations(ctx, b)
 		case <-ctx.Done():
 			// Final flush on shutdown
-			t.FlushToAnnotations(context.Background(), clientset, namespace, logger)
+			t.FlushToAnnotations(context.Background(), b)
 			return
 		}
 	}

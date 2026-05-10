@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/llmgateway"
@@ -21,15 +20,12 @@ func newLLMGatewayHandler(ctx context.Context, b *bundle.Bundle) http.Handler {
 		})
 	}
 
-	llmAPIKey := os.Getenv("LLM_API_KEY")
-	llmAPIURL := os.Getenv("LLM_API_URL")
-
 	usage := llmgateway.NewUsageTracker()
-	gateway, err := llmgateway.NewGateway(b.Config.CookieConfig.SigningKey, llmAPIURL, llmAPIKey, usage, b.Log)
+	gateway, err := llmgateway.NewGateway(b, usage)
 	if err != nil {
 		log.Fatalf("Failed to create LLM gateway: %v", err)
 	}
-	go usage.StartFlusher(ctx, b.ClientSet, b.RuntimeEnvironment.Namespace, b.Log)
+	go usage.StartFlusher(ctx, b)
 	b.Log.Info("LLM gateway mounted on internal port :8082")
 	return gateway
 }

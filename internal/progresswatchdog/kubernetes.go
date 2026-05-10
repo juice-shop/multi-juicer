@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"strings"
 
+	"github.com/juice-shop/multi-juicer/internal/bundle"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes"
 )
 
 type CheatScoreEntry struct {
@@ -44,8 +43,8 @@ type UpdateProgressDeploymentDiffAnnotations struct {
 	CheatScores      string `json:"multi-juicer.owasp-juice.shop/cheatScores,omitempty"`
 }
 
-func PersistProgress(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace, team string, solvedChallenges []ChallengeStatus, cheatScores []CheatScoreEntry) {
-	log.Debug("Updating saved ContinueCode", "team", team)
+func PersistProgress(ctx context.Context, b *bundle.Bundle, team string, solvedChallenges []ChallengeStatus, cheatScores []CheatScoreEntry) {
+	b.Log.Debug("Updating saved ContinueCode", "team", team)
 
 	encodedSolvedChallenges, err := json.Marshal(solvedChallenges)
 	if err != nil {
@@ -60,7 +59,7 @@ func PersistProgress(ctx context.Context, log *slog.Logger, clientset kubernetes
 	if len(cheatScores) > 0 {
 		encodedCheatScores, err := json.Marshal(cheatScores)
 		if err != nil {
-			log.Error("failed to encode cheat scores", "team", team, "error", err)
+			b.Log.Error("failed to encode cheat scores", "team", team, "error", err)
 		} else {
 			annotations.CheatScores = string(encodedCheatScores)
 		}
@@ -77,8 +76,8 @@ func PersistProgress(ctx context.Context, log *slog.Logger, clientset kubernetes
 		panic("Could not encode json, to update ContinueCode and challengeSolved count on deployment")
 	}
 
-	_, err = clientset.AppsV1().Deployments(namespace).Patch(ctx, fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
+	_, err = b.ClientSet.AppsV1().Deployments(b.RuntimeEnvironment.Namespace).Patch(ctx, fmt.Sprintf("juiceshop-%s", team), types.MergePatchType, jsonBytes, v1.PatchOptions{})
 	if err != nil {
-		log.Error("failed to patch new ContinueCode into deployment", "team", team, "error", err)
+		b.Log.Error("failed to patch new ContinueCode into deployment", "team", team, "error", err)
 	}
 }

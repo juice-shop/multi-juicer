@@ -52,6 +52,13 @@ type Config struct {
 	CookieConfig          CookieConfig    `json:"cookie"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
+	Cleanup               CleanupConfig
+}
+
+type CleanupConfig struct {
+	// MaxInactive is the duration of inactivity after which a JuiceShop deployment is deleted.
+	// When zero the cleanup loop is disabled.
+	MaxInactive time.Duration
 }
 
 type AdminConfig struct {
@@ -73,6 +80,8 @@ type LLMConfig struct {
 	Enabled bool   `json:"enabled"`
 	Model   string `json:"model"`
 	ApiUrl  string `json:"apiUrl"`
+	// ApiKey is sourced from the LLM_API_KEY env var, never the JSON config.
+	ApiKey string `json:"-"`
 }
 
 type JuiceShopConfig struct {
@@ -245,6 +254,27 @@ func New() *Bundle {
 	config.CookieConfig.SigningKey = cookieSigningKey
 	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
 	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
+
+	if config.JuiceShopConfig.LLM.Enabled {
+		llmAPIKey := os.Getenv("LLM_API_KEY")
+		if llmAPIKey == "" {
+			panic(errors.New("environment variable 'LLM_API_KEY' must be set when juiceShop.llm.enabled is true"))
+		}
+		llmAPIURL := os.Getenv("LLM_API_URL")
+		if llmAPIURL == "" {
+			panic(errors.New("environment variable 'LLM_API_URL' must be set when juiceShop.llm.enabled is true"))
+		}
+		config.JuiceShopConfig.LLM.ApiKey = llmAPIKey
+		config.JuiceShopConfig.LLM.ApiUrl = llmAPIURL
+	}
+
+	if maxInactiveString := os.Getenv("MAX_INACTIVE_DURATION"); maxInactiveString != "" {
+		maxInactive, err := time.ParseDuration(maxInactiveString)
+		if err != nil {
+			panic(fmt.Errorf("could not parse MAX_INACTIVE_DURATION %q: %w", maxInactiveString, err))
+		}
+		config.Cleanup.MaxInactive = maxInactive
+	}
 
 	// read /challenges.json file
 	challengesBytes, err := os.ReadFile("/challenges.json")
