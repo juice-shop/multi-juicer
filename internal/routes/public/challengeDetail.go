@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"sort"
-	"strings"
 	"time"
 
 	b "github.com/juice-shop/multi-juicer/internal/bundle"
@@ -70,15 +69,12 @@ func handleChallengeDetail(bundle *b.Bundle) http.Handler {
 		// 3. Sort the solves by time to show "First Solve" first.
 		sort.Sort(solves)
 
-		description := strings.ReplaceAll(targetChallenge.Description, "<i class=\"far fa-gem\"></i>", "💎")
-		description = strings.ReplaceAll(description, "<i class=\"fab fa-btc fa-sm\"></i>", "💰")
-
 		// 4. Construct and send the response.
 		response := ChallengeDetailResponse{
 			Key:         targetChallenge.Key,
 			Name:        targetChallenge.Name,
 			Category:    targetChallenge.Category,
-			Description: description,
+			Description: targetChallenge.Description,
 			Difficulty:  targetChallenge.Difficulty,
 			Solves:      solves,
 		}

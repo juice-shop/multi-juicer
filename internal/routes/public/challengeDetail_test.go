@@ -100,46 +100,4 @@ func TestChallengeDetailHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusNotFound, rr.Code)
 	})
-
-	t.Run("should replace gem icon HTML with emoji in description", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges/gemIconChallenge", nil)
-		rr := httptest.NewRecorder()
-		server.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response ChallengeDetailResponse
-		err := json.Unmarshal(rr.Body.Bytes(), &response)
-		require.NoError(t, err)
-
-		assert.Equal(t, "Find the hidden 💎 in the application.", response.Description)
-	})
-
-	t.Run("should replace btc icon HTML with emoji in description", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges/btcIconChallenge", nil)
-		rr := httptest.NewRecorder()
-		server.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response ChallengeDetailResponse
-		err := json.Unmarshal(rr.Body.Bytes(), &response)
-		require.NoError(t, err)
-
-		assert.Equal(t, "Earn 💰 by solving this challenge.", response.Description)
-	})
-
-	t.Run("should replace both icon types in a single description", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges/bothIconsChallenge", nil)
-		rr := httptest.NewRecorder()
-		server.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response ChallengeDetailResponse
-		err := json.Unmarshal(rr.Body.Bytes(), &response)
-		require.NoError(t, err)
-
-		assert.Equal(t, "Get 💎 and 💰 rewards!", response.Description)
-	})
 }
