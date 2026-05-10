@@ -42,7 +42,7 @@ func main() {
 
 	ctx := context.Background()
 
-	go StartMetricsServer()
+	go StartMetricsServer(b.Log)
 	scoringService.CalculateAndCacheScoreBoard(ctx)
 	go scoringService.StartingScoringWorker(ctx)
 	go notificationService.StartNotificationWatcher(ctx)
@@ -122,9 +122,10 @@ func StartInternalServer(handler http.Handler, logger *slog.Logger) {
 	}
 }
 
-func StartMetricsServer() {
+func StartMetricsServer(logger *slog.Logger) {
 	metricsRouter := http.NewServeMux()
 	metricsRouter.Handle("GET /balancer/metrics", promhttp.Handler())
+	logger.Info("Starting metrics server on :8081")
 	metricServer := &http.Server{
 		Addr:    ":8081",
 		Handler: metricsRouter,
