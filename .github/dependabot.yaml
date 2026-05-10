@@ -13,7 +13,7 @@ updates:
           - "*"
 
   - package-ecosystem: "npm"
-    directory: "/ui"
+    directory: "/"
     schedule:
       interval: "weekly"
     commit-message:

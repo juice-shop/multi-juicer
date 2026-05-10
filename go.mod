@@ -2,6 +2,8 @@ module github.com/juice-shop/multi-juicer
 
 go 1.26.0
 
+ignore ./node_modules
+
 require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/speps/go-hashids/v2 v2.0.1

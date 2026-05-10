@@ -68,35 +68,30 @@ tasks:
       - "npm ls --depth=0" # will return an error if node_modules is not installed
     cmds:
       - npm ci --ignore-scripts
-    dir: ui/
 
   ui:build:
     deps:
       - ui:install-dependencies
     cmds:
       - npm run build
-    dir: ui/
 
   ui:lint:
     deps:
       - ui:install-dependencies
     cmds:
       - npm run lint
-    dir: ui/
 
   ui:lint:fix:
     deps:
       - ui:install-dependencies
     cmds:
       - npm run lint:fix
-    dir: ui/
 
   ui:bundle-analyzer:
     deps:
       - ui:install-dependencies
     cmds:
       - npx vite-bundle-visualizer
-    dir: ui/
 
   ui:test:
     deps:
@@ -110,7 +105,6 @@ tasks:
           else
             npm test -- --run
           fi
-    dir: ui/
 
   go:test:
     preconditions:

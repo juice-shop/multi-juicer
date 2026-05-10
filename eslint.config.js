@@ -8,7 +8,7 @@ import globals from "globals";
 export default [
   eslint.configs.recommended,
   {
-    ignores: ["build/**", "node_modules/**", "dist/**"],
+    ignores: ["ui/build/**", "node_modules/**", "ui/dist/**"],
   },
   {
     files: ["**/*.{ts,tsx}"],
@@ -82,7 +82,7 @@ export default [
       "import/resolver": {
         typescript: {
           alwaysTryTypes: true,
-          project: "./tsconfig.app.json",
+          project: "./ui/tsconfig.app.json",
         },
       },
       "import/internal-regex": "^@/",

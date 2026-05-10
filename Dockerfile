@@ -18,10 +18,11 @@ RUN chmod +x /out/balancer
 
 FROM --platform=$BUILDPLATFORM docker.io/library/node:24-alpine AS ui
 WORKDIR /home/app
-COPY ui/package.json ui/package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --ignore-scripts
-COPY ui/ ./
+COPY tsconfig.json eslint.config.js .prettierrc ./
+COPY ui/ ./ui/
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/home/app/node_modules/.vite \
     npm run build
@@ -35,6 +36,6 @@ RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challen
 
 FROM gcr.io/distroless/static:nonroot
 COPY --from=challenges-json --chown=root:root --chmod=755 /workdir/challenges.json /challenges.json
-COPY --from=ui --chown=root:root --chmod=755 /home/app/build/ /public/
+COPY --from=ui --chown=root:root --chmod=755 /home/app/ui/build/ /public/
 COPY --from=builder --chown=root:root --chmod=755 /out/balancer /balancer
 CMD ["/balancer"]
