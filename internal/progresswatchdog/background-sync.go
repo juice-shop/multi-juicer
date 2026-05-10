@@ -49,7 +49,7 @@ type JuiceShopChallenge struct {
 }
 
 // StartBackgroundSync runs the JuiceShop progress reconciliation loop. It blocks until ctx is cancelled.
-// It must run on at most one balancer replica at a time (gated via leader election).
+// It must run on at most one multi-juicer replica at a time (gated via leader election).
 func StartBackgroundSync(ctx context.Context, b *bundle.Bundle) {
 	b.Log.Info("Starting background-sync looking for JuiceShop challenge progress changes", "workers", workerCount)
 

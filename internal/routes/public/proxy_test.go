@@ -42,7 +42,7 @@ func TestProxyHandler(t *testing.T) {
 	unreadyDeployment := readyDeployment.DeepCopy()
 	unreadyDeployment.Status.ReadyReplicas = 0
 
-	t.Run("redirects to /balancer when the balancer cookie is missing", func(t *testing.T) {
+	t.Run("redirects to /multi-juicer when the team cookie is missing", func(t *testing.T) {
 		defer clearInstanceUpCache()
 		req, _ := http.NewRequest("POST", "/hello-world", nil)
 		rr := httptest.NewRecorder()
@@ -55,12 +55,12 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Result().StatusCode)
-		assert.Equal(t, "/balancer", rr.Header().Get("Location"))
-		assert.Equal(t, "balancer=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict", rr.Header().Get("Set-Cookie"))
+		assert.Equal(t, "/multi-juicer", rr.Header().Get("Location"))
+		assert.Equal(t, "team=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict", rr.Header().Get("Set-Cookie"))
 		assert.Empty(t, rr.Body.String())
 	})
 
-	t.Run("redirects to /balancer and sets Secure on cookie when configured", func(t *testing.T) {
+	t.Run("redirects to /multi-juicer and sets Secure on cookie when configured", func(t *testing.T) {
 		defer clearInstanceUpCache()
 		req, _ := http.NewRequest("POST", "/hello-world", nil)
 		rr := httptest.NewRecorder()
@@ -74,12 +74,12 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Result().StatusCode)
-		assert.Equal(t, "/balancer", rr.Header().Get("Location"))
-		assert.Equal(t, "balancer=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict", rr.Header().Get("Set-Cookie"))
+		assert.Equal(t, "/multi-juicer", rr.Header().Get("Location"))
+		assert.Equal(t, "team=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict", rr.Header().Get("Set-Cookie"))
 		assert.Empty(t, rr.Body.String())
 	})
 
-	t.Run("redirects to /balancer when the balancer cookie is signed with another secret", func(t *testing.T) {
+	t.Run("redirects to /multi-juicer when the team cookie is signed with another secret", func(t *testing.T) {
 		defer clearInstanceUpCache()
 		req, _ := http.NewRequest("POST", "/hello-world", nil)
 		invalidlySignedTeam, err := signutil.Sign("invalid-team", "this-isn't-the-right-secret")
@@ -96,7 +96,7 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Result().StatusCode)
-		assert.Equal(t, "/balancer", rr.Header().Get("Location"))
+		assert.Equal(t, "/multi-juicer", rr.Header().Get("Location"))
 		assert.Empty(t, rr.Body.String())
 	})
 
@@ -167,7 +167,7 @@ func TestProxyHandler(t *testing.T) {
 		)
 	})
 
-	t.Run("redirects to /balancer?msg=instance-restarting when the instance isn't ready", func(t *testing.T) {
+	t.Run("redirects to /multi-juicer?msg=instance-restarting when the instance isn't ready", func(t *testing.T) {
 		defer clearInstanceUpCache()
 		req, _ := http.NewRequest("POST", "/hello-world", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
@@ -192,10 +192,10 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Code)
-		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-restarting&team=%s", teamFoo), rr.Header().Get("Location"))
+		assert.Equal(t, fmt.Sprintf("/multi-juicer/?msg=instance-restarting&team=%s", teamFoo), rr.Header().Get("Location"))
 		assert.Empty(t, rr.Body.String())
 	})
-	t.Run("redirects to /balancer?msg=instance-not-found when the deployment doesn't exist", func(t *testing.T) {
+	t.Run("redirects to /multi-juicer?msg=instance-not-found when the deployment doesn't exist", func(t *testing.T) {
 		defer clearInstanceUpCache()
 		req, _ := http.NewRequest("POST", "/hello-world", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
@@ -220,7 +220,7 @@ func TestProxyHandler(t *testing.T) {
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Code)
-		assert.Equal(t, fmt.Sprintf("/balancer/?msg=instance-not-found&team=%s", teamFoo), rr.Header().Get("Location"))
+		assert.Equal(t, fmt.Sprintf("/multi-juicer/?msg=instance-not-found&team=%s", teamFoo), rr.Header().Get("Location"))
 		assert.Empty(t, rr.Body.String())
 	})
 }

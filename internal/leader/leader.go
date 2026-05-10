@@ -11,9 +11,9 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 )
 
-const leaseName = "multi-juicer-balancer-leader"
+const leaseName = "multi-juicer-leader"
 
-// Run blocks acquiring/holding the multi-juicer balancer lease. onStartedLeading runs in a goroutine
+// Run blocks acquiring/holding the multi-juicer leader lease. onStartedLeading runs in a goroutine
 // once leadership is acquired; the ctx it receives is cancelled the moment leadership is lost so
 // background workers can shut down cleanly.
 func Run(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, namespace, identity string, onStartedLeading func(context.Context)) {
@@ -36,11 +36,11 @@ func Run(ctx context.Context, log *slog.Logger, clientset kubernetes.Interface, 
 		RetryPeriod:     5 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(leaderCtx context.Context) {
-				log.Info("Acquired balancer leader lease", "identity", identity)
+				log.Info("Acquired leader lease", "identity", identity)
 				onStartedLeading(leaderCtx)
 			},
 			OnStoppedLeading: func() {
-				log.Info("Lost balancer leader lease", "identity", identity)
+				log.Info("Lost leader lease", "identity", identity)
 			},
 			OnNewLeader: func(current string) {
 				if current != identity {

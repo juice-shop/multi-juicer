@@ -61,7 +61,7 @@ func TestChallengesHandler(t *testing.T) {
 		bundle.ScoringService = scoringService
 		AddRoutes(server, bundle)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -120,7 +120,7 @@ func TestChallengesHandler(t *testing.T) {
 		bundle.ScoringService = scoringService
 		AddRoutes(server, bundle)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -155,7 +155,7 @@ func TestChallengesHandler(t *testing.T) {
 		bundle.ScoringService = scoringService
 		AddRoutes(server, bundle)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -187,7 +187,7 @@ func TestChallengesHandler(t *testing.T) {
 		bundle.ScoringService = scoringService
 		AddRoutes(server, bundle)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 
@@ -257,7 +257,7 @@ func TestChallengesHandler(t *testing.T) {
 		bundle.ScoringService = scoringService
 		AddRoutes(server, bundle)
 
-		req, _ := http.NewRequest("GET", "/balancer/api/challenges", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/challenges", nil)
 		rr := httptest.NewRecorder()
 		server.ServeHTTP(rr, req)
 

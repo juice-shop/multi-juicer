@@ -23,8 +23,8 @@ async function fetchNotification(
   signal?: AbortSignal
 ): Promise<FetchResult<NotificationData>> {
   const url = lastSeen
-    ? `/balancer/api/notifications?wait-for-update-after=${lastSeen.toISOString()}`
-    : "/balancer/api/notifications";
+    ? `/multi-juicer/api/notifications?wait-for-update-after=${lastSeen.toISOString()}`
+    : "/multi-juicer/api/notifications";
 
   const response = await fetch(url, { signal });
 

@@ -28,7 +28,7 @@ Once the pod is up the waiting screen flips to a "ready" state with a **Start Ha
 
 ## 5. Playing JuiceShop
 
-After clicking **Start Hacking** the participant lands in their personal JuiceShop. From here on they use JuiceShop normally — the MultiJuicer LoadBalancer transparently routes their traffic to the right instance.
+After clicking **Start Hacking** the participant lands in their personal JuiceShop. From here on they use JuiceShop normally — the MultiJuicer proxy transparently routes their traffic to the right instance.
 
 ![OWASP Juice Shop landing page rendered inside the participant's instance, showing the product catalog with apple juice, banana juice and other items, plus the JuiceShop navigation bar at the top.](../../images/screenshots/user-flow-5-finished-logging-in-using-juiceshop.webp)
 

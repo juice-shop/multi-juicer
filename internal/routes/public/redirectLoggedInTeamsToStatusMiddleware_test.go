@@ -21,7 +21,7 @@ func TestRedirectLoggedInTeamsToStatus(t *testing.T) {
 			w.Write([]byte("normal handler"))
 		}))
 
-		req, _ := http.NewRequest("GET", "/balancer", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer", nil)
 		rr := httptest.NewRecorder()
 
 		handler.ServeHTTP(rr, req)
@@ -37,12 +37,12 @@ func TestRedirectLoggedInTeamsToStatus(t *testing.T) {
 			w.Write([]byte("normal handler"))
 		}))
 
-		req, _ := http.NewRequest("GET", "/balancer", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
 		rr := httptest.NewRecorder()
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusFound, rr.Code)
-		assert.Equal(t, "/balancer/teams/foo/status", rr.Header().Get("Location"))
+		assert.Equal(t, "/multi-juicer/teams/foo/status", rr.Header().Get("Location"))
 	})
 }

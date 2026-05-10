@@ -24,7 +24,7 @@ type Bundle struct {
 	ClientSet          kubernetes.Interface
 	// generates a random passcode. On the bundle to have a static passcode in tests for easier assertions
 	GeneratePasscode func() string
-	// returns the (cluster internal) url for a team used by the balancer to proxy the request to. On the bundle to allow the tests to proxy requests to a local testing server
+	// returns the (cluster internal) url for a team used by the proxy to forward the request to. On the bundle to allow the tests to proxy requests to a local testing server
 	GetJuiceShopUrlForTeam func(team string, bundle *Bundle) string
 	BcryptRounds           int
 	StaticAssetsDirectory  string `json:"staticAssetsDirectory"`

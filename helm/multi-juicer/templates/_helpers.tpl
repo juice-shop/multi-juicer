@@ -25,17 +25,17 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-balancer labels
+multi-juicer labels
 */}}
-{{- define "multi-juicer.balancer.labels" -}}
-{{ include "multi-juicer.balancer.selectorLabels" . }}
+{{- define "multi-juicer.labels" -}}
+{{ include "multi-juicer.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-app.kubernetes.io/component: load-balancer
+app.kubernetes.io/component: multi-juicer
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
-{{- define "multi-juicer.balancer.selectorLabels" -}}
-app.kubernetes.io/name: balancer
-app.kubernetes.io/instance: balancer-{{ .Release.Name }}
+{{- define "multi-juicer.selectorLabels" -}}
+app.kubernetes.io/name: multi-juicer
+app.kubernetes.io/instance: multi-juicer-{{ .Release.Name }}
 app.kubernetes.io/part-of: multi-juicer
 {{- end -}}
 
@@ -52,9 +52,9 @@ app.kubernetes.io/part-of: multi-juicer
 {{- end -}}
 
 {{- define "multi-juicer.cookieName" -}}
-{{- if .Values.balancer.cookie.secure -}}
-{{- printf "__Secure-%s" .Values.balancer.cookie.name -}}
+{{- if .Values.cookie.secure -}}
+{{- printf "__Secure-%s" .Values.cookie.name -}}
 {{- else -}}
-{{- printf "%s" .Values.balancer.cookie.name -}}
+{{- printf "%s" .Values.cookie.name -}}
 {{- end -}}
 {{- end -}}

@@ -55,7 +55,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 	}
 
 	t.Run("listing instances requires admin login", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/admin/all", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("some team")))
 		rr := httptest.NewRecorder()
 
@@ -72,7 +72,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 	})
 
 	t.Run("lists all juice shop instances", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/admin/all", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 
@@ -113,7 +113,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 	})
 
 	t.Run("includes cheat scores when available", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/admin/all", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 
@@ -171,7 +171,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 	})
 
 	t.Run("handles invalid cheat score JSON gracefully", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/admin/all", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 
@@ -200,7 +200,7 @@ func TestAdminListInstanceshandler(t *testing.T) {
 	})
 
 	t.Run("handles empty cheat scores array", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/admin/all", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/admin/all", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 

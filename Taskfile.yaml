@@ -6,11 +6,11 @@ tasks:
     aliases: [d]
     desc: |
       Builds and Deploys MultiJuicer to the default kubernetes context.
-      Then forwards the balancer service to localhost:8080
+      Then forwards the multi-juicer service to localhost:8080
     cmds:
       - task: build-and-deploy
-      - kubectl rollout status deployment balancer
-      - kubectl port-forward deployment/balancer 8080:8080
+      - kubectl rollout status deployment multi-juicer
+      - kubectl port-forward deployment/multi-juicer 8080:8080
 
   build-and-deploy:
     desc: |
@@ -20,15 +20,15 @@ tasks:
     vars:
       VERSION: '{{uuid}}'
     cmds:
-      - docker build --progress quiet -t local/balancer:{{.VERSION}} .
+      - docker build --progress quiet -t local/multi-juicer:{{.VERSION}} .
       - if: '[ $(kubectl config current-context) == "kind-kind" ]'
-        cmd: kind load docker-image "local/balancer:{{.VERSION}}"
+        cmd: kind load docker-image "local/multi-juicer:{{.VERSION}}"
       - |
         helm upgrade --install multi-juicer ./helm/multi-juicer \
           --set="imagePullPolicy=IfNotPresent" \
-          --set="balancer.repository=local/balancer" \
-          --set="balancer.tag={{.VERSION}}" \
-          --set="balancer.cookie.cookieParserSecret=dev-secret"
+          --set="repository=local/multi-juicer" \
+          --set="tag={{.VERSION}}" \
+          --set="cookie.cookieParserSecret=dev-secret"
 
   build:
     aliases: [b]

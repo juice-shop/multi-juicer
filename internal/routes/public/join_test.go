@@ -45,21 +45,21 @@ func TestJoinHandler(t *testing.T) {
 		}
 	}
 
-	balancerDeployment := &appsv1.Deployment{
+	multiJuicerDeployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "balancer",
+			Name:      "multi-juicer",
 			Namespace: "test-namespace",
 			UID:       "34c0bb8a-240b-4f2a-84ae-2eb2258298f9",
 		},
 	}
 
 	t.Run("creates a deployment and service on join", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewClientset(balancerDeployment)
+		clientset := fake.NewClientset(multiJuicerDeployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -81,7 +81,7 @@ func TestJoinHandler(t *testing.T) {
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
 		actionCounter++
 
-		// then get the deployment uid of the balancer
+		// then get the deployment uid of multi-juicer
 		assert.Equal(t, "get", actions[actionCounter].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
 		actionCounter++
@@ -105,7 +105,7 @@ func TestJoinHandler(t *testing.T) {
 			{
 				APIVersion:         "apps/v1",
 				Kind:               "Deployment",
-				Name:               "balancer",
+				Name:               "multi-juicer",
 				UID:                "34c0bb8a-240b-4f2a-84ae-2eb2258298f9",
 				Controller:         &truePointer,
 				BlockOwnerDeletion: &truePointer,
@@ -128,12 +128,12 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("set secure flag on team cookie when configured", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewClientset(balancerDeployment)
+		clientset := fake.NewClientset(multiJuicerDeployment)
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		bundle.Config.CookieConfig.Secure = true
@@ -146,13 +146,13 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("refuses to create a team if max instances limit is reached", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
 		clientset := fake.NewClientset(
-			balancerDeployment,
+			multiJuicerDeployment,
 			createTeam("team-1"),
 			createTeam("team-2"),
 			createTeam("team-3"),
@@ -181,7 +181,7 @@ func TestJoinHandler(t *testing.T) {
 			"fooooooooooooooooooooooooooooo",
 		}
 		for _, team := range invalidTeamnames {
-			req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
 			rr := httptest.NewRecorder()
 			server.ServeHTTP(rr, req)
 			assert.Equal(t, http.StatusBadRequest, rr.Code, fmt.Sprintf("expected status code 400 for teamname '%s'", team))
@@ -189,12 +189,12 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("if team already exists then join requires a passcode", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewClientset(balancerDeployment, createTeam(team))
+		clientset := fake.NewClientset(multiJuicerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -207,12 +207,12 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("is able to join team when the requests includes a correct passcode", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "02101791"})
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewClientset(balancerDeployment, createTeam(team))
+		clientset := fake.NewClientset(multiJuicerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -225,12 +225,12 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("join is rejected when the passcode doesn't match", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "00000000"})
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewClientset(balancerDeployment, createTeam(team))
+		clientset := fake.NewClientset(multiJuicerDeployment, createTeam(team))
 
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
@@ -243,7 +243,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("allows admins login with the correct passcode", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
-		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -258,7 +258,7 @@ func TestJoinHandler(t *testing.T) {
 	})
 
 	t.Run("admin login returns usual 'requires auth' response when it get's no request body passed", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", nil)
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -274,7 +274,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("admin account requires the correct passcod", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "wrong-password"})
-		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -290,12 +290,12 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("admin login doesn't make any kubernetes api calls / creates not kubernetes resources", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
-		req, _ := http.NewRequest("POST", "/balancer/api/teams/admin/join", bytes.NewReader(jsonPayload))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", bytes.NewReader(jsonPayload))
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
 
-		clientset := fake.NewClientset(balancerDeployment)
+		clientset := fake.NewClientset(multiJuicerDeployment)
 		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
 		AddRoutes(server, bundle)
 

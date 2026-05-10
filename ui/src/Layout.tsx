@@ -92,7 +92,7 @@ function PasscodeResetMenuItem({
 
     setIsResetting(true);
     try {
-      const response = await fetch("/balancer/api/teams/reset-passcode", {
+      const response = await fetch("/multi-juicer/api/teams/reset-passcode", {
         method: "POST",
       });
       const data = await response.json();
@@ -166,7 +166,7 @@ function LogoutMenuItem({
     try {
       setActiveTeam(null);
       setIsLoggingOut(true);
-      await fetch("/balancer/api/teams/logout", {
+      await fetch("/multi-juicer/api/teams/logout", {
         method: "POST",
       });
       setIsLoggingOut(false);
@@ -399,7 +399,7 @@ export function Layout({
           >
             <Link to={primaryBackLink} className="flex items-center gap-3">
               <img
-                src="/balancer/multi-juicer.svg"
+                src="/multi-juicer/multi-juicer.svg"
                 alt="MultiJuicer Logo"
                 className="h-12"
               />

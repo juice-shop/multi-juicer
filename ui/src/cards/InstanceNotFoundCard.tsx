@@ -6,7 +6,7 @@ export const InstanceNotFoundCard = () => {
   return (
     <Card className="flex items-center p-4 bg-white shadow-md rounded-md mb-3">
       <img
-        src="/balancer/icons/warning.svg"
+        src="/multi-juicer/icons/warning.svg"
         alt="Warning"
         className="h-12 w-auto mr-3"
       />

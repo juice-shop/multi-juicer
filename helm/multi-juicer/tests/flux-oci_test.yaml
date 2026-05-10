@@ -6,9 +6,9 @@ suite: OCI & Flux Version Compliance
 # Docker tags (which cannot contain "+").
 
 tests:
-  - it: balancer should use Chart.AppVersion for image tag even when Chart.Version has build metadata
+  - it: multi-juicer should use Chart.AppVersion for image tag even when Chart.Version has build metadata
     templates:
-      - templates/balancer/deployment.yaml
+      - templates/deployment.yaml
 
     # Simulate Flux behavior: Chart.Version has build metadata, but AppVersion doesn't
     chart:
@@ -19,4 +19,4 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: "ghcr.io/juice-shop/multi-juicer/balancer:v8.3.0"
+          value: "ghcr.io/juice-shop/multi-juicer/multi-juicer:v8.3.0"

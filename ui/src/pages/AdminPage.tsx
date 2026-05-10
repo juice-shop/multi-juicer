@@ -47,7 +47,7 @@ function RestartInstanceButton({ team }: { team: string }) {
     try {
       await Promise.all([
         sleep(3000), // wait at least 3 seconds to signal to the user that the restart is happening, restart takes longer than the delete
-        fetch(`/balancer/api/admin/teams/${team}/restart`, {
+        fetch(`/multi-juicer/api/admin/teams/${team}/restart`, {
           method: "POST",
         }),
       ]);
@@ -85,7 +85,7 @@ function DeleteInstanceButton({ team }: { team: string }) {
     try {
       await Promise.all([
         sleep(3000), // wait at least 3 seconds to signal to the user that the delete is happening
-        fetch(`/balancer/api/admin/teams/${team}/delete`, {
+        fetch(`/multi-juicer/api/admin/teams/${team}/delete`, {
           method: "DELETE",
         }),
       ]);
@@ -127,7 +127,7 @@ function TeamActionMenu({ team }: { team: string }) {
     setResetting(true);
     try {
       const response = await fetch(
-        `/balancer/api/admin/teams/${team}/reset-passcode`,
+        `/multi-juicer/api/admin/teams/${team}/reset-passcode`,
         { method: "POST" }
       );
 
@@ -287,7 +287,7 @@ interface TeamRaw {
 }
 
 async function fetchAdminData(signal?: AbortSignal): Promise<Team[]> {
-  const response = await fetch(`/balancer/api/admin/all`, { signal });
+  const response = await fetch(`/multi-juicer/api/admin/all`, { signal });
   if (!response.ok) {
     throw new Error("Failed to fetch current teams");
   }

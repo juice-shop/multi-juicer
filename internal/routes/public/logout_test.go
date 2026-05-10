@@ -11,8 +11,8 @@ import (
 )
 
 func TestLogoutHandler(t *testing.T) {
-	t.Run("logout unsets the balancer cookie", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/api/teams/logout", nil)
+	t.Run("logout unsets the team cookie", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/logout", nil)
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
 

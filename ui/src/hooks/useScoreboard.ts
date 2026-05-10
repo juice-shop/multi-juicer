@@ -23,8 +23,8 @@ async function fetchScoreboard(
   signal?: AbortSignal
 ): Promise<FetchResult<TeamScore[]>> {
   const url = lastSeen
-    ? `/balancer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
-    : "/balancer/api/score-board/top";
+    ? `/multi-juicer/api/score-board/top?wait-for-update-after=${lastSeen.toISOString()}`
+    : "/multi-juicer/api/score-board/top";
 
   const response = await fetch(url, { signal });
 

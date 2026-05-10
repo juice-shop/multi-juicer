@@ -10,13 +10,13 @@ import (
 func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	// these routes should serve the index.html file and let the frontend handle the routing
 	frontendRoutePatterns := []*regexp.Regexp{
-		regexp.MustCompile("/balancer/admin"),
-		regexp.MustCompile("/balancer/teams/" + teamNamePatternString + "/status"),
-		regexp.MustCompile("/balancer/teams/" + teamNamePatternString + "/joining"),
-		regexp.MustCompile("/balancer/score-overview"),
-		regexp.MustCompile("/balancer/score-overview/teams/" + teamNamePatternString),
-		regexp.MustCompile("/balancer/score-overview/challenges/" + teamNamePatternString),
-		regexp.MustCompile("/balancer/ctf"),
+		regexp.MustCompile("/multi-juicer/admin"),
+		regexp.MustCompile("/multi-juicer/teams/" + teamNamePatternString + "/status"),
+		regexp.MustCompile("/multi-juicer/teams/" + teamNamePatternString + "/joining"),
+		regexp.MustCompile("/multi-juicer/score-overview"),
+		regexp.MustCompile("/multi-juicer/score-overview/teams/" + teamNamePatternString),
+		regexp.MustCompile("/multi-juicer/score-overview/challenges/" + teamNamePatternString),
+		regexp.MustCompile("/multi-juicer/ctf"),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +31,6 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 			}
 		}
 
-		http.StripPrefix("/balancer", http.FileServer(http.Dir(bundle.StaticAssetsDirectory))).ServeHTTP(w, r)
+		http.StripPrefix("/multi-juicer", http.FileServer(http.Dir(bundle.StaticAssetsDirectory))).ServeHTTP(w, r)
 	})
 }

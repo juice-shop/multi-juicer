@@ -20,7 +20,7 @@ export const JoiningPage = ({
     try {
       setFailed(false);
       setIsJoining(true);
-      const response = await fetch(`/balancer/api/teams/${team}/join`, {
+      const response = await fetch(`/multi-juicer/api/teams/${team}/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

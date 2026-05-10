@@ -49,7 +49,7 @@ export function ClockManager() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetch("/balancer/api/notifications")
+    fetch("/multi-juicer/api/notifications")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.endDate) {
@@ -82,7 +82,7 @@ export function ClockManager() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/balancer/api/admin/clock", {
+      const response = await fetch("/multi-juicer/api/admin/clock", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +119,7 @@ export function ClockManager() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/balancer/api/admin/clock", {
+      const response = await fetch("/multi-juicer/api/admin/clock", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

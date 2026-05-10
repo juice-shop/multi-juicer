@@ -22,7 +22,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 	team := "foobar"
 
 	t.Run("admin reset passcode updates the saved passcode of the deployment", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		req.SetPathValue("team", team)
 		rr := httptest.NewRecorder()
@@ -74,7 +74,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 	})
 
 	t.Run("admin reset passcode requires admin cookie", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		req.SetPathValue("team", team)
 		rr := httptest.NewRecorder()
@@ -92,7 +92,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 	})
 
 	t.Run("admin reset passcode requires a signed team cookie", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", team), nil)
 		req.SetPathValue("team", team)
 		rr := httptest.NewRecorder()
 
@@ -110,7 +110,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 
 	t.Run("admin reset passcode validates team name", func(t *testing.T) {
 		invalidTeam := "invalid team name!" //spaces present in team name
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", invalidTeam), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", invalidTeam), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		req.SetPathValue("team", invalidTeam)
 		rr := httptest.NewRecorder()
@@ -128,7 +128,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 	})
 
 	t.Run("admin reset passcode returns 500 when kubernetes patch fails", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		req.SetPathValue("team", team)
 		rr := httptest.NewRecorder()
@@ -163,7 +163,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 	})
 
 	t.Run("admin reset passcode returns 404 when team deployment does not exist", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/balancer/api/admin/teams/%s/reset-passcode", team), nil)
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", team), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		req.SetPathValue("team", team)
 		rr := httptest.NewRecorder()

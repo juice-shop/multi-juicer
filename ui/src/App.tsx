@@ -21,7 +21,7 @@ interface SimplifiedTeamStatusResponse {
 }
 
 async function fetchTeamStatusData(): Promise<SimplifiedTeamStatusResponse | null> {
-  const response = await fetch(`/balancer/api/teams/me/status`);
+  const response = await fetch(`/multi-juicer/api/teams/me/status`);
   if (!response.ok) {
     return null;
   }
@@ -92,7 +92,7 @@ function App() {
 
   return (
     <IntlProvider defaultLocale="en" locale={locale} messages={messages}>
-      <BrowserRouter basename="/balancer">
+      <BrowserRouter basename="/multi-juicer">
         <Routes>
           <Route
             path="/ctf"

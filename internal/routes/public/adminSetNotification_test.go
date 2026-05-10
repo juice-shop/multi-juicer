@@ -25,7 +25,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		}
 		bodyBytes, _ := json.Marshal(requestBody)
 
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(bodyBytes))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(bodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("some-team")))
 		rr := httptest.NewRecorder()
@@ -49,7 +49,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		}
 		bodyBytes, _ := json.Marshal(requestBody)
 
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(bodyBytes))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(bodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
@@ -93,7 +93,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 			Enabled: true,
 		}
 		bodyBytes1, _ := json.Marshal(requestBody1)
-		req1, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(bodyBytes1))
+		req1, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(bodyBytes1))
 		req1.Header.Set("Content-Type", "application/json")
 		req1.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr1 := httptest.NewRecorder()
@@ -110,7 +110,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 			Enabled: false,
 		}
 		bodyBytes2, _ := json.Marshal(requestBody2)
-		req2, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(bodyBytes2))
+		req2, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(bodyBytes2))
 		req2.Header.Set("Content-Type", "application/json")
 		req2.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr2 := httptest.NewRecorder()
@@ -143,7 +143,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		}
 		bodyBytes, _ := json.Marshal(requestBody)
 
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(bodyBytes))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(bodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
@@ -162,7 +162,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 	})
 
 	t.Run("handles invalid JSON", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBufferString("invalid json"))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBufferString("invalid json"))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
@@ -188,7 +188,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 		// First, set an endDate via the clock endpoint
 		futureDate := time.Now().Add(2 * time.Hour)
 		clockBody, _ := json.Marshal(AdminClockRequest{EndDate: &futureDate})
-		clockReq, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBuffer(clockBody))
+		clockReq, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBuffer(clockBody))
 		clockReq.Header.Set("Content-Type", "application/json")
 		clockReq.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		clockRR := httptest.NewRecorder()
@@ -200,7 +200,7 @@ func TestAdminPostNotificationHandler(t *testing.T) {
 
 		// Now set a notification
 		notifBody, _ := json.Marshal(AdminNotificationRequest{Message: "Hello", Enabled: true})
-		notifReq, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(notifBody))
+		notifReq, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(notifBody))
 		notifReq.Header.Set("Content-Type", "application/json")
 		notifReq.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		notifRR := httptest.NewRecorder()

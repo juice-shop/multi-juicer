@@ -68,7 +68,7 @@ func (t *UsageTracker) FlushToAnnotations(ctx context.Context, b *bundle.Bundle)
 }
 
 // updateTeamAnnotations uses optimistic concurrency (read resourceVersion, retry on conflict)
-// to safely increment token counters even when multiple balancer replicas are running.
+// to safely increment token counters even when multiple multi-juicer replicas are running.
 func (t *UsageTracker) updateTeamAnnotations(ctx context.Context, b *bundle.Bundle, team string, delta *TeamUsage) error {
 	deploymentName := fmt.Sprintf("juiceshop-%s", team)
 	namespace := b.RuntimeEnvironment.Namespace

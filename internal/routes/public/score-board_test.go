@@ -40,7 +40,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		}
 	}
 	t.Run("lists teams and calculates the score", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/score-board/top", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -79,7 +79,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("should only include the top 24 teams", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/score-board/top", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -132,7 +132,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		AddRoutes(server, bundle)
 
 		// Request with a timestamp in the past - should return immediately since data is newer
-		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top?wait-for-update-after=2024-01-01T00:00:00Z", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/score-board/top?wait-for-update-after=2024-01-01T00:00:00Z", nil)
 		rr := httptest.NewRecorder()
 
 		server.ServeHTTP(rr, req)
@@ -159,7 +159,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		AddRoutes(server, bundle)
 
 		// Request with a timestamp in the future - should timeout after 25 seconds
-		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top?wait-for-update-after=2099-01-01T00:00:00Z", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/score-board/top?wait-for-update-after=2099-01-01T00:00:00Z", nil)
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 		req = req.WithContext(ctx)
@@ -200,7 +200,7 @@ func TestScoreBoardHandler(t *testing.T) {
 		errorChan := make(chan error)
 		go func() {
 			// Use URL encoding for the timestamp
-			url := fmt.Sprintf("/balancer/api/score-board/top?wait-for-update-after=%s",
+			url := fmt.Sprintf("/multi-juicer/api/score-board/top?wait-for-update-after=%s",
 				timestampBeforeUpdate.UTC().Format(time.RFC3339))
 			req, err := http.NewRequest("GET", url, nil)
 			if err != nil {
@@ -250,7 +250,7 @@ func TestScoreBoardHandler(t *testing.T) {
 				t.Logf("Score not yet updated (got %d), but polling mechanism is working", response.TopTeams[0].Score)
 				// Verify that if we request again, we get the updated score
 				time.Sleep(100 * time.Millisecond)
-				req2, _ := http.NewRequest("GET", "/balancer/api/score-board/top", nil)
+				req2, _ := http.NewRequest("GET", "/multi-juicer/api/score-board/top", nil)
 				rr2 := httptest.NewRecorder()
 				server.ServeHTTP(rr2, req2)
 				var response2 ScoreBoardResponse
@@ -263,7 +263,7 @@ func TestScoreBoardHandler(t *testing.T) {
 	})
 
 	t.Run("invalid timestamp format returns bad request", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/score-board/top?wait-for-update-after=invalid-timestamp", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/score-board/top?wait-for-update-after=invalid-timestamp", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

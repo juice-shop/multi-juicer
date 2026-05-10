@@ -20,7 +20,7 @@ import (
 
 func TestNotificationsHandler(t *testing.T) {
 	t.Run("does not require authentication", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/notifications", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/notifications", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -37,7 +37,7 @@ func TestNotificationsHandler(t *testing.T) {
 	})
 
 	t.Run("returns 200 OK with enabled=false when no notification exists", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/notifications", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/notifications", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -93,7 +93,7 @@ func TestNotificationsHandler(t *testing.T) {
 		// The notification service would need the watcher running to process the ConfigMap
 		// For testing purposes, we can't easily simulate this without running the full watcher
 
-		req, _ := http.NewRequest("GET", "/balancer/api/notifications", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/notifications", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -125,7 +125,7 @@ func TestNotificationsHandler(t *testing.T) {
 
 		// Use a future timestamp to ensure timeout
 		futureTime := time.Now().Add(1 * time.Hour)
-		url := fmt.Sprintf("/balancer/api/notifications?wait-for-update-after=%s", futureTime.UTC().Format(time.RFC3339))
+		url := fmt.Sprintf("/multi-juicer/api/notifications?wait-for-update-after=%s", futureTime.UTC().Format(time.RFC3339))
 		req, _ := http.NewRequest("GET", url, nil)
 
 		// Use a context with timeout to avoid waiting 25 seconds
@@ -176,7 +176,7 @@ func TestNotificationsHandler(t *testing.T) {
 
 		// The watcher would need to be running to process the ConfigMap
 
-		req, _ := http.NewRequest("GET", "/balancer/api/notifications", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/notifications", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

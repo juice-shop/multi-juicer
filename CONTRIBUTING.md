@@ -30,7 +30,7 @@ Make sure your `kubectl` context points at your local cluster.
 task dev
 ```
 
-This runs [`task build-and-deploy`](./Taskfile.yaml), waits for the balancer rollout, and forwards `deployment/balancer` to port 8080. You can now access MultiJuicer at `http://localhost:8080`.
+This runs [`task build-and-deploy`](./Taskfile.yaml), waits for the multi-juicer rollout, and forwards `deployment/multi-juicer` to port 8080. You can now access MultiJuicer at `http://localhost:8080`.
 
 Re-run `task dev` after code changes to rebuild and redeploy. All builds (Go and UI) happen inside Docker, so you don't need a local Go or Node toolchain just to run `task dev`. The builds are cached inside Docker, so subsequent runs should be faster.
 

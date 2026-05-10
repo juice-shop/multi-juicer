@@ -44,7 +44,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	}
 
 	t.Run("returns the instance status for logged in team", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
@@ -65,7 +65,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	})
 
 	t.Run("returns 404 if team doesn't exist in scores", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
@@ -99,7 +99,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		// Verify initial state - readiness should be false
 		{
-			req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+			req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/status", nil)
 			rr := httptest.NewRecorder()
 			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 			server.ServeHTTP(rr, req)
@@ -119,7 +119,7 @@ func TestTeamStatusHandler(t *testing.T) {
 
 		// Now the status should reflect the updated readiness
 		{
-			req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+			req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/status", nil)
 			rr := httptest.NewRecorder()
 			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(team)))
 			server.ServeHTTP(rr, req)
@@ -128,8 +128,8 @@ func TestTeamStatusHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("returns a 404 if the balancer cookie isn't signed for 'me' endpoint", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+	t.Run("returns a 404 if the team cookie isn't signed for 'me' endpoint", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", team))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
@@ -146,7 +146,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	})
 
 	t.Run("returns a a simplified response when the logged in team is the admin", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/status", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/status", nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
@@ -163,7 +163,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	})
 
 	t.Run("returns the status for a specific team by name", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/foobar/status", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/foobar/status", nil)
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
 		clientset := fake.NewClientset(
@@ -183,7 +183,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	})
 
 	t.Run("returns 404 when requesting a non-existent team", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/nonexistent/status", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/nonexistent/status", nil)
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
 		clientset := fake.NewClientset()
@@ -199,7 +199,7 @@ func TestTeamStatusHandler(t *testing.T) {
 	})
 
 	t.Run("returns 400 when requesting a team with invalid name", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/api/teams/invälid/status", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/api/teams/invälid/status", nil)
 		rr := httptest.NewRecorder()
 		server := http.NewServeMux()
 

@@ -50,8 +50,8 @@ async function fetchTeamStatus(
   signal?: AbortSignal
 ): Promise<FetchResult<TeamStatus>> {
   const url = lastSeen
-    ? `/balancer/api/teams/${team}/status?wait-for-update-after=${lastSeen.toISOString()}`
-    : `/balancer/api/teams/${team}/status`;
+    ? `/multi-juicer/api/teams/${team}/status?wait-for-update-after=${lastSeen.toISOString()}`
+    : `/multi-juicer/api/teams/${team}/status`;
 
   const response = await fetch(url, { signal });
 

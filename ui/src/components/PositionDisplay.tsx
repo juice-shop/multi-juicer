@@ -1,13 +1,13 @@
 function FirstPlace({ ...props }) {
-  return <img src="/balancer/icons/first-place.svg" {...props} />;
+  return <img src="/multi-juicer/icons/first-place.svg" {...props} />;
 }
 
 function SecondPlace({ ...props }) {
-  return <img src="/balancer/icons/second-place.svg" {...props} />;
+  return <img src="/multi-juicer/icons/second-place.svg" {...props} />;
 }
 
 function ThirdPlace({ ...props }) {
-  return <img src="/balancer/icons/third-place.svg" {...props} />;
+  return <img src="/multi-juicer/icons/third-place.svg" {...props} />;
 }
 
 export function PositionDisplay({ place }: { place: number }) {

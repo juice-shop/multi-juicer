@@ -1,39 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: balancer
+  name: multi-juicer
   labels:
-    {{ include "multi-juicer.balancer.labels" . | nindent 4 }}
+    {{ include "multi-juicer.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.balancer.replicas }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{- include "multi-juicer.balancer.selectorLabels" . | nindent 6 }}
+      {{- include "multi-juicer.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/balancer/config-map.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/balancer/secret.yaml") . | sha256sum }}
-        {{- with .Values.balancer.pod.annotations }}
+        checksum/config: {{ include (print $.Template.BasePath "/config-map.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.pod.annotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "multi-juicer.balancer.selectorLabels" . | nindent 8 }}
+        {{- include "multi-juicer.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: balancer
+      serviceAccountName: multi-juicer
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.balancer.podSecurityContext }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: '{{ .Values.balancer.repository }}:{{ .Values.balancer.tag | default (printf "v%s" .Chart.AppVersion) }}'
+          image: '{{ .Values.repository }}:{{ .Values.tag | default (printf "v%s" .Chart.AppVersion) }}'
           imagePullPolicy: {{ .Values.imagePullPolicy | quote }}
-          {{- with .Values.balancer.containerSecurityContext }}
+          {{- with .Values.containerSecurityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -52,16 +52,16 @@ spec:
             valueFrom:
               secretKeyRef:
                 key: adminPassword
-                name: balancer-secret
+                name: multi-juicer-secret
           - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
             valueFrom:
               secretKeyRef:
                 key: cookieParserSecret
-                name: balancer-secret
+                name: multi-juicer-secret
           - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
-            value: {{ .Values.balancer.contentSecurityPolicy | quote }}
+            value: {{ .Values.contentSecurityPolicy | quote }}
           - name: LOG_LEVEL
-            value: {{ .Values.balancer.logLevel | default "info" | quote }}
+            value: {{ .Values.logLevel | default "info" | quote }}
           {{- if .Values.config.juiceShop.llm.enabled }}
           - name: LLM_API_KEY
             valueFrom:
@@ -80,11 +80,11 @@ spec:
               containerPort: 8082
           livenessProbe:
             httpGet:
-              path: /balancer/api/health
+              path: /multi-juicer/api/health
               port: http
           readinessProbe:
             httpGet:
-              path: /balancer/api/readiness
+              path: /multi-juicer/api/readiness
               port: http
           volumeMounts:
             - name: config-volume
@@ -92,20 +92,20 @@ spec:
               subPath: config.json
               readOnly: true
           resources:
-            {{- toYaml .Values.balancer.resources | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: config-volume
           configMap:
-            name: balancer-config
+            name: multi-juicer-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.balancer.affinity }}
+      {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.balancer.tolerations }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

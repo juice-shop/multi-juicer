@@ -27,7 +27,7 @@ function getPatternIndexForTeam(teamName: string): number {
  */
 function getPatternPathByIndex(index: number): string {
   const paddedIndex = String(index + 1).padStart(2, "0");
-  return `/balancer/patterns/pattern_${paddedIndex}.png`;
+  return `/multi-juicer/patterns/pattern_${paddedIndex}.png`;
 }
 
 /**
@@ -35,7 +35,7 @@ function getPatternPathByIndex(index: number): string {
  */
 export function getPatternPathForTeam(teamName: string): string {
   if (teamName === "owasp") {
-    return "/balancer/patterns/special_owasp.png";
+    return "/multi-juicer/patterns/special_owasp.png";
   }
   const index = getPatternIndexForTeam(teamName);
   return getPatternPathByIndex(index);

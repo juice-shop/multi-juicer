@@ -193,7 +193,7 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: balancer
+            name: multi-juicer
             port:
               number: 8080
 ```

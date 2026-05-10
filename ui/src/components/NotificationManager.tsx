@@ -13,7 +13,7 @@ export function NotificationManager() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetch("/balancer/api/notifications")
+    fetch("/multi-juicer/api/notifications")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.message) {
@@ -39,7 +39,7 @@ export function NotificationManager() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/balancer/api/admin/notifications", {
+      const response = await fetch("/multi-juicer/api/admin/notifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export function NotificationManager() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/balancer/api/admin/notifications", {
+      const response = await fetch("/multi-juicer/api/admin/notifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -22,7 +22,7 @@ helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
 
 echo "Installing MultiJuicer"
 helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juicer \
-  --set="balancer.metrics.dashboards.enabled=true" --set="balancer.metrics.serviceMonitor.enabled=true"
+  --set="metrics.dashboards.enabled=true" --set="metrics.serviceMonitor.enabled=true"
 ```
 
 The Grafana instance automatically includes a MultiJuicer Dashboard.

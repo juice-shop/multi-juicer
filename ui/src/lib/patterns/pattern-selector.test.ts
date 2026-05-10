@@ -4,13 +4,13 @@ import { getPatternPathForTeam } from "./pattern-selector";
 
 describe("getPatternPathForTeam", () => {
   test.each([
-    { teamName: "owasp", expected: "/balancer/patterns/special_owasp.png" },
-    { teamName: "hackers", expected: "/balancer/patterns/pattern_50.png" },
-    { teamName: "team1", expected: "/balancer/patterns/pattern_17.png" },
-    { teamName: "a", expected: "/balancer/patterns/pattern_14.png" },
+    { teamName: "owasp", expected: "/multi-juicer/patterns/special_owasp.png" },
+    { teamName: "hackers", expected: "/multi-juicer/patterns/pattern_50.png" },
+    { teamName: "team1", expected: "/multi-juicer/patterns/pattern_17.png" },
+    { teamName: "a", expected: "/multi-juicer/patterns/pattern_14.png" },
     {
       teamName: "long-team-name-with-many-characters",
-      expected: "/balancer/patterns/pattern_77.png",
+      expected: "/multi-juicer/patterns/pattern_77.png",
     },
   ])("returns $expected for team '$teamName'", ({ teamName, expected }) => {
     expect(getPatternPathForTeam(teamName)).toBe(expected);

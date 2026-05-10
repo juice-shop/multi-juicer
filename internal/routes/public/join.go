@@ -286,19 +286,19 @@ func getDeploymentOwnerReferences(deployment *appsv1.Deployment) []metav1.OwnerR
 	}
 }
 
-// uid of the balancer kubernetes deployment resource. used to "attach" created juice shop deployments to the balancer deployment so that they get deleted when the balancer gets deleted
+// uid of the multi-juicer kubernetes deployment resource. used to "attach" created juice shop deployments to it so that they get deleted when multi-juicer gets deleted
 var deploymentUid types.UID
 
 func getOwnerReferences(context context.Context, bundle *bundle.Bundle) ([]metav1.OwnerReference, error) {
 	if deploymentUid == "" {
-		balancerDeployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(
+		multiJuicerDeployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(
 			context,
-			"balancer",
+			"multi-juicer",
 			metav1.GetOptions{},
 		)
-		deploymentUid = balancerDeployment.ObjectMeta.UID
+		deploymentUid = multiJuicerDeployment.ObjectMeta.UID
 		if err != nil {
-			return nil, fmt.Errorf("failed to get balancer deployment to attach correct owner reference to start juice shop: %w", err)
+			return nil, fmt.Errorf("failed to get multi-juicer deployment to attach correct owner reference to start juice shop: %w", err)
 		}
 	}
 
@@ -307,7 +307,7 @@ func getOwnerReferences(context context.Context, bundle *bundle.Bundle) ([]metav
 		{
 			APIVersion:         "apps/v1",
 			Kind:               "Deployment",
-			Name:               "balancer",
+			Name:               "multi-juicer",
 			UID:                deploymentUid,
 			Controller:         &truePointer,
 			BlockOwnerDeletion: &truePointer,

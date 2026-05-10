@@ -41,7 +41,7 @@ export async function loadGeoJSON(
   onProgress: ((progress: number) => void) | null = null
 ): Promise<CountryData[]> {
   try {
-    const response = await fetch("/balancer/world.geo.json");
+    const response = await fetch("/multi-juicer/world.geo.json");
     if (!response.ok) {
       throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
     }

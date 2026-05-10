@@ -151,7 +151,7 @@ Ideally you setup a DNS name for MultiJuicer on your local network by setting up
 # create a kubernetes secret with a tls cert & key
 kubectl create secret tls multi-juicer-tls --cert=path/to/tls.cert --key=path/to/tls.key
 
-kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=balancer:8080,tls=multi-juicer-tls"
+kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=multi-juicer:8080,tls=multi-juicer-tls"
 ```
 
 ### With a DNS hostname and no TLS Cert
@@ -159,11 +159,11 @@ kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --r
 If you don't have DNS setup you can register a ingress rule route all traffic for any host to MultiJuicer.
 
 ```bash
-kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=balancer:8080"
+kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="multi-juicer.example.com/*=multi-juicer:8080"
 ```
 
 ### Without a DNS hostname and no TLS Cert
 
 ```bash
-kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="/*=balancer:8080"
+kubectl create ingress multi-juicer --namespace=multi-juicer --class=traefik --rule="/*=multi-juicer:8080"
 ```

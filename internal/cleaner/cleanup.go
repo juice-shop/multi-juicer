@@ -18,7 +18,7 @@ type Summary struct {
 }
 
 // StartPeriodicCleanup runs RunCleanup on a fixed interval until ctx is cancelled.
-// Must run on at most one balancer replica at a time (gated via leader election).
+// Must run on at most one multi-juicer replica at a time (gated via leader election).
 // When b.Config.Cleanup.MaxInactive is zero the cleanup loop is disabled.
 func StartPeriodicCleanup(ctx context.Context, b *bundle.Bundle) {
 	maxInactive := b.Config.Cleanup.MaxInactive

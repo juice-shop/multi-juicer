@@ -58,7 +58,7 @@ export function useChallengeDetail(challengeKey: string | null) {
         setError(null);
 
         const response = await fetch(
-          `/balancer/api/challenges/${challengeKey}`
+          `/multi-juicer/api/challenges/${challengeKey}`
         );
 
         if (!response.ok) {

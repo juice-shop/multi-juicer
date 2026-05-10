@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: multijuicer-private
   labels:
-    {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
+    {{- include "multi-juicer.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   selector:
-    {{ include "multi-juicer.balancer.selectorLabels" . | nindent 4 }}
+    {{ include "multi-juicer.selectorLabels" . | nindent 4 }}
   ports:
     - port: 8082
       name: private

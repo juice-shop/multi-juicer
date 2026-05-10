@@ -36,7 +36,7 @@ async function fetchChallengeDetails(
   challengeKey: string,
   signal?: AbortSignal
 ): Promise<ChallengeDetailData> {
-  const response = await fetch(`/balancer/api/challenges/${challengeKey}`, {
+  const response = await fetch(`/multi-juicer/api/challenges/${challengeKey}`, {
     signal,
   });
   if (!response.ok) {
@@ -137,7 +137,7 @@ export const ChallengeDetailPage = () => {
             {Array.from({ length: challengeData.difficulty }).map((_, i) => (
               <img
                 key={i}
-                src="/balancer/icons/star.svg"
+                src="/multi-juicer/icons/star.svg"
                 alt="Star"
                 className="h-6 w-6"
               />
@@ -213,7 +213,7 @@ export const ChallengeDetailPage = () => {
                     {index + 1}
                     {index === 0 && (
                       <img
-                        src="/balancer/icons/party-popper.svg"
+                        src="/multi-juicer/icons/party-popper.svg"
                         alt="First Solve"
                         title="First Solve"
                         className="ml-2 inline-block h-5 w-5"

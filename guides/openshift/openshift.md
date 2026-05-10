@@ -33,21 +33,21 @@ This step is optional, but helpful to catch errors quicker.
 
 ```bash
 # lets test out if the app is working correctly before proceeding
-# for that we can port forward the JuiceBalancer service to your local machine
-oc port-forward service/balancer 8080:8080
+# for that we can port forward the MultiJuicer service to your local machine
+oc port-forward service/multi-juicer 8080:8080
 
 # Open up your browser for localhost:8080
-# You should be able to see the MultiJuicer Balancer UI
+# You should be able to see the MultiJuicer UI
 
 # Try to create a team and see if everything works correctly
 # You should be able to access a JuiceShop instances after a few seconds after creating a team,
 # and after clicking the "Start Hacking" Button
 
 # You can also try out if the admin UI works correctly
-# Go back to localhost:8080/balancer
+# Go back to localhost:8080/multi-juicer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-oc get secrets balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+oc get secrets multi-juicer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. Add a route to expose the app to the world
@@ -58,7 +58,7 @@ OpenShift lets you create routes to expose your app to the internet.
 # Create the route.
 # Make sure to adjust the hostname to match the one of your org.
 # You can also perform this step easily via the OpenShift web ui.
-oc create route edge balancer --service balancer --hostname multi-juicer.cloudapps.example.com
+oc create route edge multi-juicer --service multi-juicer --hostname multi-juicer.cloudapps.example.com
 ```
 
 ## Step 4. Deinstallation
@@ -67,5 +67,5 @@ oc create route edge balancer --service balancer --hostname multi-juicer.cloudap
 helm delete multi-juicer
 
 # Delete the route
-oc delete route edge balancer
+oc delete route edge multi-juicer
 ```

@@ -54,8 +54,8 @@ async function fetchActivityFeed(
   signal?: AbortSignal
 ): Promise<FetchResult<ActivityEvent[]>> {
   const url = lastSeen
-    ? `/balancer/api/activity-feed?wait-for-update-after=${lastSeen.toISOString()}`
-    : "/balancer/api/activity-feed";
+    ? `/multi-juicer/api/activity-feed?wait-for-update-after=${lastSeen.toISOString()}`
+    : "/multi-juicer/api/activity-feed";
 
   const response = await fetch(url, { signal });
 

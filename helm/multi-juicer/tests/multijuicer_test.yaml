@@ -6,14 +6,14 @@ tests:
       # templates are specified here as it fails otherwise when empty templates are rendered (e.g. service-monitors which are skipped in this config)
       - templates/juice-shop/config-map.yaml
 
-      - templates/balancer/config-map.yaml
-      - templates/balancer/deployment.yaml
-      - templates/balancer/private-service.yaml
-      - templates/balancer/role-binding.yaml
-      - templates/balancer/role.yaml
-      - templates/balancer/secret.yaml
-      - templates/balancer/service-account.yaml
-      - templates/balancer/service.yaml
+      - templates/config-map.yaml
+      - templates/deployment.yaml
+      - templates/private-service.yaml
+      - templates/role-binding.yaml
+      - templates/role.yaml
+      - templates/secret.yaml
+      - templates/service-account.yaml
+      - templates/service.yaml
     chart:
       version: 42.0.0
       appVersion: 42.0.0
@@ -21,10 +21,9 @@ tests:
       juiceShop:
         tag: v42.42.42
       # randomized values are still specified here as the snapshot tests would fail otherwise
-      balancer:
-        adminPassword: "ABCDEFGH"
-        cookie:
-          cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+      adminPassword: "ABCDEFGH"
+      cookie:
+        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
     asserts:
       - matchSnapshot: {}
   - it: production notes work correctly
@@ -32,27 +31,26 @@ tests:
       # templates are specified here as it fails otherwise when empty templates are rendered (e.g. service-monitors which are skipped in this config)
       - templates/juice-shop/config-map.yaml
 
-      - templates/balancer/config-map.yaml
-      - templates/balancer/deployment.yaml
-      - templates/balancer/private-service.yaml
-      - templates/balancer/role-binding.yaml
-      - templates/balancer/role.yaml
-      - templates/balancer/secret.yaml
-      - templates/balancer/service-account.yaml
-      - templates/balancer/service.yaml
+      - templates/config-map.yaml
+      - templates/deployment.yaml
+      - templates/private-service.yaml
+      - templates/role-binding.yaml
+      - templates/role.yaml
+      - templates/secret.yaml
+      - templates/service-account.yaml
+      - templates/service.yaml
     chart:
       version: 42.0.0
       appVersion: 42.0.0
     set:
-      balancer:
-        adminPassword: "ABCDEFGH"
-        replicas: 3
-        cookie:
-          cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
-          secure: true
-        metrics:
-          basicAuth:
-            password: "ROTATE_THIS_YOU_LAZY_ASS"
+      adminPassword: "ABCDEFGH"
+      replicas: 3
+      cookie:
+        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+        secure: true
+      metrics:
+        basicAuth:
+          password: "ROTATE_THIS_YOU_LAZY_ASS"
 
       juiceShop:
         tag: v42.42.42
@@ -79,19 +77,18 @@ tests:
           - secretName: tls-secret
             hosts:
               - multi-juicer.local
-      balancer:
-        adminPassword: "ABCDEFGH"
-        replicas: 3
-        cookie:
-          cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
-          secure: true
-        metrics:
-          basicAuth:
-            password: "ROTATE_THIS_YOU_LAZY_ASS"
-          serviceMonitor:
-            enabled: true
-          dashboards:
-            enabled: true
+      adminPassword: "ABCDEFGH"
+      replicas: 3
+      cookie:
+        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+        secure: true
+      metrics:
+        basicAuth:
+          password: "ROTATE_THIS_YOU_LAZY_ASS"
+        serviceMonitor:
+          enabled: true
+        dashboards:
+          enabled: true
 
       juiceShop:
         tag: v42.42.42

@@ -22,7 +22,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 		requestBody := AdminClockRequest{EndDate: &futureDate}
 		bodyBytes, _ := json.Marshal(requestBody)
 
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBuffer(bodyBytes))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBuffer(bodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("some-team")))
 		rr := httptest.NewRecorder()
@@ -44,7 +44,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 		requestBody := AdminClockRequest{EndDate: &futureDate}
 		bodyBytes, _ := json.Marshal(requestBody)
 
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBuffer(bodyBytes))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBuffer(bodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
@@ -80,7 +80,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 		requestBody := AdminClockRequest{EndDate: &pastDate}
 		bodyBytes, _ := json.Marshal(requestBody)
 
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBuffer(bodyBytes))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBuffer(bodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
@@ -110,7 +110,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 		// First set an endDate
 		futureDate := time.Now().Add(2 * time.Hour)
 		setBody, _ := json.Marshal(AdminClockRequest{EndDate: &futureDate})
-		setReq, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBuffer(setBody))
+		setReq, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBuffer(setBody))
 		setReq.Header.Set("Content-Type", "application/json")
 		setReq.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		setRR := httptest.NewRecorder()
@@ -118,7 +118,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 		assert.Equal(t, http.StatusOK, setRR.Code)
 
 		// Then clear it (null endDate)
-		clearReq, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBufferString(`{"endDate":null}`))
+		clearReq, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBufferString(`{"endDate":null}`))
 		clearReq.Header.Set("Content-Type", "application/json")
 		clearReq.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		clearRR := httptest.NewRecorder()
@@ -136,7 +136,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 	})
 
 	t.Run("handles invalid JSON", func(t *testing.T) {
-		req, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBufferString("not json"))
+		req, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBufferString("not json"))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		rr := httptest.NewRecorder()
@@ -164,7 +164,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 
 		// First set a notification
 		notifBody, _ := json.Marshal(AdminNotificationRequest{Message: "Important notice", Enabled: true})
-		notifReq, _ := http.NewRequest("POST", "/balancer/api/admin/notifications", bytes.NewBuffer(notifBody))
+		notifReq, _ := http.NewRequest("POST", "/multi-juicer/api/admin/notifications", bytes.NewBuffer(notifBody))
 		notifReq.Header.Set("Content-Type", "application/json")
 		notifReq.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		notifRR := httptest.NewRecorder()
@@ -174,7 +174,7 @@ func TestAdminSetClockHandler(t *testing.T) {
 		// Then set an endDate
 		futureDate := time.Now().Add(2 * time.Hour)
 		clockBody, _ := json.Marshal(AdminClockRequest{EndDate: &futureDate})
-		clockReq, _ := http.NewRequest("POST", "/balancer/api/admin/clock", bytes.NewBuffer(clockBody))
+		clockReq, _ := http.NewRequest("POST", "/multi-juicer/api/admin/clock", bytes.NewBuffer(clockBody))
 		clockReq.Header.Set("Content-Type", "application/json")
 		clockReq.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		clockRR := httptest.NewRecorder()

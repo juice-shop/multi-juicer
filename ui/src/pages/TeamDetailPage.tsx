@@ -145,7 +145,7 @@ export const TeamDetailPage = () => {
                         (_, i) => (
                           <img
                             key={i}
-                            src="/balancer/icons/star.svg"
+                            src="/multi-juicer/icons/star.svg"
                             alt="Star"
                             className="h-4 w-4"
                           />

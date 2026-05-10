@@ -12,7 +12,7 @@ func redirectLoggedInTeamsToStatus(bundle *bundle.Bundle, next http.Handler) htt
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, req *http.Request) {
 		team, _ := teamcookie.GetTeamFromRequest(bundle, req)
 		if team != "" {
-			http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/teams/%s/status", team), http.StatusFound)
+			http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/teams/%s/status", team), http.StatusFound)
 		}
 		next.ServeHTTP(responseWriter, req)
 	})

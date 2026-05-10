@@ -36,7 +36,7 @@ export function useChallenges() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch("/balancer/api/challenges");
+      const response = await fetch("/multi-juicer/api/challenges");
 
       if (!response.ok) {
         throw new Error(`Failed to fetch challenges: ${response.status}`);

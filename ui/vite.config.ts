@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig(() => {
   return {
     root: __dirname,
-    base: "/balancer/",
+    base: "/multi-juicer/",
     build: {
       outDir: "build",
       sourcemap: true, // we are an open source project, we have nothing to hide :D
@@ -23,7 +23,7 @@ export default defineConfig(() => {
     },
     server: {
       proxy: {
-        "/balancer/api": "http://localhost:8080",
+        "/multi-juicer/api": "http://localhost:8080",
       },
     },
   };

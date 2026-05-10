@@ -7,14 +7,14 @@ COPY go.mod go.sum ./
 # and so that source changes don't invalidate our downloaded layer
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
-COPY cmd/balancer ./cmd/balancer
+COPY cmd/multi-juicer ./cmd/multi-juicer
 COPY internal ./internal
 ARG TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 \
-    go build -o /out/balancer ./cmd/balancer
-RUN chmod +x /out/balancer
+    go build -o /out/multi-juicer ./cmd/multi-juicer
+RUN chmod +x /out/multi-juicer
 
 FROM --platform=$BUILDPLATFORM docker.io/library/node:24-alpine AS ui
 WORKDIR /home/app
@@ -37,5 +37,5 @@ RUN yq eval --output-format json '.' /workdir/challenges.yaml > /workdir/challen
 FROM gcr.io/distroless/static:nonroot
 COPY --from=challenges-json --chown=root:root --chmod=755 /workdir/challenges.json /challenges.json
 COPY --from=ui --chown=root:root --chmod=755 /home/app/ui/build/ /public/
-COPY --from=builder --chown=root:root --chmod=755 /out/balancer /balancer
-CMD ["/balancer"]
+COPY --from=builder --chown=root:root --chmod=755 /out/multi-juicer /multi-juicer
+CMD ["/multi-juicer"]

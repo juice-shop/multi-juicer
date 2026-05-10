@@ -36,15 +36,15 @@ func newReverseProxy(target string) *httputil.ReverseProxy {
 	return httputil.NewSingleHostReverseProxy(url)
 }
 
-// HandleProxy determines the JuiceShop instance of the Team based on the "balancer" cookie and proxies the request to the corresponding JuiceShop instance.
+// HandleProxy determines the JuiceShop instance of the Team based on the team cookie and proxies the request to the corresponding JuiceShop instance.
 func handleProxy(bundle *bundle.Bundle) http.Handler {
 	return http.HandlerFunc(
 		func(responseWriter http.ResponseWriter, req *http.Request) {
 			team, err := teamcookie.GetTeamFromRequest(bundle, req)
 			if err != nil {
 				// nosemgrep: go.lang.security.audit.net.cookie-missing-secure.cookie-missing-secure
-				http.SetCookie(responseWriter, &http.Cookie{Name: "balancer", Path: "/", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteStrictMode, Secure: bundle.Config.CookieConfig.Secure})
-				http.Redirect(responseWriter, req, "/balancer", http.StatusFound)
+				http.SetCookie(responseWriter, &http.Cookie{Name: bundle.Config.CookieConfig.Name, Path: "/", MaxAge: -1, HttpOnly: true, SameSite: http.SameSiteStrictMode, Secure: bundle.Config.CookieConfig.Secure})
+				http.Redirect(responseWriter, req, "/multi-juicer", http.StatusFound)
 				return
 			}
 
@@ -56,12 +56,12 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 					instanceUpCache[team] = time.Now().UnixMilli()
 					cacheMutex.Unlock()
 				case instanceMissing:
-					bundle.Log.Info("Instance for team is missing. Redirecting to balancer page.", "team", team)
-					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-not-found&team=%s", team), http.StatusFound)
+					bundle.Log.Info("Instance for team is missing. Redirecting to multi-juicer landing page.", "team", team)
+					http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/?msg=instance-not-found&team=%s", team), http.StatusFound)
 					return
 				default:
-					bundle.Log.Info("Instance for team is down. Redirecting to balancer page.", "team", team)
-					http.Redirect(responseWriter, req, fmt.Sprintf("/balancer/?msg=instance-restarting&team=%s", team), http.StatusFound)
+					bundle.Log.Info("Instance for team is down. Redirecting to multi-juicer landing page.", "team", team)
+					http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/?msg=instance-restarting&team=%s", team), http.StatusFound)
 					return
 				}
 			}

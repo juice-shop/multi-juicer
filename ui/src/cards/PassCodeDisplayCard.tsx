@@ -16,7 +16,7 @@ export const PasscodeDisplayCard = ({
   const [activlyDisplayedPasscode, setActivlyDisplayedPasscode] =
     useState<string>(placeHolder);
 
-  const joinLink = `${window.location.origin}/balancer/teams/${team}/joining#${passcode}`;
+  const joinLink = `${window.location.origin}/multi-juicer/teams/${team}/joining#${passcode}`;
 
   const copyJoinLink = () => {
     if (!navigator.clipboard) {
@@ -66,7 +66,11 @@ export const PasscodeDisplayCard = ({
               defaultMessage: "Copy join link",
             })}
           >
-            <img src="/balancer/icons/link.svg" alt="" className="h-5 w-5" />
+            <img
+              src="/multi-juicer/icons/link.svg"
+              alt=""
+              className="h-5 w-5"
+            />
             <span>
               <FormattedMessage
                 id="copy_link_button"

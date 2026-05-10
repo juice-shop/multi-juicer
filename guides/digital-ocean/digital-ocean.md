@@ -31,18 +31,18 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 # kubernetes will now spin up the pods
 # to verify every thing is starting up, run:
 kubectl get pods
-# This should show you the balancer pod
+# This should show you the multi-juicer pod
 # Wait until it is ready
 ```
 
-If the balancer pods is still pending status after a couple of minutes, the cluster may not have the necessary resources to provision the pods.
+If the multi-juicer pods is still pending status after a couple of minutes, the cluster may not have the necessary resources to provision the pods.
 
 ```bash
-# This show details about the balancer pods. Warnings can be found under Events, and the cluster
+# This show details about the multi-juicer pods. Warnings can be found under Events, and the cluster
 # does not have the necessary resources if theres is a warning about insufficient CPU or memory.
 # In this case you would need to increase resources
-kubectl describe pods balancer-<postfix>
-# e.g. kubectl describe pods balancer-7d57fff697-4r8lv
+kubectl describe pods multi-juicer-<postfix>
+# e.g. kubectl describe pods multi-juicer-7d57fff697-4r8lv
 
 # To see the different size options for compute resources run the following command:
 doctl kubernetes options sizes
@@ -58,21 +58,21 @@ This step is optional, but helpful to catch errors quicker.
 
 ```bash
 # lets test out if the app is working correctly before proceeding
-# for that we can port forward the JuiceBalancer service to your local machine
-kubectl port-forward service/balancer 8080:8080
+# for that we can port forward the MultiJuicer service to your local machine
+kubectl port-forward service/multi-juicer 8080:8080
 
 # Open up your browser for localhost:8080
-# You should be able to see the MultiJuicer Balancer UI
+# You should be able to see the MultiJuicer UI
 
 # Try to create a team and see if everything works correctly
 # You should be able to access a JuiceShop instances after a few seconds after creating a team,
 # and after clicking the "Start Hacking" Button
 
 # You can also try out if the admin UI works correctly
-# Go back to localhost:8080/balancer
+# Go back to localhost:8080/multi-juicer
 # To log in as the admin log in as the team "admin"
 # The password for the team gets auto generated if not specified, you can extract it from the kubernetes secret:
-kubectl get secrets balancer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
+kubectl get secrets multi-juicer-secret -o=jsonpath='{.data.adminPassword}' | base64 --decode
 ```
 
 ## Step 4. Add a LoadBalancer to expose the app to the world

@@ -12,7 +12,7 @@ import (
 // Test for the HelloHandler
 func TestStaticFileHandler(t *testing.T) {
 	t.Run("should return static files when requested", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -29,13 +29,13 @@ func TestStaticFileHandler(t *testing.T) {
 
 	t.Run("should return index.html too when requesting a route handled by the frontend router", func(t *testing.T) {
 		frontendRoutes := []string{
-			"/balancer/admin",
-			"/balancer/teams/abc/status/",
-			"/balancer/teams/foo-bar-123/status/",
-			"/balancer/teams/abc/joining/",
-			"/balancer/score-overview/",
-			"/balancer/score-overview/teams/abc/score/",
-			"/balancer/ctf",
+			"/multi-juicer/admin",
+			"/multi-juicer/teams/abc/status/",
+			"/multi-juicer/teams/foo-bar-123/status/",
+			"/multi-juicer/teams/abc/joining/",
+			"/multi-juicer/score-overview/",
+			"/multi-juicer/score-overview/teams/abc/score/",
+			"/multi-juicer/ctf",
 		}
 
 		server := http.NewServeMux()
@@ -55,7 +55,7 @@ func TestStaticFileHandler(t *testing.T) {
 	})
 
 	t.Run("should set Content-Security-Policy header for index.html when CSP is configured", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/admin", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/admin", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -71,7 +71,7 @@ func TestStaticFileHandler(t *testing.T) {
 	})
 
 	t.Run("should not set Content-Security-Policy header when CSP is empty", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/admin", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/admin", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -87,7 +87,7 @@ func TestStaticFileHandler(t *testing.T) {
 	})
 
 	t.Run("should not set Content-Security-Policy header for non-index.html static files", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/balancer/favicon.ico", nil)
+		req, _ := http.NewRequest("GET", "/multi-juicer/favicon.ico", nil)
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()

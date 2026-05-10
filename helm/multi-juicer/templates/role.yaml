@@ -2,8 +2,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: {{ .Release.Namespace | quote }}
-  name: balancer
-  labels: {{- include "multi-juicer.balancer.labels" . | nindent 4 }}
+  name: multi-juicer
+  labels: {{- include "multi-juicer.labels" . | nindent 4 }}
 rules:
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]

@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 imagePullPolicy: IfNotPresent
-# -- imagePullSecrets used for the balancer image. You'll also need to set `config.juiceShop.imagePullSecrets` to set the imagePullSecrets if you are using a private registry for all images
+# -- imagePullSecrets used for the multi-juicer image. You'll also need to set `config.juiceShop.imagePullSecrets` to set the imagePullSecrets if you are using a private registry for all images
 imagePullSecrets: []
 nodeSelector: {}
 
@@ -21,77 +21,74 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+cookie:
+  # SET THIS TO TRUE IF IN PRODUCTION
+  # Sets secure Flag in cookie
+  # -- Sets the secure attribute on cookie so that it only be send over https
+  secure: false
+  # -- Changes the cookies name used to identify teams.
+  name: multi-juicer
+  # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
+  cookieParserSecret: null
+# -- Content Security Policy header configuration for index.html responses. Set to empty string to disable CSP header.
+contentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+repository: ghcr.io/juice-shop/multi-juicer/multi-juicer
+tag: null
+# -- Number of replicas of the multi-juicer deployment
+replicas: 1
 service:
+  # -- Kubernetes service type
   type: ClusterIP
+  # -- Service port for the multi-juicer service
   port: 8080
-
-balancer:
-  cookie:
-    # SET THIS TO TRUE IF IN PRODUCTION
-    # Sets secure Flag in cookie
-    # -- Sets the secure attribute on cookie so that it only be send over https
-    secure: false
-    # -- Changes the cookies name used to identify teams.
-    name: balancer
-    # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
-    cookieParserSecret: null
-  # -- Content Security Policy header configuration for index.html responses. Set to empty string to disable CSP header.
-  contentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
-  repository: ghcr.io/juice-shop/multi-juicer/balancer
-  tag: null
-  # -- Number of replicas of the balancer deployment
-  replicas: 1
-  service:
-    # -- Kubernetes service type
-    type: ClusterIP
-    # -- internal cluster service IP
-    clusterIP: null
-    # -- IP address to assign to load balancer (if supported)
-    loadBalancerIP: null
-    # -- list of IP CIDRs allowed access to lb (if supported)
-    loadBalancerSourceRanges: null
-    # -- IP address to assign to load balancer (if supported)
-    externalIPs: null
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 400m
-    limits:
-      memory: 256Mi
-      cpu: 400m
-  # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
-  podSecurityContext:
-    runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
-  # -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
-  # -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-  # -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
-  # -- Log level for the balancer service. One of: debug, info, warn, error
-  logLevel: "info"
-  pod:
-    # -- Optional Additional annotations for the balancer pods.
-    annotations: {}
-    # -- Optional Additional labels for the balancer pods.
+  # -- internal cluster service IP
+  clusterIP: null
+  # -- IP address to assign to load balancer (if supported)
+  loadBalancerIP: null
+  # -- list of IP CIDRs allowed access to lb (if supported)
+  loadBalancerSourceRanges: null
+  # -- IP address to assign to load balancer (if supported)
+  externalIPs: null
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 400m
+  limits:
+    memory: 256Mi
+    cpu: 400m
+# -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+# -- Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+# -- Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+affinity: {}
+# -- Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+tolerations: []
+# -- Log level for the multi-juicer service. One of: debug, info, warn, error
+logLevel: "info"
+pod:
+  # -- Optional Additional annotations for the multi-juicer pods.
+  annotations: {}
+  # -- Optional Additional labels for the multi-juicer pods.
+  labels: {}
+metrics:
+  dashboards:
+    # -- if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-datasources
+    enabled: false
+  serviceMonitor:
+    # -- If true, creates a Prometheus Operator ServiceMonitor. This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
+    enabled: false
+    # -- Optional Allows to add additional labels to the service monitor. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
+    # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
     labels: {}
-  metrics:
-    dashboards:
-      # -- if true, creates a Grafana Dashboard Config Map. These will automatically be imported by Grafana when using the Grafana helm chart, see: https://github.com/grafana/helm-charts/tree/main/charts/grafana#sidecar-for-datasources
-      enabled: false
-    serviceMonitor:
-      # -- If true, creates a Prometheus Operator ServiceMonitor. This will also deploy a servicemonitor which monitors metrics from the Juice Shop instances
-      enabled: false
-      # -- Optional Allows to add additional labels to the service monitor. The Prometheus Operator can be adjusted to look for specific labels in ServiceMonitors.
-      # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
-      labels: {}
 
 config:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
@@ -104,7 +101,7 @@ config:
     tag: v19.1.1
     imagePullSecrets: []
     imagePullPolicy: IfNotPresent
-    # -- How long a Juice Shop instance may sit idle (no end-user requests) before the balancer deletes it. Accepts Go duration strings, e.g. "24h", "30m", "90m".
+    # -- How long a Juice Shop instance may sit idle (no end-user requests) before MultiJuicer deletes it. Accepts Go duration strings, e.g. "24h", "30m", "90m".
     deleteInactiveAfter: 24h
     # -- Change the key when hosting a CTF event. This key gets used to generate the challenge flags. See: https://pwning.owasp-juice.shop/companion-guide/latest/part4/ctf.html#_overriding_the_ctf_key
     ctfKey: "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr"
@@ -123,7 +120,7 @@ config:
       ctf:
         showFlagsInNotifications: false
         systemWideNotifications:
-          url: /balancer/api/notifications
+          url: /multi-juicer/api/notifications
           pollFrequencySeconds: 15
     # -- Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`.
     nodeEnv: "multi-juicer"

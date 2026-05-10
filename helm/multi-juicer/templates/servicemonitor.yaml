@@ -2,23 +2,22 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: juice-shops
+  name: multi-juicer
   labels:
-    {{- include "multi-juicer.juice-shop.labels" . | nindent 4 }}
+    {{ include "multi-juicer.labels" . | nindent 4 }}
     {{- with .Values.metrics.serviceMonitor.labels }}
-      {{- toYaml . | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- with .Values.metrics.serviceMonitor.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  targetLabels:
-    - team
   selector:
     matchLabels:
-      app.kubernetes.io/name: 'juice-shop'
-      app.kubernetes.io/part-of: multi-juicer
+      {{- include "multi-juicer.selectorLabels" . | nindent 6 }}
+      type: metrics
   endpoints:
-    - targetPort: 3000
+    - port: metrics
+      path: '/metrics'
 {{- end }}

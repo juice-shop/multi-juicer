@@ -9,11 +9,11 @@ import (
 )
 
 func GetTeamFromRequest(bundle *bundle.Bundle, req *http.Request) (string, error) {
-	balancerCookie, err := req.Cookie(bundle.Config.CookieConfig.Name)
+	teamCookie, err := req.Cookie(bundle.Config.CookieConfig.Name)
 	if err != nil {
 		return "", fmt.Errorf("request is missing team cookie")
 	}
-	cookieTeamname, err := signutil.Unsign(balancerCookie.Value, bundle.Config.CookieConfig.SigningKey)
+	cookieTeamname, err := signutil.Unsign(teamCookie.Value, bundle.Config.CookieConfig.SigningKey)
 	if err != nil {
 		return "", fmt.Errorf("cookie is signed by an invalid key")
 	}

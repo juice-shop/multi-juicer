@@ -50,7 +50,7 @@ func main() {
 
 	go runLeaderLoop(ctx, b)
 
-	StartBalancerServer(b)
+	StartPublicServer(b)
 }
 
 func runLeaderLoop(ctx context.Context, b *bundle.Bundle) {
@@ -86,18 +86,18 @@ func runLeaderLoop(ctx context.Context, b *bundle.Bundle) {
 	}
 }
 
-func StartBalancerServer(b *bundle.Bundle) {
+func StartPublicServer(b *bundle.Bundle) {
 	router := http.NewServeMux()
 	public_routes.AddRoutes(router, b)
 
-	b.Log.Info("Starting MultiJuicer balancer on :8080")
+	b.Log.Info("Starting MultiJuicer on :8080")
 	server := &http.Server{
 		Addr:    ":8080",
 		Handler: router,
 	}
 
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("Failed to start balancer server: %v", err)
+		log.Fatalf("Failed to start public server: %v", err)
 	}
 }
 
@@ -122,6 +122,6 @@ func StartMetricsServer(logger *slog.Logger) {
 	}
 
 	if err := metricServer.ListenAndServe(); err != nil {
-		log.Fatalf("Failed to start balancer server: %v", err)
+		log.Fatalf("Failed to start metrics server: %v", err)
 	}
 }

@@ -26,14 +26,26 @@ export const TeamStatusPage = ({
 
   return (
     <>
-      <link rel="preload" href="/balancer/icons/first-place.svg" as="image" />
-      <link rel="preload" href="/balancer/icons/second-place.svg" as="image" />
-      <link rel="preload" href="/balancer/icons/third-place.svg" as="image" />
+      <link
+        rel="preload"
+        href="/multi-juicer/icons/first-place.svg"
+        as="image"
+      />
+      <link
+        rel="preload"
+        href="/multi-juicer/icons/second-place.svg"
+        as="image"
+      />
+      <link
+        rel="preload"
+        href="/multi-juicer/icons/third-place.svg"
+        as="image"
+      />
 
       <Card className="w-full max-w-2xl">
         <div className="flex flex-row items-center p-4">
           <img
-            src="/balancer/icons/astronaut.svg"
+            src="/multi-juicer/icons/astronaut.svg"
             alt="Astronaut"
             className="h-12 w-12 shrink-0 mr-3"
           />
