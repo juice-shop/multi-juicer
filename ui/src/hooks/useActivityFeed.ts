@@ -1,6 +1,6 @@
 import {
   useHttpLongPoll,
-  FetchResult,
+  type FetchResult,
   extractLastUpdateTimestamp,
 } from "./useHttpLongPoll";
 

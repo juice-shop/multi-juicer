@@ -1,8 +1,8 @@
+import type { Challenge } from "../../hooks/useChallenges";
 import type { CountryData } from "../globe/data/geojson-loader";
 import { getPatternPathForTeam } from "../patterns/pattern-selector";
 
-// Re-export Challenge from the hook
-export type { Challenge } from "../../hooks/useChallenges";
+export type { Challenge };
 
 export interface CountryPopulation {
   name: string;

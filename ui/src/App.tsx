@@ -8,7 +8,7 @@ import { Layout } from "@/Layout";
 import { JoiningPage } from "@/pages/JoiningPage";
 import { JoinPage } from "@/pages/JoinPage";
 import { TeamStatusPage } from "@/pages/TeamStatusPage";
-import availableLanguages, { MessageLoader } from "@/translations/index";
+import availableLanguages, { type MessageLoader } from "@/translations/index";
 
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const ScoreOverviewPage = lazy(() => import("@/pages/ScoreOverviewPage"));

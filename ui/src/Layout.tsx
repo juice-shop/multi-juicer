@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link, NavLink, useNavigate } from "react-router-dom";
