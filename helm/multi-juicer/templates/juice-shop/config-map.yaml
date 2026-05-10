@@ -8,7 +8,7 @@ data:
   multi-juicer.yaml: |-
     {{- $config := deepCopy .Values.config.juiceShop.config }}
     {{- if .Values.config.juiceShop.llm.enabled }}
-    {{- $chatBot := dict "chatBot" (dict "model" .Values.config.juiceShop.llm.model "llmApiUrl" (printf "http://multijuicer-private.%s.svc.cluster.local:8082" .Release.Namespace)) }}
+    {{- $chatBot := dict "chatBot" (dict "model" .Values.config.juiceShop.llm.model "llmApiUrl" (printf "http://multijuicer-private.%s.svc.cluster.local" .Release.Namespace)) }}
     {{- $_ := merge ($config).application $chatBot }}
     {{- end }}
     {{ $config | toYaml | nindent 4 }}

@@ -234,7 +234,7 @@ default values render correctly:
     spec:
       ports:
         - name: private
-          port: 8082
+          port: 80
           targetPort: private
       selector:
         app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2298,7 +2298,7 @@ full values render out correctly:
     spec:
       ports:
         - name: private
-          port: 8082
+          port: 80
           targetPort: private
       selector:
         app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2699,7 +2699,7 @@ production notes work correctly:
     spec:
       ports:
         - name: private
-          port: 8082
+          port: 80
           targetPort: private
       selector:
         app.kubernetes.io/instance: multi-juicer-RELEASE-NAME

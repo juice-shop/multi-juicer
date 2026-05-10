@@ -9,6 +9,6 @@ spec:
   selector:
     {{ include "multi-juicer.selectorLabels" . | nindent 4 }}
   ports:
-    - port: 8082
+    - port: 80
       name: private
       targetPort: private
