@@ -47,7 +47,8 @@
     "start": "vite -c ui/vite.config.ts",
     "build": "vite build -c ui/vite.config.ts",
     "serve": "vite preview -c ui/vite.config.ts",
-    "test": "vitest -c ui/vitest.config.ts",
+    "test": "vitest -c ui/vitest.config.ts --watch=false",
+    "test:watch": "vitest -c ui/vitest.config.ts",
     "lint": "tsc --noEmit && eslint ui/src --ext .ts,.tsx && prettier --check ui/",
     "lint:fix": "eslint ui/src --ext .ts,.tsx --fix && prettier --write ui/"
   },
