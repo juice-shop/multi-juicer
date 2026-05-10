@@ -124,7 +124,7 @@ func StartInternalServer(handler http.Handler, logger *slog.Logger) {
 
 func StartMetricsServer(logger *slog.Logger) {
 	metricsRouter := http.NewServeMux()
-	metricsRouter.Handle("GET /balancer/metrics", promhttp.Handler())
+	metricsRouter.Handle("GET /metrics", promhttp.Handler())
 	logger.Info("Starting metrics server on :8081")
 	metricServer := &http.Server{
 		Addr:    ":8081",

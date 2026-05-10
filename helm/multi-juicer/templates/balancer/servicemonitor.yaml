@@ -19,5 +19,5 @@ spec:
       type: metrics
   endpoints:
     - port: metrics
-      path: '/balancer/metrics'
+      path: '/metrics'
 {{- end }}
