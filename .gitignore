@@ -8,3 +8,5 @@ ui/build/
 
 # Go binaries / test outputs
 *.test
+
+.claude/
