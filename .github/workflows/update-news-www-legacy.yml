@@ -1,4 +1,4 @@
-name: "Update news on owasp-juice.shop"
+name: "Update news on owasp.org/www-project-juice-shop (legacy)"
 
 on:
   release:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          repository: juice-shop/juice-shop.github.io
+          repository: OWASP/www-project-juice-shop
           ref: master
       - name: Update tab_news.md
         run: |
