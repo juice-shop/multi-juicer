@@ -1,7 +1,5 @@
 ![MultiJuicer, Multi User Juice Shop Platform](./images/multijuicer-cover.svg)
 
-> Note: The readme and documentation are already updated for the upcoming v10 MultiJuicer release, some features mentioned here, e.g. the LLM Gateway or the CTF view are currently unreleased.
-
 Running CTFs and Security Trainings with [OWASP Juice Shop](https://github.com/bkimminich/juice-shop) is usually quite tricky, Juice Shop just isn't intended to be used by multiple users at a time.
 Instructing everybody how to start Juice Shop on their own machine works ok, but takes away too much valuable time.
 
@@ -32,7 +30,7 @@ helm install multi-juicer oci://ghcr.io/juice-shop/multi-juicer/helm/multi-juice
 
 See [production notes](./guides/production-notes/production-notes.md) for a checklist of values you'll likely need to configure before using MultiJuicer in proper events.
 
-To setup MultiJuicer with support for the JuiceShop v20+ AI/LLM realted challenges, see [AI/LLM configuration guide](./guides/llm/llm.md) (Coming 🔜 with the upcoming MultiJuicer v10 & JuiceShop v20 release)
+To setup MultiJuicer with support for the JuiceShop v20+ AI/LLM realted challenges, see [AI/LLM configuration guide](./guides/llm/llm.md)
 
 ### Installation Guides for specific Cloud Providers / Environments
 
