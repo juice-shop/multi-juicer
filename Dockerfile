@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -o /out/multi-juicer ./cmd/multi-juicer
 RUN chmod +x /out/multi-juicer
 
-FROM --platform=$BUILDPLATFORM docker.io/library/node:24-alpine AS ui
+FROM --platform=$BUILDPLATFORM docker.io/library/node:26-alpine AS ui
 WORKDIR /home/app
 COPY package.json package-lock.json .npmrc ./
 RUN --mount=type=cache,target=/root/.npm \
