@@ -98,7 +98,7 @@ config:
   juiceShop:
     # -- Juice Shop Image to use
     image: bkimminich/juice-shop
-    tag: v19.1.1
+    tag: v20.0.0
     imagePullSecrets: []
     imagePullPolicy: IfNotPresent
     # -- How long a Juice Shop instance may sit idle (no end-user requests) before MultiJuicer deletes it. Accepts Go duration strings, e.g. "24h", "30m", "90m".

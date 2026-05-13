@@ -73,7 +73,7 @@ default values render correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v19.1.1",
+            "tag": "v20.0.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -113,7 +113,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 198b34e45f2e1ecc579e160d17918c0fe41194fd43da871734a4c264a9c1e797
+            checksum/config: ca328a6adf1df26d8c16ff954dbe69a968145448d4976ce487e79a954f2289a4
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -454,7 +454,7 @@ full values render out correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v19.1.1",
+            "tag": "v20.0.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -494,7 +494,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: a5fac97a49f7e54321862992e9d731c6195b9bd435e47b7b896e5dc3b855013f
+            checksum/config: 1469a842b79d36d0da18b2f3eb76bc998e0871aa3cbbd23de1992b566b5a90ed
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2538,7 +2538,7 @@ production notes work correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v19.1.1",
+            "tag": "v20.0.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -2578,7 +2578,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: a5fac97a49f7e54321862992e9d731c6195b9bd435e47b7b896e5dc3b855013f
+            checksum/config: 1469a842b79d36d0da18b2f3eb76bc998e0871aa3cbbd23de1992b566b5a90ed
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
