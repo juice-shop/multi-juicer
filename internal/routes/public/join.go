@@ -482,24 +482,34 @@ func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team s
 	return err
 }
 
-func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
+func buildJuiceShopEnv(b *bundle.Bundle, team string) []corev1.EnvVar {
+	webhookToken, err := signutil.Sign(team, b.Config.CookieConfig.SigningKey)
+	if err != nil {
+		// SigningKey and team are both validated at startup / team-creation time; this is unreachable.
+		panic(fmt.Sprintf("failed to sign webhook token for team %q: %v", team, err))
+	}
+
 	envVars := append(
-		bundle.Config.JuiceShopConfig.Env,
+		b.Config.JuiceShopConfig.Env,
 		corev1.EnvVar{
 			Name:  "NODE_ENV",
-			Value: bundle.Config.JuiceShopConfig.NodeEnv,
+			Value: b.Config.JuiceShopConfig.NodeEnv,
 		},
 		corev1.EnvVar{
 			Name:  "CTF_KEY",
-			Value: bundle.Config.JuiceShopConfig.CtfKey,
+			Value: b.Config.JuiceShopConfig.CtfKey,
 		},
 		corev1.EnvVar{
 			Name:  "SOLUTIONS_WEBHOOK",
-			Value: fmt.Sprintf("http://multijuicer-private.%s.svc.cluster.local/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
+			Value: fmt.Sprintf("http://multijuicer-private.%s.svc.cluster.local/team/%s/webhook", b.RuntimeEnvironment.Namespace, team),
+		},
+		corev1.EnvVar{
+			Name:  "SOLUTIONS_WEBHOOK_TOKEN",
+			Value: webhookToken,
 		},
 	)
 
-	if bundle.Config.JuiceShopConfig.LLM.Enabled {
+	if b.Config.JuiceShopConfig.LLM.Enabled {
 		envVars = append(envVars, corev1.EnvVar{
 			Name: "LLM_API_KEY",
 			ValueFrom: &corev1.EnvVarSource{

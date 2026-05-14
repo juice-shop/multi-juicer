@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/progresswatchdog"
+	"github.com/juice-shop/multi-juicer/internal/signutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -41,6 +43,21 @@ func NewSolutionsWebhookHandler(b *bundle.Bundle) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		team := r.PathValue("team")
+
+		// Validate the per-team bearer token to prevent cross-team credit injection.
+		// The token is HMAC(team, signingKey), deterministically generated at deploy time
+		// and injected into each JuiceShop pod as SOLUTIONS_WEBHOOK_TOKEN.
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			http.Error(w, "missing or invalid authorization header", http.StatusUnauthorized)
+			return
+		}
+		tokenFromHeader := strings.TrimPrefix(authHeader, "Bearer ")
+		claimedTeam, err := signutil.Unsign(tokenFromHeader, b.Config.CookieConfig.SigningKey)
+		if err != nil || claimedTeam != team {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
 
 		var webhook juiceShopWebhook
 		if err := json.NewDecoder(r.Body).Decode(&webhook); err != nil {
