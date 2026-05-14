@@ -13,6 +13,7 @@ import (
 	"github.com/juice-shop/multi-juicer/internal/testutil"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes/fake"
@@ -87,9 +88,13 @@ func TestJoinHandler(t *testing.T) {
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
 		actionCounter++
 
-		// because the juice shop doesn't exist it should create it and a service for it
+		// because the juice shop doesn't exist it should create the deployment,
+		// the per-team secret (holding the signed webhook url), and the service.
 		assert.Equal(t, "create", actions[actionCounter].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, actions[actionCounter].GetResource())
+		actionCounter++
+		assert.Equal(t, "create", actions[actionCounter].GetVerb())
+		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "secrets"}, actions[actionCounter].GetResource())
 		actionCounter++
 		assert.Equal(t, "create", actions[actionCounter].GetVerb())
 		assert.Equal(t, schema.GroupVersionResource{Group: "", Version: "v1", Resource: "services"}, actions[actionCounter].GetResource())
@@ -126,6 +131,75 @@ func TestJoinHandler(t *testing.T) {
 				BlockOwnerDeletion: &truePointer,
 			},
 		}, service.OwnerReferences)
+	})
+
+	t.Run("creates a per-team secret with a signed webhook url", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		clientset := fake.NewClientset(multiJuicerDeployment)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		secret, err := clientset.CoreV1().Secrets("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+		assert.NoError(t, err)
+
+		// LLM is disabled in the default test bundle — only the webhook url should be present.
+		assert.Contains(t, secret.Data, "solutionsWebhookUrl")
+		assert.NotContains(t, secret.Data, "llmApiKey")
+
+		// The signed URL must verify against the test signing key.
+		expectedSig := testutil.SignTestWebhookTeamname(team)
+		expectedURL := fmt.Sprintf("http://multijuicer-private.test-namespace.svc.cluster.local/team/%s/webhook/%s", team, expectedSig)
+		assert.Equal(t, expectedURL, string(secret.Data["solutionsWebhookUrl"]))
+
+		// Secret is owned by the team Deployment so it gets GC'd with it.
+		deployment, err := clientset.AppsV1().Deployments("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+		assert.NoError(t, err)
+		assert.Len(t, secret.OwnerReferences, 1)
+		assert.Equal(t, deployment.Name, secret.OwnerReferences[0].Name)
+		assert.Equal(t, deployment.UID, secret.OwnerReferences[0].UID)
+
+		// The Juice Shop container's SOLUTIONS_WEBHOOK env must be sourced from this secret, not a literal URL.
+		container := deployment.Spec.Template.Spec.Containers[0]
+		var webhookEnv *corev1.EnvVar
+		for i, env := range container.Env {
+			if env.Name == "SOLUTIONS_WEBHOOK" {
+				webhookEnv = &container.Env[i]
+				break
+			}
+		}
+		assert.NotNil(t, webhookEnv, "expected SOLUTIONS_WEBHOOK env var")
+		assert.Empty(t, webhookEnv.Value, "SOLUTIONS_WEBHOOK must be sourced from a Secret, not a literal value")
+		assert.NotNil(t, webhookEnv.ValueFrom)
+		assert.NotNil(t, webhookEnv.ValueFrom.SecretKeyRef)
+		assert.Equal(t, secret.Name, webhookEnv.ValueFrom.SecretKeyRef.Name)
+		assert.Equal(t, "solutionsWebhookUrl", webhookEnv.ValueFrom.SecretKeyRef.Key)
+	})
+
+	t.Run("includes llmApiKey in the team secret when LLM is enabled", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		clientset := fake.NewClientset(multiJuicerDeployment)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bundle.Config.JuiceShopConfig.LLM.Enabled = true
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		secret, err := clientset.CoreV1().Secrets("test-namespace").Get(context.Background(), fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
+		assert.NoError(t, err)
+		assert.Contains(t, secret.Data, "solutionsWebhookUrl")
+		assert.Contains(t, secret.Data, "llmApiKey")
 	})
 
 	t.Run("set secure flag on team cookie when configured", func(t *testing.T) {

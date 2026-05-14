@@ -154,13 +154,10 @@ func createANewTeam(context context.Context, bundle *bundle.Bundle, team string,
 		return
 	}
 
-	if bundle.Config.JuiceShopConfig.LLM.Enabled {
-		err = createLLMTokenSecretForTeam(context, bundle, team, deployment)
-		if err != nil {
-			bundle.Log.Error("Failed to create LLM token secret", "team", team, "error", err)
-			http.Error(w, "failed to create LLM token secret", http.StatusInternalServerError)
-			return
-		}
+	if err := createTeamSecret(context, bundle, team, deployment); err != nil {
+		bundle.Log.Error("Failed to create team secret", "team", team, "error", err)
+		http.Error(w, "failed to create team secret", http.StatusInternalServerError)
+		return
 	}
 
 	err = createServiceForTeam(context, bundle, team, deployment)
@@ -485,6 +482,8 @@ func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team s
 }
 
 func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
+	secretName := fmt.Sprintf("juiceshop-%s", team)
+
 	envVars := append(
 		slices.Clone(bundle.Config.JuiceShopConfig.Env),
 		corev1.EnvVar{
@@ -496,8 +495,15 @@ func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
 			Value: bundle.Config.JuiceShopConfig.CtfKey,
 		},
 		corev1.EnvVar{
-			Name:  "SOLUTIONS_WEBHOOK",
-			Value: fmt.Sprintf("http://multijuicer-private.%s.svc.cluster.local/team/%s/webhook", bundle.RuntimeEnvironment.Namespace, team),
+			Name: "SOLUTIONS_WEBHOOK",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: secretName,
+					},
+					Key: "solutionsWebhookUrl",
+				},
+			},
 		},
 	)
 
@@ -507,9 +513,9 @@ func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: fmt.Sprintf("juiceshop-%s", team),
+						Name: secretName,
 					},
-					Key: "token",
+					Key: "llmApiKey",
 				},
 			},
 		})
@@ -518,10 +524,30 @@ func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
 	return envVars
 }
 
-func createLLMTokenSecretForTeam(ctx context.Context, bundle *bundle.Bundle, team string, ownerDeployment *appsv1.Deployment) error {
-	token, err := signutil.Sign(team, bundle.Config.CookieConfig.SigningKey)
+// createTeamSecret creates the per-team Kubernetes Secret holding the signed
+// solutions-webhook URL (and, when configured, the LLM gateway token). The
+// Secret is owned by the team Deployment so it is garbage-collected together
+// with the team.
+func createTeamSecret(ctx context.Context, b *bundle.Bundle, team string, ownerDeployment *appsv1.Deployment) error {
+	webhookSig, err := signutil.SignWebhookTeam(team, b.Config.WebhookConfig.SigningKey)
 	if err != nil {
-		return fmt.Errorf("failed to sign LLM token: %w", err)
+		return fmt.Errorf("failed to sign webhook url: %w", err)
+	}
+	webhookURL := fmt.Sprintf(
+		"http://multijuicer-private.%s.svc.cluster.local/team/%s/webhook/%s",
+		b.RuntimeEnvironment.Namespace, team, webhookSig,
+	)
+
+	data := map[string][]byte{
+		"solutionsWebhookUrl": []byte(webhookURL),
+	}
+
+	if b.Config.JuiceShopConfig.LLM.Enabled {
+		llmToken, err := signutil.Sign(team, b.Config.CookieConfig.SigningKey)
+		if err != nil {
+			return fmt.Errorf("failed to sign LLM token: %w", err)
+		}
+		data["llmApiKey"] = []byte(llmToken)
 	}
 
 	secret := &corev1.Secret{
@@ -529,19 +555,17 @@ func createLLMTokenSecretForTeam(ctx context.Context, bundle *bundle.Bundle, tea
 			Name: fmt.Sprintf("juiceshop-%s", team),
 			Labels: map[string]string{
 				"team":                        team,
-				"app.kubernetes.io/component": "llm-token",
+				"app.kubernetes.io/component": "juice-shop-credentials",
 				"app.kubernetes.io/part-of":   "multi-juicer",
 			},
 			OwnerReferences: getDeploymentOwnerReferences(ownerDeployment),
 		},
-		Data: map[string][]byte{
-			"token": []byte(token),
-		},
+		Data: data,
 	}
 
-	_, err = bundle.ClientSet.CoreV1().Secrets(bundle.RuntimeEnvironment.Namespace).Create(ctx, secret, metav1.CreateOptions{})
+	_, err = b.ClientSet.CoreV1().Secrets(b.RuntimeEnvironment.Namespace).Create(ctx, secret, metav1.CreateOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to create LLM token secret: %w", err)
+		return fmt.Errorf("failed to create team secret: %w", err)
 	}
 	return nil
 }

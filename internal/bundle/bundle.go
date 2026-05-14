@@ -51,6 +51,7 @@ type Config struct {
 	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
 	CookieConfig          CookieConfig    `json:"cookie"`
 	ThemeConfig           ThemeConfig     `json:"theme"`
+	WebhookConfig         WebhookConfig   `json:"webhook"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
 	Cleanup               CleanupConfig
@@ -83,6 +84,13 @@ type CookieConfig struct {
 
 	// Secure controls if the Secure attribute is set on the cookie.
 	Secure bool `json:"secure"`
+}
+
+// WebhookConfig holds settings for the cluster-internal solutions webhook.
+// The SigningKey is used to HMAC-sign each team's webhook URL so that a
+// compromised Juice Shop cannot forge solves for a different team.
+type WebhookConfig struct {
+	SigningKey string `json:"-"`
 }
 
 type LLMConfig struct {
@@ -249,6 +257,11 @@ func New() *Bundle {
 		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY' must be set"))
 	}
 
+	webhookSigningKey := os.Getenv("MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY")
+	if webhookSigningKey == "" {
+		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY' must be set"))
+	}
+
 	adminPasswordKey := os.Getenv("MULTI_JUICER_CONFIG_ADMIN_PASSWORD")
 	if adminPasswordKey == "" {
 		panic(errors.New("environment variable 'MULTI_JUICER_CONFIG_ADMIN_PASSWORD' must be set"))
@@ -269,6 +282,7 @@ func New() *Bundle {
 	}
 
 	config.CookieConfig.SigningKey = cookieSigningKey
+	config.WebhookConfig.SigningKey = webhookSigningKey
 	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
 	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
 

@@ -215,7 +215,7 @@ default values render correctly:
         metadata:
           annotations:
             checksum/config: 2244d4adba924361e1a70cf73c7d2e8519f328dc684c9efaa9bf09223d9260fc
-            checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
+            checksum/secret: 40bc73fed5819bbf8bd20feefc0adc65f8b4c1b3f1bb97e4e5ed0fd33663fafe
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
             app.kubernetes.io/name: multi-juicer
@@ -242,6 +242,11 @@ default values render correctly:
                   valueFrom:
                     secretKeyRef:
                       key: cookieParserSecret
+                      name: multi-juicer-secret
+                - name: MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: webhookSigningKey
                       name: multi-juicer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
                   value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
@@ -434,6 +439,7 @@ default values render correctly:
     data:
       adminPassword: QUJDREVGR0g=
       cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      webhookSigningKey: VEhJU19JU19BX0VYQU1QTEVfV0VCSE9PS19TSUdOSU5HX0tFWV9ET05UX1VTRV9USElT
     kind: Secret
     metadata:
       labels:
@@ -600,7 +606,7 @@ full values render out correctly:
         metadata:
           annotations:
             checksum/config: cbb616602c32f28306e32d90923b9292e16857f438a155578d2898c7a9537349
-            checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
+            checksum/secret: 40bc73fed5819bbf8bd20feefc0adc65f8b4c1b3f1bb97e4e5ed0fd33663fafe
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
             app.kubernetes.io/name: multi-juicer
@@ -627,6 +633,11 @@ full values render out correctly:
                   valueFrom:
                     secretKeyRef:
                       key: cookieParserSecret
+                      name: multi-juicer-secret
+                - name: MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: webhookSigningKey
                       name: multi-juicer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
                   value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
@@ -2502,6 +2513,7 @@ full values render out correctly:
     data:
       adminPassword: QUJDREVGR0g=
       cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      webhookSigningKey: VEhJU19JU19BX0VYQU1QTEVfV0VCSE9PS19TSUdOSU5HX0tFWV9ET05UX1VTRV9USElT
     kind: Secret
     metadata:
       labels:
@@ -2688,7 +2700,7 @@ production notes work correctly:
         metadata:
           annotations:
             checksum/config: cbb616602c32f28306e32d90923b9292e16857f438a155578d2898c7a9537349
-            checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
+            checksum/secret: 40bc73fed5819bbf8bd20feefc0adc65f8b4c1b3f1bb97e4e5ed0fd33663fafe
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
             app.kubernetes.io/name: multi-juicer
@@ -2715,6 +2727,11 @@ production notes work correctly:
                   valueFrom:
                     secretKeyRef:
                       key: cookieParserSecret
+                      name: multi-juicer-secret
+                - name: MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: webhookSigningKey
                       name: multi-juicer-secret
                 - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
                   value: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
@@ -2907,6 +2924,7 @@ production notes work correctly:
     data:
       adminPassword: QUJDREVGR0g=
       cookieParserSecret: VEhJU19JU19BX0VYQU1QTEVfRE9OVF9VU0VfVEhJU19BU19USEVfQUNUVUFMX1NFQ1JFVA==
+      webhookSigningKey: VEhJU19JU19BX0VYQU1QTEVfV0VCSE9PS19TSUdOSU5HX0tFWV9ET05UX1VTRV9USElT
     kind: Secret
     metadata:
       labels:

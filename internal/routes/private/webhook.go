@@ -9,6 +9,7 @@ import (
 
 	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/progresswatchdog"
+	"github.com/juice-shop/multi-juicer/internal/signutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,12 +36,21 @@ type juiceShopWebhook struct {
 }
 
 // NewSolutionsWebhookHandler returns the handler that JuiceShop instances call when a challenge is solved.
+// The {sig} path segment must be a valid HMAC of {team} produced with the multi-juicer webhook signing key —
+// this prevents a Juice Shop with RCE from forging solves for a different team.
 // It's safe to register this on every replica: PersistProgress patches deployment annotations idempotently
 // and an early "challenge already solved?" check makes duplicate webhooks no-ops.
 func NewSolutionsWebhookHandler(b *bundle.Bundle) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		team := r.PathValue("team")
+		sig := r.PathValue("sig")
+
+		if err := signutil.VerifyWebhookTeam(team, sig, b.Config.WebhookConfig.SigningKey); err != nil {
+			b.Log.Warn("rejected webhook with invalid signature", "team", team, "remoteAddr", r.RemoteAddr)
+			http.Error(w, "invalid signature", http.StatusUnauthorized)
+			return
+		}
 
 		var webhook juiceShopWebhook
 		if err := json.NewDecoder(r.Body).Decode(&webhook); err != nil {

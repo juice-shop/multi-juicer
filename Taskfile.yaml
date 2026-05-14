@@ -27,8 +27,7 @@ tasks:
         helm upgrade --install multi-juicer ./helm/multi-juicer \
           --set="imagePullPolicy=IfNotPresent" \
           --set="repository=local/multi-juicer" \
-          --set="tag={{.VERSION}}" \
-          --set="cookie.cookieParserSecret=dev-secret"
+          --set="tag={{.VERSION}}"
 
   build:
     aliases: [b]

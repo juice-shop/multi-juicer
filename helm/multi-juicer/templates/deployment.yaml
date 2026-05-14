@@ -58,6 +58,11 @@ spec:
               secretKeyRef:
                 key: cookieParserSecret
                 name: multi-juicer-secret
+          - name: MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webhookSigningKey
+                name: multi-juicer-secret
           - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
             value: {{ .Values.contentSecurityPolicy | quote }}
           - name: LOG_LEVEL
