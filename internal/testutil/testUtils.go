@@ -29,6 +29,7 @@ func NewTestBundle() *bundle.Bundle {
 }
 
 var testSigningKey = "test-signing-key"
+var testWebhookSigningKey = "test-webhook-signing-key"
 
 func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.Bundle {
 	return &bundle.Bundle{
@@ -85,6 +86,9 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 				Name:       "team",
 				Secure:     false,
 			},
+			WebhookConfig: bundle.WebhookConfig{
+				SigningKey: testWebhookSigningKey,
+			},
 			AdminConfig: &bundle.AdminConfig{
 				Password: "mock-admin-password",
 			},
@@ -94,6 +98,14 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 
 func SignTestTeamname(team string) string {
 	signed, err := signutil.Sign(team, testSigningKey)
+	if err != nil {
+		panic(err)
+	}
+	return signed
+}
+
+func SignTestWebhookTeamname(team string) string {
+	signed, err := signutil.SignWebhookTeam(team, testWebhookSigningKey)
 	if err != nil {
 		panic(err)
 	}

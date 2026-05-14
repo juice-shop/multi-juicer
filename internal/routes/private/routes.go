@@ -10,6 +10,6 @@ import (
 )
 
 func AddRoutes(ctx context.Context, mux *http.ServeMux, b *bundle.Bundle) {
-	mux.Handle("POST /team/{team}/webhook", metrics.TrackRequestMetrics(metrics.RequestTypeAPIInternal, middleware.RequireJSONContentType(NewSolutionsWebhookHandler(b))))
+	mux.Handle("POST /team/{team}/webhook/{sig}", metrics.TrackRequestMetrics(metrics.RequestTypeAPIInternal, middleware.RequireJSONContentType(NewSolutionsWebhookHandler(b))))
 	mux.Handle("/", metrics.TrackRequestMetrics(metrics.RequestTypeAPIInternal, newLLMGatewayHandler(ctx, b)))
 }

@@ -24,6 +24,8 @@ tests:
       adminPassword: "ABCDEFGH"
       cookie:
         cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+      webhook:
+        signingKey: "THIS_IS_A_EXAMPLE_WEBHOOK_SIGNING_KEY_DONT_USE_THIS"
     asserts:
       - matchSnapshot: {}
   - it: production notes work correctly
@@ -48,6 +50,8 @@ tests:
       cookie:
         cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
         secure: true
+      webhook:
+        signingKey: "THIS_IS_A_EXAMPLE_WEBHOOK_SIGNING_KEY_DONT_USE_THIS"
       metrics:
         basicAuth:
           password: "ROTATE_THIS_YOU_LAZY_ASS"
@@ -82,6 +86,8 @@ tests:
       cookie:
         cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
         secure: true
+      webhook:
+        signingKey: "THIS_IS_A_EXAMPLE_WEBHOOK_SIGNING_KEY_DONT_USE_THIS"
       metrics:
         basicAuth:
           password: "ROTATE_THIS_YOU_LAZY_ASS"

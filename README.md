@@ -41,6 +41,7 @@ Generally MultiJuicer runs on pretty much any kubernetes cluster, but to make it
 - [OpenShift](./guides/openshift/openshift.md)
 - [Plain Kubernetes](./guides/k8s/k8s.md)
 - [Azure](./guides/azure/azure.md)
+- [ArgoCD](./guides/argocd/argocd.md) (and other tools that render with `helm template`)
 
 ### Customizing the Setup
 
