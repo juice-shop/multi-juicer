@@ -2,6 +2,7 @@ package public
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -88,7 +89,7 @@ func handleAdminLogin(bundle *bundle.Bundle, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if requestBody.Passcode != bundle.Config.AdminConfig.Password {
+	if subtle.ConstantTimeCompare([]byte(requestBody.Passcode), []byte(bundle.Config.AdminConfig.Password)) != 1 {
 		failedLoginCounter.WithLabelValues("admin").Inc()
 		writeUnauthorizedResponse(w)
 		return
