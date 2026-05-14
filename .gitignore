@@ -10,3 +10,4 @@ ui/build/
 *.test
 
 .claude/
+/graphify-out
