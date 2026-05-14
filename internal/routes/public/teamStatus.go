@@ -73,9 +73,18 @@ func handleTeamStatus(b *bundle.Bundle) http.Handler {
 					return
 				}
 			} else {
-				// Specific team requested
+				// Specific team requested — require authentication and ownership
 				if !isValidTeamName(teamParam) {
 					http.Error(responseWriter, "invalid team name", http.StatusBadRequest)
+					return
+				}
+				requestingTeam, err := teamcookie.GetTeamFromRequest(b, req)
+				if err != nil {
+					http.Error(responseWriter, "", http.StatusUnauthorized)
+					return
+				}
+				if requestingTeam != "admin" && requestingTeam != teamParam {
+					http.Error(responseWriter, "", http.StatusForbidden)
 					return
 				}
 				team = teamParam
