@@ -55,6 +55,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("creates a deployment and service on join", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -129,6 +130,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("set secure flag on team cookie when configured", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -147,6 +149,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("refuses to create a team if max instances limit is reached", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -182,6 +185,7 @@ func TestJoinHandler(t *testing.T) {
 		}
 		for _, team := range invalidTeamnames {
 			req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+			req.Header.Set("Content-Type", "application/json")
 			rr := httptest.NewRecorder()
 			server.ServeHTTP(rr, req)
 			assert.Equal(t, http.StatusBadRequest, rr.Code, fmt.Sprintf("expected status code 400 for teamname '%s'", team))
@@ -190,6 +194,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("if team already exists then join requires a passcode", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), nil)
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -208,6 +213,7 @@ func TestJoinHandler(t *testing.T) {
 	t.Run("is able to join team when the requests includes a correct passcode", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "02101791"})
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -226,6 +232,7 @@ func TestJoinHandler(t *testing.T) {
 	t.Run("join is rejected when the passcode doesn't match", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "00000000"})
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -244,6 +251,7 @@ func TestJoinHandler(t *testing.T) {
 	t.Run("allows admins login with the correct passcode", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
 		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", bytes.NewReader(jsonPayload))
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -259,6 +267,7 @@ func TestJoinHandler(t *testing.T) {
 
 	t.Run("admin login returns usual 'requires auth' response when it get's no request body passed", func(t *testing.T) {
 		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", nil)
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -275,6 +284,7 @@ func TestJoinHandler(t *testing.T) {
 	t.Run("admin account requires the correct passcod", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "wrong-password"})
 		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", bytes.NewReader(jsonPayload))
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -291,6 +301,7 @@ func TestJoinHandler(t *testing.T) {
 	t.Run("admin login doesn't make any kubernetes api calls / creates not kubernetes resources", func(t *testing.T) {
 		jsonPayload, _ := json.Marshal(map[string]string{"passcode": "mock-admin-password"})
 		req, _ := http.NewRequest("POST", "/multi-juicer/api/teams/admin/join", bytes.NewReader(jsonPayload))
+		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
 		server := http.NewServeMux()
@@ -303,5 +314,36 @@ func TestJoinHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Len(t, clientset.Actions(), 0)
+	})
+
+	t.Run("rejects login CSRF via cross-site form submission (issue #525)", func(t *testing.T) {
+		// Browsers can only set Content-Type to application/x-www-form-urlencoded,
+		// multipart/form-data, or text/plain without triggering a CORS preflight.
+		// All three must be rejected so an attacker can't trick a victim into
+		// logging in as the attacker's team.
+		csrfContentTypes := []string{
+			"text/plain",
+			"application/x-www-form-urlencoded",
+			"multipart/form-data; boundary=----WebKitFormBoundary",
+			"",
+		}
+		for _, ct := range csrfContentTypes {
+			jsonPayload := []byte(`{"passcode":"02101791","whatever":"`)
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/teams/%s/join", team), bytes.NewReader(jsonPayload))
+			if ct != "" {
+				req.Header.Set("Content-Type", ct)
+			}
+			rr := httptest.NewRecorder()
+
+			server := http.NewServeMux()
+			clientset := fake.NewClientset(multiJuicerDeployment, createTeam(team))
+			bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+			AddRoutes(server, bundle)
+
+			server.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusUnsupportedMediaType, rr.Code, fmt.Sprintf("expected 415 for Content-Type %q", ct))
+			assert.Equal(t, "", rr.Header().Get("Set-Cookie"), fmt.Sprintf("no cookie should be set for Content-Type %q", ct))
+		}
 	})
 }

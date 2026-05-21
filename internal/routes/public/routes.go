@@ -5,6 +5,7 @@ import (
 
 	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/metrics"
+	"github.com/juice-shop/multi-juicer/internal/routes/middleware"
 )
 
 func AddRoutes(
@@ -14,11 +15,14 @@ func AddRoutes(
 	api := func(h http.Handler) http.Handler {
 		return metrics.TrackRequestMetrics(metrics.RequestTypeAPIPublic, h)
 	}
+	jsonAPI := func(h http.Handler) http.Handler {
+		return api(middleware.RequireJSONContentType(h))
+	}
 
 	router.Handle("/", metrics.TrackRequestMetrics(metrics.RequestTypeProxy, handleProxy(bundle)))
 	router.Handle("GET /multi-juicer", api(redirectLoggedInTeamsToStatus(bundle, handleStaticFiles(bundle))))
 	router.Handle("GET /multi-juicer/", api(handleStaticFiles(bundle)))
-	router.Handle("POST /multi-juicer/api/teams/{team}/join", api(handleTeamJoin(bundle)))
+	router.Handle("POST /multi-juicer/api/teams/{team}/join", jsonAPI(handleTeamJoin(bundle)))
 	router.Handle("POST /multi-juicer/api/teams/logout", api(handleLogout(bundle)))
 	router.Handle("POST /multi-juicer/api/teams/reset-passcode", api(handleResetPasscode(bundle)))
 	router.Handle("GET /multi-juicer/api/score-board/top", api(handleScoreBoard(bundle)))
@@ -32,8 +36,8 @@ func AddRoutes(
 	router.Handle("GET /multi-juicer/api/admin/all", api(requireAdmin(bundle, handleAdminListInstances(bundle))))
 	router.Handle("DELETE /multi-juicer/api/admin/teams/{team}/delete", api(requireAdmin(bundle, handleAdminDeleteInstance(bundle))))
 	router.Handle("POST /multi-juicer/api/admin/teams/{team}/restart", api(requireAdmin(bundle, handleAdminRestartInstance(bundle))))
-	router.Handle("POST /multi-juicer/api/admin/notifications", api(requireAdmin(bundle, handleAdminPostNotification(bundle))))
-	router.Handle("POST /multi-juicer/api/admin/clock", api(requireAdmin(bundle, handleAdminSetClock(bundle))))
+	router.Handle("POST /multi-juicer/api/admin/notifications", jsonAPI(requireAdmin(bundle, handleAdminPostNotification(bundle))))
+	router.Handle("POST /multi-juicer/api/admin/clock", jsonAPI(requireAdmin(bundle, handleAdminSetClock(bundle))))
 	router.Handle("POST /multi-juicer/api/admin/teams/{team}/reset-passcode", api(requireAdmin(bundle, handleAdminResetPasscode(bundle))))
 
 	router.HandleFunc("GET /multi-juicer/api/health", func(w http.ResponseWriter, r *http.Request) {
