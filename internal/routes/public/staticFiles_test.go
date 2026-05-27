@@ -100,4 +100,20 @@ func TestStaticFileHandler(t *testing.T) {
 
 		assert.Empty(t, rr.Header().Get("Content-Security-Policy"))
 	})
+
+	t.Run("should redirect the balancer logo when a custom logo URL is configured", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/multi-juicer/multi-juicer.svg", nil)
+		rr := httptest.NewRecorder()
+
+		server := http.NewServeMux()
+		bundle := testutil.NewTestBundle()
+		bundle.StaticAssetsDirectory = testutil.UIBuildDir()
+		bundle.Config.BalancerConfig.LogoURL = "/multi-juicer/custom/logo.png"
+		AddRoutes(server, bundle)
+
+		server.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusFound, rr.Code)
+		assert.Equal(t, "/multi-juicer/custom/logo.png", rr.Header().Get("Location"))
+	})
 }
