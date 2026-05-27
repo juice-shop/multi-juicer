@@ -90,6 +90,10 @@ metrics:
     # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
     labels: {}
 
+balancer:
+  # -- Optional URL to a custom logo for the MultiJuicer balancer UI. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
+  logoUrl: ""
+
 config:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10

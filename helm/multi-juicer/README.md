@@ -19,6 +19,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| balancer.logoUrl | string | `""` | Optional URL to a custom logo for the MultiJuicer balancer UI. If this points to an external host, update `contentSecurityPolicy` to allow that image source. |
 | config.juiceShop.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | config.juiceShop.config | object | See values.yaml for full details | Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/companion-guide/latest/part4/customization.html#_yaml_configuration_file |
 | config.juiceShop.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |

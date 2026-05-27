@@ -20,6 +20,11 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/multi-juicer/multi-juicer.svg" && bundle.Config.BalancerConfig.LogoURL != "" {
+			http.Redirect(w, r, bundle.Config.BalancerConfig.LogoURL, http.StatusFound)
+			return
+		}
+
 		for _, route := range frontendRoutePatterns {
 			if route.MatchString(r.URL.Path) {
 				// Set Content Security Policy header for index.html if configured

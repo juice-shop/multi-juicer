@@ -50,9 +50,14 @@ type Config struct {
 	MaxInstances          int             `json:"maxInstances"`
 	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
 	CookieConfig          CookieConfig    `json:"cookie"`
+	BalancerConfig        BalancerConfig  `json:"balancer"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
 	Cleanup               CleanupConfig
+}
+
+type BalancerConfig struct {
+	LogoURL string `json:"logoUrl"`
 }
 
 type CleanupConfig struct {
@@ -254,6 +259,7 @@ func New() *Bundle {
 	config.CookieConfig.SigningKey = cookieSigningKey
 	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
 	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
+	config.BalancerConfig.LogoURL = os.Getenv("MULTI_JUICER_BALANCER_LOGO_URL")
 
 	if config.JuiceShopConfig.LLM.Enabled {
 		llmAPIKey := os.Getenv("LLM_API_KEY")
