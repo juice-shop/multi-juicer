@@ -32,10 +32,10 @@ func TestPasscode(t *testing.T) {
 			passcodes.WriteString(passcode)
 		}
 
-		//check that we have at least one letter
+		// check that we have at least one letter
 		assert.Regexp(t, "[A-Z]", passcodes.String())
 
-		//check that we have at least one number
+		// check that we have at least one number
 		assert.Regexp(t, "[0-9]", passcodes.String())
 	})
 }

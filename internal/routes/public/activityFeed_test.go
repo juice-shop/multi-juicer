@@ -129,11 +129,12 @@ func TestActivityFeedHandler(t *testing.T) {
 		var teamAlphaEvent, teamBravoC1Event, teamBravoC2Event *ChallengeSolvedEvent
 		for _, event := range feed {
 			if solvedEvent, ok := IsChallengeSolvedEvent(event); ok {
-				if solvedEvent.GetTeam() == "team-alpha" {
+				switch {
+				case solvedEvent.GetTeam() == "team-alpha":
 					teamAlphaEvent = solvedEvent
-				} else if solvedEvent.ChallengeKey == challenge1 {
+				case solvedEvent.ChallengeKey == challenge1:
 					teamBravoC1Event = solvedEvent
-				} else {
+				default:
 					teamBravoC2Event = solvedEvent
 				}
 			}

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"slices"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -52,7 +53,8 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 		}
 
 		deployment, err := getDeployment(r.Context(), bundle, team)
-		if err != nil && errors.IsNotFound(err) {
+		switch {
+		case err != nil && errors.IsNotFound(err):
 			isMaxLimitReached, err := isMaxInstanceLimitReached(r.Context(), bundle)
 			if err != nil {
 				http.Error(w, "failed to check max instance limit", http.StatusInternalServerError)
@@ -63,10 +65,10 @@ func handleTeamJoin(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 			createANewTeam(r.Context(), bundle, team, w)
-		} else if err == nil {
-			joinExistingTeam(bundle, team, deployment, w, r)
-		} else {
+		case err != nil:
 			http.Error(w, "failed to get deployment", http.StatusInternalServerError)
+		default:
+			joinExistingTeam(bundle, team, deployment, w, r)
 		}
 	})
 }
@@ -484,7 +486,7 @@ func createServiceForTeam(context context.Context, bundle *bundle.Bundle, team s
 
 func buildJuiceShopEnv(bundle *bundle.Bundle, team string) []corev1.EnvVar {
 	envVars := append(
-		bundle.Config.JuiceShopConfig.Env,
+		slices.Clone(bundle.Config.JuiceShopConfig.Env),
 		corev1.EnvVar{
 			Name:  "NODE_ENV",
 			Value: bundle.Config.JuiceShopConfig.NodeEnv,

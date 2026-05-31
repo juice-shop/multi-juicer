@@ -109,7 +109,7 @@ func TestAdminResetPasscodeHandler(t *testing.T) {
 	})
 
 	t.Run("admin reset passcode validates team name", func(t *testing.T) {
-		invalidTeam := "invalid team name!" //spaces present in team name
+		invalidTeam := "invalid team name!" // spaces present in team name
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/multi-juicer/api/admin/teams/%s/reset-passcode", invalidTeam), nil)
 		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname("admin")))
 		req.SetPathValue("team", invalidTeam)

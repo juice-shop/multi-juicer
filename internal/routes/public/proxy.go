@@ -91,12 +91,15 @@ const (
 func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) instanceStatus {
 	deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context, fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 
-	if errors.IsNotFound(err) {
+	switch {
+	case errors.IsNotFound(err):
 		return instanceMissing
-	} else if err != nil {
+	case err != nil:
 		bundle.Log.Error("Failed to lookup if an instance is up in the kubernetes api. Assuming it's missing.", "error", err)
 		return instanceMissing
-	} else if deployment.Status.ReadyReplicas > 0 {
+	case deployment.Status.ReadyReplicas < 1:
+		return instanceDown
+	default:
 		err = updateLastRequestTimestamp(context, bundle, team)
 		if err != nil {
 			// we will continue here, as a working proxy is more important than a up to date timestamp.
@@ -104,7 +107,6 @@ func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) i
 		}
 		return instanceUp
 	}
-	return instanceDown
 }
 
 type UpdateProgressDeploymentDiff struct {
