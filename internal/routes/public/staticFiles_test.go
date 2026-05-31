@@ -108,12 +108,30 @@ func TestStaticFileHandler(t *testing.T) {
 		server := http.NewServeMux()
 		bundle := testutil.NewTestBundle()
 		bundle.StaticAssetsDirectory = testutil.UIBuildDir()
-		bundle.Config.BalancerConfig.LogoURL = "/multi-juicer/custom/logo.png"
+		bundle.Config.ThemeConfig.LogoURL = "/multi-juicer/custom/logo.png"
 		AddRoutes(server, bundle)
 
 		server.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusFound, rr.Code)
 		assert.Equal(t, "/multi-juicer/custom/logo.png", rr.Header().Get("Location"))
+	})
+
+	t.Run("should redirect the favicon when a custom favicon URL is configured", func(t *testing.T) {
+		for _, path := range []string{"/multi-juicer/favicon.ico", "/multi-juicer/favicon.svg"} {
+			req, _ := http.NewRequest("GET", path, nil)
+			rr := httptest.NewRecorder()
+
+			server := http.NewServeMux()
+			bundle := testutil.NewTestBundle()
+			bundle.StaticAssetsDirectory = testutil.UIBuildDir()
+			bundle.Config.ThemeConfig.FaviconURL = "/multi-juicer/custom/favicon.png"
+			AddRoutes(server, bundle)
+
+			server.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusFound, rr.Code)
+			assert.Equal(t, "/multi-juicer/custom/favicon.png", rr.Header().Get("Location"))
+		}
 	})
 }

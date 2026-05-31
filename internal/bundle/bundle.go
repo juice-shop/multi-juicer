@@ -50,14 +50,18 @@ type Config struct {
 	MaxInstances          int             `json:"maxInstances"`
 	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
 	CookieConfig          CookieConfig    `json:"cookie"`
-	BalancerConfig        BalancerConfig  `json:"balancer"`
+	ThemeConfig           ThemeConfig     `json:"theme"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
 	Cleanup               CleanupConfig
 }
 
-type BalancerConfig struct {
+// ThemeConfig customizes the look of the MultiJuicer balancer UI itself
+type ThemeConfig struct {
+	// LogoURL overrides the MultiJuicer logo shown in the balancer UI.
 	LogoURL string `json:"logoUrl"`
+	// FaviconURL overrides the favicon used by the balancer UI.
+	FaviconURL string `json:"faviconUrl"`
 }
 
 type CleanupConfig struct {
@@ -259,7 +263,6 @@ func New() *Bundle {
 	config.CookieConfig.SigningKey = cookieSigningKey
 	config.AdminConfig = &AdminConfig{Password: adminPasswordKey}
 	config.ContentSecurityPolicy = os.Getenv("MULTI_JUICER_CONTENT_SECURITY_POLICY")
-	config.BalancerConfig.LogoURL = os.Getenv("MULTI_JUICER_BALANCER_LOGO_URL")
 
 	if config.JuiceShopConfig.LLM.Enabled {
 		llmAPIKey := os.Getenv("LLM_API_KEY")

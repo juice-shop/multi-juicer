@@ -60,10 +60,6 @@ spec:
                 name: multi-juicer-secret
           - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
             value: {{ .Values.contentSecurityPolicy | quote }}
-          {{- if .Values.balancer.logoUrl }}
-          - name: MULTI_JUICER_BALANCER_LOGO_URL
-            value: {{ .Values.balancer.logoUrl | quote }}
-          {{- end }}
           - name: LOG_LEVEL
             value: {{ .Values.logLevel | default "info" | quote }}
           {{- if .Values.config.juiceShop.llm.enabled }}

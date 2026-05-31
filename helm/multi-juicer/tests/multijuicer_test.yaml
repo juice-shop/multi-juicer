@@ -97,3 +97,19 @@ tests:
         ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
     asserts:
       - matchSnapshot: {}
+  - it: custom balancer theme renders into the config map
+    templates:
+      - templates/config-map.yaml
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    set:
+      adminPassword: "ABCDEFGH"
+      cookie:
+        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+      config:
+        theme:
+          logoUrl: "https://example.com/custom-logo.svg"
+          faviconUrl: "https://example.com/custom-favicon.ico"
+    asserts:
+      - matchSnapshot: {}

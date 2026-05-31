@@ -20,8 +20,13 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/multi-juicer/multi-juicer.svg" && bundle.Config.BalancerConfig.LogoURL != "" {
-			http.Redirect(w, r, bundle.Config.BalancerConfig.LogoURL, http.StatusFound)
+		if r.URL.Path == "/multi-juicer/multi-juicer.svg" && bundle.Config.ThemeConfig.LogoURL != "" {
+			http.Redirect(w, r, bundle.Config.ThemeConfig.LogoURL, http.StatusFound)
+			return
+		}
+
+		if (r.URL.Path == "/multi-juicer/favicon.ico" || r.URL.Path == "/multi-juicer/favicon.svg") && bundle.Config.ThemeConfig.FaviconURL != "" {
+			http.Redirect(w, r, bundle.Config.ThemeConfig.FaviconURL, http.StatusFound)
 			return
 		}
 

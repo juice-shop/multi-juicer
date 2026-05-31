@@ -90,15 +90,16 @@ metrics:
     # -- If you use the kube-prometheus-stack helm chart, the default label looked for is `release=<kube-prometheus-release-name>
     labels: {}
 
-balancer:
-  # -- Optional URL to a custom logo for the MultiJuicer balancer UI. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
-  logoUrl: ""
-
 config:
   # -- Specifies how many JuiceShop instances MultiJuicer should start at max. Set to -1 to remove the max Juice Shop instance cap
   maxInstances: 10
   # -- Passcode length for the team passcode, needs to be at least 8 characters long and a multiple of 4. e.g 8, 12, 16.
   teamPasscodeLength: 12
+  theme:
+    # -- Optional URL to a custom logo for the MultiJuicer balancer UI (the team join, scoreboard and admin pages). This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.logo` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
+    logoUrl: ""
+    # -- Optional URL to a custom favicon for the MultiJuicer balancer UI (the team join, scoreboard and admin pages). This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.favicon` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
+    faviconUrl: ""
   juiceShop:
     # -- Juice Shop Image to use
     image: bkimminich/juice-shop

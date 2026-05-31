@@ -1,3 +1,100 @@
+custom balancer theme renders into the config map:
+  1: |
+    apiVersion: v1
+    data:
+      config.json: |
+        {
+          "cookie": {
+            "name": "multi-juicer",
+            "secure": false
+          },
+          "juiceShop": {
+            "affinity": {},
+            "config": {
+              "application": {
+                "favicon": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/ui/public/favicon.ico",
+                "logo": "https://raw.githubusercontent.com/juice-shop/multi-juicer/main/images/multijuicer-icon-only-padding.png",
+                "showGitHubLinks": false,
+                "showVersionNumber": false
+              },
+              "challenges": {
+                "showHints": true
+              },
+              "ctf": {
+                "showFlagsInNotifications": false,
+                "systemWideNotifications": {
+                  "pollFrequencySeconds": 15,
+                  "url": "/multi-juicer/api/notifications"
+                }
+              },
+              "hackingInstructor": {
+                "isEnabled": true
+              }
+            },
+            "containerSecurityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "ctfKey": "zLp@.-6fMW6L-7R3b!9uR_K!NfkkTr",
+            "deleteInactiveAfter": "24h",
+            "env": [],
+            "envFrom": [],
+            "image": "bkimminich/juice-shop",
+            "imagePullPolicy": "IfNotPresent",
+            "imagePullSecrets": [],
+            "llm": {
+              "apiUrl": "",
+              "enabled": false,
+              "existingSecret": {
+                "key": "token",
+                "name": "multi-juicer-llm"
+              },
+              "model": ""
+            },
+            "nodeEnv": "multi-juicer",
+            "pod": {
+              "annotations": {},
+              "labels": {}
+            },
+            "podSecurityContext": {
+              "runAsNonRoot": true,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "150m",
+                "memory": "300Mi"
+              }
+            },
+            "runtimeClassName": null,
+            "tag": "v20.0.0",
+            "tolerations": [],
+            "volumeMounts": [],
+            "volumes": []
+          },
+          "maxInstances": 10,
+          "teamPasscodeLength": 12,
+          "theme": {
+            "faviconUrl": "https://example.com/custom-favicon.ico",
+            "logoUrl": "https://example.com/custom-logo.svg"
+          }
+        }
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: multi-juicer
+        app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: multi-juicer
+        app.kubernetes.io/part-of: multi-juicer
+        app.kubernetes.io/version: 42.0.0
+      name: multi-juicer-config
 default values render correctly:
   1: |
     apiVersion: v1
@@ -79,7 +176,11 @@ default values render correctly:
             "volumes": []
           },
           "maxInstances": 10,
-          "teamPasscodeLength": 12
+          "teamPasscodeLength": 12,
+          "theme": {
+            "faviconUrl": "",
+            "logoUrl": ""
+          }
         }
     kind: ConfigMap
     metadata:
@@ -113,7 +214,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: ca328a6adf1df26d8c16ff954dbe69a968145448d4976ce487e79a954f2289a4
+            checksum/config: 2244d4adba924361e1a70cf73c7d2e8519f328dc684c9efaa9bf09223d9260fc
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -460,7 +561,11 @@ full values render out correctly:
             "volumes": []
           },
           "maxInstances": 10,
-          "teamPasscodeLength": 12
+          "teamPasscodeLength": 12,
+          "theme": {
+            "faviconUrl": "",
+            "logoUrl": ""
+          }
         }
     kind: ConfigMap
     metadata:
@@ -494,7 +599,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1469a842b79d36d0da18b2f3eb76bc998e0871aa3cbbd23de1992b566b5a90ed
+            checksum/config: cbb616602c32f28306e32d90923b9292e16857f438a155578d2898c7a9537349
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2544,7 +2649,11 @@ production notes work correctly:
             "volumes": []
           },
           "maxInstances": 10,
-          "teamPasscodeLength": 12
+          "teamPasscodeLength": 12,
+          "theme": {
+            "faviconUrl": "",
+            "logoUrl": ""
+          }
         }
     kind: ConfigMap
     metadata:
@@ -2578,7 +2687,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 1469a842b79d36d0da18b2f3eb76bc998e0871aa3cbbd23de1992b566b5a90ed
+            checksum/config: cbb616602c32f28306e32d90923b9292e16857f438a155578d2898c7a9537349
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
