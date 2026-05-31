@@ -96,9 +96,9 @@ config:
   # -- Passcode length for the team passcode, needs to be at least 8 characters long and a multiple of 4. e.g 8, 12, 16.
   teamPasscodeLength: 12
   theme:
-    # -- Optional URL to a custom logo for the MultiJuicer balancer UI (the team join, scoreboard and admin pages). This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.logo` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
+    # -- Optional URL to a custom logo for the MultiJuicer balancer UI (the team join, scoreboard and admin pages), e.g. `http://example.com/logo.svg`. A horizontally-oriented logo is preferred, as the default MultiJuicer logo combines an icon with the "MultiJuicer" wordmark. This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.logo` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
     logoUrl: ""
-    # -- Optional URL to a custom favicon for the MultiJuicer balancer UI (the team join, scoreboard and admin pages). This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.favicon` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
+    # -- Optional URL to a custom favicon for the MultiJuicer balancer UI (the team join, scoreboard and admin pages), e.g. `http://example.com/favicon.svg`. An `.svg` is the preferred format; raster formats (`.ico`/`.png`) also work for the regular favicon, might come with issues in some browsers. This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.favicon` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
     faviconUrl: ""
   juiceShop:
     # -- Juice Shop Image to use
