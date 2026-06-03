@@ -14,6 +14,13 @@ const availableLanguages: Language[] = [
     messageLoader: () => Promise.resolve({ default: {} }),
   },
   {
+    flag: "🇫🇷",
+    name: "French",
+    key: "fr-FR",
+    messageLoader: () =>
+      import("./fr-FR") as Promise<{ default: Record<string, string> }>,
+  },
+  {
     flag: "🇩🇪",
     name: "German",
     key: "de-DE",
