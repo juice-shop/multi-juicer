@@ -68,6 +68,8 @@ spec:
               secretKeyRef:
                 name: {{ .Values.config.juiceShop.llm.existingSecret.name }}
                 key: {{ .Values.config.juiceShop.llm.existingSecret.key }}
+          - name: LLM_API_URL
+            value: {{ .Values.config.juiceShop.llm.apiUrl | quote }}
           {{- end }}
           ports:
             - name: http
