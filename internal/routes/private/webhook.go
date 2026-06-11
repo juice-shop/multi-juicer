@@ -48,6 +48,16 @@ func NewSolutionsWebhookHandler(b *bundle.Bundle) http.HandlerFunc {
 			return
 		}
 
+		// Once the event countdown has elapsed and scoreboard freezing is enabled,
+		// new challenge solves reported by JuiceShops are ignored so the final
+		// scores stay locked in. We still ack with 200 so JuiceShop doesn't retry.
+		if b.NotificationService.IsScoreboardFrozen() {
+			b.Log.Info("Scoreboard frozen, ignoring solve webhook", "team", team, "challenge", webhook.Solution.Challenge)
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("ok"))
+			return
+		}
+
 		deployment, err := b.ClientSet.AppsV1().Deployments(b.RuntimeEnvironment.Namespace).Get(ctx, fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 		if err != nil {
 			b.Log.Error("failed to get deployment for team received via webhook", "team", team, "error", err)

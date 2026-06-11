@@ -179,6 +179,10 @@ type Notification struct {
 	Enabled   bool       `json:"enabled"`
 	UpdatedAt time.Time  `json:"updatedAt"`
 	EndDate   *time.Time `json:"endDate,omitempty"`
+	// FreezeScoreboardOnEnd, when true, freezes the scoreboard once the countdown
+	// (EndDate) has elapsed: challenge solves reported by JuiceShops after the
+	// end date are ignored so the final scores stay locked in.
+	FreezeScoreboardOnEnd bool `json:"freezeScoreboardOnEnd"`
 }
 
 // ScoringService defines the interface for the scoring service
@@ -200,7 +204,10 @@ type NotificationService interface {
 	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) (*Notification, time.Time, bool)
 	StartNotificationWatcher(ctx context.Context)
 	SetNotification(ctx context.Context, message string, enabled bool) error
-	SetEndDate(ctx context.Context, endDate *time.Time) error
+	SetEndDate(ctx context.Context, endDate *time.Time, freezeScoreboardOnEnd bool) error
+	// IsScoreboardFrozen reports whether the scoreboard is currently frozen,
+	// i.e. freezing is enabled and the configured end date has already passed.
+	IsScoreboardFrozen() bool
 }
 
 // ParseLogLevel converts a log level string to a slog.Level.

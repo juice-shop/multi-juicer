@@ -142,10 +142,22 @@ func workOnProgressUpdates(ctx context.Context, b *bundle.Bundle, progressUpdate
 			continue
 		}
 
+		// When the scoreboard is frozen (event countdown elapsed + freezing enabled)
+		// we still restore already-recorded progress to JuiceShop pods that lost it
+		// (ApplyCode), but we never record any newly discovered solves into the
+		// persisted progress, keeping the final scores locked in.
+		frozen := b.NotificationService.IsScoreboardFrozen()
+
 		switch CompareChallengeStates(challengeProgress, lastChallengeProgress) {
 		case ApplyCode:
 			b.Log.Debug("Last ContinueCode contains unsolved challenges", "team", job.Team)
 			applyChallengeProgress(b.Log, job.Team, lastChallengeProgress)
+
+			if frozen {
+				// Scoreboard frozen: progress was restored to the pod, but we don't
+				// persist anything that might include post-freeze solves.
+				continue
+			}
 
 			challengeProgress, err = getCurrentChallengeProgress(job.Team)
 
@@ -155,6 +167,10 @@ func workOnProgressUpdates(ctx context.Context, b *bundle.Bundle, progressUpdate
 			}
 			PersistProgress(ctx, b, job.Team, challengeProgress, nil)
 		case UpdateCache:
+			if frozen {
+				b.Log.Debug("Scoreboard frozen, ignoring newly discovered solves from background-sync", "team", job.Team)
+				continue
+			}
 			PersistProgress(ctx, b, job.Team, challengeProgress, nil)
 		case NoOp:
 		}

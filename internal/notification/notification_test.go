@@ -187,3 +187,102 @@ func TestWaitForUpdatesNewerThan(t *testing.T) {
 		assert.Less(t, elapsed, 200*time.Millisecond)
 	})
 }
+
+func TestIsScoreboardFrozen(t *testing.T) {
+	newService := func() *NotificationService {
+		clientset := fake.NewClientset()
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		return NewNotificationService(bundle)
+	}
+
+	t.Run("not frozen when no notification is set", func(t *testing.T) {
+		service := newService()
+		service.parseAndUpdateNotification(nil)
+		assert.False(t, service.IsScoreboardFrozen())
+	})
+
+	t.Run("not frozen when freezing is disabled even after end date", func(t *testing.T) {
+		service := newService()
+		past := time.Now().Add(-1 * time.Hour)
+		service.currentNotification = &b.Notification{
+			EndDate:               &past,
+			FreezeScoreboardOnEnd: false,
+		}
+		assert.False(t, service.IsScoreboardFrozen())
+	})
+
+	t.Run("not frozen when freezing is enabled but end date is in the future", func(t *testing.T) {
+		service := newService()
+		future := time.Now().Add(1 * time.Hour)
+		service.currentNotification = &b.Notification{
+			EndDate:               &future,
+			FreezeScoreboardOnEnd: true,
+		}
+		assert.False(t, service.IsScoreboardFrozen())
+	})
+
+	t.Run("not frozen when freezing is enabled but no end date is set", func(t *testing.T) {
+		service := newService()
+		service.currentNotification = &b.Notification{
+			EndDate:               nil,
+			FreezeScoreboardOnEnd: true,
+		}
+		assert.False(t, service.IsScoreboardFrozen())
+	})
+
+	t.Run("frozen when freezing is enabled and end date has elapsed", func(t *testing.T) {
+		service := newService()
+		past := time.Now().Add(-1 * time.Hour)
+		service.currentNotification = &b.Notification{
+			EndDate:               &past,
+			FreezeScoreboardOnEnd: true,
+		}
+		assert.True(t, service.IsScoreboardFrozen())
+	})
+}
+
+func TestSetEndDatePersistsFreezeFlag(t *testing.T) {
+	t.Run("persists the freeze flag alongside the end date", func(t *testing.T) {
+		clientset := fake.NewClientset()
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		service := NewNotificationService(bundle)
+
+		endDate := time.Now().Add(2 * time.Hour)
+		err := service.SetEndDate(context.Background(), &endDate, true)
+		assert.Nil(t, err)
+
+		cm, err := clientset.CoreV1().ConfigMaps(bundle.RuntimeEnvironment.Namespace).Get(
+			context.Background(),
+			"multi-juicer-notification",
+			metav1.GetOptions{},
+		)
+		assert.Nil(t, err)
+
+		var stored b.Notification
+		assert.Nil(t, json.Unmarshal([]byte(cm.Data["notification.json"]), &stored))
+		assert.True(t, stored.FreezeScoreboardOnEnd)
+		assert.NotNil(t, stored.EndDate)
+	})
+
+	t.Run("preserves the freeze flag when updating the message", func(t *testing.T) {
+		clientset := fake.NewClientset()
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		service := NewNotificationService(bundle)
+
+		endDate := time.Now().Add(2 * time.Hour)
+		assert.Nil(t, service.SetEndDate(context.Background(), &endDate, true))
+		assert.Nil(t, service.SetNotification(context.Background(), "hello", true))
+
+		cm, err := clientset.CoreV1().ConfigMaps(bundle.RuntimeEnvironment.Namespace).Get(
+			context.Background(),
+			"multi-juicer-notification",
+			metav1.GetOptions{},
+		)
+		assert.Nil(t, err)
+
+		var stored b.Notification
+		assert.Nil(t, json.Unmarshal([]byte(cm.Data["notification.json"]), &stored))
+		assert.Equal(t, "hello", stored.Message)
+		assert.True(t, stored.FreezeScoreboardOnEnd)
+	})
+}

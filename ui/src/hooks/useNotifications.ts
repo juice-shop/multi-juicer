@@ -9,6 +9,7 @@ export interface NotificationData {
   enabled: boolean;
   updatedAt: string; // ISO String
   endDate?: string; // ISO String, optional
+  freezeScoreboardOnEnd?: boolean; // freeze scores once the countdown reaches zero
 }
 
 /**

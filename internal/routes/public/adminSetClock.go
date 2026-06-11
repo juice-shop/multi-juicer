@@ -10,6 +10,8 @@ import (
 
 type AdminClockRequest struct {
 	EndDate *time.Time `json:"endDate"`
+	// FreezeScoreboardOnEnd freezes the scoreboard once the countdown reaches zero.
+	FreezeScoreboardOnEnd bool `json:"freezeScoreboardOnEnd"`
 }
 
 func handleAdminSetClock(bundle *bundle.Bundle) http.Handler {
@@ -29,7 +31,7 @@ func handleAdminSetClock(bundle *bundle.Bundle) http.Handler {
 			}
 
 			// Use the NotificationService to set the end date
-			if err := bundle.NotificationService.SetEndDate(req.Context(), clockReq.EndDate); err != nil {
+			if err := bundle.NotificationService.SetEndDate(req.Context(), clockReq.EndDate, clockReq.FreezeScoreboardOnEnd); err != nil {
 				bundle.Log.Error("Failed to set clock", "error", err)
 				http.Error(responseWriter, "", http.StatusInternalServerError)
 				return

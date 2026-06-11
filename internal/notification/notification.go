@@ -248,17 +248,19 @@ func (s *NotificationService) SetNotification(ctx context.Context, message strin
 	existing := s.readNotification(cm)
 
 	notificationData := bundle.Notification{
-		Message:   message,
-		Enabled:   enabled,
-		UpdatedAt: timeutil.TruncateToMillisecond(time.Now()),
-		EndDate:   existing.EndDate,
+		Message:               message,
+		Enabled:               enabled,
+		UpdatedAt:             timeutil.TruncateToMillisecond(time.Now()),
+		EndDate:               existing.EndDate,
+		FreezeScoreboardOnEnd: existing.FreezeScoreboardOnEnd,
 	}
 
 	return s.saveConfigMap(ctx, cm, existed, notificationData)
 }
 
 // SetEndDate updates or creates the notification ConfigMap, preserving the existing message and enabled fields.
-func (s *NotificationService) SetEndDate(ctx context.Context, endDate *time.Time) error {
+// freezeScoreboardOnEnd controls whether the scoreboard freezes once the countdown reaches zero.
+func (s *NotificationService) SetEndDate(ctx context.Context, endDate *time.Time, freezeScoreboardOnEnd bool) error {
 	cm, existed, err := s.getOrCreateConfigMap(ctx)
 	if err != nil {
 		return err
@@ -267,11 +269,25 @@ func (s *NotificationService) SetEndDate(ctx context.Context, endDate *time.Time
 	existing := s.readNotification(cm)
 
 	notificationData := bundle.Notification{
-		Message:   existing.Message,
-		Enabled:   existing.Enabled,
-		UpdatedAt: timeutil.TruncateToMillisecond(time.Now()),
-		EndDate:   endDate,
+		Message:               existing.Message,
+		Enabled:               existing.Enabled,
+		UpdatedAt:             timeutil.TruncateToMillisecond(time.Now()),
+		EndDate:               endDate,
+		FreezeScoreboardOnEnd: freezeScoreboardOnEnd,
 	}
 
 	return s.saveConfigMap(ctx, cm, existed, notificationData)
+}
+
+// IsScoreboardFrozen reports whether the scoreboard is currently frozen: freezing
+// is enabled for the event and the configured end date has already elapsed.
+func (s *NotificationService) IsScoreboardFrozen() bool {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	n := s.currentNotification
+	if n == nil || !n.FreezeScoreboardOnEnd || n.EndDate == nil {
+		return false
+	}
+	return time.Now().After(*n.EndDate)
 }

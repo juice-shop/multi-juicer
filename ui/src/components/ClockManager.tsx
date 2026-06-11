@@ -46,6 +46,7 @@ function formatRelativeTime(date: Date): {
 export function ClockManager() {
   const intl = useIntl();
   const [endDateStr, setEndDateStr] = useState("");
+  const [freezeScoreboardOnEnd, setFreezeScoreboardOnEnd] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -54,6 +55,9 @@ export function ClockManager() {
       .then((data) => {
         if (data?.endDate) {
           setEndDateStr(toDatetimeLocalString(new Date(data.endDate)));
+        }
+        if (typeof data?.freezeScoreboardOnEnd === "boolean") {
+          setFreezeScoreboardOnEnd(data.freezeScoreboardOnEnd);
         }
       })
       .catch(() => {});
@@ -89,6 +93,7 @@ export function ClockManager() {
         },
         body: JSON.stringify({
           endDate: new Date(endDateStr).toISOString(),
+          freezeScoreboardOnEnd,
         }),
       });
 
@@ -211,6 +216,31 @@ export function ClockManager() {
                 )}
               </p>
             )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="clock-freeze-scoreboard"
+              className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              <input
+                id="clock-freeze-scoreboard"
+                type="checkbox"
+                checked={freezeScoreboardOnEnd}
+                onChange={(e) => setFreezeScoreboardOnEnd(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <FormattedMessage
+                id="admin.clock.freeze_scoreboard.label"
+                defaultMessage="Freeze the scoreboard when the countdown reaches zero"
+              />
+            </label>
+            <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+              <FormattedMessage
+                id="admin.clock.freeze_scoreboard.hint"
+                defaultMessage="When enabled, challenge solves reported after the end date are ignored, locking in the final scores."
+              />
+            </p>
           </div>
 
           <div className="flex gap-2">

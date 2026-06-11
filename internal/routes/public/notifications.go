@@ -11,10 +11,11 @@ import (
 )
 
 type NotificationResponse struct {
-	Message   string     `json:"message"`
-	Enabled   bool       `json:"enabled"`
-	UpdatedAt time.Time  `json:"updatedAt"`
-	EndDate   *time.Time `json:"endDate,omitempty"`
+	Message               string     `json:"message"`
+	Enabled               bool       `json:"enabled"`
+	UpdatedAt             time.Time  `json:"updatedAt"`
+	EndDate               *time.Time `json:"endDate,omitempty"`
+	FreezeScoreboardOnEnd bool       `json:"freezeScoreboardOnEnd"`
 }
 
 func handleNotifications(b *bundle.Bundle) http.Handler {
@@ -36,10 +37,11 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 					}, lastUpdateTime, true, nil
 				}
 				return &NotificationResponse{
-					Message:   notification.Message,
-					Enabled:   notification.Enabled,
-					UpdatedAt: lastUpdateTime,
-					EndDate:   notification.EndDate,
+					Message:               notification.Message,
+					Enabled:               notification.Enabled,
+					UpdatedAt:             lastUpdateTime,
+					EndDate:               notification.EndDate,
+					FreezeScoreboardOnEnd: notification.FreezeScoreboardOnEnd,
 				}, lastUpdateTime, true, nil
 			}
 
@@ -53,10 +55,11 @@ func handleNotifications(b *bundle.Bundle) http.Handler {
 				}, lastUpdateTime, true, nil
 			}
 			return &NotificationResponse{
-				Message:   notification.Message,
-				Enabled:   notification.Enabled,
-				UpdatedAt: lastUpdateTime,
-				EndDate:   notification.EndDate,
+				Message:               notification.Message,
+				Enabled:               notification.Enabled,
+				UpdatedAt:             lastUpdateTime,
+				EndDate:               notification.EndDate,
+				FreezeScoreboardOnEnd: notification.FreezeScoreboardOnEnd,
 			}, lastUpdateTime, true, nil
 		}
 
