@@ -33,21 +33,19 @@ export function CtfGameClock({
           />
         </div>
       ) : (
-        <>
-          <div
-            className="text-center font-mono tabular-nums text-2xl font-bold text-ctf-primary"
-            style={{
-              textShadow:
-                "0 0 10px rgba(255,107,107,0.6), 0 0 20px rgba(255,107,107,0.3)",
-            }}
-          >
-            {pad2(countdown.hours)}:{pad2(countdown.minutes)}:
-            {pad2(countdown.seconds)}
-            <span className="text-base opacity-60">
-              .{pad2(countdown.milliseconds)}
-            </span>
-          </div>
-        </>
+        <div
+          className="text-center font-mono tabular-nums text-2xl font-bold text-ctf-primary"
+          style={{
+            textShadow:
+              "0 0 10px rgba(255,107,107,0.6), 0 0 20px rgba(255,107,107,0.3)",
+          }}
+        >
+          {pad2(countdown.hours)}:{pad2(countdown.minutes)}:
+          {pad2(countdown.seconds)}
+          <span className="text-base opacity-60">
+            .{pad2(countdown.milliseconds)}
+          </span>
+        </div>
       )}
     </div>
   );

@@ -3,7 +3,7 @@
  * Uses three-conic-polygon-geometry for proper spherical polygon rendering
  */
 
-import { BufferGeometry, BufferAttribute } from "three";
+import { BufferAttribute, BufferGeometry } from "three";
 import ConicPolygonGeometry from "three-conic-polygon-geometry";
 
 // GeoJSON type definitions
@@ -119,7 +119,7 @@ function processGeoJSON(
         // This ensures perfect alignment between borders and fills
         const borderGeometry = extractBoundaryEdges(conicGeometry);
 
-        if (conicGeometry && conicGeometry.attributes.position) {
+        if (conicGeometry?.attributes.position) {
           countries.push({
             name: countryName,
             partIndex: i,

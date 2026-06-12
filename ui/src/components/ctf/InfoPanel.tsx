@@ -11,8 +11,7 @@ interface InfoPanelProps {
 export function InfoPanel({ notification }: InfoPanelProps) {
   const intl = useIntl();
 
-  const hasNotification =
-    notification && notification.enabled && notification.message;
+  const hasNotification = notification?.enabled && notification.message;
 
   const sanitizedHtml = hasNotification
     ? DOMPurify.sanitize(snarkdown(notification.message))

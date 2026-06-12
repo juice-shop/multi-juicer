@@ -4,14 +4,14 @@
  * that originates from the country's capital.
  */
 
-import { Vector3, type BufferGeometry } from "three";
 import type { Mesh, ShaderMaterial } from "three";
+import { type BufferGeometry, Vector3 } from "three";
 
 import type { Animation } from "../globe-animator";
 
 /** Ease-out cubic */
 function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - t, 3);
+  return 1 - (1 - t) ** 3;
 }
 
 const DEFAULT_DURATION = 2700; // ms

@@ -1,15 +1,14 @@
 import {
-  Mesh,
   LineBasicMaterial,
-  WireframeGeometry,
   LineSegments,
-  Scene,
-  Vector3,
-  ShaderMaterial,
+  Mesh,
+  type Scene,
+  type ShaderMaterial,
+  type Vector3,
+  WireframeGeometry,
 } from "three";
 
 import { TextureCache } from "../patterns/texture-cache";
-
 import type { CountryGeometryManager } from "./country-geometry";
 import type { CountryData } from "./data/geojson-loader";
 import { createNeonPatternMaterial } from "./materials/neon-pattern";

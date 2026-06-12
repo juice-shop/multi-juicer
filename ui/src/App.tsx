@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { IntlProvider } from "react-intl";
 import { BrowserRouter, Route, Routes } from "react-router-dom";

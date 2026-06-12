@@ -6,7 +6,7 @@ import { Card } from "@/components/Card";
 import { LiveActivitySidebar } from "@/components/LiveActivitySidebar";
 import { PositionDisplay } from "@/components/PositionDisplay";
 import { Spinner } from "@/components/Spinner";
-import { useScoreboard, type TeamScore } from "@/hooks/useScoreboard";
+import { type TeamScore, useScoreboard } from "@/hooks/useScoreboard";
 
 // A list item component for all teams in the table
 const TeamListItem = ({

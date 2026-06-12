@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { InstanceNotFoundCard } from "@/cards/InstanceNotFoundCard";

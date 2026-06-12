@@ -8,12 +8,11 @@
  *   1500–4300ms: Country highlight glow pulse (overlaps with reveal)
  */
 
-import type { PerspectiveCamera, Mesh, Vector3 } from "three";
+import type { Mesh, PerspectiveCamera, Vector3 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 import type { Animation } from "../globe-animator";
 import type { GlobeRenderer } from "../globe-renderer";
-
 import { CameraFocusAnimation } from "./camera-focus";
 import { CountryHighlightAnimation } from "./country-highlight";
 import { PatternRevealAnimation } from "./pattern-reveal";

@@ -1,5 +1,5 @@
 import DOMPurify from "dompurify";
-import { FormattedMessage, useIntl, type IntlShape } from "react-intl";
+import { FormattedMessage, type IntlShape, useIntl } from "react-intl";
 
 import { useChallengeDetail } from "@/hooks/useChallengeDetail";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";

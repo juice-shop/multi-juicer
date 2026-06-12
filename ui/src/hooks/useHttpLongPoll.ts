@@ -18,7 +18,7 @@ export function extractLastUpdateTimestamp(
 
   const timestamp = new Date(timestampHeader);
   // Validate that the parsed date is valid
-  return isNaN(timestamp.getTime()) ? undefined : timestamp;
+  return Number.isNaN(timestamp.getTime()) ? undefined : timestamp;
 }
 
 export interface FetchResult<T> {

@@ -3,15 +3,15 @@
  * Works with OrbitControls by slerping camera position on the spherical shell.
  */
 
-import { Vector3 } from "three";
 import type { PerspectiveCamera } from "three";
+import { Vector3 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 import type { Animation } from "../globe-animator";
 
 /** Ease-in-out cubic */
 function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 }
 
 export class CameraFocusAnimation implements Animation {

@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
 import type { Challenge } from "@/hooks/useChallenges";
 import {
-  mapChallengesToCountries,
   getCountriesByChallengeStatus,
+  mapChallengesToCountries,
 } from "@/lib/challenges/challenge-mapper";
 import { CountryGeometryManager } from "@/lib/globe/country-geometry";
-import { loadGeoJSON, type CountryData } from "@/lib/globe/data/geojson-loader";
+import { type CountryData, loadGeoJSON } from "@/lib/globe/data/geojson-loader";
 
 // CSS Color Utilities
 function getCSSVariable(name: string): string {

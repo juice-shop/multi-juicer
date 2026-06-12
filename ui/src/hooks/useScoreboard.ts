@@ -1,7 +1,7 @@
 import {
-  useHttpLongPoll,
-  type FetchResult,
   extractLastUpdateTimestamp,
+  type FetchResult,
+  useHttpLongPoll,
 } from "./useHttpLongPoll";
 
 export interface TeamScore {

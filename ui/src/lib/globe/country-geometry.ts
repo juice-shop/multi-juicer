@@ -1,4 +1,4 @@
-import { BufferGeometry } from "three";
+import type { BufferGeometry } from "three";
 
 import type { CountryData } from "./data/geojson-loader";
 

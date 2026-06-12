@@ -1,9 +1,9 @@
 import {
-  ShaderMaterial,
-  Vector3,
   AdditiveBlending,
   DoubleSide,
-  Texture,
+  ShaderMaterial,
+  type Texture,
+  Vector3,
 } from "three";
 
 export function createNeonPatternMaterial(

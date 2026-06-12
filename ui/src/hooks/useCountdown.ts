@@ -88,7 +88,7 @@ export function useCountdown(
         cancelAnimationFrame(rafRef.current);
       }
     };
-  }, [endDate, startDate, compute]);
+  }, [endDate, compute]);
 
   return result;
 }

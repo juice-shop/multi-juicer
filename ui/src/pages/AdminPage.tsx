@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import Popup from "reactjs-popup";
 import type { PopupActions } from "reactjs-popup/dist/types";
 

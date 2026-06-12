@@ -2,10 +2,10 @@ import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
 
 import {
-  useActivityFeed,
   type ActivityEvent,
-  isTeamCreatedEvent,
   isChallengeSolvedEvent,
+  isTeamCreatedEvent,
+  useActivityFeed,
 } from "@/hooks/useActivityFeed";
 import { classNames } from "@/util/classNames";
 

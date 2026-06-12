@@ -1,4 +1,4 @@
-import { SphereGeometry, MeshBasicMaterial, Mesh, FrontSide } from "three";
+import { FrontSide, Mesh, MeshBasicMaterial, SphereGeometry } from "three";
 
 export function createOcclusionSphere(radius: number = 0.99): Mesh {
   const geometry = new SphereGeometry(radius, 32, 32);

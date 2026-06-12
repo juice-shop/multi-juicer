@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ChallengesPanel } from "@/components/ctf/ChallengesPanel";
 import { Globe, type GlobeHandle } from "@/components/ctf/Globe";
@@ -6,7 +6,7 @@ import { LeftPanels } from "@/components/ctf/LeftPanels";
 import { Loading } from "@/components/ctf/Loading";
 import { useActivityFeed } from "@/hooks/useActivityFeed";
 import { useActivitySolveProcessor } from "@/hooks/useActivitySolveProcessor";
-import { useChallenges, type Challenge } from "@/hooks/useChallenges";
+import { type Challenge, useChallenges } from "@/hooks/useChallenges";
 import { useGlobeDataLoader } from "@/hooks/useGlobeDataLoader";
 import { findNewlySolvedChallenges } from "@/lib/challenges/challenge-diff";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";

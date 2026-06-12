@@ -1,11 +1,11 @@
 import {
+  type Camera,
+  type Mesh,
   Raycaster,
+  type Scene,
+  type ShaderMaterial,
   Vector2,
-  Camera,
-  Scene,
-  WebGLRenderer,
-  Mesh,
-  ShaderMaterial,
+  type WebGLRenderer,
 } from "three";
 
 /**

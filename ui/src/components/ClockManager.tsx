@@ -66,7 +66,7 @@ export function ClockManager() {
   const endDateHint = useMemo(() => {
     if (!endDateStr) return null;
     const date = new Date(endDateStr);
-    if (isNaN(date.getTime())) return null;
+    if (Number.isNaN(date.getTime())) return null;
     return formatRelativeTime(date);
   }, [endDateStr]);
 

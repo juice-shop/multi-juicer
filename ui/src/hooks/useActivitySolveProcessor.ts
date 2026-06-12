@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 
 import {
-  isChallengeSolvedEvent,
   type ActivityEvent,
+  isChallengeSolvedEvent,
 } from "@/hooks/useActivityFeed";
 
 /**

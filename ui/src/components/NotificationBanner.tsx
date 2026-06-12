@@ -21,8 +21,7 @@ export function NotificationBanner({
     return DOMPurify.sanitize(rawHtml);
   }, [notification?.message]);
 
-  const hasMessage =
-    notification && notification.enabled && notification.message;
+  const hasMessage = notification?.enabled && notification.message;
   const hasCountdown = countdown != null;
 
   if (!hasMessage && !hasCountdown) {

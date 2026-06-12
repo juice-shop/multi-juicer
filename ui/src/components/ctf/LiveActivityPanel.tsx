@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { FormattedMessage, useIntl, type IntlShape } from "react-intl";
+import { FormattedMessage, type IntlShape, useIntl } from "react-intl";
 
 import {
-  isTeamCreatedEvent,
-  isChallengeSolvedEvent,
   type ActivityEvent,
+  isChallengeSolvedEvent,
+  isTeamCreatedEvent,
 } from "@/hooks/useActivityFeed";
 import type { ChallengeCountryMapping } from "@/lib/challenges/challenge-mapper";
 

@@ -1,4 +1,5 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import type React from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   FormattedDate,
   FormattedMessage,

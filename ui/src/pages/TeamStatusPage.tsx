@@ -5,7 +5,7 @@ import { PasscodeDisplayCard } from "@/cards/PassCodeDisplayCard";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { PositionDisplay } from "@/components/PositionDisplay";
-import { useTeamStatus, type TeamStatus } from "@/hooks/useTeamStatus";
+import { type TeamStatus, useTeamStatus } from "@/hooks/useTeamStatus";
 
 export const TeamStatusPage = ({
   setActiveTeam,

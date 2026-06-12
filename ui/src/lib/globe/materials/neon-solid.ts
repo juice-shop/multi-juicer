@@ -1,4 +1,4 @@
-import { ShaderMaterial, Vector3, AdditiveBlending, DoubleSide } from "three";
+import { AdditiveBlending, DoubleSide, ShaderMaterial, Vector3 } from "three";
 
 export function createNeonSolidMaterial(
   neonColor: number[],

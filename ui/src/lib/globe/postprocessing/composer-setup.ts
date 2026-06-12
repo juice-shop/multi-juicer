@@ -1,4 +1,4 @@
-import { Vector2, WebGLRenderer, Scene, Camera } from "three";
+import { type Camera, type Scene, Vector2, type WebGLRenderer } from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";

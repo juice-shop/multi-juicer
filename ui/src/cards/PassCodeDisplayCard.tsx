@@ -119,10 +119,10 @@ export const PasscodeDisplayCard = ({
         >
           <div className="flex gap-3 flex-wrap">
             {activlyDisplayedPasscode.match(/.{1,4}/g)!.map((group, index) => (
-              <span className="flex gap-1" key={"group-" + index}>
+              <span className="flex gap-1" key={`group-${index}`}>
                 {group.split("").map((char, index) => (
                   <span
-                    key={"char-" + index}
+                    key={`char-${index}`}
                     className={
                       "font-mono p-3 rounded-sm inline-block dark:bg-gray-900 bg-gray-200"
                     }

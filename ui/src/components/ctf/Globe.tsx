@@ -1,8 +1,8 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Scene, Color, PerspectiveCamera, WebGLRenderer, Vector3 } from "three";
+import { Color, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import type { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 
 import { SolveSequenceAnimation } from "@/lib/globe/animations/solve-sequence";
 import type { CountryGeometryManager } from "@/lib/globe/country-geometry";
@@ -10,8 +10,8 @@ import type { CountryData } from "@/lib/globe/data/geojson-loader";
 import { GlobeAnimator } from "@/lib/globe/globe-animator";
 import { GlobeRenderer } from "@/lib/globe/globe-renderer";
 import {
-  latLonToSphere,
   greatCircleDistance,
+  latLonToSphere,
 } from "@/lib/globe/math/projection";
 import { MouseInteraction } from "@/lib/globe/mouse-interaction";
 import { createOcclusionSphere } from "@/lib/globe/occlusion-sphere";
@@ -95,6 +95,7 @@ function GlobeInternal({
   }, [onGlobeReady]);
 
   // Main initialization - runs ONCE
+  // biome-ignore lint/correctness/useExhaustiveDependencies: init should only re-run when countries or geometryManager change
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -509,7 +510,6 @@ function GlobeInternal({
     }
 
     init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countries, geometryManager]);
 
   if (error) {

@@ -1,4 +1,4 @@
-import { ShaderMaterial, Vector3, AdditiveBlending } from "three";
+import { AdditiveBlending, ShaderMaterial, Vector3 } from "three";
 
 export function createNeonWireframeMaterial(
   neonColor: number[],

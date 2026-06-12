@@ -51,6 +51,7 @@ export const JoiningPage = ({
   };
 
   // Check for passcode in URL fragment and auto-join
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run only once on mount to auto-join from the URL fragment
   useEffect(() => {
     const fragment = window.location.hash.slice(1); // Remove the '#'
     if (fragment && fragment.length >= 8) {
@@ -60,7 +61,6 @@ export const JoiningPage = ({
         sendJoinRequestWithPasscode(fragment);
       }, 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function sendJoinRequest() {

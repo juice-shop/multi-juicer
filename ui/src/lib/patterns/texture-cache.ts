@@ -1,4 +1,9 @@
-import { Texture, TextureLoader, RepeatWrapping, LinearFilter } from "three";
+import {
+  LinearFilter,
+  RepeatWrapping,
+  type Texture,
+  TextureLoader,
+} from "three";
 
 export class TextureCache {
   private static instance: TextureCache;
