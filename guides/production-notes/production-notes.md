@@ -7,11 +7,13 @@ To ensure MultiJuicer runs as smoothly during your CTF's / trainings / workshops
 3. Set `replicas` to at least 2, so that you have at least one fall back MultiJuicer when one crashes or the node it lives on goes down.
 4. When running a CTF with JuiceShop challenge flags, make sure to change `juiceShop.ctfKey` from the default. Otherwise users will be able to generate their own flags relatively easily. Additionally, include the `juiceShop.nodeEnv` value and specify it as "ctf". This way, it will generate flags for the CTF event. The default behavior is to not generate them.
 
-## Signing keys (`cookieParserSecret`, `webhookSigningKey`)
+## Signing keys & admin password
 
-The chart generates random values for `cookie.cookieParserSecret` and `webhook.signingKey` on first install and preserves them across subsequent `helm upgrade`s via Helm's `lookup` function. Under standard Helm, k3s' built-in `helm-controller`, or FluxCD's `HelmRelease`, you do **not** need to set these explicitly. A full `helm uninstall` deletes the Secret along with all Juice Shop deployments — on reinstall, fresh keys are generated, which is correct since the old keys would only sign URLs for instances that no longer exist.
+The chart manages a `multi-juicer-secret` Kubernetes Secret holding the cookie signing key, the webhook signing key, and the admin password. On first install it fills the Secret with random values; on subsequent `helm upgrade`s it preserves the existing values via Helm's `lookup` function. Under standard Helm, k3s' built-in `helm-controller`, or FluxCD's `HelmRelease`, you do **not** need to configure anything here.
 
-If you deploy via **ArgoCD** (or any other tool that renders with `helm template` rather than `helm install`/`helm upgrade`), see the [ArgoCD deployment guide](../argocd/argocd.md) — `lookup` doesn't work in that mode and you need to either set the values explicitly or configure `ignoreDifferences` on the `Application`.
+If you want to manage the Secret yourself (e.g. via Sealed Secrets, External Secrets Operator, or `kubectl` out-of-band), set `existingSecret.name` to its name. The Secret must contain three keys: `cookieParserSecret`, `webhookSigningKey`, and `adminPassword`.
+
+If you deploy via **ArgoCD** (or any other tool that renders with `helm template` rather than `helm install`/`helm upgrade`), see the [ArgoCD deployment guide](../argocd/argocd.md) — `lookup` doesn't work in that mode.
 
 ## Security Consideration
 

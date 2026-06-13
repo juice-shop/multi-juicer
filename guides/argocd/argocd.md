@@ -34,9 +34,17 @@ Notes:
 - `RespectIgnoreDifferences=true` is required when `selfHeal: true` is set, otherwise ArgoCD will fight `ignoreDifferences` and keep trying to re-apply the rendered (random) values. See [ArgoCD sync options](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/#respect-ignore-difference-configs).
 - The first sync still generates random values via `randAlphaNum`. After that, `ignoreDifferences` keeps them stable.
 
-## Alternative — set the signing keys explicitly
+## Alternative — manage the Secret yourself
 
-If your team already has a setup for delivering encrypted secrets into ArgoCD Helm values at render time (e.g. [helm-secrets](https://github.com/jkroepke/helm-secrets) + [SOPS](https://github.com/getsops/sops), or the [ArgoCD Vault Plugin](https://argocd-vault-plugin.readthedocs.io/)), you can instead provide `cookie.cookieParserSecret`, `webhook.signingKey`, and `adminPassword` explicitly. Only go this route if that infrastructure is already in place, plaintext values in Git are not acceptable, and standing up SOPS/AVP just for MultiJuicer is probably more work than the `ignoreDifferences` approach above.
+If your team already has tooling for delivering Kubernetes Secrets into the cluster out-of-band — [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets), the [External Secrets Operator](https://external-secrets.io/), Vault sidecar injection, or just `kubectl apply` — you can manage the `multi-juicer-secret` yourself and point the chart at it:
+
+```yaml
+# Application -> spec.source.helm.values
+existingSecret:
+  name: my-multi-juicer-secret
+```
+
+The Secret must contain three keys: `cookieParserSecret`, `webhookSigningKey`, and `adminPassword`. When `existingSecret.name` is set, the chart skips its own Secret template entirely, so `lookup`'s ArgoCD limitation no longer applies.
 
 ## Further reading
 
