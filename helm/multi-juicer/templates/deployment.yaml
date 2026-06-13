@@ -48,21 +48,22 @@ spec:
                 fieldPath: metadata.name
           - name: MAX_INACTIVE_DURATION
             value: {{ .Values.config.juiceShop.deleteInactiveAfter | quote }}
+          {{- $secretName := .Values.existingSecret.name | default "multi-juicer-secret" }}
           - name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: adminPassword
-                name: multi-juicer-secret
+                name: {{ $secretName }}
           - name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
             valueFrom:
               secretKeyRef:
                 key: cookieParserSecret
-                name: multi-juicer-secret
+                name: {{ $secretName }}
           - name: MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY
             valueFrom:
               secretKeyRef:
                 key: webhookSigningKey
-                name: multi-juicer-secret
+                name: {{ $secretName }}
           - name: MULTI_JUICER_CONTENT_SECURITY_POLICY
             value: {{ .Values.contentSecurityPolicy | quote }}
           - name: LOG_LEVEL

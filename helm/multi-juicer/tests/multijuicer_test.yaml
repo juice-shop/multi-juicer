@@ -20,12 +20,10 @@ tests:
     set:
       juiceShop:
         tag: v42.42.42
-      # randomized values are still specified here as the snapshot tests would fail otherwise
-      adminPassword: "ABCDEFGH"
-      cookie:
-        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
-      webhook:
-        signingKey: "THIS_IS_A_EXAMPLE_WEBHOOK_SIGNING_KEY_DONT_USE_THIS"
+      # Use an externally-managed Secret so snapshots stay deterministic
+      # (otherwise the chart-generated Secret would contain randAlphaNum output).
+      existingSecret:
+        name: "external-multi-juicer-secret"
     asserts:
       - matchSnapshot: {}
   - it: production notes work correctly
@@ -45,13 +43,11 @@ tests:
       version: 42.0.0
       appVersion: 42.0.0
     set:
-      adminPassword: "ABCDEFGH"
       replicas: 3
       cookie:
-        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
         secure: true
-      webhook:
-        signingKey: "THIS_IS_A_EXAMPLE_WEBHOOK_SIGNING_KEY_DONT_USE_THIS"
+      existingSecret:
+        name: "external-multi-juicer-secret"
       metrics:
         basicAuth:
           password: "ROTATE_THIS_YOU_LAZY_ASS"
@@ -81,13 +77,11 @@ tests:
           - secretName: tls-secret
             hosts:
               - multi-juicer.local
-      adminPassword: "ABCDEFGH"
       replicas: 3
       cookie:
-        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
         secure: true
-      webhook:
-        signingKey: "THIS_IS_A_EXAMPLE_WEBHOOK_SIGNING_KEY_DONT_USE_THIS"
+      existingSecret:
+        name: "external-multi-juicer-secret"
       metrics:
         basicAuth:
           password: "ROTATE_THIS_YOU_LAZY_ASS"
@@ -110,12 +104,71 @@ tests:
       version: 42.0.0
       appVersion: 42.0.0
     set:
-      adminPassword: "ABCDEFGH"
-      cookie:
-        cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
       config:
         theme:
           logoUrl: "https://example.com/custom-logo.svg"
           faviconUrl: "https://example.com/custom-favicon.ico"
     asserts:
       - matchSnapshot: {}
+  - it: auto-generates the Secret with all three keys when existingSecret is unset
+    template: templates/secret.yaml
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    asserts:
+      - equal:
+          path: kind
+          value: Secret
+      - equal:
+          path: metadata.name
+          value: multi-juicer-secret
+      - isNotNullOrEmpty:
+          path: data.cookieParserSecret
+      - isNotNullOrEmpty:
+          path: data.webhookSigningKey
+      - isNotNullOrEmpty:
+          path: data.adminPassword
+  - it: skips Secret rendering when existingSecret.name is set
+    template: templates/secret.yaml
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    set:
+      existingSecret:
+        name: "my-external-secret"
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: deployment references the external Secret when existingSecret.name is set
+    template: templates/deployment.yaml
+    chart:
+      version: 42.0.0
+      appVersion: 42.0.0
+    set:
+      existingSecret:
+        name: "my-external-secret"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MULTI_JUICER_CONFIG_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: adminPassword
+                name: my-external-secret
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MULTI_JUICER_CONFIG_COOKIE_SIGNING_KEY
+            valueFrom:
+              secretKeyRef:
+                key: cookieParserSecret
+                name: my-external-secret
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MULTI_JUICER_CONFIG_WEBHOOK_SIGNING_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webhookSigningKey
+                name: my-external-secret

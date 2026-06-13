@@ -24,8 +24,6 @@ rules:
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["create", "update"] # create doesn't properly work with resourceNames, for the initial reation of the multi-juicer-notification, we need general create permissions :(
-{{- if .Values.config.juiceShop.llm.enabled }}
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["create"]
-{{- end }}

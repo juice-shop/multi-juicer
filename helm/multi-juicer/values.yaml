@@ -28,11 +28,9 @@ cookie:
   secure: false
   # -- Changes the cookies name used to identify teams.
   name: multi-juicer
-  # -- Set this to a fixed random alpha-numeric string (recommended length 24 chars). If not set this gets randomly generated with every helm upgrade, each rotation invalidates all active cookies / sessions requiring users to login again.
-  cookieParserSecret: null
-webhook:
-  # -- HMAC signing key used to authenticate the cluster-internal solutions webhook so that a compromised Juice Shop can't forge solved-events for other teams. Set this to a fixed random alpha-numeric string (recommended length 32 chars). If not set this gets randomly generated with every helm upgrade; rotation invalidates the webhook URLs of any existing Juice Shop pods until they are recreated.
-  signingKey: null
+# -- Reference an existing Kubernetes Secret to source MultiJuicer's signing keys and admin password from, instead of letting the chart generate them. Use this when you manage secrets out-of-band (Sealed Secrets, External Secrets Operator, manual kubectl, ...). The Secret must contain three keys: `cookieParserSecret`, `webhookSigningKey`, `adminPassword`. Leave `name` empty to let the chart create and manage `multi-juicer-secret` itself (random values on first install, preserved across upgrades via Helm `lookup`).
+existingSecret:
+  name: ""
 # -- Content Security Policy header configuration for index.html responses. Set to empty string to disable CSP header.
 contentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
 repository: ghcr.io/juice-shop/multi-juicer/multi-juicer
