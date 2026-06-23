@@ -21,7 +21,7 @@ WORKDIR /home/app
 COPY package.json package-lock.json .npmrc ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --ignore-scripts
-COPY tsconfig.json eslint.config.js .prettierrc ./
+COPY tsconfig.json biome.json ./
 COPY ui/ ./ui/
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/home/app/node_modules/.vite \
