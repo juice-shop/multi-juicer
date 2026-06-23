@@ -73,7 +73,7 @@ custom balancer theme renders into the config map:
               }
             },
             "runtimeClassName": null,
-            "tag": "v20.0.0",
+            "tag": "v20.1.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -170,7 +170,7 @@ default values render correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v20.0.0",
+            "tag": "v20.1.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -214,7 +214,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 2244d4adba924361e1a70cf73c7d2e8519f328dc684c9efaa9bf09223d9260fc
+            checksum/config: e8407a66e17cc2c7a08bda03e3080acd3c3da5407eb35537fe3da444f8daed4e
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -555,7 +555,7 @@ full values render out correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v20.0.0",
+            "tag": "v20.1.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -599,7 +599,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: cbb616602c32f28306e32d90923b9292e16857f438a155578d2898c7a9537349
+            checksum/config: da837b3639a6bc5670ac7c35702b230320e79f1bdb2080ea3346530a4cd2748a
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2643,7 +2643,7 @@ production notes work correctly:
               }
             },
             "runtimeClassName": null,
-            "tag": "v20.0.0",
+            "tag": "v20.1.0",
             "tolerations": [],
             "volumeMounts": [],
             "volumes": []
@@ -2687,7 +2687,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: cbb616602c32f28306e32d90923b9292e16857f438a155578d2898c7a9537349
+            checksum/config: da837b3639a6bc5670ac7c35702b230320e79f1bdb2080ea3346530a4cd2748a
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
