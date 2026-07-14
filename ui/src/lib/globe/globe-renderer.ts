@@ -1,11 +1,9 @@
 import {
-  LineBasicMaterial,
   LineSegments,
   Mesh,
   type Scene,
   type ShaderMaterial,
   type Vector3,
-  WireframeGeometry,
 } from "three";
 
 import { TextureCache } from "../patterns/texture-cache";
@@ -14,9 +12,7 @@ import type { CountryData } from "./data/geojson-loader";
 import { createNeonPatternMaterial } from "./materials/neon-pattern";
 import { createNeonSolidMaterial } from "./materials/neon-solid";
 import { createNeonWireframeMaterial } from "./materials/neon-wireframe";
-
-// DEBUG: Toggle triangle wireframe visualization
-const SHOW_TRIANGLE_WIREFRAMES = false;
+import { sphereToLatLon } from "./math/projection";
 
 interface ThemeColors {
   primary: number[];
@@ -33,7 +29,6 @@ export class GlobeRenderer {
   wireframeLines: LineSegments[] = []; // Country border lines as individual segments
   patternMeshes: Mesh[] = [];
   solidMeshes: Mesh[] = [];
-  triangleWireframes: LineSegments[] = []; // For visualizing triangle edges
   private scene: Scene;
   private textureCache: TextureCache;
   /** Map of country name → capital {lat, lon} for camera focus animations */
@@ -124,23 +119,6 @@ export class GlobeRenderer {
       mesh.userData.countryName = name; // For raycasting identification
       this.solidMeshes.push(mesh);
       this.scene.add(mesh);
-
-      // DEBUG: Add wireframe overlay to visualize triangle edges
-      if (SHOW_TRIANGLE_WIREFRAMES) {
-        const wireframeMat = new LineBasicMaterial({
-          color: 0xff00ff, // Magenta for triangle edges
-          linewidth: 1,
-          opacity: 0.8,
-          transparent: true,
-        });
-        // With uniform subdivision, WireframeGeometry works perfectly
-        // because all neighboring triangles subdivide shared edges identically
-        const wireframeGeo = new WireframeGeometry(geometry);
-        const wireframeMesh = new LineSegments(wireframeGeo, wireframeMat);
-        wireframeMesh.name = `${name}_wireframe`;
-        this.triangleWireframes.push(wireframeMesh);
-        this.scene.add(wireframeMesh);
-      }
     }
 
     // Build country center lookup from capital coordinates
@@ -165,12 +143,9 @@ export class GlobeRenderer {
       mesh.geometry.computeBoundingSphere();
       const center = mesh.geometry.boundingSphere?.center;
       if (center) {
-        // Convert 3D position back to lat/lon (reverse of latLonToSphere)
-        const r = center.length();
-        if (r > 0.001) {
-          const lat = 90 - Math.acos(center.y / r) * (180 / Math.PI);
-          const lon = 90 - Math.atan2(center.z, center.x) * (180 / Math.PI);
-          this.countryCenters.set(mesh.name, { lat, lon });
+        const latLon = sphereToLatLon(center.x, center.y, center.z);
+        if (latLon) {
+          this.countryCenters.set(mesh.name, latLon);
         }
       }
     }

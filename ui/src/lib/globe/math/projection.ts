@@ -60,55 +60,25 @@ export function greatCircleDistance(
 }
 
 /**
- * Interpolate between two lat/lon points along great circle
- * @param lon1 - Start longitude
- * @param lat1 - Start latitude
- * @param lon2 - End longitude
- * @param lat2 - End latitude
- * @param t - Interpolation factor (0 to 1)
- * @returns {lon, lat} interpolated coordinates
+ * Convert 3D sphere coordinates back to latitude/longitude
+ * Inverse of latLonToSphere (matching ConicPolygonGeometry's convention)
+ * @param x - X coordinate
+ * @param y - Y coordinate
+ * @param z - Z coordinate
+ * @returns {lon, lat} in degrees, or null if the point is at the origin
  */
-export function interpolateLatLon(
-  lon1: number,
-  lat1: number,
-  lon2: number,
-  lat2: number,
-  t: number
-): { lon: number; lat: number } {
-  const lat1Rad = lat1 * (Math.PI / 180);
-  const lon1Rad = lon1 * (Math.PI / 180);
-  const lat2Rad = lat2 * (Math.PI / 180);
-  const lon2Rad = lon2 * (Math.PI / 180);
-
-  const d = Math.acos(
-    Math.sin(lat1Rad) * Math.sin(lat2Rad) +
-      Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.cos(lon2Rad - lon1Rad)
-  );
-
-  if (d < 1e-10) {
-    // Points are very close, use linear interpolation
-    return {
-      lon: lon1 + (lon2 - lon1) * t,
-      lat: lat1 + (lat2 - lat1) * t,
-    };
+export function sphereToLatLon(
+  x: number,
+  y: number,
+  z: number
+): { lon: number; lat: number } | null {
+  const r = Math.sqrt(x * x + y * y + z * z);
+  if (r < 0.001) {
+    return null;
   }
 
-  const a = Math.sin((1 - t) * d) / Math.sin(d);
-  const b = Math.sin(t * d) / Math.sin(d);
-
-  const x =
-    a * Math.cos(lat1Rad) * Math.cos(lon1Rad) +
-    b * Math.cos(lat2Rad) * Math.cos(lon2Rad);
-  const y =
-    a * Math.cos(lat1Rad) * Math.sin(lon1Rad) +
-    b * Math.cos(lat2Rad) * Math.sin(lon2Rad);
-  const z = a * Math.sin(lat1Rad) + b * Math.sin(lat2Rad);
-
-  const lat = Math.atan2(z, Math.sqrt(x * x + y * y));
-  const lon = Math.atan2(y, x);
-
   return {
-    lon: lon * (180 / Math.PI),
-    lat: lat * (180 / Math.PI),
+    lat: 90 - Math.acos(y / r) * (180 / Math.PI),
+    lon: 90 - Math.atan2(z, x) * (180 / Math.PI),
   };
 }

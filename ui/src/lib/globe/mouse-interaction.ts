@@ -216,13 +216,6 @@ export class MouseInteraction {
   };
 
   /**
-   * Update method called each frame (for future smooth transitions)
-   */
-  update(): void {
-    // Future: Could add smooth interpolation for hover transitions here
-  }
-
-  /**
    * Cleanup event listeners
    */
   dispose(): void {

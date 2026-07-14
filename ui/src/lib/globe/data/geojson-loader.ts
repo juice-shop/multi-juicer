@@ -40,27 +40,22 @@ export interface CountryData {
 export async function loadGeoJSON(
   onProgress: ((progress: number) => void) | null = null
 ): Promise<CountryData[]> {
-  try {
-    const response = await fetch("/multi-juicer/world.geo.json");
-    if (!response.ok) {
-      throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
-    }
-
-    if (onProgress) onProgress(0.3);
-
-    const geojson = await response.json();
-
-    if (onProgress) onProgress(0.5);
-
-    const countries = processGeoJSON(geojson, onProgress);
-
-    if (onProgress) onProgress(1.0);
-
-    return countries;
-  } catch (error) {
-    console.error("Error loading GeoJSON:", error);
-    throw error;
+  const response = await fetch("/multi-juicer/world.geo.json");
+  if (!response.ok) {
+    throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
   }
+
+  if (onProgress) onProgress(0.3);
+
+  const geojson = await response.json();
+
+  if (onProgress) onProgress(0.5);
+
+  const countries = processGeoJSON(geojson, onProgress);
+
+  if (onProgress) onProgress(1.0);
+
+  return countries;
 }
 
 /**
@@ -237,28 +232,4 @@ function incrementEdgeCount(
   // Normalize edge key (smaller index first)
   const key = a < b ? `${a},${b}` : `${b},${a}`;
   map.set(key, (map.get(key) || 0) + 1);
-}
-
-/**
- * Get countries by continent or region
- */
-export function filterCountriesByContinent(
-  countries: CountryData[],
-  continent: string
-): CountryData[] {
-  return countries.filter(
-    (country) => country.properties.continent === continent
-  );
-}
-
-/**
- * Find country by name
- */
-export function findCountryByName(
-  countries: CountryData[],
-  name: string
-): CountryData[] {
-  return countries.filter((country) =>
-    country.name.toLowerCase().includes(name.toLowerCase())
-  );
 }
