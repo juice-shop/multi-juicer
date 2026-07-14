@@ -44,6 +44,16 @@ func NewGateway(b *bundle.Bundle, usage *UsageTracker) (*Gateway, error) {
 	}, nil
 }
 
+// decodeTeamFromToken verifies the HMAC signature on a team token and returns the
+// enclosed team name, or "" if the token is invalid.
+func (g *Gateway) decodeTeamFromToken(token string) string {
+	team, err := signutil.Unsign(token, g.b.Config.CookieConfig.SigningKey)
+	if err != nil {
+		return ""
+	}
+	return team
+}
+
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Extract bearer token
 	authHeader := r.Header.Get("Authorization")
@@ -53,9 +63,8 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	teamToken := strings.TrimPrefix(authHeader, "Bearer ")
 
-	// Validate token by verifying the HMAC signature and extracting the team name
-	team, err := signutil.Unsign(teamToken, g.b.Config.CookieConfig.SigningKey)
-	if err != nil {
+	team := g.decodeTeamFromToken(teamToken)
+	if team == "" {
 		http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
 		return
 	}
