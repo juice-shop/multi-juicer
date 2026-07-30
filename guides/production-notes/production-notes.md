@@ -8,10 +8,6 @@ To ensure MultiJuicer runs as smoothly during your CTF's / trainings / workshops
 4. Set `replicas` to at least 2, so that you have at least one fall back MultiJuicer when one crashes or the node it lives on goes down.
 5. When running a CTF with JuiceShop challenge flags, make sure to change `config.juiceShop.ctfKey` from the default. Otherwise users will be able to generate their own flags relatively easily. Additionally, include the `config.juiceShop.nodeEnv` value and specify it as "ctf". This way, it will generate flags for the CTF event. The default behavior is to not generate them.
 
-## Security Consideration
-
-Add SecurityContext and PodSecurityContext further isolate and secure your training platform.
-
 ## TLDR
 
 Here's a example helm values file:
