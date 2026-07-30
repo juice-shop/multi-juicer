@@ -22,8 +22,9 @@ cookie:
   cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
   secure: true
 
-juiceShop:
+config:
   maxInstances: 42
-  nodeEnv: "ctf"
-  ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
+  juiceShop:
+    nodeEnv: "ctf"
+    ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
 ```
