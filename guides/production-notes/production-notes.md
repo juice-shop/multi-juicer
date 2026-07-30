@@ -24,6 +24,18 @@ cookie:
 
 config:
   maxInstances: 42
+```
+
+### When using a an external CTF Tool (e.g. CTFd)
+
+```yaml
+replicas: 3
+cookie:
+  cookieParserSecret: "THIS_IS_A_EXAMPLE_DONT_USE_THIS_AS_THE_ACTUAL_SECRET"
+  secure: true
+
+config:
+  maxInstances: 42
   juiceShop:
     nodeEnv: "ctf"
     ctfKey: "DONT_LET_ME_FIND_YOU_USING_THIS_EXACT_VALUE"
