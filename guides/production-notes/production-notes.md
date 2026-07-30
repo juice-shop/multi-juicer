@@ -6,7 +6,7 @@ To ensure MultiJuicer runs as smoothly during your CTF's / trainings / workshops
 2. As you are running this with https (right?), you should set `cookie.secure` to `true`. This marks the cookie used to associate a browser with a team to transmitted via https only.
 3. Make sure the value you have configured for `config.maxInstances` fits your CTF / training / whatever you are running. The default is set to only allow 10 instances. Set to -1 to remove any restrictions.
 4. Set `replicas` to at least 2, so that you have at least one fall back MultiJuicer when one crashes or the node it lives on goes down.
-5. When running a CTF with JuiceShop challenge flags, make sure to change `config.juiceShop.ctfKey` from the default. Otherwise users will be able to generate their own flags relatively easily. Additionally, include the `config.juiceShop.nodeEnv` value and specify it as "ctf". This way, it will generate flags for the CTF event. The default behavior is to not generate them.
+5. When running a CTF with JuiceShop challenge flags (which you would only do when running MultiJuicer together with a CTF score keeping service like [CTFd](https://ctfd.io/) over the integrated scoreboard), make sure to change `config.juiceShop.ctfKey` from the default. Otherwise users will be able to generate their own flags relatively easily. Additionally, include the `config.juiceShop.nodeEnv` value and specify it as "ctf". This way, it will generate flags for the CTF event. The default behavior is to not generate them.
 
 ## TLDR
 
