@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Provision a fresh MultiJuicer cluster on Hetzner Cloud, sized for ~10 teams.
+# Provision a fresh MultiJuicer cluster on Hetzner Cloud, sized for ~30 teams.
 #
 # The script creates a single Hetzner Cloud VM, installs k3s on it, deploys
 # ingress-nginx + cert-manager, installs MultiJuicer via Helm, and requests
@@ -57,17 +57,17 @@ LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"
 LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"
 
-# Server / cluster sizing. cpx22 = 2 vCPU / 4 GB RAM / 40 GB SSD.
+# Server / cluster sizing. cpx32 = 4 vCPU / 8 GB RAM / 80 GB SSD (Hetzner's newer AMD generation).
 # CPU is the tightest resource — see the sizing notes in hetzner.md for the math.
-# Bump to cpx31 / cpx41 (and raise MAX_INSTANCES accordingly) for larger events.
+# Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (and raise MAX_INSTANCES accordingly) for larger ones.
 SERVER_NAME="${SERVER_NAME:-multi-juicer}"
-SERVER_TYPE="${SERVER_TYPE:-cpx22}"
+SERVER_TYPE="${SERVER_TYPE:-cpx32}"
 SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"
 SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"          # Nuremberg
 SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"
 FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"
 K3S_CHANNEL="${K3S_CHANNEL:-stable}"
-MAX_INSTANCES="${MAX_INSTANCES:-10}"                # allowed team count (fits a cpx22; raise together with SERVER_TYPE)
+MAX_INSTANCES="${MAX_INSTANCES:-30}"                # allowed team count (fits a cpx32; raise together with SERVER_TYPE)
 LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
 STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
 KUBECONFIG_FILE="${STATE_DIR}/kubeconfig.yaml"
