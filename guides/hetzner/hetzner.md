@@ -1,6 +1,6 @@
 # Example Setup with Hetzner Cloud
 
-This guide sets up a MultiJuicer cluster on a single [Hetzner Cloud](https://www.hetzner.com/cloud) server, sized for up to **30 teams**, reachable via public Internet on your own domain over **HTTPS** (Let's Encrypt).
+This guide sets up a MultiJuicer cluster on a single [Hetzner Cloud](https://www.hetzner.com/cloud) server, sized for up to **20 teams**, reachable via public Internet on your own domain over **HTTPS** (Let's Encrypt).
 
 The domain is expected to be registered/managed at **your existing DNS provider** (e.g. [Strato](https://www.strato.de), GoDaddy, Namecheap, Cloudflare, ...). This guide does **not** move your domain to Hetzner — you just point a single `A` record at the freshly-created Hetzner VM.
 
@@ -48,9 +48,9 @@ export DOMAIN="juicy.example.com"    # any subdomain of a domain you control
 export EMAIL="you@example.com"       # used for Let's Encrypt registration
 
 # Optional overrides:
-# export SERVER_TYPE=cpx32           # ~30 teams. Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (or ccx23 for dedicated CPUs) for larger ones.
+# export SERVER_TYPE=cpx32           # ~20 teams. Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (or ccx23 for dedicated CPUs) for larger ones.
 # export SERVER_LOCATION=nbg1        # nbg1 | fsn1 | hel1 | ash | hil | sin
-# export MAX_INSTANCES=30            # caps the number of JuiceShop instances
+# export MAX_INSTANCES=20            # caps the number of JuiceShop instances
 # export REPLICAS=2                  # MultiJuicer balancer replicas (production checklist recommends >=2)
 # export DNS_TIMEOUT=1800            # seconds to wait for DNS to propagate
 # export ADMIN_CIDR=1.2.3.4/32       # CIDR allowed to reach the k8s API (tcp/6443).
@@ -182,7 +182,7 @@ The script already applies the recommendations from [`guides/production-notes/pr
 - **`cookie.secure=true`** — the balancer session cookie is only sent over HTTPS (safe here because everything runs behind Let's Encrypt).
 - **Persistent `cookie.cookieParserSecret`** — a 24-char random secret is generated on the first run and stored in `./.multi-juicer-hetzner/cookie-parser-secret`. Re-runs reuse it, so `helm upgrade` no longer invalidates all team sessions. Delete the file if you want to force a rotation.
 - **`replicas=2`** — two balancer pods on the single node, so a pod crash or rolling upgrade does not take the whole event offline. Override with `REPLICAS=<n>`. (Note: the node itself is a single VM — for real HA you would need multiple nodes.)
-- **`config.maxInstances=30`** — matches the ~30 team sizing of the default `cpx32`. Override with `MAX_INSTANCES` (and pick a bigger `SERVER_TYPE` if you raise it much).
+- **`config.maxInstances=20`** — matches the ~20 team sizing of the default `cpx32`. Override with `MAX_INSTANCES` (and pick a bigger `SERVER_TYPE` if you raise it much).
 
 ## AI / LLM challenges
 
@@ -225,16 +225,16 @@ Then re-run with a valid id, e.g. `LLM_MODEL="<the-id-you-just-found>" ./setup.s
 
 ## Sizing notes
 
-The defaults target a mid-sized event on a `cpx32` (4 vCPU / 8 GB RAM / 80 GB SSD, Hetzner's newer AMD generation). The math behind `MAX_INSTANCES=30`:
+The defaults target a mid-sized event on a `cpx32` (4 vCPU / 8 GB RAM / 80 GB SSD, Hetzner's newer AMD generation). The math behind `MAX_INSTANCES=20`:
 
 - Per Juice Shop pod (from the upstream project's stated **minimum** system requirements): **256 MB RAM**, **200 millicpu**, **300 MB disk**. Recommended is 384 MB / 400 millicpu / 800 MB disk.
 - k3s + ingress-nginx + cert-manager + 2 MultiJuicer balancer replicas reserve roughly **1.1 vCPU** and **1.4 GB RAM** on the node, leaving about **2.9 vCPU**, **6.6 GB RAM** and ~70 GB free disk for Juice Shop pods.
-- CPU is the tightest resource: 2900 mCPU / 200 mCPU ≈ 14 pods at Juice Shop's stated minimum, or ~19 pods at the chart's default request of 150 mCPU. Since teams are mostly idle and no CPU **limits** are set, a soft cap of 30 is a realistic compromise. RAM (~25 pods at 256 MB) and disk (>200 pods at 300 MB) are not the bottleneck.
+- CPU is the tightest resource: at the chart's default request of 150 mCPU per pod, ~19 pods actually fit before the scheduler runs out of CPU requests. `MAX_INSTANCES=20` keeps the visible team ceiling in line with what the node can actually schedule, so no team ends up stuck on a `Pending` pod. RAM (~25 pods at 256 MB) and disk (>200 pods at 300 MB) are not the bottleneck.
 
 Guidelines for scaling up or down:
 
 - Small event (up to ~10 teams)? Drop to `SERVER_TYPE=cpx22` (2 vCPU / 4 GB, ~€6/month) with `MAX_INSTANCES=10`.
-- Want more than ~30 teams? Bump both variables together, e.g. `SERVER_TYPE=cpx42` (8 vCPU / 16 GB) with `MAX_INSTANCES=50`, or `SERVER_TYPE=cpx52` (16 vCPU / 32 GB) with `MAX_INSTANCES=100`.
+- Want more than ~20 teams? Bump both variables together, e.g. `SERVER_TYPE=cpx42` (8 vCPU / 16 GB) with `MAX_INSTANCES=40`, or `SERVER_TYPE=cpx52` (16 vCPU / 32 GB) with `MAX_INSTANCES=80`.
 - If you expect heavy concurrent traffic per team (e.g. teams actively hacking rather than reading), switch to a **dedicated-CPU** type (e.g. `ccx23` / `ccx33`) via `SERVER_TYPE` — shared-vCPU plans like `cpx*` can throttle under sustained load.
 - To hard-cap the number of teams, use `MAX_INSTANCES`. See the chart's `config.maxInstances` value in [`helm/multi-juicer/values.yaml`](../../helm/multi-juicer/values.yaml) for the full list of tunables.
 
