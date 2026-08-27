@@ -203,6 +203,26 @@ If `LLM_API_KEY` is **not** set, the script prints a warning and leaves the gate
 
 > **Cost tip:** the gateway does not enforce per-team rate limits — set a spending cap at your LLM provider before the event.
 
+### LLM connectivity preflight
+
+Before installing MultiJuicer, `setup.sh` runs a small probe *from the Hetzner VM itself* (via SSH) that:
+
+1. `curl`s `${LLM_API_URL}/models` with a 15 s timeout and accepts any 2xx-4xx as "network path works" (a 401 is fine here — it means the provider replied).
+2. If `LLM_API_KEY` is set, lists the provider's model catalog with a Bearer token and checks that `LLM_MODEL` is included.
+
+Both checks are **non-fatal** — the install continues either way — but they print a bright yellow warning and the final summary tags the LLM line with `(WARNING: ...)`. This is the most reliable diagnosis for the classic *"local Juice Shop chatbot works, on Hetzner it takes forever and then errors out"* symptom: the outgoing network path is fine (Hetzner Cloud firewalls only filter **inbound** traffic — outbound is unrestricted), and the culprit is almost always an upstream issue — most often a **wrong model id**. When Juice Shop asks the provider for a model that the account cannot access, the request hangs on a slow 4xx, Juice Shop retries, and eventually surfaces as a chatbot error in the UI.
+
+If you see the warning, reproduce and diagnose manually from the VM:
+
+```bash
+export KUBECONFIG="$(pwd)/.multi-juicer-hetzner/kubeconfig.yaml"
+ssh -i ./.multi-juicer-hetzner/id_ed25519 root@<IP> \
+  curl -sS -H "Authorization: Bearer $LLM_API_KEY" \
+  https://openrouter.ai/api/v1/models | jq '.data | map(.id)' | grep -i <partial-model-name>
+```
+
+Then re-run with a valid id, e.g. `LLM_MODEL="<the-id-you-just-found>" ./setup.sh` — the script is idempotent and only rewrites the LLM Helm values.
+
 ## Sizing notes
 
 The defaults target a small event on the cheapest sensible Hetzner box (`cpx22`: 2 vCPU / 4 GB RAM / 40 GB SSD). The math behind `MAX_INSTANCES=10`:
@@ -225,3 +245,4 @@ Guidelines for scaling up:
 - **Browser shows "Kubernetes Ingress Controller Fake Certificate"** — cert-manager hasn't finished the ACME challenge yet. Reload after ~30–60 s.
 - **Pods stuck `Pending`** — the node ran out of schedulable CPU or memory. On the default `cpx22`, CPU is the tightest resource, so this typically happens when `MAX_INSTANCES` is raised without also picking a bigger `SERVER_TYPE`. Choose a bigger `SERVER_TYPE` (e.g. `cpx31` / `cpx41`) and re-run `setup.sh`.
 - **`kubectl` / `helm` time out with `dial tcp <ip>:6443: ... failed to respond`** — the Hetzner firewall is not letting your machine reach the Kubernetes API. `setup.sh` opens tcp/6443 only for the public IPv4 it detects via `api.ipify.org` when it runs, so if your public IP has changed since the last run (new network, VPN toggled, ISP-reassigned dynamic address), just re-run `setup.sh` — the firewall rules are re-applied every run and the current IP will be allowed. Behind a shared/corporate egress or on a dynamic range, set `ADMIN_CIDR` explicitly (e.g. `ADMIN_CIDR=203.0.113.0/24 ./setup.sh`).
+- **JuiceShop chatbot works locally but hangs / errors out on Hetzner** — this is almost never a firewall issue: Hetzner Cloud firewalls only filter *inbound* traffic, and `setup.sh`'s LLM preflight (see [LLM connectivity preflight](#llm-connectivity-preflight)) verifies from the VM that `${LLM_API_URL}/models` responds and that `LLM_MODEL` is actually listed by the provider. If the preflight prints a `!! ...` warning, the fix is upstream: fix `LLM_API_URL`, pick a model your account can access (see the provider dashboard), or bump a spending cap that the free tier has already exhausted, then re-run `setup.sh`.
