@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Provision a fresh MultiJuicer cluster on Hetzner Cloud, sized for ~30 teams.
+# Provision a fresh MultiJuicer cluster on Hetzner Cloud, sized for ~20 teams.
 #
 # The script creates a single Hetzner Cloud VM, installs k3s on it, deploys
 # ingress-nginx + cert-manager, installs MultiJuicer via Helm, and requests
@@ -67,7 +67,7 @@ SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"          # Nuremberg
 SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"
 FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"
 K3S_CHANNEL="${K3S_CHANNEL:-stable}"
-MAX_INSTANCES="${MAX_INSTANCES:-30}"                # allowed team count (fits a cpx32; raise together with SERVER_TYPE)
+MAX_INSTANCES="${MAX_INSTANCES:-20}"                # allowed team count (fits a cpx32; raise together with SERVER_TYPE)
 LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
 STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
 KUBECONFIG_FILE="${STATE_DIR}/kubeconfig.yaml"
