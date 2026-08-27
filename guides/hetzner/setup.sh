@@ -35,7 +35,7 @@
 #                       so the JuiceShop chatbot works for all teams while the
 #                       real API key stays inside the cluster.
 #   - env LLM_MODEL     Model identifier to expose to JuiceShop
-#                       (default: qwen/qwen3.5-9b).
+#                       (default: inclusionai/ling-3.0-flash-fin:free).
 #   - env LLM_API_URL   Upstream base URL, including path prefix
 #                       (default: https://openrouter.ai/api/v1).
 
@@ -53,7 +53,7 @@ REPLICAS="${REPLICAS:-2}"                           # >=2 balancer replicas for 
 
 # Optional LLM gateway (see guides/llm/llm.md). Only enabled when LLM_API_KEY is set.
 LLM_API_KEY="${LLM_API_KEY:-}"
-LLM_MODEL="${LLM_MODEL:-qwen/qwen3.5-9b}"
+LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"
 LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"
 

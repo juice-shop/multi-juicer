@@ -60,7 +60,7 @@ export EMAIL="you@example.com"       # used for Let's Encrypt registration
 # When unset, the gateway stays off and the chatbot is not available to teams.
 # See guides/llm/llm.md for background.
 # export LLM_API_KEY="sk-..."                       # your upstream LLM API key
-# export LLM_MODEL="qwen/qwen3.5-9b"                # default shown
+# export LLM_MODEL="inclusionai/ling-3.0-flash-fin:free" # default shown
 # export LLM_API_URL="https://openrouter.ai/api/v1" # any OpenAI-compatible base URL
 
 cd guides/hetzner
@@ -192,7 +192,7 @@ To enable it in this Hetzner setup, set `LLM_API_KEY` (and optionally `LLM_MODEL
 
 ```bash
 export LLM_API_KEY="sk-..."                       # OpenAI / OpenRouter / Ollama key
-export LLM_MODEL="qwen/qwen3.5-9b"                # any model your provider serves
+export LLM_MODEL="inclusionai/ling-3.0-flash-fin:free" # any model your provider serves
 export LLM_API_URL="https://openrouter.ai/api/v1" # any OpenAI-compatible base URL
 ./setup.sh
 ```
