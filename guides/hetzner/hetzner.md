@@ -1,6 +1,6 @@
 # Example Setup with Hetzner Cloud
 
-This guide sets up a MultiJuicer cluster on a single [Hetzner Cloud](https://www.hetzner.com/cloud) server, sized for up to **10 teams**, reachable via public Internet on your own domain over **HTTPS** (Let's Encrypt).
+This guide sets up a MultiJuicer cluster on a single [Hetzner Cloud](https://www.hetzner.com/cloud) server, sized for up to **30 teams**, reachable via public Internet on your own domain over **HTTPS** (Let's Encrypt).
 
 The domain is expected to be registered/managed at **your existing DNS provider** (e.g. [Strato](https://www.strato.de), GoDaddy, Namecheap, Cloudflare, ...). This guide does **not** move your domain to Hetzner — you just point a single `A` record at the freshly-created Hetzner VM.
 
@@ -9,7 +9,7 @@ The setup is intentionally **throw-away**: everything lives on one VM, so once y
 - [`setup.sh`](./setup.sh) — provisions everything from scratch
 - [`teardown.sh`](./teardown.sh) — deletes every Hetzner resource created by `setup.sh`
 
-**WARNING:** The default server type used here (`cpx22`, 2 vCPU / 4 GB RAM / 40 GB SSD) costs roughly **€6/month** (~€0.01/h) on Hetzner Cloud. Delete the resources with `teardown.sh` when you no longer need them.
+**WARNING:** The default server type used here (`cpx32`, 4 vCPU / 8 GB RAM / 80 GB SSD, Hetzner's newer AMD generation) costs **€0.0677/h** on Hetzner Cloud, capped at **€42.23/month** on the monthly plan (per Hetzner's published price sheet). Delete the resources with `teardown.sh` when you no longer need them.
 
 ## What the script creates
 
@@ -17,7 +17,7 @@ The setup is intentionally **throw-away**: everything lives on one VM, so once y
 |--------------------------------|----------------------|------------------------------------------------------------------|
 | SSH key (`ed25519`)            | local + Hetzner Cloud | Login key for the fresh VM                                       |
 | Firewall (`multi-juicer-fw`)   | Hetzner Cloud        | Allows inbound tcp/22, tcp/80, tcp/443 (world) and tcp/6443 (k8s API, restricted to your public IP) |
-| Server (`multi-juicer`, cpx22) | Hetzner Cloud        | Single-node cluster host                                         |
+| Server (`multi-juicer`, cpx32) | Hetzner Cloud        | Single-node cluster host                                         |
 | k3s (Traefik disabled)         | on the VM            | Lightweight Kubernetes                                           |
 | ingress-nginx                  | in-cluster           | HTTP(S) entry point (matches chart default `ingressClassName`)   |
 | cert-manager + ClusterIssuer   | in-cluster           | Automatic Let's Encrypt certificate                              |
@@ -48,9 +48,9 @@ export DOMAIN="juicy.example.com"    # any subdomain of a domain you control
 export EMAIL="you@example.com"       # used for Let's Encrypt registration
 
 # Optional overrides:
-# export SERVER_TYPE=cpx22           # ~10 teams. Use cpx31/cpx41 (or ccx23 for dedicated CPUs) for larger events.
+# export SERVER_TYPE=cpx32           # ~30 teams. Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (or ccx23 for dedicated CPUs) for larger ones.
 # export SERVER_LOCATION=nbg1        # nbg1 | fsn1 | hel1 | ash | hil | sin
-# export MAX_INSTANCES=10            # caps the number of JuiceShop instances
+# export MAX_INSTANCES=30            # caps the number of JuiceShop instances
 # export REPLICAS=2                  # MultiJuicer balancer replicas (production checklist recommends >=2)
 # export DNS_TIMEOUT=1800            # seconds to wait for DNS to propagate
 # export ADMIN_CIDR=1.2.3.4/32       # CIDR allowed to reach the k8s API (tcp/6443).
@@ -182,7 +182,7 @@ The script already applies the recommendations from [`guides/production-notes/pr
 - **`cookie.secure=true`** — the balancer session cookie is only sent over HTTPS (safe here because everything runs behind Let's Encrypt).
 - **Persistent `cookie.cookieParserSecret`** — a 24-char random secret is generated on the first run and stored in `./.multi-juicer-hetzner/cookie-parser-secret`. Re-runs reuse it, so `helm upgrade` no longer invalidates all team sessions. Delete the file if you want to force a rotation.
 - **`replicas=2`** — two balancer pods on the single node, so a pod crash or rolling upgrade does not take the whole event offline. Override with `REPLICAS=<n>`. (Note: the node itself is a single VM — for real HA you would need multiple nodes.)
-- **`config.maxInstances=10`** — matches the ~10 team sizing of the default `cpx22`. Override with `MAX_INSTANCES` (and pick a bigger `SERVER_TYPE` if you raise it much).
+- **`config.maxInstances=30`** — matches the ~30 team sizing of the default `cpx32`. Override with `MAX_INSTANCES` (and pick a bigger `SERVER_TYPE` if you raise it much).
 
 ## AI / LLM challenges
 
@@ -225,15 +225,16 @@ Then re-run with a valid id, e.g. `LLM_MODEL="<the-id-you-just-found>" ./setup.s
 
 ## Sizing notes
 
-The defaults target a small event on the cheapest sensible Hetzner box (`cpx22`: 2 vCPU / 4 GB RAM / 40 GB SSD). The math behind `MAX_INSTANCES=10`:
+The defaults target a mid-sized event on a `cpx32` (4 vCPU / 8 GB RAM / 80 GB SSD, Hetzner's newer AMD generation). The math behind `MAX_INSTANCES=30`:
 
 - Per Juice Shop pod (from the upstream project's stated **minimum** system requirements): **256 MB RAM**, **200 millicpu**, **300 MB disk**. Recommended is 384 MB / 400 millicpu / 800 MB disk.
-- k3s + ingress-nginx + cert-manager + 2 MultiJuicer balancer replicas reserve roughly **1.1 vCPU** and **1.4 GB RAM** on the node, leaving about **900 mCPU**, **2.6 GB RAM** and ~30 GB free disk for Juice Shop pods.
-- CPU is the tightest resource: 900 mCPU / 200 mCPU ≈ 4–5 pods at Juice Shop's stated minimum, or ~6 pods at the chart's default request of 150 mCPU. Since teams are mostly idle and no CPU **limits** are set, a soft cap of 10 is a realistic compromise. RAM (~10 pods at 256 MB) and disk (>90 pods at 300 MB) are not the bottleneck.
+- k3s + ingress-nginx + cert-manager + 2 MultiJuicer balancer replicas reserve roughly **1.1 vCPU** and **1.4 GB RAM** on the node, leaving about **2.9 vCPU**, **6.6 GB RAM** and ~70 GB free disk for Juice Shop pods.
+- CPU is the tightest resource: 2900 mCPU / 200 mCPU ≈ 14 pods at Juice Shop's stated minimum, or ~19 pods at the chart's default request of 150 mCPU. Since teams are mostly idle and no CPU **limits** are set, a soft cap of 30 is a realistic compromise. RAM (~25 pods at 256 MB) and disk (>200 pods at 300 MB) are not the bottleneck.
 
-Guidelines for scaling up:
+Guidelines for scaling up or down:
 
-- Want more than ~10 teams? Bump both variables together, e.g. `SERVER_TYPE=cpx31` (4 vCPU / 8 GB) with `MAX_INSTANCES=25`, or the previous `SERVER_TYPE=cpx41` (8 vCPU / 16 GB) with `MAX_INSTANCES=50`.
+- Small event (up to ~10 teams)? Drop to `SERVER_TYPE=cpx22` (2 vCPU / 4 GB, ~€6/month) with `MAX_INSTANCES=10`.
+- Want more than ~30 teams? Bump both variables together, e.g. `SERVER_TYPE=cpx42` (8 vCPU / 16 GB) with `MAX_INSTANCES=50`, or `SERVER_TYPE=cpx52` (16 vCPU / 32 GB) with `MAX_INSTANCES=100`.
 - If you expect heavy concurrent traffic per team (e.g. teams actively hacking rather than reading), switch to a **dedicated-CPU** type (e.g. `ccx23` / `ccx33`) via `SERVER_TYPE` — shared-vCPU plans like `cpx*` can throttle under sustained load.
 - To hard-cap the number of teams, use `MAX_INSTANCES`. See the chart's `config.maxInstances` value in [`helm/multi-juicer/values.yaml`](../../helm/multi-juicer/values.yaml) for the full list of tunables.
 
@@ -243,6 +244,6 @@ Guidelines for scaling up:
 - **Wrong IP resolved / stale record** — if you re-created the VM, `DOMAIN` may still resolve to the previous IP because of TTL caching at your provider or resolver. Update the record at your provider, wait for the old TTL to expire, and re-run `setup.sh`.
 - **Certificate stuck in `Ready: False`** — check `kubectl describe certificate multi-juicer-tls` and `kubectl -n cert-manager logs deploy/cert-manager`. The most common cause is that DNS hasn't propagated to the Let's Encrypt validators yet; wait a minute and retry. A stale `AAAA` record pointing at a non-existent IPv6 host also breaks the ACME HTTP-01 challenge — delete or update it.
 - **Browser shows "Kubernetes Ingress Controller Fake Certificate"** — cert-manager hasn't finished the ACME challenge yet. Reload after ~30–60 s.
-- **Pods stuck `Pending`** — the node ran out of schedulable CPU or memory. On the default `cpx22`, CPU is the tightest resource, so this typically happens when `MAX_INSTANCES` is raised without also picking a bigger `SERVER_TYPE`. Choose a bigger `SERVER_TYPE` (e.g. `cpx31` / `cpx41`) and re-run `setup.sh`.
+- **Pods stuck `Pending`** — the node ran out of schedulable CPU or memory. On the default `cpx32`, CPU is the tightest resource, so this typically happens when `MAX_INSTANCES` is raised without also picking a bigger `SERVER_TYPE`. Choose a bigger `SERVER_TYPE` (e.g. `cpx42` / `cpx52` / `ccx33`) and re-run `setup.sh`.
 - **`kubectl` / `helm` time out with `dial tcp <ip>:6443: ... failed to respond`** — the Hetzner firewall is not letting your machine reach the Kubernetes API. `setup.sh` opens tcp/6443 only for the public IPv4 it detects via `api.ipify.org` when it runs, so if your public IP has changed since the last run (new network, VPN toggled, ISP-reassigned dynamic address), just re-run `setup.sh` — the firewall rules are re-applied every run and the current IP will be allowed. Behind a shared/corporate egress or on a dynamic range, set `ADMIN_CIDR` explicitly (e.g. `ADMIN_CIDR=203.0.113.0/24 ./setup.sh`).
 - **JuiceShop chatbot works locally but hangs / errors out on Hetzner** — this is almost never a firewall issue: Hetzner Cloud firewalls only filter *inbound* traffic, and `setup.sh`'s LLM preflight (see [LLM connectivity preflight](#llm-connectivity-preflight)) verifies from the VM that `${LLM_API_URL}/models` responds and that `LLM_MODEL` is actually listed by the provider. If the preflight prints a `!! ...` warning, the fix is upstream: fix `LLM_API_URL`, pick a model your account can access (see the provider dashboard), or bump a spending cap that the free tier has already exhausted, then re-run `setup.sh`.
