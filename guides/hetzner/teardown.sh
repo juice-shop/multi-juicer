@@ -53,4 +53,4 @@ if [[ -d "${STATE_DIR}" ]]; then
 fi
 
 log "Teardown complete."
-log "Reminder: remove the A record for your domain at your DNS provider (e.g. Strato) if you no longer need it."
+log "Reminder: remove the A record for your domain at your DNS provider if you no longer need it."
