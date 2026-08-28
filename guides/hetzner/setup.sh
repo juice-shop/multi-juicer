@@ -11,8 +11,7 @@
 # GoDaddy, Namecheap, Cloudflare, ...). This script does NOT touch your DNS
 # zone. After creating the VM, it prints the VM's public IPv4 and then
 # waits until your domain's A record resolves to that IP before continuing
-# with the k3s / ingress / Let's Encrypt part. See hetzner.md for how to
-# create the A record at Strato.
+# with the k3s / ingress / Let's Encrypt part.
 #
 # The setup is intentionally "throw-away": run this before your event,
 # run `teardown.sh` afterwards, and every Hetzner resource created here
@@ -58,7 +57,6 @@ LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"
 
 # Server / cluster sizing. cpx32 = 4 vCPU / 8 GB RAM / 80 GB SSD (Hetzner's newer AMD generation).
-# CPU is the tightest resource — see the sizing notes in hetzner.md for the math.
 # Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (and raise MAX_INSTANCES accordingly) for larger ones.
 SERVER_NAME="${SERVER_NAME:-multi-juicer}"
 SERVER_TYPE="${SERVER_TYPE:-cpx32}"
@@ -180,7 +178,6 @@ Create an A record at your DNS provider (e.g. Strato) before continuing:
     Value / IPv4: ${SERVER_IP}
     TTL:          as low as your provider allows (e.g. 300 s / 1 min)
 
-See hetzner.md for step-by-step instructions for Strato.
 The script will now poll public DNS every 10 s until ${DOMAIN}
 resolves to ${SERVER_IP}. Press Ctrl+C to abort.
 ----------------------------------------------------------------------
@@ -304,59 +301,6 @@ COOKIE_PARSER_SECRET="$(cat "${COOKIE_SECRET_FILE}")"
 ############################
 # 10. Optional: LLM gateway secret (for AI / chatbot challenges)
 ############################
-# Preflight: verify the Hetzner VM (and therefore the in-cluster LLM gateway,
-# which egresses through the same host via k3s SNAT/MASQUERADE) can actually
-# reach the LLM provider. Hetzner Cloud firewalls only filter *inbound*
-# traffic by default, so this is a smoke test aimed at catching provider-side
-# issues (geoblocking, rate limits, DNS, wrong URL) or a locked-down network
-# on custom images. Failures here are warnings, never fatal — the rest of
-# the MultiJuicer install is unaffected.
-#
-# When LLM_API_KEY is set we additionally list the provider's model catalog
-# and warn if LLM_MODEL is not in it (common cause of "AI challenges hang
-# then time out" — the request is accepted but the upstream 4xx's on the
-# missing model, and JuiceShop retries until it gives up).
-LLM_BASE="${LLM_API_URL%/}"
-LLM_HOST="$(printf '%s' "${LLM_API_URL}" | awk -F/ '{print $3}')"
-LLM_REACHABLE=0
-LLM_MODEL_OK=0
-log "Checking outbound connectivity from the Hetzner VM to ${LLM_HOST} (${LLM_BASE}/models)"
-# `-m 15`: 15 s wall-clock ceiling. `-o /dev/null -w '%{http_code}'` prints
-# just the HTTP status (or `000` on connect/timeout failure). We accept
-# anything 2xx-4xx as "network path works" — auth/model issues are handled
-# by the follow-up check below.
-LLM_CODE="$($SSH "curl -sS -o /dev/null -m 15 -w '%{http_code}' '${LLM_BASE}/models' 2>/dev/null || true" </dev/null || true)"
-case "${LLM_CODE}" in
-  2*|3*|4*)
-    log "LLM API reachable from the Hetzner VM (HTTP ${LLM_CODE})"
-    LLM_REACHABLE=1
-    ;;
-  *)
-    warn "LLM API ${LLM_BASE}/models is NOT reachable from the Hetzner VM (curl result: '${LLM_CODE:-<no response>}')."
-    warn "Hetzner Cloud allows all outbound traffic by default, so this is almost always an upstream issue"
-    warn "(provider outage, DNS, geoblock, or wrong LLM_API_URL). Continuing anyway — the JuiceShop chatbot"
-    warn "and AI challenges will fail until you fix the upstream. You can test manually with:"
-    warn "  ssh -i ${SSH_KEY_FILE} root@${SERVER_IP} \"curl -v ${LLM_BASE}/models\""
-    ;;
-esac
-
-if [[ -n "${LLM_API_KEY}" && "${LLM_REACHABLE}" -eq 1 ]]; then
-  log "Checking model '${LLM_MODEL}' is served by ${LLM_HOST}"
-  # Passes the key via env to avoid it landing in the remote shell history or
-  # `ps` output on the VM.
-  LLM_MODELS_JSON="$($SSH "LLM_API_KEY='${LLM_API_KEY}' curl -sS -m 20 -H 'Authorization: Bearer '\"\$LLM_API_KEY\" '${LLM_BASE}/models' 2>/dev/null || true" </dev/null || true)"
-  if printf '%s' "${LLM_MODELS_JSON}" | jq -e --arg m "${LLM_MODEL}" '(.data // .models // []) | map(.id // .name) | index($m)' >/dev/null 2>&1; then
-    log "Model '${LLM_MODEL}' is available"
-    LLM_MODEL_OK=1
-  else
-    warn "Model '${LLM_MODEL}' was NOT returned by ${LLM_BASE}/models."
-    warn "Either the model id is wrong or your account cannot access it — JuiceShop AI challenges"
-    warn "will hang and eventually error out on the first chatbot request. Pick another model"
-    warn "(see your provider dashboard, e.g. https://openrouter.ai/models) and re-run with:"
-    warn "  LLM_MODEL='<other-model>' ./setup.sh"
-  fi
-fi
-
 HELM_LLM_ARGS=()
 if [[ -n "${LLM_API_KEY}" ]]; then
   log "Configuring LLM gateway (model=${LLM_MODEL}, apiUrl=${LLM_API_URL})"
@@ -408,11 +352,6 @@ ADMIN_PW="$(kubectl get secret multi-juicer-secret -o jsonpath='{.data.adminPass
 LLM_STATUS="disabled (JuiceShop chatbot / AI challenges will not work)"
 if [[ -n "${LLM_API_KEY}" ]]; then
   LLM_STATUS="enabled — model=${LLM_MODEL}, upstream=${LLM_API_URL}"
-  if [[ "${LLM_REACHABLE}" -ne 1 ]]; then
-    LLM_STATUS="${LLM_STATUS} (WARNING: upstream not reachable from the VM — see warnings above)"
-  elif [[ "${LLM_MODEL_OK}" -ne 1 ]]; then
-    LLM_STATUS="${LLM_STATUS} (WARNING: model not listed by provider — see warnings above)"
-  fi
 fi
 
 cat <<EOF
