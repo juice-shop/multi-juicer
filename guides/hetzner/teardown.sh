@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 #
-# Delete every Hetzner resource created by ./setup.sh:
-#   - Hetzner Cloud server
-#   - Hetzner Cloud firewall
-#   - Hetzner Cloud SSH key
-#   - Local state directory (kubeconfig, SSH key)
+# Delete every Hetzner resource created by ./setup.sh (server, firewall, SSH
+# key) and wipe the local state dir. The DNS A record at your provider is NOT
+# touched — remove it manually.
 #
-# The DNS A record for your domain is managed at your own DNS provider
-# (e.g. Strato) and is *not* touched by this script — remove it there
-# manually once you no longer need the deployment.
-#
-# Required env vars (same as setup.sh):
-#   HCLOUD_TOKEN
+# Required env: HCLOUD_TOKEN
 
 set -euo pipefail
 
