@@ -371,9 +371,11 @@ $(log "MultiJuicer is ready")
 The Let's Encrypt certificate is issued by Traefik on the first HTTPS request
 and can take up to a minute. If the browser initially shows Traefik's default
 self-signed certificate, wait a moment and reload.
+EOF
 
-When your event is over, run ./teardown.sh to delete every Hetzner
-resource (server, firewall, SSH key) created by this script. The A
-record for ${DOMAIN} at your DNS provider is *not* touched — remove
-it there manually if you no longer need it.
+action "After the event: run ./teardown.sh to delete every Hetzner resource (server, firewall, SSH key) created by this script"
+cat <<EOF
+
+  The A record for ${DOMAIN} at your DNS provider is *not* touched — remove it there
+  manually if you no longer need it.
 EOF
