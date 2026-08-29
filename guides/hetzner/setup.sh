@@ -1,42 +1,13 @@
 #!/usr/bin/env bash
 #
-# Provision a fresh MultiJuicer cluster on Hetzner Cloud, sized for ~20 teams.
+# Provision a throw-away MultiJuicer cluster on Hetzner Cloud (~20 teams):
+# one VM, k3s + bundled Traefik with ACME (Let's Encrypt), MultiJuicer via Helm.
+# The DNS A record for DOMAIN is managed by you; the script waits for it to
+# resolve to the new VM before continuing. See hetzner.md for full details.
 #
-# The script creates a single Hetzner Cloud VM, installs k3s on it (with the
-# bundled Traefik ingress controller), configures Traefik's built-in ACME
-# client to request a Let's Encrypt certificate, and installs MultiJuicer via
-# Helm so the balancer UI is reachable over HTTPS on your own domain.
-#
-# The domain is expected to be managed at *your* DNS provider (e.g. Strato,
-# GoDaddy, Namecheap, Cloudflare, ...). This script does NOT touch your DNS
-# zone. After creating the VM, it prints the VM's public IPv4 and then
-# waits until your domain's A record resolves to that IP before continuing
-# with the k3s / ingress / Let's Encrypt part.
-#
-# The setup is intentionally "throw-away": run this before your event,
-# run `teardown.sh` afterwards, and every Hetzner resource created here
-# is gone.
-#
-# Prerequisites (see hetzner.md):
-#   - hcloud  (https://github.com/hetznercloud/cli)
-#   - kubectl (https://kubernetes.io/docs/tasks/tools/)
-#   - helm    (https://helm.sh)
-#   - ssh, ssh-keygen, curl, jq
-#   - A Hetzner Cloud API token   -> env HCLOUD_TOKEN
-#   - A domain you control        -> env DOMAIN   (e.g. juicy.example.com)
-#     (the A record for it will be   env EMAIL    (used for Let's Encrypt)
-#      created manually at your
-#      registrar, e.g. Strato)
-#
-# Optional (for AI / LLM challenges — see guides/llm/llm.md):
-#   - env LLM_API_KEY   API key of an OpenAI-compatible LLM provider.
-#                       When set, MultiJuicer's built-in LLM gateway is enabled
-#                       so the JuiceShop chatbot works for all teams while the
-#                       real API key stays inside the cluster.
-#   - env LLM_MODEL     Model identifier to expose to JuiceShop
-#                       (default: inclusionai/ling-3.0-flash-fin:free).
-#   - env LLM_API_URL   Upstream base URL, including path prefix
-#                       (default: https://openrouter.ai/api/v1).
+# Required env: HCLOUD_TOKEN, DOMAIN, EMAIL
+# Optional env (LLM gateway, see guides/llm/llm.md): LLM_API_KEY, LLM_MODEL, LLM_API_URL
+# Required binaries: hcloud, kubectl, helm, ssh, ssh-keygen, curl, jq
 
 set -euo pipefail
 
@@ -47,17 +18,16 @@ set -euo pipefail
 : "${DOMAIN:?DOMAIN is required, e.g. juicy.example.com (managed at your DNS provider)}"
 : "${EMAIL:?EMAIL is required (used for Lets Encrypt registration)}"
 
-# Production-hardening defaults (see guides/production-notes/production-notes.md).
-REPLICAS="${REPLICAS:-2}"                           # >=2 balancer replicas for pod-crash / upgrade resilience
+# See guides/production-notes/production-notes.md.
+REPLICAS="${REPLICAS:-2}"                           # >=2 for pod-crash / upgrade resilience
 
-# Optional LLM gateway (see guides/llm/llm.md). Only enabled when LLM_API_KEY is set.
+# LLM gateway (guides/llm/llm.md); enabled only when LLM_API_KEY is set.
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"
 LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"
 
-# Server / cluster sizing. cpx32 = 4 vCPU / 8 GB RAM / 80 GB SSD (Hetzner's newer AMD generation).
-# Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (and raise MAX_INSTANCES accordingly) for larger ones.
+# cpx32 = 4 vCPU / 8 GB RAM / 80 GB SSD. Bump SERVER_TYPE + MAX_INSTANCES for larger events.
 SERVER_NAME="${SERVER_NAME:-multi-juicer}"
 SERVER_TYPE="${SERVER_TYPE:-cpx32}"
 SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"
@@ -65,7 +35,7 @@ SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"          # Nuremberg
 SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"
 FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"
 K3S_CHANNEL="${K3S_CHANNEL:-stable}"
-MAX_INSTANCES="${MAX_INSTANCES:-20}"                # allowed team count (fits a cpx32; raise together with SERVER_TYPE)
+MAX_INSTANCES="${MAX_INSTANCES:-20}"                # team cap; raise together with SERVER_TYPE
 LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
 STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
 KUBECONFIG_FILE="${STATE_DIR}/kubeconfig.yaml"
@@ -102,13 +72,10 @@ if ! hcloud ssh-key describe "${SSH_KEY_NAME}" >/dev/null 2>&1; then
 fi
 
 ############################
-# 2. Firewall (22 SSH, 80/443 HTTP(S), 6443 k8s API restricted to your IP)
+# 2. Firewall (22, 80/443 world; 6443 k8s API restricted to ADMIN_CIDR)
 ############################
-# The k3s API server listens on tcp/6443. kubectl / helm on your machine
-# need to reach it, so we open that port on the Hetzner firewall — but only
-# for *your* current public IP (a /32) so the API is not world-exposed.
-# Override ADMIN_CIDR (e.g. `1.2.3.0/24`) if you are behind a shared/dynamic
-# egress or want to allow a company range.
+# ADMIN_CIDR defaults to your current public IP /32. Override for a shared
+# egress or company range (e.g. ADMIN_CIDR=1.2.3.0/24).
 ADMIN_CIDR="${ADMIN_CIDR:-}"
 if [[ -z "${ADMIN_CIDR}" ]]; then
   MY_IP="$(curl -sS https://api.ipify.org 2>/dev/null || true)"
@@ -124,11 +91,8 @@ if ! hcloud firewall describe "${FIREWALL_NAME}" >/dev/null 2>&1; then
   hcloud firewall create --name "${FIREWALL_NAME}" >/dev/null
 fi
 
-# Merge the (possibly new) ADMIN_CIDR into the firewall's existing 6443 allowlist
-# instead of replacing it. This lets you re-run setup.sh from a new location
-# (different public IP — e.g. home vs. hotel/venue) and *add* your current IP
-# while keeping the previously-allowed ones. Set ADMIN_CIDR_RESET=1 to instead
-# drop all previous entries and keep only the current ADMIN_CIDR.
+# Merge current ADMIN_CIDR into the existing 6443 allowlist so re-runs from a
+# different location keep previous IPs. ADMIN_CIDR_RESET=1 replaces instead.
 ADMIN_CIDR_RESET="${ADMIN_CIDR_RESET:-0}"
 EXISTING_ADMIN_CIDRS=""
 if [[ "${ADMIN_CIDR_RESET}" != "1" ]]; then
@@ -178,8 +142,7 @@ log "Server public IPv4: ${SERVER_IP}"
 ############################
 # 4. Wait until the user's DNS A record points to this VM
 ############################
-# Uses Cloudflare's DNS-over-HTTPS (1.1.1.1) resolver so we bypass any local
-# DNS caches. curl + jq are already required by the script.
+# DoH via 1.1.1.1 to bypass local DNS caches.
 dns_lookup_a() {
   curl -sS -H 'accept: application/dns-json' \
     "https://cloudflare-dns.com/dns-query?name=${DOMAIN}&type=A" \
@@ -254,16 +217,10 @@ kubectl wait --for=condition=Ready node --all --timeout=180s
 ############################
 # 7. Configure Traefik with Let's Encrypt (built-in ACME)
 ############################
-# k3s installs Traefik via helm-controller from a HelmChart CR in kube-system.
-# A HelmChartConfig with the same name/namespace layers extra values on top of
-# the bundled chart's defaults — we use it to add a persistent volume for
-# acme.json (so certs survive Traefik pod restarts) and an HTTP-01
-# certResolver named 'letsencrypt'. Individual ingresses opt in via the
-# `traefik.ingress.kubernetes.io/router.tls.certresolver` annotation (§10).
-#
-# No custom init container is needed: the Traefik chart's default
-# podSecurityContext (fsGroup=65532) makes the kubelet chown the mounted PVC
-# so the non-root Traefik process can write acme.json.
+# Layer extra values onto k3s's bundled Traefik chart via HelmChartConfig:
+# a PVC for acme.json (so certs survive pod restarts) and an HTTP-01
+# certResolver 'letsencrypt'. Ingresses opt in via the router.tls.certresolver
+# annotation (§10). The chart's default fsGroup=65532 handles PVC ownership.
 log "Configuring Traefik with a Let's Encrypt certResolver"
 kubectl apply -f - <<EOF
 apiVersion: helm.cattle.io/v1
@@ -289,14 +246,9 @@ spec:
             entryPoint: web
 EOF
 
-# helm-controller reconciles the HelmChartConfig by (re-)rendering the bundled
-# Traefik chart via a Helm install/upgrade Job in kube-system, which then
-# creates/updates the Traefik Deployment. On a fresh k3s install that Job may
-# not have finished yet at this point, so the Deployment doesn't exist and
-# `kubectl wait` / `rollout status` immediately fail with NotFound. Poll for
-# the Deployment to appear first — but also detect a failing helm-install Job
-# (bad valuesContent, chart schema mismatch, ...) and surface its logs
-# instead of hanging silently until the timeout.
+# On a fresh k3s the helm-install-traefik Job may not have created the
+# Deployment yet, so poll for it before waiting. Also short-circuit on a
+# failing helm-install pod so we surface its logs instead of hanging.
 log "Waiting for Traefik to reconcile with the new configuration"
 TRAEFIK_READY=0
 for i in {1..60}; do
@@ -304,8 +256,7 @@ for i in {1..60}; do
     TRAEFIK_READY=1
     break
   fi
-  # If any helm-install-traefik* pod is CrashLoopBackOff / Error, the install
-  # is broken and no amount of waiting will help — dump its logs and bail out.
+  # Fail fast if the helm-install pod is broken.
   FAILING_POD="$(kubectl -n kube-system get pods \
     -l 'helmcharts.helm.cattle.io/chart=traefik' \
     -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.containerStatuses[*].state.waiting.reason}{"\n"}{end}' 2>/dev/null \
@@ -327,15 +278,12 @@ kubectl -n kube-system wait --for=condition=Available deploy/traefik --timeout=2
 kubectl -n kube-system rollout status deploy/traefik --timeout=240s
 
 ############################
-# 8. Cookie parser secret (persistent across re-runs — otherwise every
-#    `helm upgrade` rotates it and invalidates all team sessions)
+# 8. Cookie parser secret (persisted so helm upgrades don't invalidate sessions)
 ############################
 if [[ ! -s "${COOKIE_SECRET_FILE}" ]]; then
   log "Generating persistent cookieParserSecret at ${COOKIE_SECRET_FILE}"
-  # 24 alphanumeric chars, matches the recommendation in production-notes.md.
-  # `head -c 24` closes the pipe early, which sends SIGPIPE to `tr` (exit 141);
-  # under `set -o pipefail` that fails the whole pipeline and aborts the script,
-  # so temporarily disable pipefail just for this one pipeline.
+  # 24 alphanumeric chars (see production-notes.md). Disable pipefail: `head`
+  # closes the pipe early, sending SIGPIPE to `tr` which would abort the script.
   set +o pipefail
   LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24 > "${COOKIE_SECRET_FILE}"
   set -o pipefail
@@ -349,8 +297,7 @@ COOKIE_PARSER_SECRET="$(cat "${COOKIE_SECRET_FILE}")"
 HELM_LLM_ARGS=()
 if [[ -n "${LLM_API_KEY}" ]]; then
   log "Configuring LLM gateway (model=${LLM_MODEL}, apiUrl=${LLM_API_URL})"
-  # Upsert the k8s secret with the upstream API key. `kubectl apply` avoids
-  # errors on re-runs and lets the user rotate the key by re-running setup.sh.
+  # Upsert secret so re-runs can rotate the key.
   kubectl create secret generic "${LLM_SECRET_NAME}" \
     --namespace default \
     --from-literal=token="${LLM_API_KEY}" \
