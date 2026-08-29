@@ -47,4 +47,4 @@ if [[ -d "${STATE_DIR}" ]]; then
 fi
 
 log "Teardown complete."
-action "Reminder: remove the A record for your domain at your DNS provider if you no longer need it."
+action "Reminder: the A record for your domain at your DNS provider was *not* touched — remove it there manually if you no longer need it"
