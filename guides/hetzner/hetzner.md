@@ -48,6 +48,9 @@ export EMAIL="you@example.com"       # used for Let's Encrypt registration
 # export REPLICAS=2                  # MultiJuicer balancer replicas
 # export DNS_TIMEOUT=1800            # seconds to wait for DNS to propagate
 # export ADMIN_CIDR=1.2.3.4/32       # CIDR allowed to reach the k8s API (tcp/6443); defaults to your current public IPv4.
+# export ADMIN_CIDR_RESET=1          # On re-run, drop previously-allowed admin IPs instead of appending the new one.
+#                                    # Handy when travelling: re-running setup.sh from a hotel/venue *adds* your new
+#                                    # public IP to the tcp/6443 allowlist and keeps existing ones (server untouched).
 
 # Optional: enable the LLM gateway so the JuiceShop chatbot / AI challenges work.
 # See guides/llm/llm.md for background. The gateway keeps the API key inside the cluster;

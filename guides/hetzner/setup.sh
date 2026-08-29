@@ -118,7 +118,29 @@ if [[ -z "${ADMIN_CIDR}" ]]; then
   fi
   ADMIN_CIDR="${MY_IP}/32"
 fi
-log "Restricting Kubernetes API (tcp/6443) to ${ADMIN_CIDR}"
+
+if ! hcloud firewall describe "${FIREWALL_NAME}" >/dev/null 2>&1; then
+  log "Creating firewall '${FIREWALL_NAME}'"
+  hcloud firewall create --name "${FIREWALL_NAME}" >/dev/null
+fi
+
+# Merge the (possibly new) ADMIN_CIDR into the firewall's existing 6443 allowlist
+# instead of replacing it. This lets you re-run setup.sh from a new location
+# (different public IP — e.g. home vs. hotel/venue) and *add* your current IP
+# while keeping the previously-allowed ones. Set ADMIN_CIDR_RESET=1 to instead
+# drop all previous entries and keep only the current ADMIN_CIDR.
+ADMIN_CIDR_RESET="${ADMIN_CIDR_RESET:-0}"
+EXISTING_ADMIN_CIDRS=""
+if [[ "${ADMIN_CIDR_RESET}" != "1" ]]; then
+  EXISTING_ADMIN_CIDRS="$(hcloud firewall describe "${FIREWALL_NAME}" -o json 2>/dev/null \
+    | jq -r '(.rules // []) | map(select(.direction=="in" and .protocol=="tcp" and .port=="6443")) | .[].source_ips[]?' \
+    || true)"
+fi
+ADMIN_CIDRS_JSON="$(printf '%s\n%s\n' "${EXISTING_ADMIN_CIDRS}" "${ADMIN_CIDR}" \
+  | awk 'NF && !seen[$0]++' \
+  | jq -R . | jq -s .)"
+
+log "Allowing Kubernetes API (tcp/6443) from: $(echo "${ADMIN_CIDRS_JSON}" | jq -r 'join(", ")')"
 
 RULES_FILE="${STATE_DIR}/firewall-rules.json"
 cat > "${RULES_FILE}" <<EOF
@@ -126,14 +148,10 @@ cat > "${RULES_FILE}" <<EOF
   {"direction":"in","protocol":"tcp","port":"22",  "source_ips":["0.0.0.0/0","::/0"]},
   {"direction":"in","protocol":"tcp","port":"80",  "source_ips":["0.0.0.0/0","::/0"]},
   {"direction":"in","protocol":"tcp","port":"443", "source_ips":["0.0.0.0/0","::/0"]},
-  {"direction":"in","protocol":"tcp","port":"6443","source_ips":["${ADMIN_CIDR}"]}
+  {"direction":"in","protocol":"tcp","port":"6443","source_ips":${ADMIN_CIDRS_JSON}}
 ]
 EOF
 
-if ! hcloud firewall describe "${FIREWALL_NAME}" >/dev/null 2>&1; then
-  log "Creating firewall '${FIREWALL_NAME}'"
-  hcloud firewall create --name "${FIREWALL_NAME}" >/dev/null
-fi
 log "Applying firewall rules to '${FIREWALL_NAME}'"
 hcloud firewall replace-rules "${FIREWALL_NAME}" --rules-file "${RULES_FILE}" >/dev/null
 
