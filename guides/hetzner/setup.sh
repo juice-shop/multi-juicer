@@ -48,8 +48,9 @@ export KUBECONFIG="${KUBECONFIG_FILE}"
 mkdir -p "${STATE_DIR}"
 chmod 700 "${STATE_DIR}"
 
-log()  { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
-warn() { printf '\n\033[1;33m!!  %s\033[0m\n' "$*" >&2; }
+log()    { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
+warn()   { printf '\n\033[1;33m!!  %s\033[0m\n' "$*" >&2; }
+action() { printf '\n\033[1;36m>>  %s\033[0m\n' "$*"; }
 
 ############################
 # 0. Sanity checks
@@ -149,10 +150,13 @@ dns_lookup_a() {
     | jq -r '.Answer // [] | map(select(.type==1)) | .[].data' 2>/dev/null
 }
 
-cat <<EOF
-
-----------------------------------------------------------------------
-Create an A record at your DNS provider before continuing:
+log "Checking DNS for ${DOMAIN}"
+CURRENT_IPS="$(dns_lookup_a || true)"
+if echo "${CURRENT_IPS}" | grep -qx "${SERVER_IP}"; then
+  log "DNS OK: ${DOMAIN} -> ${SERVER_IP}"
+else
+  action "Action required: create an A record at your DNS provider"
+  cat <<EOF
 
     Host / Name:  ${DOMAIN}
     Type:         A
@@ -161,25 +165,25 @@ Create an A record at your DNS provider before continuing:
 
 The script will now poll public DNS every 10 s until ${DOMAIN}
 resolves to ${SERVER_IP}. Press Ctrl+C to abort.
-----------------------------------------------------------------------
 EOF
 
-DNS_TIMEOUT="${DNS_TIMEOUT:-1800}"   # 30 minutes
-SECONDS=0
-while :; do
-  CURRENT_IPS="$(dns_lookup_a || true)"
-  if echo "${CURRENT_IPS}" | grep -qx "${SERVER_IP}"; then
-    log "DNS OK: ${DOMAIN} -> ${SERVER_IP}"
-    break
-  fi
-  if (( SECONDS >= DNS_TIMEOUT )); then
-    echo "DNS did not propagate within ${DNS_TIMEOUT}s. ${DOMAIN} currently resolves to: ${CURRENT_IPS:-<nothing>}" >&2
-    echo "Re-run this script once the A record is in place — it is idempotent." >&2
-    exit 1
-  fi
-  printf '.'
-  sleep 10
-done
+  DNS_TIMEOUT="${DNS_TIMEOUT:-1800}"   # 30 minutes
+  SECONDS=0
+  while :; do
+    CURRENT_IPS="$(dns_lookup_a || true)"
+    if echo "${CURRENT_IPS}" | grep -qx "${SERVER_IP}"; then
+      log "DNS OK: ${DOMAIN} -> ${SERVER_IP}"
+      break
+    fi
+    if (( SECONDS >= DNS_TIMEOUT )); then
+      echo "DNS did not propagate within ${DNS_TIMEOUT}s. ${DOMAIN} currently resolves to: ${CURRENT_IPS:-<nothing>}" >&2
+      echo "Re-run this script once the A record is in place — it is idempotent." >&2
+      exit 1
+    fi
+    printf '.'
+    sleep 10
+  done
+fi
 
 ############################
 # 5. Wait for SSH to be ready
@@ -191,6 +195,7 @@ for i in {1..60}; do
          "root@${SERVER_IP}" 'true' 2>/dev/null; then
     break
   fi
+  printf '.'
   sleep 5
 done
 

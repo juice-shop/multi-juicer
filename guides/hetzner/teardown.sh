@@ -17,7 +17,8 @@ STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
 
 export HCLOUD_TOKEN
 
-log() { printf '\n\033[1;33m==> %s\033[0m\n' "$*"; }
+log() { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
+action() { printf '\n\033[1;36m>>  %s\033[0m\n' "$*"; }
 
 for bin in hcloud; do
   command -v "$bin" >/dev/null 2>&1 || { echo "Missing required binary: $bin" >&2; exit 1; }
@@ -46,4 +47,4 @@ if [[ -d "${STATE_DIR}" ]]; then
 fi
 
 log "Teardown complete."
-log "Reminder: remove the A record for your domain at your DNS provider if you no longer need it."
+action "Reminder: remove the A record for your domain at your DNS provider if you no longer need it."
