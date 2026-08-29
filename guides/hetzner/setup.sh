@@ -171,7 +171,7 @@ dns_lookup_a() {
 cat <<EOF
 
 ----------------------------------------------------------------------
-Create an A record at your DNS provider (e.g. Strato) before continuing:
+Create an A record at your DNS provider before continuing:
 
     Host / Name:  ${DOMAIN}
     Type:         A
