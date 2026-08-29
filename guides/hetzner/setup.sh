@@ -2,10 +2,10 @@
 #
 # Provision a fresh MultiJuicer cluster on Hetzner Cloud, sized for ~20 teams.
 #
-# The script creates a single Hetzner Cloud VM, installs k3s on it, deploys
-# ingress-nginx + cert-manager, installs MultiJuicer via Helm, and requests
-# a Let's Encrypt certificate so the balancer UI is reachable over HTTPS on
-# your own domain.
+# The script creates a single Hetzner Cloud VM, installs k3s on it (with the
+# bundled Traefik ingress controller), configures Traefik's built-in ACME
+# client to request a Let's Encrypt certificate, and installs MultiJuicer via
+# Helm so the balancer UI is reachable over HTTPS on your own domain.
 #
 # The domain is expected to be managed at *your* DNS provider (e.g. Strato,
 # GoDaddy, Namecheap, Cloudflare, ...). This script does NOT touch your DNS
@@ -234,12 +234,12 @@ done
 SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE} root@${SERVER_IP}"
 
 ############################
-# 6. Install k3s (Traefik disabled — we use ingress-nginx to match the chart's default ingressClassName)
+# 6. Install k3s (with bundled Traefik — we configure it below to also handle Let's Encrypt)
 ############################
 log "Installing k3s on the server"
 $SSH "curl -sfL https://get.k3s.io | \
       INSTALL_K3S_CHANNEL=${K3S_CHANNEL} \
-      INSTALL_K3S_EXEC='--disable=traefik --tls-san=${DOMAIN} --tls-san=${SERVER_IP} --write-kubeconfig-mode=644' \
+      INSTALL_K3S_EXEC='--tls-san=${DOMAIN} --tls-san=${SERVER_IP} --write-kubeconfig-mode=644' \
       sh -" >/dev/null
 
 log "Fetching kubeconfig to ${KUBECONFIG_FILE}"
@@ -252,55 +252,82 @@ log "Waiting for the node to become Ready"
 kubectl wait --for=condition=Ready node --all --timeout=180s
 
 ############################
-# 7. ingress-nginx
+# 7. Configure Traefik with Let's Encrypt (built-in ACME)
 ############################
-log "Installing ingress-nginx"
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx >/dev/null 2>&1 || true
-helm repo update >/dev/null
-helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-  --namespace ingress-nginx --create-namespace \
-  --set controller.service.type=NodePort \
-  --set controller.hostPort.enabled=true \
-  --set controller.hostPort.ports.http=80 \
-  --set controller.hostPort.ports.https=443 \
-  --set controller.kind=DaemonSet \
-  --set controller.publishService.enabled=false
-
-kubectl -n ingress-nginx rollout status ds/ingress-nginx-controller --timeout=180s
-
-############################
-# 8. cert-manager + Let's Encrypt ClusterIssuer
-############################
-log "Installing cert-manager"
-helm repo add jetstack https://charts.jetstack.io >/dev/null 2>&1 || true
-helm repo update >/dev/null
-helm upgrade --install cert-manager jetstack/cert-manager \
-  --namespace cert-manager --create-namespace \
-  --set crds.enabled=true
-
-kubectl -n cert-manager rollout status deploy/cert-manager --timeout=180s
-kubectl -n cert-manager rollout status deploy/cert-manager-webhook --timeout=180s
-
-log "Creating Let's Encrypt ClusterIssuer"
+# k3s installs Traefik via helm-controller from a HelmChart CR in kube-system.
+# A HelmChartConfig with the same name/namespace layers extra values on top of
+# the bundled chart's defaults — we use it to add a persistent volume for
+# acme.json (so certs survive Traefik pod restarts) and an HTTP-01
+# certResolver named 'letsencrypt'. Individual ingresses opt in via the
+# `traefik.ingress.kubernetes.io/router.tls.certresolver` annotation (§10).
+#
+# No custom init container is needed: the Traefik chart's default
+# podSecurityContext (fsGroup=65532) makes the kubelet chown the mounted PVC
+# so the non-root Traefik process can write acme.json.
+log "Configuring Traefik with a Let's Encrypt certResolver"
 kubectl apply -f - <<EOF
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
 metadata:
-  name: letsencrypt
+  name: traefik
+  namespace: kube-system
 spec:
-  acme:
-    server: ${LE_SERVER}
-    email: ${EMAIL}
-    privateKeySecretRef:
-      name: letsencrypt-account-key
-    solvers:
-      - http01:
-          ingress:
-            class: nginx
+  valuesContent: |-
+    persistence:
+      enabled: true
+      name: traefik-data
+      accessMode: ReadWriteOnce
+      size: 128Mi
+      path: /data
+    certificatesResolvers:
+      letsencrypt:
+        acme:
+          email: ${EMAIL}
+          storage: /data/acme.json
+          caServer: ${LE_SERVER}
+          httpChallenge:
+            entryPoint: web
 EOF
 
+# helm-controller reconciles the HelmChartConfig by (re-)rendering the bundled
+# Traefik chart via a Helm install/upgrade Job in kube-system, which then
+# creates/updates the Traefik Deployment. On a fresh k3s install that Job may
+# not have finished yet at this point, so the Deployment doesn't exist and
+# `kubectl wait` / `rollout status` immediately fail with NotFound. Poll for
+# the Deployment to appear first — but also detect a failing helm-install Job
+# (bad valuesContent, chart schema mismatch, ...) and surface its logs
+# instead of hanging silently until the timeout.
+log "Waiting for Traefik to reconcile with the new configuration"
+TRAEFIK_READY=0
+for i in {1..60}; do
+  if kubectl -n kube-system get deploy traefik >/dev/null 2>&1; then
+    TRAEFIK_READY=1
+    break
+  fi
+  # If any helm-install-traefik* pod is CrashLoopBackOff / Error, the install
+  # is broken and no amount of waiting will help — dump its logs and bail out.
+  FAILING_POD="$(kubectl -n kube-system get pods \
+    -l 'helmcharts.helm.cattle.io/chart=traefik' \
+    -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.containerStatuses[*].state.waiting.reason}{"\n"}{end}' 2>/dev/null \
+    | awk -F'\t' '$2 ~ /CrashLoopBackOff|Error|ImagePullBackOff/ {print $1; exit}')"
+  if [[ -n "${FAILING_POD}" ]]; then
+    warn "Traefik helm-install Job is failing (pod ${FAILING_POD}). Recent logs:"
+    kubectl -n kube-system logs "${FAILING_POD}" --tail=40 >&2 || true
+    echo "Fix the HelmChartConfig above, then re-run setup.sh (it is idempotent)." >&2
+    exit 1
+  fi
+  printf '.'
+  sleep 5
+done
+if [[ "${TRAEFIK_READY}" != "1" ]]; then
+  echo "Traefik Deployment did not appear within 5 min. Inspect: kubectl -n kube-system get pods,helmchart,helmchartconfig" >&2
+  exit 1
+fi
+kubectl -n kube-system wait --for=condition=Available deploy/traefik --timeout=240s
+kubectl -n kube-system rollout status deploy/traefik --timeout=240s
+
 ############################
-# 9. Cookie parser secret (persistent across re-runs — otherwise every
+# 8. Cookie parser secret (persistent across re-runs — otherwise every
 #    `helm upgrade` rotates it and invalidates all team sessions)
 ############################
 if [[ ! -s "${COOKIE_SECRET_FILE}" ]]; then
@@ -317,7 +344,7 @@ fi
 COOKIE_PARSER_SECRET="$(cat "${COOKIE_SECRET_FILE}")"
 
 ############################
-# 10. Optional: LLM gateway secret (for AI / chatbot challenges)
+# 9. Optional: LLM gateway secret (for AI / chatbot challenges)
 ############################
 HELM_LLM_ARGS=()
 if [[ -n "${LLM_API_KEY}" ]]; then
@@ -341,7 +368,7 @@ else
 fi
 
 ############################
-# 11. MultiJuicer
+# 10. MultiJuicer
 ############################
 log "Installing MultiJuicer via Helm (replicas=${REPLICAS}, maxInstances=${MAX_INSTANCES})"
 helm upgrade --install multi-juicer \
@@ -352,8 +379,10 @@ helm upgrade --install multi-juicer \
   --set-string "cookie.cookieParserSecret=${COOKIE_PARSER_SECRET}" \
   --set "config.maxInstances=${MAX_INSTANCES}" \
   --set ingress.enabled=true \
-  --set ingress.ingressClassName=nginx \
-  --set-string 'ingress.annotations.cert-manager\.io/cluster-issuer=letsencrypt' \
+  --set ingress.ingressClassName=traefik \
+  --set-string 'ingress.annotations.traefik\.ingress\.kubernetes\.io/router\.tls=true' \
+  --set-string 'ingress.annotations.traefik\.ingress\.kubernetes\.io/router\.tls\.certresolver=letsencrypt' \
+  --set-string 'ingress.annotations.traefik\.ingress\.kubernetes\.io/router\.entrypoints=websecure' \
   --set "ingress.hosts[0].host=${DOMAIN}" \
   --set "ingress.hosts[0].paths[0]=/" \
   --set "ingress.tls[0].secretName=multi-juicer-tls" \
@@ -363,7 +392,7 @@ helm upgrade --install multi-juicer \
 kubectl -n default rollout status deploy/multi-juicer --timeout=180s
 
 ############################
-# 12. Done
+# 11. Done
 ############################
 ADMIN_PW="$(kubectl get secret multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d)"
 
@@ -387,9 +416,9 @@ $(log "MultiJuicer is ready")
   SSH into server:  ssh -i ${SSH_KEY_FILE} root@${SERVER_IP}
   Cookie secret:    ${COOKIE_SECRET_FILE} (keep it — re-runs reuse it so team sessions survive helm upgrades)
 
-The Let's Encrypt certificate is issued on the first HTTPS request and can
-take up to a minute. If the browser initially shows the ingress default
-certificate, wait a moment and reload.
+The Let's Encrypt certificate is issued by Traefik on the first HTTPS request
+and can take up to a minute. If the browser initially shows Traefik's default
+self-signed certificate, wait a moment and reload.
 
 When your event is over, run ./teardown.sh to delete every Hetzner
 resource (server, firewall, SSH key) created by this script. The A

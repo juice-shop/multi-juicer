@@ -16,9 +16,8 @@ The setup is intentionally throw-away: everything lives on one VM, so after the 
 | SSH key (`ed25519`)            | local + Hetzner Cloud | Login key for the fresh VM                                       |
 | Firewall (`multi-juicer-fw`)   | Hetzner Cloud        | Allows inbound tcp/22, tcp/80, tcp/443 (world) and tcp/6443 (k8s API, restricted to your public IP) |
 | Server (`multi-juicer`, cpx32) | Hetzner Cloud        | Single-node cluster host                                         |
-| k3s (Traefik disabled)         | on the VM            | Lightweight Kubernetes                                           |
-| ingress-nginx                  | in-cluster           | HTTP(S) entry point                                              |
-| cert-manager + ClusterIssuer   | in-cluster           | Automatic Let's Encrypt certificate                              |
+| k3s (with bundled Traefik)     | on the VM            | Lightweight Kubernetes + Traefik ingress controller              |
+| Traefik ACME certResolver      | in-cluster           | Traefik's built-in Let's Encrypt client (HTTP-01, persistent `acme.json`) |
 | MultiJuicer Helm release       | in-cluster           | The MultiJuicer balancer (2 replicas by default) + on-demand JuiceShop instances |
 | LLM gateway secret (optional)  | in-cluster           | Holds the upstream LLM API key for the JuiceShop chatbot / AI challenges (only created when `LLM_API_KEY` is set) |
 
@@ -95,7 +94,7 @@ The `Host` field is the part of `DOMAIN` **before** your registered domain:
 
 If your provider also serves a stale `AAAA` (IPv6) record for the same host, delete it or point it at the server's IPv6 (`hcloud server describe multi-juicer` shows it) — otherwise browsers may prefer IPv6 and skip the fresh `A` record, and the Let's Encrypt HTTP-01 challenge breaks.
 
-Once DNS has propagated (usually seconds to minutes for a small TTL), the script continues automatically and installs k3s, ingress-nginx, cert-manager and MultiJuicer.
+Once DNS has propagated (usually seconds to minutes for a small TTL), the script continues automatically and installs k3s (with the bundled Traefik ingress controller + a Let's Encrypt `certResolver`) and MultiJuicer.
 
 ## Step 3. Wait for the installation to finish
 
@@ -111,7 +110,7 @@ Kubeconfig:       ./.multi-juicer-hetzner/kubeconfig.yaml
 SSH into server:  ssh -i ./.multi-juicer-hetzner/id_ed25519 root@<ip>
 ```
 
-Open `https://<DOMAIN>` in your browser. The first hit may briefly show the ingress' default self-signed certificate while cert-manager completes the HTTP-01 challenge — reload after a few seconds.
+Open `https://<DOMAIN>` in your browser. The first hit may briefly show Traefik's default self-signed certificate while Traefik completes the Let's Encrypt HTTP-01 challenge — reload after a few seconds.
 
 ## Step 4. Verify
 
@@ -121,7 +120,9 @@ export KUBECONFIG="$(pwd)/.multi-juicer-hetzner/kubeconfig.yaml"
 
 kubectl get pods -A
 kubectl get ingress
-kubectl get certificate    # should show READY=True within ~1 minute
+# Traefik stores the issued cert in acme.json on its persistent volume;
+# once the first HTTPS request has been served, the cert is cached there.
+kubectl -n kube-system logs deploy/traefik | grep -i acme    # look for successful certificate issuance
 
 # Admin password:
 kubectl get secrets multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d
