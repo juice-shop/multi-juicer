@@ -9,17 +9,31 @@ The setup is intentionally throw-away: everything lives on one VM, so after the 
 
 > Expected costs: The default server type (`cpx32`, 4 vCPU / 8 GB RAM / 80 GB SSD) costs ~€0.07/h on Hetzner Cloud capped at ~€42/month. Run `teardown.sh` when you no longer need it.
 
+## Recommended VM sizing
+
+The single-VM recommendations below are based on the bundled load tests. Keep
+larger events in separate deployments rather than increasing the VM size beyond
+these tiers.
+
+| Maximum teams | Hetzner VM | Configuration                                     |
+|--------------:|------------|---------------------------------------------------|
+|           <=5 | `cpx22`    | `SERVER_TYPE=cpx22`, `MAX_INSTANCES=5`            |
+|          <=20 | `cpx32`    | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=20` (default) |
+|          <=30 | `cpx42`    | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=30`           |
+
+> From 40 teams upward multi-second latencies might become the limiting factor, even on more powerful VMs such as `cpx52` and `cpx62`.
+
 ## What the script creates
 
-| Resource                       | Where                | Purpose                                                          |
-|--------------------------------|----------------------|------------------------------------------------------------------|
-| SSH key (`ed25519`)            | local + Hetzner Cloud | Login key for the fresh VM                                       |
-| Firewall (`multi-juicer-fw`)   | Hetzner Cloud        | Allows inbound tcp/22, tcp/80, tcp/443 (world) and tcp/6443 (k8s API, restricted to your public IP) |
-| Server (`multi-juicer`, cpx32) | Hetzner Cloud        | Single-node cluster host                                         |
-| k3s (with bundled Traefik)     | on the VM            | Lightweight Kubernetes + Traefik ingress controller              |
-| Traefik ACME certResolver      | in-cluster           | Traefik's built-in Let's Encrypt client (HTTP-01, persistent `acme.json`) |
-| MultiJuicer Helm release       | in-cluster           | The MultiJuicer balancer (2 replicas by default) + on-demand JuiceShop instances |
-| LLM gateway secret (optional)  | in-cluster           | Holds the upstream LLM API key for the JuiceShop chatbot / AI challenges (only created when `LLM_API_KEY` is set) |
+| Resource                       | Where                 | Purpose                                                                                                           |
+|--------------------------------|-----------------------|-------------------------------------------------------------------------------------------------------------------|
+| SSH key (`ed25519`)            | local + Hetzner Cloud | Login key for the fresh VM                                                                                        |
+| Firewall (`multi-juicer-fw`)   | Hetzner Cloud         | Allows inbound tcp/22, tcp/80, tcp/443 (world) and tcp/6443 (k8s API, restricted to your public IP)               |
+| Server (`multi-juicer`, cpx32) | Hetzner Cloud         | Single-node cluster host                                                                                          |
+| k3s (with bundled Traefik)     | on the VM             | Lightweight Kubernetes + Traefik ingress controller                                                               |
+| Traefik ACME certResolver      | in-cluster            | Traefik's built-in Let's Encrypt client (HTTP-01, persistent `acme.json`)                                         |
+| MultiJuicer Helm release       | in-cluster            | The MultiJuicer balancer (2 replicas by default) + on-demand JuiceShop instances                                  |
+| LLM gateway secret (optional)  | in-cluster            | Holds the upstream LLM API key for the JuiceShop chatbot / AI challenges (only created when `LLM_API_KEY` is set) |
 
 The `A` record for `DOMAIN` stays at your existing DNS provider and is managed by you. `setup.sh` already applies the recommendations from [`guides/production-notes/production-notes.md`](../production-notes/production-notes.md) (secure cookie, persistent `cookieParserSecret` stored in `./.multi-juicer-hetzner/cookie-parser-secret`, 2 balancer replicas, `config.maxInstances`).
 
@@ -41,9 +55,10 @@ export DOMAIN="juicy.example.com"    # any subdomain of a domain you control
 export EMAIL="you@example.com"       # used for Let's Encrypt registration
 
 # Optional overrides:
-# export SERVER_TYPE=cpx32           # ~20 teams. Drop to cpx22 for tiny events, or bump to cpx42 / cpx52 (or ccx23 for dedicated CPUs) for larger ones.
+# Recommended tiers: cpx22 / 5 teams, cpx32 / 20 teams (default), cpx42 / 30 teams.
+# export SERVER_TYPE=cpx32           # Select cpx22, cpx32, or cpx42 for the matching tier.
 # export SERVER_LOCATION=nbg1        # nbg1 | fsn1 | hel1 | ash | hil | sin
-# export MAX_INSTANCES=20            # caps the number of JuiceShop instances (raise together with SERVER_TYPE)
+# export MAX_INSTANCES=20            # Use 5, 20, or 30 with cpx22, cpx32, or cpx42.
 # export REPLICAS=2                  # MultiJuicer balancer replicas
 # export DNS_TIMEOUT=1800            # seconds to wait for DNS to propagate
 # export ADMIN_CIDR=1.2.3.4/32       # CIDR allowed to reach the k8s API (tcp/6443); defaults to your current public IPv4.
@@ -80,12 +95,12 @@ Leave the script running while continuing with [Step 2](#step-2-create-the-a-rec
 
 You need one DNS record:
 
-| Field         | Value                                    |
-|---------------|------------------------------------------|
-| Type          | `A`                                      |
-| Host / Name   | the sub-part of your `DOMAIN` (see below)|
-| Value / Target| the public IPv4 printed by `setup.sh`    |
-| TTL           | as low as your provider allows (e.g. 60 or 300 seconds) |
+| Field          | Value                                                   |
+|----------------|---------------------------------------------------------|
+| Type           | `A`                                                     |
+| Host / Name    | the sub-part of your `DOMAIN` (see below)               |
+| Value / Target | the public IPv4 printed by `setup.sh`                   |
+| TTL            | as low as your provider allows (e.g. 60 or 300 seconds) |
 
 The `Host` field is the part of `DOMAIN` **before** your registered domain:
 
