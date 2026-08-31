@@ -149,6 +149,32 @@ dns_lookup_a() {
     | jq -r '.Answer // [] | map(select(.type==1)) | .[].data' 2>/dev/null
 }
 
+# Report what DNS currently returns, but only when the answer changes, so the
+# poll below stays quiet while nothing moves. The first time we see a wrong
+# (rather than missing) answer, point at Cloudflare's cache purge tool: a stale
+# entry there — e.g. from a wildcard record with a long TTL — keeps 1.1.1.1 on
+# the old IP long after the A record itself is correct.
+LAST_REPORTED_IPS="__unset__"
+PURGE_HINT_SHOWN=0
+report_dns() {
+  local ips="${1//$'\n'/, }"
+  [[ "${ips}" == "${LAST_REPORTED_IPS}" ]] && return 0
+  LAST_REPORTED_IPS="${ips}"
+  warn "${DOMAIN} resolves to ${ips:-<nothing>}, expected ${SERVER_IP}"
+  if [[ -n "${ips}" && "${PURGE_HINT_SHOWN}" == "0" ]]; then
+    PURGE_HINT_SHOWN=1
+    cat >&2 <<EOF
+
+    If the A record is already in place, the resolver this script queries
+    (1.1.1.1) is likely still serving a cached older answer. Purge it at
+    https://one.one.one.one/purge-cache/ (name: ${DOMAIN}, type: A) or run:
+
+      curl -sSL -X POST "https://cloudflare-dns.com/api/v1/purge?domain=${DOMAIN}&type=A"
+
+EOF
+  fi
+}
+
 log "Checking DNS for ${DOMAIN}"
 CURRENT_IPS="$(dns_lookup_a || true)"
 if echo "${CURRENT_IPS}" | grep -qx "${SERVER_IP}"; then
@@ -166,6 +192,8 @@ The script will now poll public DNS every 10 s until ${DOMAIN}
 resolves to ${SERVER_IP}. Press Ctrl+C to abort.
 EOF
 
+  report_dns "${CURRENT_IPS}"
+
   DNS_TIMEOUT="${DNS_TIMEOUT:-1800}"   # 30 minutes
   SECONDS=0
   while :; do
@@ -179,6 +207,7 @@ EOF
       echo "Re-run this script once the A record is in place — it is idempotent." >&2
       exit 1
     fi
+    report_dns "${CURRENT_IPS}"
     printf '.'
     sleep 10
   done
