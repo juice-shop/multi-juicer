@@ -189,6 +189,9 @@ type Notification struct {
 type ScoringService interface {
 	GetScores() map[string]*TeamScore
 	GetScoreForTeam(team string) (*TeamScore, bool)
+	// GetInstanceReadiness reports whether the team's JuiceShop instance is ready to
+	// serve traffic. known is false for teams the deployment watcher hasn't seen.
+	GetInstanceReadiness(team string) (ready bool, known bool)
 	GetTopScores() []*TeamScore
 	GetTopScoresWithTimestamp() ([]*TeamScore, time.Time)
 	WaitForUpdatesNewerThan(ctx context.Context, lastSeenUpdate time.Time) []*TeamScore

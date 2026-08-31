@@ -63,6 +63,17 @@ func (s *ScoringService) GetScoreForTeam(team string) (*bundle.TeamScore, bool) 
 	return score, ok
 }
 
+// GetInstanceReadiness answers from the deployment watch cache only.
+func (s *ScoringService) GetInstanceReadiness(team string) (bool, bool) {
+	s.currentScoresMutex.Lock()
+	defer s.currentScoresMutex.Unlock()
+	score, ok := s.currentScores[team]
+	if !ok {
+		return false, false
+	}
+	return score.InstanceReadiness, true
+}
+
 func (s *ScoringService) GetTopScores() []*bundle.TeamScore {
 	s.currentScoresMutex.Lock()
 	defer s.currentScoresMutex.Unlock()

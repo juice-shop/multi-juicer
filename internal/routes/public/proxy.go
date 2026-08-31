@@ -18,13 +18,19 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+// lastRequestWriteInterval is how often the lastRequest annotation is refreshed
+// per team and replica.
+const lastRequestWriteInterval = 1 * time.Minute
+
 var (
-	instanceUpCache = map[string]int64{}
-	cacheMutex      = &sync.Mutex{}
+	lastRequestWrites = map[string]int64{}
+	cacheMutex        = &sync.Mutex{}
 )
 
-func clearInstanceUpCache() {
-	instanceUpCache = map[string]int64{}
+func clearLastRequestWriteCache() {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+	lastRequestWrites = map[string]int64{}
 }
 
 // newReverseProxy creates a reverse proxy for a given target URL.
@@ -48,23 +54,18 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 				return
 			}
 
-			if !wasInstanceUptimeStatusCheckedRecently(team) {
-				status := isInstanceUp(req.Context(), bundle, team)
-				switch status {
-				case instanceUp:
-					cacheMutex.Lock()
-					instanceUpCache[team] = time.Now().UnixMilli()
-					cacheMutex.Unlock()
-				case instanceMissing:
-					bundle.Log.Info("Instance for team is missing. Redirecting to multi-juicer landing page.", "team", team)
-					http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/?msg=instance-not-found&team=%s", team), http.StatusFound)
-					return
-				default:
-					bundle.Log.Info("Instance for team is down. Redirecting to multi-juicer landing page.", "team", team)
-					http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/?msg=instance-restarting&team=%s", team), http.StatusFound)
-					return
-				}
+			switch resolveInstanceStatus(req.Context(), bundle, team) {
+			case instanceMissing:
+				bundle.Log.Info("Instance for team is missing. Redirecting to multi-juicer landing page.", "team", team)
+				http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/?msg=instance-not-found&team=%s", team), http.StatusFound)
+				return
+			case instanceDown:
+				bundle.Log.Info("Instance for team is down. Redirecting to multi-juicer landing page.", "team", team)
+				http.Redirect(responseWriter, req, fmt.Sprintf("/multi-juicer/?msg=instance-restarting&team=%s", team), http.StatusFound)
+				return
 			}
+
+			touchLastRequestTimestamp(req.Context(), bundle, team)
 
 			target := bundle.GetJuiceShopUrlForTeam(team, bundle)
 			bundle.Log.Debug("Proxying request", "team", team, "method", req.Method, "path", req.URL)
@@ -74,10 +75,19 @@ func handleProxy(bundle *bundle.Bundle) http.Handler {
 	)
 }
 
-// checks if the instance uptime status was checked in the last ten seconds by looking into the instanceUpCache
-func wasInstanceUptimeStatusCheckedRecently(team string) bool {
-	lastConnect, ok := instanceUpCache[team]
-	return ok && lastConnect > time.Now().Add(-10*time.Second).UnixMilli()
+// claimLastRequestWrite reports whether this request should refresh the
+// lastRequest annotation for the team. The claim is recorded before the patch
+// is sent, so concurrent requests for the same team don't each issue their own.
+func claimLastRequestWrite(team string) bool {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
+	now := time.Now().UnixMilli()
+	if lastWrite, ok := lastRequestWrites[team]; ok && lastWrite > now-lastRequestWriteInterval.Milliseconds() {
+		return false
+	}
+	lastRequestWrites[team] = now
+	return true
 }
 
 type instanceStatus string
@@ -88,7 +98,22 @@ const (
 	instanceMissing instanceStatus = "missing"
 )
 
-func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) instanceStatus {
+// resolveInstanceStatus determines whether the team's JuiceShop can be proxied to.
+// answering from cache only to keep kubernetes api calls out of the request path entirely
+// Only teams the watcher hasn't seen yet fall back to a direct lookup.
+func resolveInstanceStatus(context context.Context, bundle *bundle.Bundle, team string) instanceStatus {
+	if bundle.ScoringService != nil {
+		if ready, known := bundle.ScoringService.GetInstanceReadiness(team); known {
+			if ready {
+				return instanceUp
+			}
+			return instanceDown
+		}
+	}
+	return lookupInstanceStatusInKubernetesApi(context, bundle, team)
+}
+
+func lookupInstanceStatusInKubernetesApi(context context.Context, bundle *bundle.Bundle, team string) instanceStatus {
 	deployment, err := bundle.ClientSet.AppsV1().Deployments(bundle.RuntimeEnvironment.Namespace).Get(context, fmt.Sprintf("juiceshop-%s", team), metav1.GetOptions{})
 
 	switch {
@@ -100,12 +125,18 @@ func isInstanceUp(context context.Context, bundle *bundle.Bundle, team string) i
 	case deployment.Status.ReadyReplicas < 1:
 		return instanceDown
 	default:
-		err = updateLastRequestTimestamp(context, bundle, team)
-		if err != nil {
-			// we will continue here, as a working proxy is more important than a up to date timestamp.
-			bundle.Log.Warn("failed to update last request time stamp on deployment. last request timestamps shown on the admin page might be out of sync.")
-		}
 		return instanceUp
+	}
+}
+
+// touchLastRequestTimestamp keeps the annotation the inactivity cleaner reads up
+// to date. Best effort: a failure here must not stop us from proxying.
+func touchLastRequestTimestamp(context context.Context, bundle *bundle.Bundle, team string) {
+	if !claimLastRequestWrite(team) {
+		return
+	}
+	if err := updateLastRequestTimestamp(context, bundle, team); err != nil {
+		bundle.Log.Warn("failed to update last request time stamp on deployment. last request timestamps shown on the admin page might be out of sync.", "team", team, "error", err)
 	}
 }
 
