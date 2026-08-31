@@ -112,9 +112,9 @@ Once DNS has propagated (usually seconds to minutes for a small TTL), the script
 
 ## Step 3. Wait for the installation to finish
 
-Expect the full run to take about **5–8 minutes**. The script is idempotent: if you re-run it, existing Hetzner resources are reused and the DNS wait loop short-circuits as soon as the record already resolves.
+Expect the full run to take about **5–10 minutes**. The script is idempotent: if you re-run it, existing Hetzner resources are reused and the DNS wait loop short-circuits as soon as the record already resolves.
 
-When it finishes, it prints:
+When the script finishes, it prints:
 
 ```
 URL:              https://juicy.example.com
@@ -124,8 +124,6 @@ Kubeconfig:       ./.multi-juicer-hetzner/kubeconfig.yaml
 SSH into server:  ssh -i ./.multi-juicer-hetzner/id_ed25519 root@<ip>
 ```
 
-Open `https://<DOMAIN>` in your browser. The first hit may briefly show Traefik's default self-signed certificate while Traefik completes the Let's Encrypt HTTP-01 challenge — reload after a few seconds.
-
 ## Step 4. Verify
 
 ```bash
@@ -134,9 +132,8 @@ export KUBECONFIG="$(pwd)/.multi-juicer-hetzner/kubeconfig.yaml"
 
 kubectl get pods -A
 kubectl get ingress
-# Traefik stores the issued cert in acme.json on its persistent volume;
-# once the first HTTPS request has been served, the cert is cached there.
-kubectl -n kube-system logs deploy/traefik | grep -i acme    # look for successful certificate issuance
+# Traefik stores the issued cert in acme.json on its persistent volume.
+kubectl -n kube-system logs deploy/traefik | grep -i acme
 
 # Admin password:
 kubectl get secrets multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d

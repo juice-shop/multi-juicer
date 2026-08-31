@@ -7,7 +7,7 @@
 #
 # Required env: HCLOUD_TOKEN, DOMAIN, EMAIL
 # Optional env (LLM gateway, see guides/llm/llm.md): LLM_API_KEY, LLM_MODEL, LLM_API_URL
-# Required binaries: hcloud, kubectl, helm, ssh, ssh-keygen, curl, jq
+# Required binaries: hcloud, kubectl, helm, ssh, ssh-keygen, curl, jq, openssl
 
 set -euo pipefail
 
@@ -36,6 +36,7 @@ FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"
 K3S_CHANNEL="${K3S_CHANNEL:-stable}"
 MAX_INSTANCES="${MAX_INSTANCES:-20}"                # use 5/20/30 with cpx22/cpx32/cpx42 VMs
 LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
+LE_TIMEOUT="${LE_TIMEOUT:-180}"                    # seconds to wait for a trusted LE certificate
 STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
 KUBECONFIG_FILE="${STATE_DIR}/kubeconfig.yaml"
 SSH_KEY_FILE="${STATE_DIR}/id_ed25519"
@@ -54,7 +55,7 @@ action() { printf '\n\033[1;36m>>  %s\033[0m\n' "$*"; }
 ############################
 # 0. Sanity checks
 ############################
-for bin in hcloud kubectl helm ssh ssh-keygen curl jq; do
+for bin in hcloud kubectl helm ssh ssh-keygen curl jq openssl; do
   command -v "$bin" >/dev/null 2>&1 || { echo "Missing required binary: $bin" >&2; exit 1; }
 done
 
@@ -372,7 +373,61 @@ helm upgrade --install multi-juicer \
 kubectl -n default rollout status deploy/multi-juicer --timeout=180s
 
 ############################
-# 11. Done
+# 11. Request and verify the Let's Encrypt certificate
+############################
+# Traefik obtains certificates on the first matching HTTPS request. Connect to
+# the VM directly while retaining DOMAIN as the TLS SNI name, so this check
+# cannot be affected by a stale local DNS cache or proxy configuration.
+log "Requesting a Let's Encrypt certificate for ${DOMAIN}"
+curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
+  --resolve "${DOMAIN}:443:${SERVER_IP}" \
+  --connect-timeout 10 --max-time 20 \
+  -o /dev/null "https://${DOMAIN}/" >/dev/null 2>&1 || true
+
+LE_CERTIFICATE_ISSUED=0
+LE_CERTIFICATE_DETAILS=""
+LE_WAITED=0
+while (( LE_WAITED <= LE_TIMEOUT )); do
+  LE_CERTIFICATE_DETAILS="$(
+    printf '' | openssl s_client -connect "${SERVER_IP}:443" -servername "${DOMAIN}" -showcerts 2>/dev/null \
+      | openssl x509 -noout -issuer -subject -ext subjectAltName 2>/dev/null || true
+  )"
+
+  # curl verifies both the certificate chain and DOMAIN's hostname. Checking
+  # the issuer separately ensures the trusted certificate came from LE.
+  if curl --silent --show-error --noproxy "${DOMAIN}" \
+      --resolve "${DOMAIN}:443:${SERVER_IP}" \
+      --connect-timeout 10 --max-time 20 \
+      -o /dev/null "https://${DOMAIN}/" >/dev/null 2>&1 \
+    && grep -qi "Let's Encrypt" <<<"${LE_CERTIFICATE_DETAILS}"; then
+    LE_CERTIFICATE_ISSUED=1
+    break
+  fi
+
+  if (( LE_WAITED >= LE_TIMEOUT )); then
+    break
+  fi
+  sleep 5
+  ((LE_WAITED += 5))
+done
+
+if [[ "${LE_CERTIFICATE_ISSUED}" == "1" ]]; then
+  log "Let's Encrypt certificate verified for ${DOMAIN}"
+  printf '%s\n' "${LE_CERTIFICATE_DETAILS}"
+else
+  warn "No valid Let's Encrypt certificate was served for ${DOMAIN} after ${LE_TIMEOUT}s."
+  warn "Traefik may still be serving its default certificate; recent ACME errors and challenge failures follow:"
+  kubectl -n kube-system logs deploy/traefik --since="${LE_TIMEOUT}s" 2>&1 \
+    | grep -Ei 'acme|let.?s encrypt|certificate|challenge|error' \
+    | sed 's/^/!! /' >&2 || true
+  if [[ -n "${LE_CERTIFICATE_DETAILS}" ]]; then
+    warn "Certificate currently served by Traefik:"
+    printf '%s\n' "${LE_CERTIFICATE_DETAILS}" >&2
+  fi
+fi
+
+############################
+# 12. Done
 ############################
 ADMIN_PW="$(kubectl get secret multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d)"
 
@@ -396,9 +451,9 @@ $(log "MultiJuicer is ready")
   SSH into server:  ssh -i ${SSH_KEY_FILE} root@${SERVER_IP}
   Cookie secret:    ${COOKIE_SECRET_FILE} (keep it — re-runs reuse it so team sessions survive helm upgrades)
 
-The Let's Encrypt certificate is issued by Traefik on the first HTTPS request
-and can take up to a minute. If the browser initially shows Traefik's default
-self-signed certificate, wait a moment and reload.
+The setup script requested and verified the certificate above. If it printed a
+warning instead, inspect the Traefik ACME logs it included, fix the reported
+DNS or HTTP-01 reachability issue, and re-run setup.sh.
 EOF
 
 action "After the event: run ./teardown.sh to delete every Hetzner resource (server, firewall, SSH key) created by this script"
