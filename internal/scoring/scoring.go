@@ -173,6 +173,12 @@ func (s *ScoringService) StartingScoringWorker(ctx context.Context) {
 			s.bundle.Log.Info("MultiJuicer context canceled. Exiting the scoring watcher.")
 			return
 		default:
+			// resync the cache before (re-)starting the watch. the watch only reports deletions
+			// which happen while it is connected, teams deleted while it was down would otherwise
+			// stay in the cache forever and the proxy would keep routing to instances long gone.
+			if err := s.CalculateAndCacheScoreBoard(ctx); err != nil {
+				s.bundle.Log.Error("Failed to resync the score board before starting the deployment watcher.", "error", err)
+			}
 			s.startScoringWatcher(ctx)
 		}
 	}
@@ -201,14 +207,14 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 				deployment := event.Object.(*appsv1.Deployment)
 				score := calculateScore(s.bundle, deployment, cachedChallengesMap)
 
+				s.currentScoresMutex.Lock()
 				if currentTeamScore, ok := s.currentScores[score.Name]; ok {
 					if currentTeamScore.EqualsIgnoringLastUpdate(score) {
 						// No need to update, if the score hasn't changed
+						s.currentScoresMutex.Unlock()
 						continue
 					}
 				}
-
-				s.currentScoresMutex.Lock()
 				s.currentScores[score.Name] = score
 				s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
 				s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
@@ -230,6 +236,8 @@ func (s *ScoringService) startScoringWatcher(ctx context.Context) {
 	}
 }
 
+// CalculateAndCacheScoreBoard replaces the cached scores with the current state of every
+// JuiceShop deployment. Teams whose deployment is gone are dropped from the cache.
 func (s *ScoringService) CalculateAndCacheScoreBoard(context context.Context) error {
 	// Get all JuiceShop instances
 	juiceShops, err := getDeployments(context, s.bundle)
@@ -238,13 +246,32 @@ func (s *ScoringService) CalculateAndCacheScoreBoard(context context.Context) er
 	}
 
 	// Calculate the new scores
-	s.currentScoresMutex.Lock()
-	for _, juiceShop := range juiceShops.Items {
-		score := calculateScore(s.bundle, &juiceShop, s.challengesMap)
-		s.currentScores[score.Name] = score
+	newScores := make(map[string]*bundle.TeamScore, len(juiceShops.Items))
+	for i := range juiceShops.Items {
+		score := calculateScore(s.bundle, &juiceShops.Items[i], s.challengesMap)
+		newScores[score.Name] = score
 	}
-	s.currentScoresSorted = sortTeamsByScoreAndCalculatePositions(s.currentScores)
-	s.currentScoresMutex.Unlock()
+	newScoresSorted := sortTeamsByScoreAndCalculatePositions(newScores)
+
+	s.currentScoresMutex.Lock()
+	defer s.currentScoresMutex.Unlock()
+
+	// teams missing from the new scores have been deleted, which is a change on its own
+	changed := len(newScores) != len(s.currentScores)
+	for team, score := range newScores {
+		if previous, ok := s.currentScores[team]; ok && previous.EqualsIgnoringLastUpdate(score) {
+			// carry the previous timestamp over, so long polling clients don't get woken up for a team which didn't change
+			score.LastUpdate = previous.LastUpdate
+			continue
+		}
+		changed = true
+	}
+
+	s.currentScores = newScores
+	s.currentScoresSorted = newScoresSorted
+	if changed {
+		s.lastUpdate = timeutil.TruncateToMillisecond(time.Now())
+	}
 
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/juice-shop/multi-juicer/internal/bundle"
 	"github.com/juice-shop/multi-juicer/internal/scoring"
@@ -14,7 +15,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/rest"
+	testcore "k8s.io/client-go/testing"
 )
 
 func TestProxyHandler(t *testing.T) {
@@ -344,6 +349,131 @@ func TestProxyHandler(t *testing.T) {
 		}
 
 		assert.Equal(t, 1, countDeploymentActions(clientset, "patch"), "five requests within the interval must result in a single annotation write")
+	})
+	t.Run("refreshes the lastRequest annotation even when the client disconnected mid request", func(t *testing.T) {
+		defer clearLastRequestWriteCache()
+
+		patches := make(chan struct{}, 1)
+		kubernetesApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			select {
+			case patches <- struct{}{}:
+			default:
+			}
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprint(w, `{"kind":"Deployment","apiVersion":"apps/v1","metadata":{"name":"juiceshop-foobar"}}`)
+		}))
+		defer kubernetesApi.Close()
+
+		// a real client is required here, the fake clientset ignores the context entirely
+		clientset, err := kubernetes.NewForConfig(&rest.Config{Host: kubernetesApi.URL})
+		assert.Nil(t, err)
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer ts.Close()
+
+		server := http.NewServeMux()
+
+		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
+			return fmt.Sprintf("%s/%s/", ts.URL, team)
+		}
+		bu.ScoringService = scoring.NewScoringServiceWithInitialScores(bu, map[string]*bundle.TeamScore{
+			teamFoo: {Name: teamFoo, InstanceReadiness: true},
+		})
+		AddRoutes(server, bu)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		// the client is gone before the request is handled, e.g. an aborted fetch or a closed tab
+		cancel()
+		req, _ := http.NewRequestWithContext(ctx, "POST", "/hello-world", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
+
+		server.ServeHTTP(httptest.NewRecorder(), req)
+
+		select {
+		case <-patches:
+		default:
+			t.Fatal("expected the lastRequest annotation to be written even though the request context was canceled")
+		}
+	})
+
+	t.Run("retries the lastRequest write on the next request when the patch failed", func(t *testing.T) {
+		defer clearLastRequestWriteCache()
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer ts.Close()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewClientset(readyDeployment)
+		failNextPatch := true
+		clientset.PrependReactor("patch", "deployments", func(action testcore.Action) (bool, runtime.Object, error) {
+			if failNextPatch {
+				failNextPatch = false
+				return true, nil, fmt.Errorf("the kubernetes api is having a bad day")
+			}
+			return false, nil, nil
+		})
+
+		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
+			return fmt.Sprintf("%s/%s/", ts.URL, team)
+		}
+		scoringService := scoring.NewScoringService(bu)
+		assert.Nil(t, scoringService.CalculateAndCacheScoreBoard(context.Background()))
+		bu.ScoringService = scoringService
+		AddRoutes(server, bu)
+
+		clientset.ClearActions()
+		for range 2 {
+			req, _ := http.NewRequest("POST", "/hello-world", nil)
+			req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
+			rr := httptest.NewRecorder()
+			server.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+		}
+
+		assert.Equal(t, 2, countDeploymentActions(clientset, "patch"), "a failed write must not suppress the next one for the rest of the interval")
+	})
+
+	t.Run("evicts stale teams from the lastRequest write cache", func(t *testing.T) {
+		defer clearLastRequestWriteCache()
+
+		cacheMutex.Lock()
+		lastRequestWrites["team-which-left-hours-ago"] = time.Now().Add(-2 * lastRequestWriteInterval).UnixMilli()
+		cacheMutex.Unlock()
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		}))
+		defer ts.Close()
+
+		server := http.NewServeMux()
+
+		clientset := fake.NewClientset(readyDeployment)
+		bu := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		bu.GetJuiceShopUrlForTeam = func(team string, _bundle *bundle.Bundle) string {
+			return fmt.Sprintf("%s/%s/", ts.URL, team)
+		}
+		scoringService := scoring.NewScoringService(bu)
+		assert.Nil(t, scoringService.CalculateAndCacheScoreBoard(context.Background()))
+		bu.ScoringService = scoringService
+		AddRoutes(server, bu)
+
+		req, _ := http.NewRequest("POST", "/hello-world", nil)
+		req.Header.Set("Cookie", fmt.Sprintf("team=%s", testutil.SignTestTeamname(teamFoo)))
+		rr := httptest.NewRecorder()
+		server.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		cacheMutex.Lock()
+		defer cacheMutex.Unlock()
+		assert.NotContains(t, lastRequestWrites, "team-which-left-hours-ago", "entries older than the write interval must not be kept around forever")
+		assert.Contains(t, lastRequestWrites, teamFoo)
 	})
 }
 

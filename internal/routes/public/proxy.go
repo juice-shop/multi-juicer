@@ -22,6 +22,10 @@ import (
 // per team and replica.
 const lastRequestWriteInterval = 1 * time.Minute
 
+// lastRequestWriteTimeout bounds the annotation write, which outlives the request
+// it was triggered by.
+const lastRequestWriteTimeout = 10 * time.Second
+
 var (
 	lastRequestWrites = map[string]int64{}
 	cacheMutex        = &sync.Mutex{}
@@ -83,11 +87,31 @@ func claimLastRequestWrite(team string) bool {
 	defer cacheMutex.Unlock()
 
 	now := time.Now().UnixMilli()
-	if lastWrite, ok := lastRequestWrites[team]; ok && lastWrite > now-lastRequestWriteInterval.Milliseconds() {
+	cutoff := now - lastRequestWriteInterval.Milliseconds()
+
+	if lastWrite, ok := lastRequestWrites[team]; ok && lastWrite > cutoff {
 		return false
 	}
+
+	// this branch runs at most once per team and interval, cheap enough to drop the
+	// entries which have gone stale here. Without this the map would keep an entry for
+	// every team which ever sent a request through this replica.
+	for cachedTeam, lastWrite := range lastRequestWrites {
+		if lastWrite <= cutoff {
+			delete(lastRequestWrites, cachedTeam)
+		}
+	}
+
 	lastRequestWrites[team] = now
 	return true
+}
+
+// releaseLastRequestWrite gives up a claim taken by claimLastRequestWrite, so that the
+// next request for the team retries instead of waiting out the interval.
+func releaseLastRequestWrite(team string) {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+	delete(lastRequestWrites, team)
 }
 
 type instanceStatus string
@@ -131,11 +155,20 @@ func lookupInstanceStatusInKubernetesApi(context context.Context, bundle *bundle
 
 // touchLastRequestTimestamp keeps the annotation the inactivity cleaner reads up
 // to date. Best effort: a failure here must not stop us from proxying.
-func touchLastRequestTimestamp(context context.Context, bundle *bundle.Bundle, team string) {
+func touchLastRequestTimestamp(ctx context.Context, bundle *bundle.Bundle, team string) {
 	if !claimLastRequestWrite(team) {
 		return
 	}
-	if err := updateLastRequestTimestamp(context, bundle, team); err != nil {
+
+	// clients disconnect mid request all the time (aborted fetches, closed tabs), which
+	// cancels the request context. The write has to happen anyway, otherwise the cleaner
+	// would consider an instance inactive while it's actively being used.
+	writeCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), lastRequestWriteTimeout)
+	defer cancel()
+
+	if err := updateLastRequestTimestamp(writeCtx, bundle, team); err != nil {
+		// drop the claim, so the next request retries instead of waiting out the interval
+		releaseLastRequestWrite(team)
 		bundle.Log.Warn("failed to update last request time stamp on deployment. last request timestamps shown on the admin page might be out of sync.", "team", team, "error", err)
 	}
 }

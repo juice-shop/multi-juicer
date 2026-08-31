@@ -223,6 +223,48 @@ func TestScoreingService(t *testing.T) {
 		}, withoutTimestamps(scores))
 	})
 
+	t.Run("drops teams whose deployment is gone when the score board is recalculated", func(t *testing.T) {
+		clientset := fake.NewClientset(
+			createTeam("foobar", `[]`, "0"),
+			createTeam("barfoo", `[]`, "0"),
+		)
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		scoringService := NewScoringService(bundle)
+		assert.Nil(t, scoringService.CalculateAndCacheScoreBoard(context.Background()))
+		assert.Len(t, scoringService.GetTopScores(), 2)
+
+		// the instance is deleted while nobody is watching, e.g. while the watch is reconnecting
+		assert.Nil(t, clientset.AppsV1().Deployments("test-namespace").Delete(context.Background(), "juiceshop-barfoo", metav1.DeleteOptions{}))
+		assert.Nil(t, scoringService.CalculateAndCacheScoreBoard(context.Background()))
+
+		assert.Len(t, scoringService.GetTopScores(), 1)
+		_, ok := scoringService.GetScoreForTeam("barfoo")
+		assert.False(t, ok)
+		_, known := scoringService.GetInstanceReadiness("barfoo")
+		assert.False(t, known, "the proxy must not consider a deleted instance ready")
+	})
+
+	t.Run("scoring worker drops teams which were deleted while the watch was down", func(t *testing.T) {
+		clientset := fake.NewClientset(createTeam("foobar", `[]`, "0"))
+		bundle := testutil.NewTestBundleWithCustomFakeClient(clientset)
+		// "barfoo" was deleted while the watch was reconnecting, no delete event will ever
+		// arrive for it, only a resync can get it out of the cache again
+		scoringService := NewScoringServiceWithInitialScores(bundle, map[string]*b.TeamScore{
+			"barfoo": {Name: "barfoo", Challenges: []b.ChallengeProgress{}, InstanceReadiness: true},
+		})
+
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		go scoringService.StartingScoringWorker(ctx)
+
+		assert.Eventually(t, func() bool {
+			_, stillCached := scoringService.GetScoreForTeam("barfoo")
+			_, ok := scoringService.GetScoreForTeam("foobar")
+			return ok && !stillCached
+		}, 1*time.Second, 10*time.Millisecond, "the worker has to resync when it (re)starts the watch")
+	})
+
 	t.Run("watcher properly updates scores", func(t *testing.T) {
 		clientset := fake.NewClientset(
 			createTeam("foobar", `[{"key":"scoreBoardChallenge","solvedAt":"2024-11-01T19:55:48.211Z"}]`, "1"),
