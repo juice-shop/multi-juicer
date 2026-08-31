@@ -74,7 +74,6 @@ export EMAIL="you@example.com"       # used for Let's Encrypt registration
 # export LLM_API_URL="https://openrouter.ai/api/v1"     # any OpenAI-compatible base URL
 
 cd guides/hetzner
-chmod +x setup.sh teardown.sh
 ./setup.sh
 ```
 
