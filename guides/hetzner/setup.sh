@@ -28,13 +28,13 @@ LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"
 
 SERVER_NAME="${SERVER_NAME:-multi-juicer}"
-SERVER_TYPE="${SERVER_TYPE:-cpx32}"                 # use cpx22/cpx32/cpx42 for 5/20/30 teams
+SERVER_TYPE="${SERVER_TYPE:-cpx32}"                 # use cpx22/cpx32/cpx42/cpx52 for 5/20/40/70 teams
 SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"
 SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"          # Nuremberg
 SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"
 FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"
 K3S_CHANNEL="${K3S_CHANNEL:-stable}"
-MAX_INSTANCES="${MAX_INSTANCES:-20}"                # use 5/20/30 with cpx22/cpx32/cpx42 VMs
+MAX_INSTANCES="${MAX_INSTANCES:-20}"                # use 5/20/40/70 with cpx22/cpx32/cpx42/cpx52 VMs
 LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
 LE_TIMEOUT="${LE_TIMEOUT:-180}"                    # seconds to wait for a trusted LE certificate
 STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
