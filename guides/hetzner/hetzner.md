@@ -1,6 +1,6 @@
 # Example Setup with Hetzner Cloud
 
-This guide sets up a MultiJuicer cluster on a single [Hetzner Cloud](https://www.hetzner.com/cloud) server, sized for up to **20 teams**, reachable over **HTTPS** on your own domain (Let's Encrypt). The domain stays at your existing DNS provider — you just point an `A` record at the freshly-created VM.
+This guide sets up a MultiJuicer cluster on a single [Hetzner Cloud](https://www.hetzner.com/cloud) server, sized for up to **20 teams**, reachable over **HTTPS** on your own domain (Let's Encrypt). The domain stays at your existing DNS provider — you just point an `A` record at the freshly created VM.
 
 The setup is intentionally throw-away: everything lives on one VM, so after the event you delete it and pay nothing more. Two scripts do the whole thing:
 
@@ -11,17 +11,14 @@ The setup is intentionally throw-away: everything lives on one VM, so after the 
 
 ## Recommended VM sizing
 
-The single-VM recommendations below are based on the bundled load tests. Keep
-larger events in separate deployments rather than increasing the VM size beyond
-these tiers.
+| Maximum capacity | Expected latency\* | Hetzner VM | Configuration                                     |
+|-----------------:|--------------------|------------|---------------------------------------------------|
+|          5 teams | ~400 ms            | `cpx22`    | `SERVER_TYPE=cpx22`, `MAX_INSTANCES=5`            |
+|         20 teams | ~400 ms            | `cpx32`    | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=20` (default) |
+|         40 teams | ~800 ms            | `cpx42`    | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=40`           |
+|         70 teams | ~1.60 s            | `cpx52`    | `SERVER_TYPE=cpx52`, `MAX_INSTANCES=70`           |
 
-| Maximum teams | Hetzner VM | Configuration                                     |
-|--------------:|------------|---------------------------------------------------|
-|           <=5 | `cpx22`    | `SERVER_TYPE=cpx22`, `MAX_INSTANCES=5`            |
-|          <=20 | `cpx32`    | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=20` (default) |
-|          <=30 | `cpx42`    | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=30`           |
-
-> From 40 teams upward multi-second latencies might become the limiting factor, even on more powerful VMs such as `cpx52` and `cpx62`.
+> \*=Observed combined p95 for active and brute-force teams in a mixed workload (20% inactive, 60% active, 20% brute-force).
 
 ## What the script creates
 
@@ -55,10 +52,10 @@ export DOMAIN="juicy.example.com"    # any subdomain of a domain you control
 export EMAIL="you@example.com"       # used for Let's Encrypt registration
 
 # Optional overrides:
-# Recommended tiers: cpx22 / 5 teams, cpx32 / 20 teams (default), cpx42 / 30 teams.
-# export SERVER_TYPE=cpx32           # Select cpx22, cpx32, or cpx42 for the matching tier.
+# Recommended tiers: cpx22 / 5 teams, cpx32 / 20 teams (default), cpx42 / 40 teams, cpx52 / 70 teams.
+# export SERVER_TYPE=cpx32           # Select cpx22, cpx32, cpx42, or cpx52 for the matching tier.
 # export SERVER_LOCATION=nbg1        # nbg1 | fsn1 | hel1 | ash | hil | sin
-# export MAX_INSTANCES=20            # Use 5, 20, or 30 with cpx22, cpx32, or cpx42.
+# export MAX_INSTANCES=20            # Use 5, 20, 40, or 70 with cpx22, cpx32, cpx42, or cpx52.
 # export REPLICAS=2                  # MultiJuicer balancer replicas
 # export DNS_TIMEOUT=1800            # seconds to wait for DNS to propagate
 # export ADMIN_CIDR=1.2.3.4/32       # CIDR allowed to reach the k8s API (tcp/6443); defaults to your current public IPv4.
