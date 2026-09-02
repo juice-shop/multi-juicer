@@ -9,9 +9,9 @@ require (
 	github.com/speps/go-hashids/v2 v2.0.1
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/crypto v0.55.0
-	k8s.io/api v0.36.3
-	k8s.io/apimachinery v0.36.3
-	k8s.io/client-go v0.36.3
+	k8s.io/api v0.36.4
+	k8s.io/apimachinery v0.36.4
+	k8s.io/client-go v0.36.4
 	k8s.io/klog/v2 v2.140.0
 )
 
