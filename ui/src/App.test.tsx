@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
@@ -7,6 +7,7 @@ import App from "./App";
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 beforeEach(() => {
@@ -25,7 +26,7 @@ beforeEach(() => {
     removeItem: vi.fn(),
     clear: vi.fn(),
   };
-  globalThis.localStorage = localStorageMock as unknown as Storage;
+  vi.stubGlobal("localStorage", localStorageMock);
 
   // Suppress Router basename warning in test environment
   vi.spyOn(console, "warn").mockImplementation(() => {});
