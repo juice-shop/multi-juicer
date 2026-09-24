@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #
-# Provision a throw-away MultiJuicer cluster on Hetzner Cloud (~20 teams):
-# one VM, k3s + bundled Traefik with ACME (Let's Encrypt), MultiJuicer via Helm.
+# Provision a throw-away MultiJuicer cluster on Hetzner Cloud:
+# single-VM (default, ~20-70 teams) or multi-VM (up to 200+ teams),
+# k3s + bundled Traefik with ACME (Let's Encrypt), MultiJuicer via Helm.
 # The DNS A record for DOMAIN is managed by you; the script waits for it to
-# resolve to the new VM before continuing. See hetzner.md for full details.
+# resolve to the control-plane VM before continuing. See hetzner.md for full details.
 #
 # Required env: HCLOUD_TOKEN, DOMAIN, EMAIL
 # Optional env (LLM gateway, see guides/llm/llm.md): LLM_API_KEY, LLM_MODEL, LLM_API_URL
@@ -18,26 +19,49 @@ set -euo pipefail
 : "${DOMAIN:?DOMAIN is required, e.g. juicy.example.com (managed at your DNS provider)}"
 : "${EMAIL:?EMAIL is required (used for Lets Encrypt registration)}"
 
+# Sanitize env vars against trailing CR (common when running under Git Bash / Windows)
+HCLOUD_TOKEN="${HCLOUD_TOKEN//$'\r'/}"
+DOMAIN="${DOMAIN//$'\r'/}"
+EMAIL="${EMAIL//$'\r'/}"
+
+# Sizing recommendations (using only cpx32, cpx42, cpx52):
+# Single-VM:
+#   -  20 teams (default): SERVER_TYPE=cpx32, MAX_INSTANCES=20, WORKER_COUNT=0, REPLICAS=2
+#   -  40 teams:           SERVER_TYPE=cpx42, MAX_INSTANCES=40, WORKER_COUNT=0, REPLICAS=2
+#   -  70 teams:           SERVER_TYPE=cpx52, MAX_INSTANCES=70, WORKER_COUNT=0, REPLICAS=2
+# Multi-VM (cluster with dedicated worker nodes, 1x cpx52 per 50 teams):
+#   - 100 teams:           SERVER_TYPE=cpx32, WORKER_TYPE=cpx52, WORKER_COUNT=2, MAX_INSTANCES=100, REPLICAS=3
+#   - 150 teams:           SERVER_TYPE=cpx32, WORKER_TYPE=cpx52, WORKER_COUNT=3, MAX_INSTANCES=150, REPLICAS=3
+#   - 200 teams:           SERVER_TYPE=cpx32, WORKER_TYPE=cpx52, WORKER_COUNT=4, MAX_INSTANCES=200, REPLICAS=3
+
 # See guides/production-notes/production-notes.md.
-REPLICAS="${REPLICAS:-2}"                           # >=2 for pod-crash / upgrade resilience
+REPLICAS="${REPLICAS:-2}"; REPLICAS="${REPLICAS//$'\r'/}"                           # >=2 for pod-crash / upgrade resilience (3 recommended for multi-VM)
 
 # LLM gateway (guides/llm/llm.md); enabled only when LLM_API_KEY is set.
-LLM_API_KEY="${LLM_API_KEY:-}"
-LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"
-LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"
-LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"
+LLM_API_KEY="${LLM_API_KEY:-}"; LLM_API_KEY="${LLM_API_KEY//$'\r'/}"
+LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"; LLM_MODEL="${LLM_MODEL//$'\r'/}"
+LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"; LLM_API_URL="${LLM_API_URL//$'\r'/}"
+LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"; LLM_SECRET_NAME="${LLM_SECRET_NAME//$'\r'/}"
 
-SERVER_NAME="${SERVER_NAME:-multi-juicer}"
-SERVER_TYPE="${SERVER_TYPE:-cpx32}"                 # use cpx22/cpx32/cpx42/cpx52 for 5/20/40/70 teams
-SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"
-SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"          # Nuremberg
-SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"
-FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"
-K3S_CHANNEL="${K3S_CHANNEL:-stable}"
-MAX_INSTANCES="${MAX_INSTANCES:-20}"                # use 5/20/40/70 with cpx22/cpx32/cpx42/cpx52 VMs
-LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
-LE_TIMEOUT="${LE_TIMEOUT:-180}"                    # seconds to wait for a trusted LE certificate
-STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"
+SERVER_NAME="${SERVER_NAME:-multi-juicer}"; SERVER_NAME="${SERVER_NAME//$'\r'/}"
+SERVER_TYPE="${SERVER_TYPE:-cpx32}"; SERVER_TYPE="${SERVER_TYPE//$'\r'/}"                 # use cpx32/cpx42/cpx52 for 20/40/70 teams (or control plane in multi-VM)
+SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"; SERVER_IMAGE="${SERVER_IMAGE//$'\r'/}"
+SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"; SERVER_LOCATION="${SERVER_LOCATION//$'\r'/}"          # Nuremberg
+SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"; SSH_KEY_NAME="${SSH_KEY_NAME//$'\r'/}"
+FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"; FIREWALL_NAME="${FIREWALL_NAME//$'\r'/}"
+K3S_CHANNEL="${K3S_CHANNEL:-stable}"; K3S_CHANNEL="${K3S_CHANNEL//$'\r'/}"
+MAX_INSTANCES="${MAX_INSTANCES:-20}"; MAX_INSTANCES="${MAX_INSTANCES//$'\r'/}"                # max JuiceShop instances (e.g. 20, 40, 70, 100, 150, 200)
+
+# Multi-VM cluster settings (WORKER_COUNT=0 for single-VM, >0 for multi-VM cluster)
+WORKER_COUNT="${WORKER_COUNT:-0}"; WORKER_COUNT="${WORKER_COUNT//$'\r'/}"                  # 0 = single VM; >0 = multi-VM cluster with N worker nodes
+WORKER_TYPE="${WORKER_TYPE:-${SERVER_TYPE}}"; WORKER_TYPE="${WORKER_TYPE//$'\r'/}"       # VM type for worker nodes (e.g. cpx52)
+NETWORK_NAME="${NETWORK_NAME:-${SERVER_NAME}-net}"; NETWORK_NAME="${NETWORK_NAME//$'\r'/}" # Hetzner private network name
+NETWORK_RANGE="${NETWORK_RANGE:-10.0.0.0/16}"; NETWORK_RANGE="${NETWORK_RANGE//$'\r'/}"      # Private IP CIDR range
+NETWORK_ZONE="${NETWORK_ZONE:-eu-central}"; NETWORK_ZONE="${NETWORK_ZONE//$'\r'/}"         # Hetzner network zone: eu-central (nbg1/fsn1/hel1), us-east (ash), us-west (hil), ap-southeast (sin)
+
+LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"; LE_SERVER="${LE_SERVER//$'\r'/}"
+LE_TIMEOUT="${LE_TIMEOUT:-180}"; LE_TIMEOUT="${LE_TIMEOUT//$'\r'/}"                    # seconds to wait for a trusted LE certificate
+STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"; STATE_DIR="${STATE_DIR//$'\r'/}"
 KUBECONFIG_FILE="${STATE_DIR}/kubeconfig.yaml"
 SSH_KEY_FILE="${STATE_DIR}/id_ed25519"
 COOKIE_SECRET_FILE="${COOKIE_SECRET_FILE:-${STATE_DIR}/cookie-parser-secret}"
@@ -78,8 +102,9 @@ fi
 # ADMIN_CIDR defaults to your current public IP /32. Override for a shared
 # egress or company range (e.g. ADMIN_CIDR=1.2.3.0/24).
 ADMIN_CIDR="${ADMIN_CIDR:-}"
+ADMIN_CIDR="${ADMIN_CIDR//$'\r'/}"
 if [[ -z "${ADMIN_CIDR}" ]]; then
-  MY_IP="$(curl -sS https://api.ipify.org 2>/dev/null || true)"
+  MY_IP="$(curl -sS https://api.ipify.org 2>/dev/null | tr -d '\r' || true)"
   if [[ -z "${MY_IP}" ]]; then
     echo "Could not auto-detect your public IPv4 (api.ipify.org unreachable). Set ADMIN_CIDR=<ip>/32 explicitly." >&2
     exit 1
@@ -95,13 +120,16 @@ fi
 # Merge current ADMIN_CIDR into the existing 6443 allowlist so re-runs from a
 # different location keep previous IPs. ADMIN_CIDR_RESET=1 replaces instead.
 ADMIN_CIDR_RESET="${ADMIN_CIDR_RESET:-0}"
+ADMIN_CIDR_RESET="${ADMIN_CIDR_RESET//$'\r'/}"
 EXISTING_ADMIN_CIDRS=""
 if [[ "${ADMIN_CIDR_RESET}" != "1" ]]; then
   EXISTING_ADMIN_CIDRS="$(hcloud firewall describe "${FIREWALL_NAME}" -o json 2>/dev/null \
     | jq -r '(.rules // []) | map(select(.direction=="in" and .protocol=="tcp" and .port=="6443")) | .[].source_ips[]?' \
+    | tr -d '\r' \
     || true)"
 fi
 ADMIN_CIDRS_JSON="$(printf '%s\n%s\n' "${EXISTING_ADMIN_CIDRS}" "${ADMIN_CIDR}" \
+  | tr -d '\r' \
   | awk 'NF && !seen[$0]++' \
   | jq -R . | jq -s .)"
 
@@ -121,8 +149,28 @@ log "Applying firewall rules to '${FIREWALL_NAME}'"
 hcloud firewall replace-rules "${FIREWALL_NAME}" --rules-file "${RULES_FILE}" >/dev/null
 
 ############################
-# 3. Server
+# 2b. Private Network (for multi-VM cluster)
 ############################
+NETWORK_ID=""
+if [[ "${WORKER_COUNT}" -gt 0 ]]; then
+  if ! hcloud network describe "${NETWORK_NAME}" >/dev/null 2>&1; then
+    log "Creating private network '${NETWORK_NAME}' (${NETWORK_RANGE})"
+    hcloud network create --name "${NETWORK_NAME}" --ip-range "${NETWORK_RANGE}" >/dev/null
+    hcloud network add-subnet "${NETWORK_NAME}" --network-zone "${NETWORK_ZONE}" --type cloud --ip-range "10.0.0.0/24" >/dev/null
+  else
+    log "Private network '${NETWORK_NAME}' already exists, reusing it"
+  fi
+  NETWORK_ID="$(hcloud network describe "${NETWORK_NAME}" -o json | jq -r .id | tr -d '\r')"
+fi
+
+############################
+# 3. Server (Control plane)
+############################
+SERVER_NET_ARGS=()
+if [[ "${WORKER_COUNT}" -gt 0 ]]; then
+  SERVER_NET_ARGS=(--network "${NETWORK_NAME}")
+fi
+
 if ! hcloud server describe "${SERVER_NAME}" >/dev/null 2>&1; then
   log "Creating server '${SERVER_NAME}' (${SERVER_TYPE}, ${SERVER_LOCATION}, ${SERVER_IMAGE})"
   hcloud server create \
@@ -132,13 +180,30 @@ if ! hcloud server describe "${SERVER_NAME}" >/dev/null 2>&1; then
     --location   "${SERVER_LOCATION}" \
     --ssh-key    "${SSH_KEY_NAME}" \
     --firewall   "${FIREWALL_NAME}" \
+    ${SERVER_NET_ARGS[@]+"${SERVER_NET_ARGS[@]}"} \
     --start-after-create >/dev/null
 else
   log "Server '${SERVER_NAME}' already exists, reusing it"
+  if [[ "${WORKER_COUNT}" -gt 0 ]]; then
+    if ! hcloud server describe "${SERVER_NAME}" -o json | jq -e --argjson net_id "${NETWORK_ID}" '.private_net[]? | select(.network == $net_id)' >/dev/null 2>&1; then
+      log "Attaching server '${SERVER_NAME}' to private network '${NETWORK_NAME}'"
+      hcloud server attach-to-network "${SERVER_NAME}" --network "${NETWORK_NAME}" >/dev/null
+    fi
+  fi
 fi
 
-SERVER_IP="$(hcloud server ip "${SERVER_NAME}")"
+SERVER_IP="$(hcloud server ip "${SERVER_NAME}" | tr -d '\r')"
 log "Server public IPv4: ${SERVER_IP}"
+
+SERVER_PRIVATE_IP=""
+if [[ "${WORKER_COUNT}" -gt 0 ]]; then
+  SERVER_PRIVATE_IP="$(hcloud server describe "${SERVER_NAME}" -o json | jq -r --argjson net_id "${NETWORK_ID}" '(.private_net[]? | select(.network == $net_id) | .ip) // empty' | tr -d '\r')"
+  if [[ -z "${SERVER_PRIVATE_IP}" ]]; then
+    echo "Could not determine private IP for server '${SERVER_NAME}' on network '${NETWORK_NAME}' (ID: ${NETWORK_ID})" >&2
+    exit 1
+  fi
+  log "Server private IP: ${SERVER_PRIVATE_IP}"
+fi
 
 ############################
 # 4. Wait until the user's DNS A record points to this VM
@@ -147,7 +212,8 @@ log "Server public IPv4: ${SERVER_IP}"
 dns_lookup_a() {
   curl -sS -H 'accept: application/dns-json' \
     "https://cloudflare-dns.com/dns-query?name=${DOMAIN}&type=A" \
-    | jq -r '.Answer // [] | map(select(.type==1)) | .[].data' 2>/dev/null
+    | jq -r '.Answer // [] | map(select(.type==1)) | .[].data' 2>/dev/null \
+    | tr -d '\r'
 }
 
 # Report what DNS currently returns, but only when the answer changes, so the
@@ -233,11 +299,20 @@ SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KE
 ############################
 # 6. Install k3s (with bundled Traefik — we configure it below to also handle Let's Encrypt)
 ############################
-log "Installing k3s on the server"
-$SSH "curl -sfL https://get.k3s.io | \
+EXTRA_K3S_ARGS=""
+if [[ "${WORKER_COUNT}" -gt 0 ]]; then
+  EXTRA_K3S_ARGS="--tls-san=${SERVER_PRIVATE_IP} --node-ip=${SERVER_PRIVATE_IP} --advertise-address=${SERVER_PRIVATE_IP}"
+fi
+
+log "Installing k3s on the control plane server"
+if ! $SSH "curl -sfL https://get.k3s.io | \
       INSTALL_K3S_CHANNEL=${K3S_CHANNEL} \
-      INSTALL_K3S_EXEC='--tls-san=${DOMAIN} --tls-san=${SERVER_IP} --write-kubeconfig-mode=644' \
-      sh -" >/dev/null
+      INSTALL_K3S_EXEC='--tls-san=${DOMAIN} --tls-san=${SERVER_IP} ${EXTRA_K3S_ARGS} --write-kubeconfig-mode=644' \
+      sh -" >/dev/null; then
+  warn "k3s installation failed on the control plane. Systemd service logs:"
+  $SSH "journalctl -u k3s.service --no-pager -n 50" >&2 || true
+  exit 1
+fi
 
 log "Fetching kubeconfig to ${KUBECONFIG_FILE}"
 $SSH 'cat /etc/rancher/k3s/k3s.yaml' \
@@ -245,8 +320,74 @@ $SSH 'cat /etc/rancher/k3s/k3s.yaml' \
   > "${KUBECONFIG_FILE}"
 chmod 600 "${KUBECONFIG_FILE}"
 
-log "Waiting for the node to become Ready"
+log "Waiting for the control plane node to become Ready"
 kubectl wait --for=condition=Ready node --all --timeout=180s
+
+############################
+# 6b. Worker nodes (for multi-VM cluster)
+############################
+if [[ "${WORKER_COUNT}" -gt 0 ]]; then
+  log "Fetching k3s node token for worker join"
+  NODE_TOKEN="$($SSH 'cat /var/lib/rancher/k3s/server/node-token' | tr -d '\r')"
+
+  for (( i=1; i<=WORKER_COUNT; i++ )); do
+    WORKER_NAME="${SERVER_NAME}-worker-${i}"
+    if ! hcloud server describe "${WORKER_NAME}" >/dev/null 2>&1; then
+      log "Creating worker server '${WORKER_NAME}' (${WORKER_TYPE}, ${SERVER_LOCATION}, ${SERVER_IMAGE})"
+      hcloud server create \
+        --name       "${WORKER_NAME}" \
+        --type       "${WORKER_TYPE}" \
+        --image      "${SERVER_IMAGE}" \
+        --location   "${SERVER_LOCATION}" \
+        --ssh-key    "${SSH_KEY_NAME}" \
+        --firewall   "${FIREWALL_NAME}" \
+        --network    "${NETWORK_NAME}" \
+        --start-after-create >/dev/null
+    else
+      log "Worker server '${WORKER_NAME}' already exists, reusing it"
+      if ! hcloud server describe "${WORKER_NAME}" -o json | jq -e --argjson net_id "${NETWORK_ID}" '.private_net[]? | select(.network == $net_id)' >/dev/null 2>&1; then
+        log "Attaching worker server '${WORKER_NAME}' to private network '${NETWORK_NAME}'"
+        hcloud server attach-to-network "${WORKER_NAME}" --network "${NETWORK_NAME}" >/dev/null
+      fi
+    fi
+
+    WORKER_IP="$(hcloud server ip "${WORKER_NAME}" | tr -d '\r')"
+    WORKER_PRIVATE_IP="$(hcloud server describe "${WORKER_NAME}" -o json | jq -r --argjson net_id "${NETWORK_ID}" '(.private_net[]? | select(.network == $net_id) | .ip) // empty' | tr -d '\r')"
+    if [[ -z "${WORKER_PRIVATE_IP}" ]]; then
+      echo "Could not determine private IP for worker server '${WORKER_NAME}' on network '${NETWORK_NAME}' (ID: ${NETWORK_ID})" >&2
+      exit 1
+    fi
+
+    log "Waiting for SSH on worker '${WORKER_NAME}' (${WORKER_IP})"
+    for retry in {1..60}; do
+      if ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+             -o ConnectTimeout=5 -i "${SSH_KEY_FILE}" \
+             "root@${WORKER_IP}" 'true' 2>/dev/null; then
+        break
+      fi
+      printf '.'
+      sleep 5
+    done
+
+    WORKER_SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE} root@${WORKER_IP}"
+
+    log "Joining worker '${WORKER_NAME}' to the cluster"
+    if ! $WORKER_SSH "curl -sfL https://get.k3s.io | \
+      INSTALL_K3S_CHANNEL=${K3S_CHANNEL} \
+      K3S_URL='https://${SERVER_PRIVATE_IP}:6443' \
+      K3S_TOKEN='${NODE_TOKEN}' \
+      INSTALL_K3S_EXEC='--node-ip=${WORKER_PRIVATE_IP}' \
+      sh -" >/dev/null; then
+      warn "k3s agent join failed on worker '${WORKER_NAME}'. Systemd service logs:"
+      $WORKER_SSH "journalctl -u k3s-agent.service --no-pager -n 50" >&2 || true
+      exit 1
+    fi
+  done
+
+  TOTAL_NODES=$(( WORKER_COUNT + 1 ))
+  log "Waiting for all ${TOTAL_NODES} nodes to become Ready"
+  kubectl wait --for=condition=Ready node --all --timeout=180s
+fi
 
 ############################
 # 7. Configure Traefik with Let's Encrypt (built-in ACME)
@@ -294,6 +435,7 @@ for i in {1..60}; do
   FAILING_POD="$(kubectl -n kube-system get pods \
     -l 'helmcharts.helm.cattle.io/chart=traefik' \
     -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.containerStatuses[*].state.waiting.reason}{"\n"}{end}' 2>/dev/null \
+    | tr -d '\r' \
     | awk -F'\t' '$2 ~ /CrashLoopBackOff|Error|ImagePullBackOff/ {print $1; exit}')"
   if [[ -n "${FAILING_POD}" ]]; then
     warn "Traefik helm-install Job is failing (pod ${FAILING_POD}). Recent logs:"
@@ -323,7 +465,7 @@ if [[ ! -s "${COOKIE_SECRET_FILE}" ]]; then
   set -o pipefail
   chmod 600 "${COOKIE_SECRET_FILE}"
 fi
-COOKIE_PARSER_SECRET="$(cat "${COOKIE_SECRET_FILE}")"
+COOKIE_PARSER_SECRET="$(cat "${COOKIE_SECRET_FILE}" | tr -d '\r')"
 
 ############################
 # 9. Optional: LLM gateway secret (for AI / chatbot challenges)
@@ -390,7 +532,8 @@ LE_WAITED=0
 while (( LE_WAITED <= LE_TIMEOUT )); do
   LE_CERTIFICATE_DETAILS="$(
     printf '' | openssl s_client -connect "${SERVER_IP}:443" -servername "${DOMAIN}" -showcerts 2>/dev/null \
-      | openssl x509 -noout -issuer -subject -ext subjectAltName 2>/dev/null || true
+      | openssl x509 -noout -issuer -subject -ext subjectAltName 2>/dev/null \
+      | tr -d '\r' || true
   )"
 
   # curl verifies both the certificate chain and DOMAIN's hostname. Checking
@@ -429,7 +572,7 @@ fi
 ############################
 # 12. Done
 ############################
-ADMIN_PW="$(kubectl get secret multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d)"
+ADMIN_PW="$(kubectl get secret multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d | tr -d '\r')"
 
 LLM_STATUS="disabled (JuiceShop chatbot / AI challenges will not work)"
 if [[ -n "${LLM_API_KEY}" ]]; then
@@ -445,6 +588,7 @@ $(log "MultiJuicer is ready")
   Admin password:   ${ADMIN_PW}
   Max teams:        ${MAX_INSTANCES}
   Balancer replicas:${REPLICAS}
+  Cluster nodes:    $(( WORKER_COUNT + 1 )) (1 control plane$([[ "${WORKER_COUNT}" -gt 0 ]] && echo ", ${WORKER_COUNT} workers"))
   LLM gateway:      ${LLM_STATUS}
 
   Kubeconfig:       ${KUBECONFIG_FILE}
@@ -456,7 +600,7 @@ warning instead, inspect the Traefik ACME logs it included, fix the reported
 DNS or HTTP-01 reachability issue, and re-run setup.sh.
 EOF
 
-action "After the event: run ./teardown.sh to delete every Hetzner resource (server, firewall, SSH key) created by this script"
+action "After the event: run ./teardown.sh to delete every Hetzner resource (servers, private network, firewall, SSH key) created by this script"
 cat <<EOF
 
   The A record for ${DOMAIN} at your DNS provider is *not* touched — remove it there
