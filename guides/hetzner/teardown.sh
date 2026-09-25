@@ -63,7 +63,7 @@ if hcloud ssh-key describe "${SSH_KEY_NAME}" >/dev/null 2>&1; then
   hcloud ssh-key delete "${SSH_KEY_NAME}" >/dev/null
 fi
 
-# --- Local state ---
+# 6. Delete local state
 if [[ -d "${STATE_DIR}" ]]; then
   log "Removing local state at ${STATE_DIR}"
   rm -rf "${STATE_DIR}"

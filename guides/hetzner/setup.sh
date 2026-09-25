@@ -299,9 +299,28 @@ SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KE
 ############################
 # 6. Install k3s (with bundled Traefik — we configure it below to also handle Let's Encrypt)
 ############################
-EXTRA_K3S_ARGS=""
+# Ubuntu's /etc/resolv.conf is a symlink to systemd-resolved's stub listener
+# (127.0.0.53), which is only reachable from the host network namespace. If
+# k3s is left to feed that into CoreDNS, every pod's DNS lookups for external
+# names (e.g. Traefik resolving acme-v02.api.letsencrypt.org for ACME) time
+# out, even though DNS works fine on the host itself. Point k3s at
+# systemd-resolved's real upstream file instead, when present.
+RESOLV_CONF_ARG=""
+if $SSH '[[ -e /run/systemd/resolve/resolv.conf ]]' 2>/dev/null; then
+  RESOLV_CONF_ARG="--resolv-conf=/run/systemd/resolve/resolv.conf"
+fi
+
+EXTRA_K3S_ARGS="${RESOLV_CONF_ARG}"
 if [[ "${WORKER_COUNT}" -gt 0 ]]; then
-  EXTRA_K3S_ARGS="--tls-san=${SERVER_PRIVATE_IP} --node-ip=${SERVER_PRIVATE_IP} --advertise-address=${SERVER_PRIVATE_IP}"
+  SERVER_PRIVATE_IFACE="$($SSH "ip -o -4 addr show to ${NETWORK_RANGE}" | awk '{print $2; exit}' | tr -d '\r')"
+  if [[ -z "${SERVER_PRIVATE_IFACE}" ]]; then
+    SERVER_PRIVATE_IFACE="$($SSH "ip -o -4 addr show to ${SERVER_PRIVATE_IP}" | awk '{print $2; exit}' | tr -d '\r')"
+  fi
+  FLANNEL_IFACE_ARG=""
+  if [[ -n "${SERVER_PRIVATE_IFACE}" ]]; then
+    FLANNEL_IFACE_ARG="--flannel-iface=${SERVER_PRIVATE_IFACE}"
+  fi
+  EXTRA_K3S_ARGS="${EXTRA_K3S_ARGS} --tls-san=${SERVER_PRIVATE_IP} --node-ip=${SERVER_PRIVATE_IP} --advertise-address=${SERVER_PRIVATE_IP} ${FLANNEL_IFACE_ARG}"
 fi
 
 log "Installing k3s on the control plane server"
@@ -371,12 +390,26 @@ if [[ "${WORKER_COUNT}" -gt 0 ]]; then
 
     WORKER_SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE} root@${WORKER_IP}"
 
+    WORKER_RESOLV_CONF_ARG=""
+    if $WORKER_SSH '[[ -e /run/systemd/resolve/resolv.conf ]]' 2>/dev/null; then
+      WORKER_RESOLV_CONF_ARG="--resolv-conf=/run/systemd/resolve/resolv.conf"
+    fi
+
+    WORKER_PRIVATE_IFACE="$($WORKER_SSH "ip -o -4 addr show to ${NETWORK_RANGE}" | awk '{print $2; exit}' | tr -d '\r')"
+    if [[ -z "${WORKER_PRIVATE_IFACE}" ]]; then
+      WORKER_PRIVATE_IFACE="$($WORKER_SSH "ip -o -4 addr show to ${WORKER_PRIVATE_IP}" | awk '{print $2; exit}' | tr -d '\r')"
+    fi
+    WORKER_FLANNEL_IFACE_ARG=""
+    if [[ -n "${WORKER_PRIVATE_IFACE}" ]]; then
+      WORKER_FLANNEL_IFACE_ARG="--flannel-iface=${WORKER_PRIVATE_IFACE}"
+    fi
+
     log "Joining worker '${WORKER_NAME}' to the cluster"
     if ! $WORKER_SSH "curl -sfL https://get.k3s.io | \
       INSTALL_K3S_CHANNEL=${K3S_CHANNEL} \
       K3S_URL='https://${SERVER_PRIVATE_IP}:6443' \
       K3S_TOKEN='${NODE_TOKEN}' \
-      INSTALL_K3S_EXEC='--node-ip=${WORKER_PRIVATE_IP}' \
+      INSTALL_K3S_EXEC='--node-ip=${WORKER_PRIVATE_IP} ${WORKER_FLANNEL_IFACE_ARG} ${WORKER_RESOLV_CONF_ARG}' \
       sh -" >/dev/null; then
       warn "k3s agent join failed on worker '${WORKER_NAME}'. Systemd service logs:"
       $WORKER_SSH "journalctl -u k3s-agent.service --no-pager -n 50" >&2 || true
@@ -508,8 +541,6 @@ helm upgrade --install multi-juicer \
   --set-string 'ingress.annotations.traefik\.ingress\.kubernetes\.io/router\.entrypoints=websecure' \
   --set "ingress.hosts[0].host=${DOMAIN}" \
   --set "ingress.hosts[0].paths[0]=/" \
-  --set "ingress.tls[0].secretName=multi-juicer-tls" \
-  --set "ingress.tls[0].hosts[0]=${DOMAIN}" \
   ${HELM_LLM_ARGS[@]+"${HELM_LLM_ARGS[@]}"}
 
 kubectl -n default rollout status deploy/multi-juicer --timeout=180s
@@ -528,8 +559,12 @@ curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
 
 LE_CERTIFICATE_ISSUED=0
 LE_CERTIFICATE_DETAILS=""
-LE_WAITED=0
-while (( LE_WAITED <= LE_TIMEOUT )); do
+# SECONDS is bash's built-in elapsed-wall-clock-time counter (reset to 0 here).
+# The openssl/curl checks below each take several seconds on their own, so
+# tracking real elapsed time (rather than incrementing a counter only for the
+# sleep) is what makes this loop actually stop at LE_TIMEOUT.
+SECONDS=0
+while (( SECONDS < LE_TIMEOUT )); do
   LE_CERTIFICATE_DETAILS="$(
     printf '' | openssl s_client -connect "${SERVER_IP}:443" -servername "${DOMAIN}" -showcerts 2>/dev/null \
       | openssl x509 -noout -issuer -subject -ext subjectAltName 2>/dev/null \
@@ -547,12 +582,11 @@ while (( LE_WAITED <= LE_TIMEOUT )); do
     break
   fi
 
-  if (( LE_WAITED >= LE_TIMEOUT )); then
-    break
-  fi
+  (( SECONDS < LE_TIMEOUT )) || break
   sleep 5
-  ((LE_WAITED += 5))
+  printf '.'
 done
+LE_WAITED="${SECONDS}"
 
 if [[ "${LE_CERTIFICATE_ISSUED}" == "1" ]]; then
   log "Let's Encrypt certificate verified for ${DOMAIN}"
