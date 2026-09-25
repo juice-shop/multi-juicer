@@ -1,13 +1,11 @@
 # Example Setup with Hetzner Cloud
 
-This guide sets up a MultiJuicer cluster on [Hetzner Cloud](https://www.hetzner.com/cloud), supporting both **single-VM** deployments (sized for ~20–70 teams) and **multi-VM clusters** (supporting 100, 150, 200+ teams), reachable over **HTTPS** on your own domain with automated Let's Encrypt certificates. The domain stays at your existing DNS provider — you just point a single `A` record at the control-plane VM's public IP.
+This guide sets up a MultiJuicer cluster on [Hetzner Cloud](https://www.hetzner.com/cloud), supporting both **single-VM** deployments (sized for up to 70 teams) and **multi-VM clusters** (supporting at least up to 200 teams), reachable over **HTTPS** on your own domain with automated Let's Encrypt certificates. The domain stays at your existing DNS provider — you just point a single `A` record at the control-plane VM's public IP.
 
 The setup is intentionally throw-away: after the event you delete all resources with a single command and pay nothing more. Two scripts manage the entire lifecycle:
 
 - [`setup.sh`](./setup.sh) — provisions everything from scratch (single-VM or multi-VM)
 - [`teardown.sh`](./teardown.sh) — deletes every Hetzner resource created by `setup.sh` (servers, private network, firewall, SSH key)
-
-> Expected costs: The default single-VM type (`cpx32`, 4 vCPU / 8 GB RAM / 80 GB SSD) costs ~€0.07/h on Hetzner Cloud capped at ~€42/month. Run `teardown.sh` when you no longer need it.
 
 ---
 
@@ -15,38 +13,38 @@ The setup is intentionally throw-away: after the event you delete all resources 
 
 ### Single-VM vs. Multi-VM Clusters
 
-- **Single-VM (`WORKER_COUNT=0`)**: Ideal for events with up to ~70 teams. The control plane runs `k3s`, Traefik, MultiJuicer balancer replicas, and all JuiceShop instances on a single VM.
-- **Multi-VM Cluster (`WORKER_COUNT > 0`)**: Essential for 100, 150, 200+ teams. Standard Kubernetes (`k3s`) enforces a default ceiling of **110 pods per node**. To host >70 instances without pod scheduling limits or resource exhaustion, worker nodes are connected over a free **Hetzner Cloud Private Network** (`10.0.0.0/16`).
+- **Single-VM (`WORKER_COUNT=0`)**: Ideal for events with up to 70 teams. The control plane runs `k3s`, Traefik, MultiJuicer balancer replicas, and all JuiceShop instances on a single VM.
+- **Multi-VM Cluster (`WORKER_COUNT > 0`)**: Essential for 100+ teams. Standard Kubernetes (`k3s`) enforces a default ceiling of **110 pods per node**. To host >100 instances without pod scheduling limits or resource exhaustion, worker nodes are connected over a free **Hetzner Cloud Private Network** (`10.0.0.0/16`).
   - **Ingress & Networking**: Your DNS `A` record always points **exclusively to the control-plane public IP**. Traefik terminates TLS (Let's Encrypt HTTP-01) on the control plane and proxies traffic to JuiceShop pods running across worker nodes via k3s Flannel CNI over the private network. No expensive cloud load balancer is needed.
 
 ### Sizing Matrix
 
-All recommendations strictly use Hetzner `cpx32` (4 vCPU, 8 GB RAM), `cpx42` (8 vCPU, 16 GB RAM), and `cpx52` (16 vCPU, 32 GB RAM) instances. For multi-VM setups (100+ teams), clusters use 1 × `cpx52` worker VM per 50 teams:
+All recommendations strictly use Hetzner `cpx32` (4 vCPU, 8 GB RAM), `cpx42` (8 vCPU, 16 GB RAM), and `cpx52` (16 vCPU, 32 GB RAM) instances. For multi-VM setups (100+ teams), clusters ideally use 1 × `cpx52` worker VM per 50 teams:
 
-| Capacity | Control Plane (`SERVER_TYPE`) | Worker Nodes (`WORKER_TYPE` & `WORKER_COUNT`) | Configuration |
-| :--- | :--- | :--- | :--- |
-| **20 teams (default)** | `cpx32` | *None (single-VM)* | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=20`, `WORKER_COUNT=0`, `REPLICAS=2` |
-| **40 teams** | `cpx42` | *None (single-VM)* | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=40`, `WORKER_COUNT=0`, `REPLICAS=2` |
-| **70 teams** | `cpx52` | *None (single-VM)* | `SERVER_TYPE=cpx52`, `MAX_INSTANCES=70`, `WORKER_COUNT=0`, `REPLICAS=2` |
-| **100 teams** | `cpx32` | 2 × `cpx52` | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=2`, `MAX_INSTANCES=100`, `REPLICAS=3` |
-| **150 teams** | `cpx32` | 3 × `cpx52` | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=3`, `MAX_INSTANCES=150`, `REPLICAS=3` |
-| **200 teams** | `cpx32` | 4 × `cpx52` | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=4`, `MAX_INSTANCES=200`, `REPLICAS=3` |
+| Capacity               | Control Plane (`SERVER_TYPE`) | Worker Nodes (`WORKER_TYPE` & `WORKER_COUNT`) | Configuration                                                                                 |
+|:-----------------------|:------------------------------|:----------------------------------------------|:----------------------------------------------------------------------------------------------|
+| **20 teams (default)** | `cpx32`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=20`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
+| **40 teams**           | `cpx42`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=40`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
+| **70 teams**           | `cpx52`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx52`, `MAX_INSTANCES=70`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
+| **100 teams**          | `cpx32`                       | 2 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=2`, `MAX_INSTANCES=100`, `REPLICAS=3` |
+| **150 teams**          | `cpx32`                       | 3 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=3`, `MAX_INSTANCES=150`, `REPLICAS=3` |
+| **200 teams**          | `cpx32`                       | 4 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=4`, `MAX_INSTANCES=200`, `REPLICAS=3` |
 
 ---
 
 ## What the script creates
 
-| Resource | Where | Purpose |
-| :--- | :--- | :--- |
-| **SSH key** (`ed25519`) | local + Hetzner Cloud | Login key for all provisioned VMs |
-| **Firewall** (`multi-juicer-fw`) | Hetzner Cloud | Allows inbound tcp/22, tcp/80, tcp/443 (world) and tcp/6443 (k8s API, restricted to your public IP) |
-| **Private Network** (`multi-juicer-net`) | Hetzner Cloud | Private interconnect (`10.0.0.0/16`) for intra-cluster communication (created when `WORKER_COUNT > 0`) |
-| **Server** (`multi-juicer`) | Hetzner Cloud | Control-plane VM running `k3s server`, Traefik ingress, and MultiJuicer balancer |
-| **Worker Servers** (`multi-juicer-worker-1..N`) | Hetzner Cloud | Worker VMs running `k3s agent` hosting JuiceShop pods (created when `WORKER_COUNT > 0`) |
-| **k3s (with bundled Traefik)** | on VMs | Lightweight Kubernetes cluster + Traefik ingress controller |
-| **Traefik ACME certResolver** | in-cluster | Traefik's built-in Let's Encrypt client (HTTP-01, persistent `acme.json`) |
-| **MultiJuicer Helm release** | in-cluster | The MultiJuicer balancer (2–3 replicas) + on-demand JuiceShop instances |
-| **LLM gateway secret** (optional) | in-cluster | Holds the upstream LLM API key for the JuiceShop chatbot / AI challenges (only created when `LLM_API_KEY` is set) |
+| Resource                                        | Where                 | Purpose                                                                                                           |
+|:------------------------------------------------|:----------------------|:------------------------------------------------------------------------------------------------------------------|
+| **SSH key** (`ed25519`)                         | local + Hetzner Cloud | Login key for all provisioned VMs                                                                                 |
+| **Firewall** (`multi-juicer-fw`)                | Hetzner Cloud         | Allows inbound tcp/22, tcp/80, tcp/443 (world) and tcp/6443 (k8s API, restricted to your public IP)               |
+| **Private Network** (`multi-juicer-net`)        | Hetzner Cloud         | Private interconnect (`10.0.0.0/16`) for intra-cluster communication (created when `WORKER_COUNT > 0`)            |
+| **Server** (`multi-juicer`)                     | Hetzner Cloud         | Control-plane VM running `k3s server`, Traefik ingress, and MultiJuicer balancer                                  |
+| **Worker Servers** (`multi-juicer-worker-1..N`) | Hetzner Cloud         | Worker VMs running `k3s agent` hosting JuiceShop pods (created when `WORKER_COUNT > 0`)                           |
+| **k3s (with bundled Traefik)**                  | on VMs                | Lightweight Kubernetes cluster + Traefik ingress controller                                                       |
+| **Traefik ACME certResolver**                   | in-cluster            | Traefik's built-in Let's Encrypt client (HTTP-01, persistent `acme.json`)                                         |
+| **MultiJuicer Helm release**                    | in-cluster            | The MultiJuicer balancer (2–3 replicas) + on-demand JuiceShop instances                                           |
+| **LLM gateway secret** (optional)               | in-cluster            | Holds the upstream LLM API key for the JuiceShop chatbot / AI challenges (only created when `LLM_API_KEY` is set) |
 
 The `A` record for `DOMAIN` stays at your existing DNS provider and is managed by you. `setup.sh` already applies the recommendations from [`guides/production-notes/production-notes.md`](../production-notes/production-notes.md) (secure cookie, persistent `cookieParserSecret` stored in `./.multi-juicer-hetzner/cookie-parser-secret`, multiple balancer replicas, `config.maxInstances`).
 
@@ -142,12 +140,12 @@ Leave the script running while continuing with [Step 2](#step-2-create-the-a-rec
 
 You need one DNS record:
 
-| Field | Value |
-| :--- | :--- |
-| **Type** | `A` |
-| **Host / Name** | the sub-part of your `DOMAIN` (see below) |
-| **Value / Target** | the public IPv4 printed by `setup.sh` |
-| **TTL** | as low as your provider allows (e.g. 60 or 300 seconds) |
+| Field              | Value                                                   |
+|:-------------------|:--------------------------------------------------------|
+| **Type**           | `A`                                                     |
+| **Host / Name**    | the sub-part of your `DOMAIN` (see below)               |
+| **Value / Target** | the public IPv4 printed by `setup.sh`                   |
+| **TTL**            | as low as your provider allows (e.g. 60 or 300 seconds) |
 
 The `Host` field is the part of `DOMAIN` **before** your registered domain:
 

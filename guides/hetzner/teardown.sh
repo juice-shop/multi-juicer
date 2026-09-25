@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #
-# Delete every Hetzner resource created by ./setup.sh (control plane server,
-# worker servers, private network, firewall, SSH key) and wipe the local state dir.
-# The DNS A record at your provider is NOT touched — remove it manually.
+# Delete every Hetzner resource created by ./setup.sh and wipe the local state dir.
 #
 # Required env: HCLOUD_TOKEN
 

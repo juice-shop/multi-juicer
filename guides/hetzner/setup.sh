@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
 # Provisions a MultiJuicer cluster on Hetzner Cloud (single-VM or multi-VM).
-# See hetzner.md for documentation and configuration options.
+#
+# Required env: HCLOUD_TOKEN, DOMAIN, EMAIL
+# See hetzner.md for documentation and full configuration options.
 
 set -euo pipefail
 
@@ -529,7 +531,6 @@ while (( SECONDS < LE_TIMEOUT )); do
   sleep 5
   printf '.'
 done
-LE_WAITED="${SECONDS}"
 
 if [[ "${LE_CERTIFICATE_ISSUED}" == "1" ]]; then
   log "Let's Encrypt certificate verified for ${DOMAIN}"
