@@ -16,7 +16,7 @@ The setup is intentionally throw-away: after the event you delete all resources 
 ### Single-VM vs. Multi-VM Clusters
 
 - **Single-VM (`WORKER_COUNT=0`)**: Ideal for events with up to ~70 teams. The control plane runs `k3s`, Traefik, MultiJuicer balancer replicas, and all JuiceShop instances on a single VM.
-- **Multi-VM Cluster (`WORKER_COUNT > 0`)**: Essential for 100, 150, 200+ teams. Standard Kubernetes (`k3s`) enforces a default ceiling of **110 pods per node**. To host >70 instances without risking pod scheduling limits, CPU starvation, or memory exhaustion during intense challenge solving / brute-forcing, worker nodes are connected over a secure, free **Hetzner Cloud Private Network** (`10.0.0.0/16`).
+- **Multi-VM Cluster (`WORKER_COUNT > 0`)**: Essential for 100, 150, 200+ teams. Standard Kubernetes (`k3s`) enforces a default ceiling of **110 pods per node**. To host >70 instances without pod scheduling limits or resource exhaustion, worker nodes are connected over a free **Hetzner Cloud Private Network** (`10.0.0.0/16`).
   - **Ingress & Networking**: Your DNS `A` record always points **exclusively to the control-plane public IP**. Traefik terminates TLS (Let's Encrypt HTTP-01) on the control plane and proxies traffic to JuiceShop pods running across worker nodes via k3s Flannel CNI over the private network. No expensive cloud load balancer is needed.
 
 ### Sizing Matrix
@@ -66,7 +66,7 @@ The `A` record for `DOMAIN` stays at your existing DNS provider and is managed b
 
 Set the required variables. Choose between a single-VM setup (default) or a multi-VM setup depending on your expected team count.
 
-### Example A: Single-VM Setup (~20 Teams Default)
+### Example A: Single-VM Setup (20 Teams Default)
 
 ```bash
 export HCLOUD_TOKEN="<your hetzner cloud api token>"
@@ -82,11 +82,17 @@ export EMAIL="you@example.com"       # used for Let's Encrypt registration
 # export ADMIN_CIDR=1.2.3.4/32       # CIDR allowed to reach k8s API (tcp/6443); defaults to your public IP
 # export ADMIN_CIDR_RESET=1          # On re-run, replace admin CIDRs instead of appending
 
+# Optional: enable the LLM gateway so the JuiceShop chatbot / AI challenges work.
+# See guides/llm/llm.md for background.
+# export LLM_API_KEY="sk-..."
+# export LLM_MODEL="inclusionai/ling-3.0-flash-fin:free"
+# export LLM_API_URL="https://openrouter.ai/api/v1"
+
 cd guides/hetzner
 ./setup.sh
 ```
 
-### Example B: Multi-VM Setup (e.g. 100 / 150 / 200 Teams)
+### Example B: Multi-VM Setup (100 Teams)
 
 ```bash
 export HCLOUD_TOKEN="<your hetzner cloud api token>"
@@ -111,11 +117,7 @@ export MAX_INSTANCES=100
 # export WORKER_COUNT=4
 # export MAX_INSTANCES=200
 
-# Optional: enable the LLM gateway so the JuiceShop chatbot / AI challenges work.
-# See guides/llm/llm.md for background.
-# export LLM_API_KEY="sk-..."
-# export LLM_MODEL="inclusionai/ling-3.0-flash-fin:free"
-# export LLM_API_URL="https://openrouter.ai/api/v1"
+# Optional: LLM gateway and other general overrides can be configured as in Example A.
 
 cd guides/hetzner
 ./setup.sh
@@ -171,8 +173,11 @@ Admin password:   <generated>
 Max teams:        200
 Balancer replicas:3
 Cluster nodes:    4 (1 control plane, 3 workers)
+LLM gateway:      disabled (JuiceShop chatbot / AI challenges will not work)
+
 Kubeconfig:       ./.multi-juicer-hetzner/kubeconfig.yaml
 SSH into server:  ssh -i ./.multi-juicer-hetzner/id_ed25519 root@<ip>
+Cookie secret:    ./.multi-juicer-hetzner/cookie-parser-secret (keep it — re-runs reuse it so team sessions survive helm upgrades)
 ```
 
 ---

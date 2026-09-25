@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 #
-# Provision a throw-away MultiJuicer cluster on Hetzner Cloud:
-# single-VM (default, ~20-70 teams) or multi-VM (up to 200+ teams),
-# k3s + bundled Traefik with ACME (Let's Encrypt), MultiJuicer via Helm.
-# The DNS A record for DOMAIN is managed by you; the script waits for it to
-# resolve to the control-plane VM before continuing. See hetzner.md for full details.
-#
-# Required env: HCLOUD_TOKEN, DOMAIN, EMAIL
-# Optional env (LLM gateway, see guides/llm/llm.md): LLM_API_KEY, LLM_MODEL, LLM_API_URL
-# Required binaries: hcloud, kubectl, helm, ssh, ssh-keygen, curl, jq, openssl
+# Provisions a MultiJuicer cluster on Hetzner Cloud (single-VM or multi-VM).
+# See hetzner.md for documentation and configuration options.
 
 set -euo pipefail
 
@@ -19,48 +12,34 @@ set -euo pipefail
 : "${DOMAIN:?DOMAIN is required, e.g. juicy.example.com (managed at your DNS provider)}"
 : "${EMAIL:?EMAIL is required (used for Lets Encrypt registration)}"
 
-# Sanitize env vars against trailing CR (common when running under Git Bash / Windows)
 HCLOUD_TOKEN="${HCLOUD_TOKEN//$'\r'/}"
 DOMAIN="${DOMAIN//$'\r'/}"
 EMAIL="${EMAIL//$'\r'/}"
 
-# Sizing recommendations (using only cpx32, cpx42, cpx52):
-# Single-VM:
-#   -  20 teams (default): SERVER_TYPE=cpx32, MAX_INSTANCES=20, WORKER_COUNT=0, REPLICAS=2
-#   -  40 teams:           SERVER_TYPE=cpx42, MAX_INSTANCES=40, WORKER_COUNT=0, REPLICAS=2
-#   -  70 teams:           SERVER_TYPE=cpx52, MAX_INSTANCES=70, WORKER_COUNT=0, REPLICAS=2
-# Multi-VM (cluster with dedicated worker nodes, 1x cpx52 per 50 teams):
-#   - 100 teams:           SERVER_TYPE=cpx32, WORKER_TYPE=cpx52, WORKER_COUNT=2, MAX_INSTANCES=100, REPLICAS=3
-#   - 150 teams:           SERVER_TYPE=cpx32, WORKER_TYPE=cpx52, WORKER_COUNT=3, MAX_INSTANCES=150, REPLICAS=3
-#   - 200 teams:           SERVER_TYPE=cpx32, WORKER_TYPE=cpx52, WORKER_COUNT=4, MAX_INSTANCES=200, REPLICAS=3
+REPLICAS="${REPLICAS:-2}"; REPLICAS="${REPLICAS//$'\r'/}"
 
-# See guides/production-notes/production-notes.md.
-REPLICAS="${REPLICAS:-2}"; REPLICAS="${REPLICAS//$'\r'/}"                           # >=2 for pod-crash / upgrade resilience (3 recommended for multi-VM)
-
-# LLM gateway (guides/llm/llm.md); enabled only when LLM_API_KEY is set.
 LLM_API_KEY="${LLM_API_KEY:-}"; LLM_API_KEY="${LLM_API_KEY//$'\r'/}"
 LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"; LLM_MODEL="${LLM_MODEL//$'\r'/}"
 LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"; LLM_API_URL="${LLM_API_URL//$'\r'/}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"; LLM_SECRET_NAME="${LLM_SECRET_NAME//$'\r'/}"
 
 SERVER_NAME="${SERVER_NAME:-multi-juicer}"; SERVER_NAME="${SERVER_NAME//$'\r'/}"
-SERVER_TYPE="${SERVER_TYPE:-cpx32}"; SERVER_TYPE="${SERVER_TYPE//$'\r'/}"                 # use cpx32/cpx42/cpx52 for 20/40/70 teams (or control plane in multi-VM)
+SERVER_TYPE="${SERVER_TYPE:-cpx32}"; SERVER_TYPE="${SERVER_TYPE//$'\r'/}"
 SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"; SERVER_IMAGE="${SERVER_IMAGE//$'\r'/}"
-SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"; SERVER_LOCATION="${SERVER_LOCATION//$'\r'/}"          # Nuremberg
+SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"; SERVER_LOCATION="${SERVER_LOCATION//$'\r'/}"
 SSH_KEY_NAME="${SSH_KEY_NAME:-${SERVER_NAME}-key}"; SSH_KEY_NAME="${SSH_KEY_NAME//$'\r'/}"
 FIREWALL_NAME="${FIREWALL_NAME:-${SERVER_NAME}-fw}"; FIREWALL_NAME="${FIREWALL_NAME//$'\r'/}"
 K3S_CHANNEL="${K3S_CHANNEL:-stable}"; K3S_CHANNEL="${K3S_CHANNEL//$'\r'/}"
-MAX_INSTANCES="${MAX_INSTANCES:-20}"; MAX_INSTANCES="${MAX_INSTANCES//$'\r'/}"                # max JuiceShop instances (e.g. 20, 40, 70, 100, 150, 200)
+MAX_INSTANCES="${MAX_INSTANCES:-20}"; MAX_INSTANCES="${MAX_INSTANCES//$'\r'/}"
 
-# Multi-VM cluster settings (WORKER_COUNT=0 for single-VM, >0 for multi-VM cluster)
-WORKER_COUNT="${WORKER_COUNT:-0}"; WORKER_COUNT="${WORKER_COUNT//$'\r'/}"                  # 0 = single VM; >0 = multi-VM cluster with N worker nodes
-WORKER_TYPE="${WORKER_TYPE:-${SERVER_TYPE}}"; WORKER_TYPE="${WORKER_TYPE//$'\r'/}"       # VM type for worker nodes (e.g. cpx52)
-NETWORK_NAME="${NETWORK_NAME:-${SERVER_NAME}-net}"; NETWORK_NAME="${NETWORK_NAME//$'\r'/}" # Hetzner private network name
-NETWORK_RANGE="${NETWORK_RANGE:-10.0.0.0/16}"; NETWORK_RANGE="${NETWORK_RANGE//$'\r'/}"      # Private IP CIDR range
-NETWORK_ZONE="${NETWORK_ZONE:-eu-central}"; NETWORK_ZONE="${NETWORK_ZONE//$'\r'/}"         # Hetzner network zone: eu-central (nbg1/fsn1/hel1), us-east (ash), us-west (hil), ap-southeast (sin)
+WORKER_COUNT="${WORKER_COUNT:-0}"; WORKER_COUNT="${WORKER_COUNT//$'\r'/}"
+WORKER_TYPE="${WORKER_TYPE:-${SERVER_TYPE}}"; WORKER_TYPE="${WORKER_TYPE//$'\r'/}"
+NETWORK_NAME="${NETWORK_NAME:-${SERVER_NAME}-net}"; NETWORK_NAME="${NETWORK_NAME//$'\r'/}"
+NETWORK_RANGE="${NETWORK_RANGE:-10.0.0.0/16}"; NETWORK_RANGE="${NETWORK_RANGE//$'\r'/}"
+NETWORK_ZONE="${NETWORK_ZONE:-eu-central}"; NETWORK_ZONE="${NETWORK_ZONE//$'\r'/}"
 
 LE_SERVER="${LE_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"; LE_SERVER="${LE_SERVER//$'\r'/}"
-LE_TIMEOUT="${LE_TIMEOUT:-180}"; LE_TIMEOUT="${LE_TIMEOUT//$'\r'/}"                    # seconds to wait for a trusted LE certificate
+LE_TIMEOUT="${LE_TIMEOUT:-180}"; LE_TIMEOUT="${LE_TIMEOUT//$'\r'/}"
 STATE_DIR="${STATE_DIR:-$(pwd)/.multi-juicer-hetzner}"; STATE_DIR="${STATE_DIR//$'\r'/}"
 KUBECONFIG_FILE="${STATE_DIR}/kubeconfig.yaml"
 SSH_KEY_FILE="${STATE_DIR}/id_ed25519"
@@ -97,10 +76,8 @@ if ! hcloud ssh-key describe "${SSH_KEY_NAME}" >/dev/null 2>&1; then
 fi
 
 ############################
-# 2. Firewall (22, 80/443 world; 6443 k8s API restricted to ADMIN_CIDR)
+# 2. Firewall
 ############################
-# ADMIN_CIDR defaults to your current public IP /32. Override for a shared
-# egress or company range (e.g. ADMIN_CIDR=1.2.3.0/24).
 ADMIN_CIDR="${ADMIN_CIDR:-}"
 ADMIN_CIDR="${ADMIN_CIDR//$'\r'/}"
 if [[ -z "${ADMIN_CIDR}" ]]; then
@@ -117,8 +94,6 @@ if ! hcloud firewall describe "${FIREWALL_NAME}" >/dev/null 2>&1; then
   hcloud firewall create --name "${FIREWALL_NAME}" >/dev/null
 fi
 
-# Merge current ADMIN_CIDR into the existing 6443 allowlist so re-runs from a
-# different location keep previous IPs. ADMIN_CIDR_RESET=1 replaces instead.
 ADMIN_CIDR_RESET="${ADMIN_CIDR_RESET:-0}"
 ADMIN_CIDR_RESET="${ADMIN_CIDR_RESET//$'\r'/}"
 EXISTING_ADMIN_CIDRS=""
@@ -149,7 +124,7 @@ log "Applying firewall rules to '${FIREWALL_NAME}'"
 hcloud firewall replace-rules "${FIREWALL_NAME}" --rules-file "${RULES_FILE}" >/dev/null
 
 ############################
-# 2b. Private Network (for multi-VM cluster)
+# 2b. Private network
 ############################
 NETWORK_ID=""
 if [[ "${WORKER_COUNT}" -gt 0 ]]; then
@@ -206,9 +181,8 @@ if [[ "${WORKER_COUNT}" -gt 0 ]]; then
 fi
 
 ############################
-# 4. Wait until the user's DNS A record points to this VM
+# 4. Wait for DNS
 ############################
-# DoH via 1.1.1.1 to bypass local DNS caches.
 dns_lookup_a() {
   curl -sS -H 'accept: application/dns-json' \
     "https://cloudflare-dns.com/dns-query?name=${DOMAIN}&type=A" \
@@ -216,11 +190,6 @@ dns_lookup_a() {
     | tr -d '\r'
 }
 
-# Report what DNS currently returns, but only when the answer changes, so the
-# poll below stays quiet while nothing moves. The first time we see a wrong
-# (rather than missing) answer, point at Cloudflare's cache purge tool: a stale
-# entry there — e.g. from a wildcard record with a long TTL — keeps 1.1.1.1 on
-# the old IP long after the A record itself is correct.
 LAST_REPORTED_IPS="__unset__"
 PURGE_HINT_SHOWN=0
 report_dns() {
@@ -261,7 +230,7 @@ EOF
 
   report_dns "${CURRENT_IPS}"
 
-  DNS_TIMEOUT="${DNS_TIMEOUT:-1800}"   # 30 minutes
+  DNS_TIMEOUT="${DNS_TIMEOUT:-1800}"
   SECONDS=0
   while :; do
     CURRENT_IPS="$(dns_lookup_a || true)"
@@ -281,7 +250,7 @@ EOF
 fi
 
 ############################
-# 5. Wait for SSH to be ready
+# 5. Wait for SSH
 ############################
 log "Waiting for SSH on ${SERVER_IP}"
 for i in {1..60}; do
@@ -297,14 +266,8 @@ done
 SSH="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY_FILE} root@${SERVER_IP}"
 
 ############################
-# 6. Install k3s (with bundled Traefik — we configure it below to also handle Let's Encrypt)
+# 6. Install k3s
 ############################
-# Ubuntu's /etc/resolv.conf is a symlink to systemd-resolved's stub listener
-# (127.0.0.53), which is only reachable from the host network namespace. If
-# k3s is left to feed that into CoreDNS, every pod's DNS lookups for external
-# names (e.g. Traefik resolving acme-v02.api.letsencrypt.org for ACME) time
-# out, even though DNS works fine on the host itself. Point k3s at
-# systemd-resolved's real upstream file instead, when present.
 RESOLV_CONF_ARG=""
 if $SSH '[[ -e /run/systemd/resolve/resolv.conf ]]' 2>/dev/null; then
   RESOLV_CONF_ARG="--resolv-conf=/run/systemd/resolve/resolv.conf"
@@ -423,12 +386,8 @@ if [[ "${WORKER_COUNT}" -gt 0 ]]; then
 fi
 
 ############################
-# 7. Configure Traefik with Let's Encrypt (built-in ACME)
+# 7. Configure Traefik
 ############################
-# Layer extra values onto k3s's bundled Traefik chart via HelmChartConfig:
-# a PVC for acme.json (so certs survive pod restarts) and an HTTP-01
-# certResolver 'letsencrypt'. Ingresses opt in via the router.tls.certresolver
-# annotation (§10). The chart's default fsGroup=65532 handles PVC ownership.
 log "Configuring Traefik with a Let's Encrypt certResolver"
 kubectl apply -f - <<EOF
 apiVersion: helm.cattle.io/v1
@@ -454,9 +413,6 @@ spec:
             entryPoint: web
 EOF
 
-# On a fresh k3s the helm-install-traefik Job may not have created the
-# Deployment yet, so poll for it before waiting. Also short-circuit on a
-# failing helm-install pod so we surface its logs instead of hanging.
 log "Waiting for Traefik to reconcile with the new configuration"
 TRAEFIK_READY=0
 for i in {1..60}; do
@@ -464,7 +420,6 @@ for i in {1..60}; do
     TRAEFIK_READY=1
     break
   fi
-  # Fail fast if the helm-install pod is broken.
   FAILING_POD="$(kubectl -n kube-system get pods \
     -l 'helmcharts.helm.cattle.io/chart=traefik' \
     -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.containerStatuses[*].state.waiting.reason}{"\n"}{end}' 2>/dev/null \
@@ -487,12 +442,10 @@ kubectl -n kube-system wait --for=condition=Available deploy/traefik --timeout=2
 kubectl -n kube-system rollout status deploy/traefik --timeout=240s
 
 ############################
-# 8. Cookie parser secret (persisted so helm upgrades don't invalidate sessions)
+# 8. Cookie parser secret
 ############################
 if [[ ! -s "${COOKIE_SECRET_FILE}" ]]; then
   log "Generating persistent cookieParserSecret at ${COOKIE_SECRET_FILE}"
-  # 24 alphanumeric chars (see production-notes.md). Disable pipefail: `head`
-  # closes the pipe early, sending SIGPIPE to `tr` which would abort the script.
   set +o pipefail
   LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24 > "${COOKIE_SECRET_FILE}"
   set -o pipefail
@@ -501,12 +454,11 @@ fi
 COOKIE_PARSER_SECRET="$(cat "${COOKIE_SECRET_FILE}" | tr -d '\r')"
 
 ############################
-# 9. Optional: LLM gateway secret (for AI / chatbot challenges)
+# 9. LLM gateway secret (optional)
 ############################
 HELM_LLM_ARGS=()
 if [[ -n "${LLM_API_KEY}" ]]; then
   log "Configuring LLM gateway (model=${LLM_MODEL}, apiUrl=${LLM_API_URL})"
-  # Upsert secret so re-runs can rotate the key.
   kubectl create secret generic "${LLM_SECRET_NAME}" \
     --namespace default \
     --from-literal=token="${LLM_API_KEY}" \
@@ -546,11 +498,8 @@ helm upgrade --install multi-juicer \
 kubectl -n default rollout status deploy/multi-juicer --timeout=180s
 
 ############################
-# 11. Request and verify the Let's Encrypt certificate
+# 11. Request and verify Let's Encrypt certificate
 ############################
-# Traefik obtains certificates on the first matching HTTPS request. Connect to
-# the VM directly while retaining DOMAIN as the TLS SNI name, so this check
-# cannot be affected by a stale local DNS cache or proxy configuration.
 log "Requesting a Let's Encrypt certificate for ${DOMAIN}"
 curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
   --resolve "${DOMAIN}:443:${SERVER_IP}" \
@@ -559,10 +508,6 @@ curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
 
 LE_CERTIFICATE_ISSUED=0
 LE_CERTIFICATE_DETAILS=""
-# SECONDS is bash's built-in elapsed-wall-clock-time counter (reset to 0 here).
-# The openssl/curl checks below each take several seconds on their own, so
-# tracking real elapsed time (rather than incrementing a counter only for the
-# sleep) is what makes this loop actually stop at LE_TIMEOUT.
 SECONDS=0
 while (( SECONDS < LE_TIMEOUT )); do
   LE_CERTIFICATE_DETAILS="$(
@@ -571,8 +516,6 @@ while (( SECONDS < LE_TIMEOUT )); do
       | tr -d '\r' || true
   )"
 
-  # curl verifies both the certificate chain and DOMAIN's hostname. Checking
-  # the issuer separately ensures the trusted certificate came from LE.
   if curl --silent --show-error --noproxy "${DOMAIN}" \
       --resolve "${DOMAIN}:443:${SERVER_IP}" \
       --connect-timeout 10 --max-time 20 \

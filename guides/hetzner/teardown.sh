@@ -8,6 +8,9 @@
 
 set -euo pipefail
 
+############################
+# Configuration (override via env vars)
+############################
 : "${HCLOUD_TOKEN:?HCLOUD_TOKEN is required}"
 
 HCLOUD_TOKEN="${HCLOUD_TOKEN//$'\r'/}"
@@ -27,43 +30,56 @@ export HCLOUD_TOKEN
 log() { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
 action() { printf '\n\033[1;36m>>  %s\033[0m\n' "$*"; }
 
+############################
+# 0. Sanity checks
+############################
 for bin in hcloud jq; do
   command -v "$bin" >/dev/null 2>&1 || { echo "Missing required binary: $bin" >&2; exit 1; }
 done
 
-# --- Hetzner Cloud resources ---
-
-# 1. Delete worker servers if any exist
+############################
+# 1. Worker servers
+############################
 for worker in $(hcloud server list -o json 2>/dev/null | jq -r --arg prefix "${SERVER_NAME}-worker-" '.[] | select(.name | startswith($prefix)) | .name' | tr -d '\r' || true); do
   log "Deleting worker server '${worker}'"
   hcloud server delete "${worker}" >/dev/null
 done
 
-# 2. Delete control plane server
+############################
+# 2. Server (Control plane)
+############################
 if hcloud server describe "${SERVER_NAME}" >/dev/null 2>&1; then
   log "Deleting server '${SERVER_NAME}'"
   hcloud server delete "${SERVER_NAME}" >/dev/null
 fi
 
-# 3. Delete private network
+############################
+# 3. Private network
+############################
 if hcloud network describe "${NETWORK_NAME}" >/dev/null 2>&1; then
   log "Deleting private network '${NETWORK_NAME}'"
   hcloud network delete "${NETWORK_NAME}" >/dev/null
 fi
 
-# 4. Delete firewall
+############################
+# 4. Firewall
+############################
 if hcloud firewall describe "${FIREWALL_NAME}" >/dev/null 2>&1; then
   log "Deleting firewall '${FIREWALL_NAME}'"
   hcloud firewall delete "${FIREWALL_NAME}" >/dev/null
 fi
 
-# 5. Delete SSH key
+############################
+# 5. SSH key
+############################
 if hcloud ssh-key describe "${SSH_KEY_NAME}" >/dev/null 2>&1; then
   log "Deleting SSH key '${SSH_KEY_NAME}'"
   hcloud ssh-key delete "${SSH_KEY_NAME}" >/dev/null
 fi
 
-# 6. Delete local state
+############################
+# 6. Local state
+############################
 if [[ -d "${STATE_DIR}" ]]; then
   log "Removing local state at ${STATE_DIR}"
   rm -rf "${STATE_DIR}"
