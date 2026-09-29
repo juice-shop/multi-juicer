@@ -399,6 +399,11 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: "true"
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
     persistence:
       enabled: true
       name: traefik-data
@@ -503,6 +508,7 @@ kubectl -n default rollout status deploy/multi-juicer --timeout=180s
 # 11. Request and verify Let's Encrypt certificate
 ############################
 log "Requesting a Let's Encrypt certificate for ${DOMAIN}"
+sleep 5
 curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
   --resolve "${DOMAIN}:443:${SERVER_IP}" \
   --connect-timeout 10 --max-time 20 \
@@ -510,6 +516,7 @@ curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
 
 LE_CERTIFICATE_ISSUED=0
 LE_CERTIFICATE_DETAILS=""
+RESTARTED_TRAEFIK=0
 SECONDS=0
 while (( SECONDS < LE_TIMEOUT )); do
   LE_CERTIFICATE_DETAILS="$(
@@ -525,6 +532,17 @@ while (( SECONDS < LE_TIMEOUT )); do
     && grep -qi "Let's Encrypt" <<<"${LE_CERTIFICATE_DETAILS}"; then
     LE_CERTIFICATE_ISSUED=1
     break
+  fi
+
+  if (( SECONDS > 45 && RESTARTED_TRAEFIK == 0 )); then
+    warn "Certificate not yet served; restarting Traefik to trigger fresh ACME order..."
+    kubectl -n kube-system rollout restart deploy/traefik
+    kubectl -n kube-system rollout status deploy/traefik --timeout=60s
+    RESTARTED_TRAEFIK=1
+    curl --insecure --silent --show-error --noproxy "${DOMAIN}" \
+      --resolve "${DOMAIN}:443:${SERVER_IP}" \
+      --connect-timeout 10 --max-time 20 \
+      -o /dev/null "https://${DOMAIN}/" >/dev/null 2>&1 || true
   fi
 
   (( SECONDS < LE_TIMEOUT )) || break
