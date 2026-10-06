@@ -489,6 +489,17 @@ fi
 ############################
 HELM_MONITORING_ARGS=()
 if [[ "${MONITORING}" == "1" ]]; then
+  log "Installing Loki & Promtail log collector DaemonSet"
+  helm repo add grafana https://grafana.github.io/helm-charts
+  helm repo update grafana
+
+  helm upgrade --install loki grafana/loki-stack \
+    --namespace monitoring --create-namespace \
+    --set "loki.datasource.uid=P8E80F9AEF21F6940" \
+    --set "loki.isDefault=false" \
+    --set "promtail.config.snippets.extraRelabelConfigs[0].action=labelmap" \
+    --set 'promtail.config.snippets.extraRelabelConfigs[0].regex=__meta_kubernetes_pod_label_(.+)'
+
   log "Installing Prometheus Operator & Grafana"
   # Install Prometheus and Grafana
   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -496,7 +507,14 @@ if [[ "${MONITORING}" == "1" ]]; then
 
   helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
     --namespace monitoring --create-namespace \
-    --values https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/monitoring-setup/prometheus-operator-config.yaml
+    --values https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/monitoring-setup/prometheus-operator-config.yaml \
+    --set "grafana.additionalDataSources[0].name=Loki" \
+    --set "grafana.additionalDataSources[0].type=loki" \
+    --set "grafana.additionalDataSources[0].uid=P8E80F9AEF21F6940" \
+    --set "grafana.additionalDataSources[0].url=http://loki:3100" \
+    --set "grafana.additionalDataSources[0].access=proxy"
+
+  kubectl -n monitoring rollout restart deploy/monitoring-grafana 2>/dev/null || true
 
   HELM_MONITORING_ARGS=(
     --set="metrics.dashboards.enabled=true"
