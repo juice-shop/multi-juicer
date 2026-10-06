@@ -45,6 +45,7 @@ All recommendations strictly use Hetzner `cpx32` (4 vCPU, 8 GB RAM), `cpx42` (8 
 | **Traefik ACME certResolver**                   | in-cluster            | Traefik's built-in Let's Encrypt client (HTTP-01, persistent `acme.json`)                                         |
 | **MultiJuicer Helm release**                    | in-cluster            | The MultiJuicer balancer (2–3 replicas) + on-demand JuiceShop instances                                           |
 | **LLM gateway secret** (optional)               | in-cluster            | Holds the upstream LLM API key for the JuiceShop chatbot / AI challenges (only created when `LLM_API_KEY` is set) |
+| **Prometheus & Grafana** (optional)             | in-cluster            | Prometheus Operator, Grafana, and MultiJuicer dashboards/ServiceMonitor (only created when `MONITORING=1`)        |
 
 The `A` record for `DOMAIN` stays at your existing DNS provider and is managed by you. `setup.sh` already applies the recommendations from [`guides/production-notes/production-notes.md`](../production-notes/production-notes.md) (secure cookie, persistent `cookieParserSecret` stored in `./.multi-juicer-hetzner/cookie-parser-secret`, multiple balancer replicas, `config.maxInstances`).
 
@@ -85,6 +86,10 @@ export EMAIL="you@example.com"       # used for Let's Encrypt registration
 # export LLM_API_KEY="sk-..."
 # export LLM_MODEL="inclusionai/ling-3.0-flash-fin:free"
 # export LLM_API_URL="https://openrouter.ai/api/v1"
+
+# Optional: enable Prometheus and Grafana monitoring stack.
+# See guides/monitoring-setup/monitoring.md for background.
+# export MONITORING=1
 
 cd guides/hetzner
 ./setup.sh
@@ -196,6 +201,9 @@ kubectl -n kube-system logs deploy/traefik | grep -i acme
 
 # Admin password:
 kubectl get secrets multi-juicer-secret -o jsonpath='{.data.adminPassword}' | base64 -d
+
+# If MONITORING=1 was enabled, access Grafana via port-forward:
+kubectl -n monitoring port-forward service/monitoring-grafana 8080:80
 ```
 
 Then browse to `https://<DOMAIN>/balancer/` and log in as team `admin` with the printed password to access the admin UI.
