@@ -8,6 +8,7 @@ ui/build/
 
 # Go binaries / test outputs
 *.test
+/e2e/artifacts/
 
 .claude/
 /guides/hetzner/.multi-juicer-hetzner/
