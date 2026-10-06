@@ -25,6 +25,8 @@ LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"; LLM_MODEL="${LLM_
 LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"; LLM_API_URL="${LLM_API_URL//$'\r'/}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"; LLM_SECRET_NAME="${LLM_SECRET_NAME//$'\r'/}"
 
+MONITORING="${MONITORING:-0}"; MONITORING="${MONITORING//$'\r'/}"
+
 SERVER_NAME="${SERVER_NAME:-multi-juicer}"; SERVER_NAME="${SERVER_NAME//$'\r'/}"
 SERVER_TYPE="${SERVER_TYPE:-cpx32}"; SERVER_TYPE="${SERVER_TYPE//$'\r'/}"
 SERVER_IMAGE="${SERVER_IMAGE:-ubuntu-24.04}"; SERVER_IMAGE="${SERVER_IMAGE//$'\r'/}"
@@ -483,6 +485,26 @@ else
 fi
 
 ############################
+# 9b. Monitoring (optional)
+############################
+HELM_MONITORING_ARGS=()
+if [[ "${MONITORING}" == "1" ]]; then
+  log "Installing Prometheus Operator & Grafana"
+  # Install Prometheus and Grafana
+  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+  helm repo update prometheus-community
+
+  helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+    --namespace monitoring --create-namespace \
+    --values https://raw.githubusercontent.com/juice-shop/multi-juicer/main/guides/monitoring-setup/prometheus-operator-config.yaml
+
+  HELM_MONITORING_ARGS=(
+    --set="metrics.dashboards.enabled=true"
+    --set="metrics.serviceMonitor.enabled=true"
+  )
+fi
+
+############################
 # 10. MultiJuicer
 ############################
 log "Installing MultiJuicer via Helm (replicas=${REPLICAS}, maxInstances=${MAX_INSTANCES})"
@@ -500,6 +522,7 @@ helm upgrade --install multi-juicer \
   --set-string 'ingress.annotations.traefik\.ingress\.kubernetes\.io/router\.entrypoints=websecure' \
   --set "ingress.hosts[0].host=${DOMAIN}" \
   --set "ingress.hosts[0].paths[0]=/" \
+  ${HELM_MONITORING_ARGS[@]+"${HELM_MONITORING_ARGS[@]}"} \
   ${HELM_LLM_ARGS[@]+"${HELM_LLM_ARGS[@]}"}
 
 kubectl -n default rollout status deploy/multi-juicer --timeout=180s
@@ -575,6 +598,11 @@ if [[ -n "${LLM_API_KEY}" ]]; then
   LLM_STATUS="enabled — model=${LLM_MODEL}, upstream=${LLM_API_URL}"
 fi
 
+GRAFANA_PW=""
+if [[ "${MONITORING}" == "1" ]]; then
+  GRAFANA_PW="$(kubectl -n monitoring get secret monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 --decode 2>/dev/null | tr -d '\r' || kubectl -n monitoring get secret monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 -d 2>/dev/null | tr -d '\r' || true)"
+fi
+
 cat <<EOF
 
 $(log "MultiJuicer is ready")
@@ -585,10 +613,10 @@ $(log "MultiJuicer is ready")
   Max teams:        ${MAX_INSTANCES}
   Balancer replicas:${REPLICAS}
   Cluster nodes:    $(( WORKER_COUNT + 1 )) (1 control plane$([[ "${WORKER_COUNT}" -gt 0 ]] && echo ", ${WORKER_COUNT} workers"))
-  LLM gateway:      ${LLM_STATUS}
+  LLM gateway:      ${LLM_STATUS}$([[ "${MONITORING}" == "1" ]] && printf '\n  Grafana password: %s' "${GRAFANA_PW}")
 
   Kubeconfig:       ${KUBECONFIG_FILE}
-  SSH into server:  ssh -i ${SSH_KEY_FILE} root@${SERVER_IP}
+  SSH into server:  ssh -i ${SSH_KEY_FILE} root@${SERVER_IP}$([[ "${MONITORING}" == "1" ]] && printf '\n  Grafana port-forward: kubectl --kubeconfig %s -n monitoring port-forward service/monitoring-grafana 8080:80' "${KUBECONFIG_FILE}")
   Cookie secret:    ${COOKIE_SECRET_FILE} (keep it — re-runs reuse it so team sessions survive helm upgrades)
 
 The setup script requested and verified the certificate above. If it printed a
