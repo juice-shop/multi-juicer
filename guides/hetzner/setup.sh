@@ -21,7 +21,7 @@ EMAIL="${EMAIL//$'\r'/}"
 REPLICAS="${REPLICAS:-2}"; REPLICAS="${REPLICAS//$'\r'/}"
 
 LLM_API_KEY="${LLM_API_KEY:-}"; LLM_API_KEY="${LLM_API_KEY//$'\r'/}"
-LLM_MODEL="${LLM_MODEL:-inclusionai/ling-3.0-flash-fin:free}"; LLM_MODEL="${LLM_MODEL//$'\r'/}"
+LLM_MODEL="${LLM_MODEL:-google/gemini-2.5-flash}"; LLM_MODEL="${LLM_MODEL//$'\r'/}"
 LLM_API_URL="${LLM_API_URL:-https://openrouter.ai/api/v1}"; LLM_API_URL="${LLM_API_URL//$'\r'/}"
 LLM_SECRET_NAME="${LLM_SECRET_NAME:-multi-juicer-llm}"; LLM_SECRET_NAME="${LLM_SECRET_NAME//$'\r'/}"
 
