@@ -10,4 +10,6 @@ ui/build/
 *.test
 
 .claude/
+
 /guides/hetzner/.multi-juicer-hetzner/
+/guides/hetzner/.env
