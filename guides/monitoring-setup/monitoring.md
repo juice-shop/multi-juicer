@@ -14,6 +14,7 @@ You can set a custom password by adding `--set="grafana.adminPassword=yourPasswo
 ```sh
 # Install Prometheus and Grafana
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update prometheus-community
 
 echo "Installing Prometheus Operator & Grafana"
 helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
