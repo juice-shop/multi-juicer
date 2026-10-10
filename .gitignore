@@ -11,5 +11,5 @@ ui/build/
 
 .claude/
 
-/guides/hetzner/.multi-juicer-hetzner/
-/guides/hetzner/.env
+.multi-juicer-hetzner/
+.env
