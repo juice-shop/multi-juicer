@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
-    "dompurify": "^3.4.15",
+    "dompurify": "^3.4.16",
     "motion": "^13.3.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
