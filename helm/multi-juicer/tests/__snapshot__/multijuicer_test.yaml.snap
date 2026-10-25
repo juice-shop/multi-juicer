@@ -67,9 +67,12 @@ custom balancer theme renders into the config map:
               }
             },
             "resources": {
+              "limits": {
+                "memory": "384Mi"
+              },
               "requests": {
-                "cpu": "150m",
-                "memory": "300Mi"
+                "cpu": "100m",
+                "memory": "256Mi"
               }
             },
             "runtimeClassName": null,
@@ -164,9 +167,12 @@ default values render correctly:
               }
             },
             "resources": {
+              "limits": {
+                "memory": "384Mi"
+              },
               "requests": {
-                "cpu": "150m",
-                "memory": "300Mi"
+                "cpu": "100m",
+                "memory": "256Mi"
               }
             },
             "runtimeClassName": null,
@@ -549,9 +555,12 @@ full values render out correctly:
               }
             },
             "resources": {
+              "limits": {
+                "memory": "384Mi"
+              },
               "requests": {
-                "cpu": "150m",
-                "memory": "300Mi"
+                "cpu": "100m",
+                "memory": "256Mi"
               }
             },
             "runtimeClassName": null,
@@ -2637,9 +2646,12 @@ production notes work correctly:
               }
             },
             "resources": {
+              "limits": {
+                "memory": "384Mi"
+              },
               "requests": {
-                "cpu": "150m",
-                "memory": "300Mi"
+                "cpu": "100m",
+                "memory": "256Mi"
               }
             },
             "runtimeClassName": null,

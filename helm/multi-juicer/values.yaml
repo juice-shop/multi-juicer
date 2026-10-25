@@ -132,11 +132,10 @@ config:
     # -- Optional resources definitions to set for each JuiceShop instance
     resources:
       requests:
-        cpu: 150m
-        memory: 300Mi
-    #  limits:
-    #    cpu: 100m
-    #    memory: 200Mi
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 384Mi
     # -- Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core
     podSecurityContext:
       runAsNonRoot: true
