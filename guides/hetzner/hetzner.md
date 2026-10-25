@@ -1,6 +1,6 @@
 # Example Setup with Hetzner Cloud
 
-This guide sets up a MultiJuicer cluster on [Hetzner Cloud](https://www.hetzner.com/cloud), supporting both **single-VM** deployments (sized for up to 70 teams) and **multi-VM clusters** (supporting at least up to 200 teams), reachable over **HTTPS** on your own domain with automated Let's Encrypt certificates. The domain stays at your existing DNS provider — you just point a single `A` record at the control-plane VM's public IP.
+This guide sets up a MultiJuicer cluster on [Hetzner Cloud](https://www.hetzner.com/cloud), supporting both **single-VM** deployments (sized for up to 80 teams) and **multi-VM clusters** (supporting at least up to 250 teams), reachable over **HTTPS** on your own domain with automated Let's Encrypt certificates. The domain stays at your existing DNS provider — you just point a single `A` record at the control-plane VM's public IP.
 
 The setup is intentionally throw-away: after the event you delete all resources with a single command and pay nothing more. Two scripts manage the entire lifecycle:
 
@@ -13,22 +13,23 @@ The setup is intentionally throw-away: after the event you delete all resources 
 
 ### Single-VM vs. Multi-VM Clusters
 
-- **Single-VM (`WORKER_COUNT=0`)**: Ideal for events with up to 70 teams. The control plane runs `k3s`, Traefik, MultiJuicer balancer replicas, and all JuiceShop instances on a single VM.
+- **Single-VM (`WORKER_COUNT=0`)**: Ideal for events with up to 80 teams. The control plane runs `k3s`, Traefik, MultiJuicer balancer replicas, and all JuiceShop instances on a single VM.
 - **Multi-VM Cluster (`WORKER_COUNT > 0`)**: Essential for 100+ teams. Standard Kubernetes (`k3s`) enforces a default ceiling of **110 pods per node**. To host >100 instances without pod scheduling limits or resource exhaustion, worker nodes are connected over a free **Hetzner Cloud Private Network** (`10.0.0.0/16`).
   - **Ingress & Networking**: Your DNS `A` record always points **exclusively to the control-plane public IP**. Traefik terminates TLS (Let's Encrypt HTTP-01) on the control plane and proxies traffic to JuiceShop pods running across worker nodes via k3s Flannel CNI over the private network. No expensive cloud load balancer is needed.
 
 ### Sizing Matrix
 
-All recommendations strictly use Hetzner `cpx32` (4 vCPU, 8 GB RAM), `cpx42` (8 vCPU, 16 GB RAM), and `cpx52` (16 vCPU, 32 GB RAM) instances. For multi-VM setups (100+ teams), clusters ideally use 1 × `cpx52` worker VM per 50 teams:
+All recommendations strictly use Hetzner `cpx32` (4 vCPU, 8 GB RAM), `cpx42` (8 vCPU, 16 GB RAM), and `cpx52` (16 vCPU, 32 GB RAM) instances. For multi-VM setups (100+ teams), clusters ideally use 1 × `cpx52` worker VM per 100 teams:
 
 | Capacity               | Control Plane (`SERVER_TYPE`) | Worker Nodes (`WORKER_TYPE` & `WORKER_COUNT`) | Configuration                                                                                 |
 |:-----------------------|:------------------------------|:----------------------------------------------|:----------------------------------------------------------------------------------------------|
-| **20 teams (default)** | `cpx32`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=20`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
-| **40 teams**           | `cpx42`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=40`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
-| **70 teams**           | `cpx52`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx52`, `MAX_INSTANCES=70`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
-| **100 teams**          | `cpx32`                       | 2 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=2`, `MAX_INSTANCES=100`, `REPLICAS=3` |
-| **150 teams**          | `cpx32`                       | 3 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=3`, `MAX_INSTANCES=150`, `REPLICAS=3` |
-| **200 teams**          | `cpx32`                       | 4 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=4`, `MAX_INSTANCES=200`, `REPLICAS=3` |
+| **25 teams (default)** | `cpx32`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx32`, `MAX_INSTANCES=25`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
+| **50 teams**           | `cpx42`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx42`, `MAX_INSTANCES=50`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
+| **80 teams**           | `cpx52`                       | *None (single-VM)*                            | `SERVER_TYPE=cpx52`, `MAX_INSTANCES=80`, `WORKER_COUNT=0`, `REPLICAS=2`                       |
+| **100 teams**          | `cpx32`                       | 1 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=1`, `MAX_INSTANCES=100`, `REPLICAS=3` |
+| **150 teams**          | `cpx32`                       | 2 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=2`, `MAX_INSTANCES=150`, `REPLICAS=3` |
+| **200 teams**          | `cpx32`                       | 2 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=2`, `MAX_INSTANCES=200`, `REPLICAS=3` |
+| **250 teams**          | `cpx32`                       | 3 × `cpx52`                                   | `SERVER_TYPE=cpx32`, `WORKER_TYPE=cpx52`, `WORKER_COUNT=3`, `MAX_INSTANCES=250`, `REPLICAS=3` |
 
 ---
 
@@ -65,7 +66,7 @@ The `A` record for `DOMAIN` stays at your existing DNS provider and is managed b
 
 Set the required variables. Choose between a single-VM setup (default) or a multi-VM setup depending on your expected team count.
 
-### Example A: Single-VM Setup (20 Teams Default)
+### Example A: Single-VM Setup (25 Teams Default)
 
 ```bash
 export HCLOUD_TOKEN="<your hetzner cloud api token>"
@@ -73,8 +74,8 @@ export DOMAIN="juicy.example.com"    # any subdomain of a domain you control
 export EMAIL="you@example.com"       # used for Let's Encrypt registration
 
 # Optional overrides for single-VM:
-# export SERVER_TYPE=cpx32           # cpx32 (20 teams), cpx42 (40 teams), or cpx52 (70 teams)
-# export MAX_INSTANCES=20            # match with SERVER_TYPE
+# export SERVER_TYPE=cpx32           # cpx32 (25 teams), cpx42 (50 teams), or cpx52 (80 teams)
+# export MAX_INSTANCES=25            # match with SERVER_TYPE
 # export REPLICAS=2                  # MultiJuicer balancer replicas
 # export SERVER_LOCATION=nbg1        # nbg1 | fsn1 | hel1 | ash | hil | sin
 # export DNS_TIMEOUT=1800            # seconds to wait for DNS to propagate
@@ -104,21 +105,25 @@ export EMAIL="you@example.com"
 
 # Multi-VM cluster settings:
 export SERVER_TYPE="cpx32"           # Control plane VM
-export WORKER_TYPE="cpx52"           # Worker VMs (1x cpx52 per 50 teams)
+export WORKER_TYPE="cpx52"           # Worker VMs (1x cpx52 per 100 teams)
 export REPLICAS=3                    # 3 balancer replicas recommended for multi-node
 
 # Select instance count & worker count:
 # For 100 teams:
-export WORKER_COUNT=2
+export WORKER_COUNT=1
 export MAX_INSTANCES=100
 
 # For 150 teams:
-# export WORKER_COUNT=3
+# export WORKER_COUNT=2
 # export MAX_INSTANCES=150
 
 # For 200 teams:
-# export WORKER_COUNT=4
+# export WORKER_COUNT=2
 # export MAX_INSTANCES=200
+
+# For 250 teams:
+# export WORKER_COUNT=3
+# export MAX_INSTANCES=250
 
 # Optional: LLM gateway and other general overrides can be configured as in Example A.
 
