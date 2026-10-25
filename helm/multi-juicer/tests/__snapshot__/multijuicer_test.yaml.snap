@@ -220,7 +220,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 8317792834f2042c0606fbe4c2896e566ccdbd4ce173353d23afde171c90f3d3
+            checksum/config: 32dde7aeb6e46b72ca93011bdfe977932a1f56a70283dbb1ed75de9203517c5a
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -608,7 +608,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 0c67d47521c1b2be790c94c8161543adb6a4ac30593878552d9773d72a2bb5c8
+            checksum/config: e74ec77ba5dc3320aa0daaeb8d4ced3a38fa19a5fa2c49139e81b155de70a9e2
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2699,7 +2699,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 0c67d47521c1b2be790c94c8161543adb6a4ac30593878552d9773d72a2bb5c8
+            checksum/config: e74ec77ba5dc3320aa0daaeb8d4ced3a38fa19a5fa2c49139e81b155de70a9e2
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
