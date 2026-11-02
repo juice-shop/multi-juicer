@@ -19,6 +19,8 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| config.classProgress.mandatory | list | `[]` | Challenge keys (e.g. `scoreBoardChallenge`) every team of a class has to solve. Listing challenges here or in `suggested` adds a class progress page (`/multi-juicer/class-progress`) showing which team solved which of them, in the order listed. MultiJuicer refuses to start if a key is unknown or listed twice. |
+| config.classProgress.suggested | list | `[]` | Optional challenge keys teams can solve in addition to the mandatory ones. |
 | config.juiceShop.affinity | object | `{}` | Optional Configure kubernetes scheduling affinity for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | config.juiceShop.config | object | See values.yaml for full details | Specify a custom Juice Shop config.yaml. See the JuiceShop Config Docs for more detail: https://pwning.owasp-juice.shop/companion-guide/latest/part4/customization.html#_yaml_configuration_file |
 | config.juiceShop.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}` | Optional securityContext on container level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#securitycontext-v1-core |
@@ -42,7 +44,7 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | config.juiceShop.resources | object | `{"limits":{"memory":"384Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Optional resources definitions to set for each JuiceShop instance |
 | config.juiceShop.runtimeClassName | string | `nil` | Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/) |
-| config.juiceShop.tag | string | `"v20.0.0"` |  |
+| config.juiceShop.tag | string | `"v20.3.0"` |  |
 | config.juiceShop.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | config.juiceShop.volumeMounts | list | `[]` | Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | config.juiceShop.volumes | list | `[]` | Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |

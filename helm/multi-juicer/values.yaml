@@ -100,6 +100,11 @@ config:
     logoUrl: ""
     # -- Optional URL to a custom favicon for the MultiJuicer balancer UI (the team join, scoreboard and admin pages), e.g. `http://example.com/favicon.svg`. An `.svg` is the preferred format; raster formats (`.ico`/`.png`) also work for the regular favicon, might come with issues in some browsers. This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.favicon` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
     faviconUrl: ""
+  classProgress:
+    # -- Challenge keys (e.g. `scoreBoardChallenge`) every team of a class has to solve. Listing challenges here or in `suggested` adds a class progress page (`/multi-juicer/class-progress`) showing which team solved which of them, in the order listed. MultiJuicer refuses to start if a key is unknown or listed twice.
+    mandatory: []
+    # -- Optional challenge keys teams can solve in addition to the mandatory ones.
+    suggested: []
   juiceShop:
     # -- Juice Shop Image to use
     image: bkimminich/juice-shop

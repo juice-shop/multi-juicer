@@ -7,6 +7,7 @@ import type { PopupActions } from "reactjs-popup/dist/types";
 
 import { Card } from "@/components/Card";
 import { NotificationBanner } from "@/components/NotificationBanner";
+import { useIsClassProgressEnabled } from "@/hooks/useClassProgress";
 import { useNotifications } from "@/hooks/useNotifications";
 import availableLanguages, { type Language } from "@/translations";
 import { classNames } from "@/util/classNames";
@@ -325,6 +326,8 @@ function Navigation({
   selectedLocale: string;
   setActiveTeam: (team: string | null) => void;
 }) {
+  const isClassProgressEnabled = useIsClassProgressEnabled();
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg gap-2">
@@ -344,6 +347,14 @@ function Navigation({
             defaultMessage="Score Overview"
           />
         </NavbarPill>
+        {isClassProgressEnabled && (
+          <NavbarPill to="/class-progress" activeMatchingExact={true}>
+            <FormattedMessage
+              id="navigation.class-progress"
+              defaultMessage="Class Progress"
+            />
+          </NavbarPill>
+        )}
         <NavbarPill to="/ctf" activeMatchingExact={true}>
           <FormattedMessage
             id="navigation.ctf-view"

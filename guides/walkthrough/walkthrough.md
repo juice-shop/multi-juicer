@@ -38,6 +38,19 @@ The scoreboard lists every team and their solved-challenge progress. Useful duri
 
 ![MultiJuicer scoreboard listing three teams in a leaderboard table, each row showing the team name, the number of solved challenges and the score.](../../images/screenshots/user-flow-6-regular-scoreboard.webp)
 
+## Class progress
+
+For trainings, hosts can list challenges every team has to solve and optional challenges they can solve in addition. The class progress page then shows which team solved which of these challenges, so everybody can see who is done and how far the other teams have come. The page is linked in the navbar as soon as one of the lists is set:
+
+```yaml
+config:
+  classProgress:
+    mandatory: [scoreBoardChallenge, localXssChallenge, loginAdminChallenge]
+    suggested: [loginJimChallenge, forgedFeedbackChallenge]
+```
+
+![MultiJuicer class progress page showing a matrix with one row per team and one column per challenge, split into mandatory and suggested challenges. Solved challenges are marked with a check, teams that solved all mandatory challenges are marked as done, and a footer row shows how many teams solved each challenge.](../../images/screenshots/user-flow-9-class-progress.webp)
+
 ## CTF / projector view
 
 The CTF view is primarily meant for in-person events, something to put on a projector for some additional visual eye candy and to spread some hacker vibes.

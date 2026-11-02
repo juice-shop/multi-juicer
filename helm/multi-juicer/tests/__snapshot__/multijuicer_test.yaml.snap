@@ -4,6 +4,10 @@ custom balancer theme renders into the config map:
     data:
       config.json: |
         {
+          "classProgress": {
+            "mandatory": [],
+            "suggested": []
+          },
           "cookie": {
             "name": "multi-juicer",
             "secure": false
@@ -104,6 +108,10 @@ default values render correctly:
     data:
       config.json: |
         {
+          "classProgress": {
+            "mandatory": [],
+            "suggested": []
+          },
           "cookie": {
             "name": "multi-juicer",
             "secure": false
@@ -220,7 +228,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 32dde7aeb6e46b72ca93011bdfe977932a1f56a70283dbb1ed75de9203517c5a
+            checksum/config: 6a31c88e427bc96e3c63a1f2596d76fc2160779e0dff247980f17f86932c8d0a
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -492,6 +500,10 @@ full values render out correctly:
     data:
       config.json: |
         {
+          "classProgress": {
+            "mandatory": [],
+            "suggested": []
+          },
           "cookie": {
             "name": "multi-juicer",
             "secure": true
@@ -608,7 +620,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: e74ec77ba5dc3320aa0daaeb8d4ced3a38fa19a5fa2c49139e81b155de70a9e2
+            checksum/config: 77faa4b53b25f65aa94aff14868807febbcc45cbd05acbdebc7d74ac00069f3a
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2583,6 +2595,10 @@ production notes work correctly:
     data:
       config.json: |
         {
+          "classProgress": {
+            "mandatory": [],
+            "suggested": []
+          },
           "cookie": {
             "name": "multi-juicer",
             "secure": true
@@ -2699,7 +2715,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: e74ec77ba5dc3320aa0daaeb8d4ced3a38fa19a5fa2c49139e81b155de70a9e2
+            checksum/config: 77faa4b53b25f65aa94aff14868807febbcc45cbd05acbdebc7d74ac00069f3a
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME

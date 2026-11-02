@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -46,14 +47,20 @@ type RuntimeEnvironment struct {
 }
 
 type Config struct {
-	JuiceShopConfig       JuiceShopConfig `json:"juiceShop"`
-	MaxInstances          int             `json:"maxInstances"`
-	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
-	CookieConfig          CookieConfig    `json:"cookie"`
-	ThemeConfig           ThemeConfig     `json:"theme"`
+	JuiceShopConfig       JuiceShopConfig     `json:"juiceShop"`
+	MaxInstances          int                 `json:"maxInstances"`
+	TeamPasscodeLength    int                 `json:"teamPasscodeLength"`
+	CookieConfig          CookieConfig        `json:"cookie"`
+	ThemeConfig           ThemeConfig         `json:"theme"`
+	ClassProgress         ClassProgressConfig `json:"classProgress"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
 	Cleanup               CleanupConfig
+}
+
+type ClassProgressConfig struct {
+	Mandatory []string `json:"mandatory"`
+	Suggested []string `json:"suggested"`
 }
 
 // ThemeConfig customizes the look of the MultiJuicer balancer UI itself
@@ -308,6 +315,10 @@ func New() *Bundle {
 		panic(err)
 	}
 
+	if err := validateClassProgressConfig(config.ClassProgress, challenges); err != nil {
+		panic(err)
+	}
+
 	return &Bundle{
 		ClientSet:             clientset,
 		StaticAssetsDirectory: "/public/",
@@ -322,6 +333,25 @@ func New() *Bundle {
 		Config:                     config,
 		JuiceShopChallenges:        challenges,
 	}
+}
+
+func validateClassProgressConfig(classProgress ClassProgressConfig, challenges []JuiceShopChallenge) error {
+	knownChallenges := make(map[string]bool, len(challenges))
+	for _, challenge := range challenges {
+		knownChallenges[challenge.Key] = true
+	}
+
+	listedChallenges := make(map[string]bool)
+	for _, key := range slices.Concat(classProgress.Mandatory, classProgress.Suggested) {
+		if !knownChallenges[key] {
+			return fmt.Errorf("classProgress lists unknown challenge %q. Check the key against the challenges of the Juice Shop version MultiJuicer was built with", key)
+		}
+		if listedChallenges[key] {
+			return fmt.Errorf("classProgress lists challenge %q more than once", key)
+		}
+		listedChallenges[key] = true
+	}
+	return nil
 }
 
 func readConfigFromFile(filePath string) (*Config, error) {

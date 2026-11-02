@@ -26,6 +26,7 @@ func AddRoutes(
 	router.Handle("POST /multi-juicer/api/teams/logout", api(handleLogout(bundle)))
 	router.Handle("POST /multi-juicer/api/teams/reset-passcode", api(handleResetPasscode(bundle)))
 	router.Handle("GET /multi-juicer/api/score-board/top", api(handleScoreBoard(bundle)))
+	router.Handle("GET /multi-juicer/api/class-progress", api(handleClassProgress(bundle)))
 	router.Handle("GET /multi-juicer/api/challenges", api(handleChallenges(bundle)))
 	router.Handle("GET /multi-juicer/api/challenges/{challengeKey}", api(handleChallengeDetail(bundle)))
 	router.Handle("GET /multi-juicer/api/teams/status", api(handleTeamStatus(bundle)))
