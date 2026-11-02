@@ -15,6 +15,7 @@ const ScoreOverviewPage = lazy(() => import("@/pages/ScoreOverviewPage"));
 const TeamDetailPage = lazy(() => import("@/pages/TeamDetailPage"));
 const ChallengeDetailPage = lazy(() => import("@/pages/ChallengeDetailPage"));
 const CtfPage = lazy(() => import("@/pages/CtfPage"));
+const ClassProgressPage = lazy(() => import("@/pages/ClassProgressPage"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -142,6 +143,10 @@ function App() {
                     <Route
                       path="/score-overview/challenges/:challengeKey"
                       element={<ChallengeDetailPage />}
+                    />
+                    <Route
+                      path="/class-progress"
+                      element={<ClassProgressPage activeTeam={activeTeam} />}
                     />
                   </Routes>
                 </Suspense>
