@@ -75,7 +75,6 @@ custom balancer theme renders into the config map:
                 "memory": "256Mi"
               }
             },
-            "runtimeClassName": null,
             "tag": "v20.4.0",
             "tolerations": [],
             "volumeMounts": [],
@@ -175,7 +174,6 @@ default values render correctly:
                 "memory": "256Mi"
               }
             },
-            "runtimeClassName": null,
             "tag": "v20.4.0",
             "tolerations": [],
             "volumeMounts": [],
@@ -220,7 +218,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 0537d50673b5d9e748a27e4793436a433d9e8f0838dea6690431317e838fed96
+            checksum/config: 4bfd6325ce9b4a276589f87ee87faa1918536bb1b659f90ad7c6aa6c95ece2c6
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -563,7 +561,6 @@ full values render out correctly:
                 "memory": "256Mi"
               }
             },
-            "runtimeClassName": null,
             "tag": "v20.4.0",
             "tolerations": [],
             "volumeMounts": [],
@@ -608,7 +605,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: b4e037c7fbf266cef469bfd00398ec03d21f610ab4f2c3d9475fbb1c353eedb1
+            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2654,7 +2651,6 @@ production notes work correctly:
                 "memory": "256Mi"
               }
             },
-            "runtimeClassName": null,
             "tag": "v20.4.0",
             "tolerations": [],
             "volumeMounts": [],
@@ -2699,7 +2695,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: b4e037c7fbf266cef469bfd00398ec03d21f610ab4f2c3d9475fbb1c353eedb1
+            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
