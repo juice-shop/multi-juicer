@@ -77,7 +77,15 @@ jobs:
         run: |
           helm version
       - name: Install Helm Unit Test Plugin
+        env:
+          HELM_UNITTEST_VERSION: "1.2.1"
         run: |
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version 1.0.3
+          # Helm 4 verifies plugin signatures (.prov) against a keyring.
+          # The helm-unittest signing key is pinned in the repo (fingerprint 853008CD0B0A5A2DA04FF8A5616AD47F65B54AC7).
+          gpg --dearmor < "${GITHUB_WORKSPACE}/.github/helm-unittest-public-key.asc" > "${RUNNER_TEMP}/helm-unittest-pubring.gpg"
+          helm plugin install \
+            "https://github.com/helm-unittest/helm-unittest/releases/download/v${HELM_UNITTEST_VERSION}/unittest-${HELM_UNITTEST_VERSION}.tgz" \
+            --keyring "${RUNNER_TEMP}/helm-unittest-pubring.gpg"
+          helm plugin list
       - name: Helm-Chart Unit Tests
         run: helm unittest .
