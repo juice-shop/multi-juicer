@@ -32,6 +32,7 @@ func AddRoutes(
 	router.Handle("GET /multi-juicer/api/teams/{team}/status", api(handleTeamStatus(bundle)))
 	router.Handle("GET /multi-juicer/api/activity-feed", api(handleActivityFeed(bundle)))
 	router.Handle("GET /multi-juicer/api/notifications", api(handleNotifications(bundle)))
+	router.Handle("GET /multi-juicer/api/ui-config", api(handleUIConfig(bundle)))
 
 	router.Handle("GET /multi-juicer/api/admin/all", api(requireAdmin(bundle, handleAdminListInstances(bundle))))
 	router.Handle("DELETE /multi-juicer/api/admin/teams/{team}/delete", api(requireAdmin(bundle, handleAdminDeleteInstance(bundle))))

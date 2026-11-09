@@ -8,6 +8,7 @@ import type { PopupActions } from "reactjs-popup/dist/types";
 import { Card } from "@/components/Card";
 import { NotificationBanner } from "@/components/NotificationBanner";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useUIConfig } from "@/hooks/useUIConfig";
 import availableLanguages, { type Language } from "@/translations";
 import { classNames } from "@/util/classNames";
 
@@ -325,6 +326,8 @@ function Navigation({
   selectedLocale: string;
   setActiveTeam: (team: string | null) => void;
 }) {
+  const { showScoreboardView, showCtfView } = useUIConfig();
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-lg gap-2">
@@ -338,18 +341,22 @@ function Navigation({
             <FormattedMessage id="navigation.admin" defaultMessage="Admin" />
           </NavbarPill>
         )}
-        <NavbarPill to="/score-overview" activeMatchingExact={true}>
-          <FormattedMessage
-            id="navigation.scoreboard"
-            defaultMessage="Score Overview"
-          />
-        </NavbarPill>
-        <NavbarPill to="/ctf" activeMatchingExact={true}>
-          <FormattedMessage
-            id="navigation.ctf-view"
-            defaultMessage="CTF View"
-          />
-        </NavbarPill>
+        {showScoreboardView && (
+          <NavbarPill to="/score-overview" activeMatchingExact={true}>
+            <FormattedMessage
+              id="navigation.scoreboard"
+              defaultMessage="Score Overview"
+            />
+          </NavbarPill>
+        )}
+        {showCtfView && (
+          <NavbarPill to="/ctf" activeMatchingExact={true}>
+            <FormattedMessage
+              id="navigation.ctf-view"
+              defaultMessage="CTF View"
+            />
+          </NavbarPill>
+        )}
       </div>
       <ContextMenu
         switchLanguage={switchLanguage}

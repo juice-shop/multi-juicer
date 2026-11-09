@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { PositionDisplay } from "@/components/PositionDisplay";
 import { type TeamStatus, useTeamStatus } from "@/hooks/useTeamStatus";
+import { useUIConfig } from "@/hooks/useUIConfig";
 
 export const TeamStatusPage = ({
   setActiveTeam,
@@ -88,6 +89,8 @@ function ScoreDisplay({
 }: {
   instanceStatus: TeamStatus | null;
 }) {
+  const { showScoreboardView } = useUIConfig();
+
   if (!instanceStatus?.position || instanceStatus?.position === -1) {
     return (
       <div className="p-4 text-sm">
@@ -116,18 +119,20 @@ function ScoreDisplay({
           />
         </span>
       </div>
-      <div className="flex flex-row-reverse items-center p-4">
-        <Link
-          to="/score-overview"
-          className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
-        >
-          <FormattedMessage
-            id="score_overview"
-            defaultMessage="Score Overview"
-          />{" "}
-          →
-        </Link>
-      </div>
+      {showScoreboardView && (
+        <div className="flex flex-row-reverse items-center p-4">
+          <Link
+            to="/score-overview"
+            className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-sm"
+          >
+            <FormattedMessage
+              id="score_overview"
+              defaultMessage="Score Overview"
+            />{" "}
+            →
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

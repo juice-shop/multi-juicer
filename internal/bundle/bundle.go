@@ -51,6 +51,8 @@ type Config struct {
 	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
 	CookieConfig          CookieConfig    `json:"cookie"`
 	ThemeConfig           ThemeConfig     `json:"theme"`
+	ShowScoreboardView    bool            `json:"showScoreboardView"`
+	ShowCtfView           bool            `json:"showCtfView"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
 	Cleanup               CleanupConfig
