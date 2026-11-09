@@ -199,3 +199,16 @@ config:
         name: "multi-juicer-llm"
         # -- Key within the secret that holds the API key
         key: "token"
+    # -- Optional NetworkPolicy to isolate the dynamically created JuiceShop instances from
+    # the rest of the cluster. When enabled, all egress traffic from JuiceShop instance pods
+    # is denied except DNS lookups, so a compromised (RCE'd or SSRF'd) Juice Shop can no
+    # longer reach other instances or workloads in the cluster (e.g. steal another user's
+    # challenge progress). Requests directed at instances (balancer -> instance) are ingress
+    # traffic and remain unaffected. DNS is allowed by port (53) instead of selecting
+    # kube-dns/coredns pods, since the labels of those pods are not uniform across cluster
+    # distributions. Deliberately opt-in for now to gather feedback on how well
+    # CNI-based NetworkPolicy enforcement behaves on participants' clusters
+    # (https://github.com/juice-shop/multi-juicer/issues/40).
+    networkPolicy:
+      # -- Set to true to enable the JuiceShop instance isolation NetworkPolicy
+      enabled: false
