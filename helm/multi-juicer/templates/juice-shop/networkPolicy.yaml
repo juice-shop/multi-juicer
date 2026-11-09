@@ -1,0 +1,33 @@
+{{- if .Values.config.juiceShop.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: juice-shop-instance-isolation
+  labels:
+    {{- include "multi-juicer.labels" . | nindent 4 }}
+spec:
+  # Selects the dynamically created Juice Shop instance pods (the same labels the
+  # progress watchdog and the activity feed use to find them).
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: juice-shop
+      app.kubernetes.io/part-of: multi-juicer
+  policyTypes:
+    - Egress
+  egress:
+    # Denies all egress from Juice Shop instance pods except DNS lookups, which are allowed
+    # by port (53) instead of selecting the kube-dns/coredns pods, because the labels of
+    # those pods are not uniform across cluster distributions (see the discussion in
+    # https://github.com/juice-shop/multi-juicer/issues/40). This keeps a compromised
+    # (RCE'd or SSRF'd) Juice Shop from reaching other instances or workloads in the
+    # cluster, e.g. stealing another user's challenge progress. The balancer -> instance
+    # direction is unaffected because ingress remains unrestricted.
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}

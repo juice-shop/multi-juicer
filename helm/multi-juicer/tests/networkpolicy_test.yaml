@@ -1,0 +1,42 @@
+suite: Juice Shop instance isolation NetworkPolicy
+templates:
+  - templates/juice-shop/networkPolicy.yaml
+tests:
+  - it: renders nothing when the isolation is disabled (default)
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: renders the isolation NetworkPolicy when enabled
+    set:
+      config:
+        juiceShop:
+          networkPolicy:
+            enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: spec.podSelector.matchLabels["app.kubernetes.io/name"]
+          value: juice-shop
+      - equal:
+          path: spec.podSelector.matchLabels["app.kubernetes.io/part-of"]
+          value: multi-juicer
+      - equal:
+          path: spec.policyTypes[0]
+          value: Egress
+      - equal:
+          path: spec.egress[0].ports[0].port
+          value: 53
+      - equal:
+          path: spec.egress[0].ports[0].protocol
+          value: UDP
+      - equal:
+          path: spec.egress[0].ports[1].port
+          value: 53
+      - equal:
+          path: spec.egress[0].ports[1].protocol
+          value: TCP

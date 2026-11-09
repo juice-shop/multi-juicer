@@ -36,13 +36,15 @@ MultiJuicer gives you the ability to run separate Juice Shop instances for every
 | config.juiceShop.llm.existingSecret.key | string | `"token"` | Key within the secret that holds the API key |
 | config.juiceShop.llm.existingSecret.name | string | `"multi-juicer-llm"` | Name of the secret |
 | config.juiceShop.llm.model | string | `""` | The model identifier passed to JuiceShop's chatBot config, e.g. "qwen/qwen3.5-9b" |
+| config.juiceShop.networkPolicy | object | `{"enabled":false}` | Optional NetworkPolicy to isolate the dynamically created JuiceShop instances from the rest of the cluster. When enabled, all egress traffic from JuiceShop instance pods is denied except DNS lookups, so a compromised (RCE'd or SSRF'd) Juice Shop can no longer reach other instances or workloads in the cluster (e.g. steal another user's challenge progress). Requests directed at instances (balancer -> instance) are ingress traffic and remain unaffected. DNS is allowed by port (53) instead of selecting kube-dns/coredns pods, since the labels of those pods are not uniform across cluster distributions. Deliberately opt-in for now to gather feedback on how well CNI-based NetworkPolicy enforcement behaves on participants' clusters (https://github.com/juice-shop/multi-juicer/issues/40). |
+| config.juiceShop.networkPolicy.enabled | bool | `false` | Set to true to enable the JuiceShop instance isolation NetworkPolicy |
 | config.juiceShop.nodeEnv | string | `"multi-juicer"` | Specify a custom NODE_ENV for JuiceShop. If value is changed to something other than 'multi-juicer' it's not possible to set a custom config via `juiceShop.config`. |
 | config.juiceShop.pod.annotations | object | `{}` | Optional Additional annotations for the Juice Shop pods. |
 | config.juiceShop.pod.labels | object | `{}` | Optional Additional labels for the Juice Shop pods. |
 | config.juiceShop.podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Optional securityContext on pod level: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#podsecuritycontext-v1-core |
 | config.juiceShop.resources | object | `{"limits":{"memory":"384Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Optional resources definitions to set for each JuiceShop instance |
 | config.juiceShop.runtimeClassName | string | `nil` | Optional Can be used to configure the runtime class for the JuiceShop pods to add an additional layer of isolation to reduce the impact of potential container escapes. (see: https://kubernetes.io/docs/concepts/containers/runtime-class/) |
-| config.juiceShop.tag | string | `"v20.0.0"` |  |
+| config.juiceShop.tag | string | `"v20.4.0"` |  |
 | config.juiceShop.tolerations | list | `[]` | Optional Configure kubernetes toleration for the created JuiceShops (see: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | config.juiceShop.volumeMounts | list | `[]` | Optional VolumeMounts to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |
 | config.juiceShop.volumes | list | `[]` | Optional Volumes to set for each JuiceShop instance (see: https://kubernetes.io/docs/concepts/storage/volumes/) |

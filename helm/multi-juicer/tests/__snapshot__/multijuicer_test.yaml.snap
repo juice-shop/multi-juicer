@@ -55,6 +55,9 @@ custom balancer theme renders into the config map:
               },
               "model": ""
             },
+            "networkPolicy": {
+              "enabled": false
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -154,6 +157,9 @@ default values render correctly:
               },
               "model": ""
             },
+            "networkPolicy": {
+              "enabled": false
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -218,7 +224,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 4bfd6325ce9b4a276589f87ee87faa1918536bb1b659f90ad7c6aa6c95ece2c6
+            checksum/config: a9d01547dc17dbb22d65e0e08e0d34a718f9e8009ec6bce6d2ed952da8126f82
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -541,6 +547,9 @@ full values render out correctly:
               },
               "model": ""
             },
+            "networkPolicy": {
+              "enabled": false
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -605,7 +614,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
+            checksum/config: 9ed0892c97108aba89763f4b8cac715f3895388ba6b9f59897b30015e4fee2c8
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2631,6 +2640,9 @@ production notes work correctly:
               },
               "model": ""
             },
+            "networkPolicy": {
+              "enabled": false
+            },
             "nodeEnv": "multi-juicer",
             "pod": {
               "annotations": {},
@@ -2695,7 +2707,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
+            checksum/config: 9ed0892c97108aba89763f4b8cac715f3895388ba6b9f59897b30015e4fee2c8
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
