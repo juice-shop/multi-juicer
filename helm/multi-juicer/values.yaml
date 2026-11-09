@@ -95,6 +95,10 @@ config:
   maxInstances: 10
   # -- Passcode length for the team passcode, needs to be at least 8 characters long and a multiple of 4. e.g 8, 12, 16.
   teamPasscodeLength: 12
+  # -- Show the "Score Overview" tab in the navigation of the MultiJuicer balancer UI and the link to it on the team status page. When hidden, the page stays reachable under `/multi-juicer/score-overview`.
+  showScoreboardView: true
+  # -- Show the "CTF View" tab in the navigation of the MultiJuicer balancer UI. When hidden, the page stays reachable under `/multi-juicer/ctf`.
+  showCtfView: false
   theme:
     # -- Optional URL to a custom logo for the MultiJuicer balancer UI (the team join, scoreboard and admin pages), e.g. `http://example.com/logo.svg`. A horizontally-oriented logo is preferred, as the default MultiJuicer logo combines an icon with the "MultiJuicer" wordmark. This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.logo` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
     logoUrl: ""

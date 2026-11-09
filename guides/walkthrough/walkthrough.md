@@ -40,7 +40,7 @@ The scoreboard lists every team and their solved-challenge progress. Useful duri
 
 ## CTF / projector view
 
-The CTF view is primarily meant for in-person events, something to put on a projector for some additional visual eye candy and to spread some hacker vibes.
+The CTF view is primarily meant for in-person events, something to put on a projector for some additional visual eye candy and to spread some hacker vibes. Set `config.showCtfView: true` to show it in the navigation.
 
 ![MultiJuicer CTF projector view showing the top teams in a large, high-contrast layout suitable for a screen at the front of the room during a live CTF event.](../../images/screenshots/user-flow-7-ctf-view.webp)
 

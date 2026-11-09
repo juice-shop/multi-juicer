@@ -81,6 +81,8 @@ custom balancer theme renders into the config map:
             "volumes": []
           },
           "maxInstances": 10,
+          "showCtfView": false,
+          "showScoreboardView": true,
           "teamPasscodeLength": 12,
           "theme": {
             "faviconUrl": "https://example.com/custom-favicon.ico",
@@ -180,6 +182,8 @@ default values render correctly:
             "volumes": []
           },
           "maxInstances": 10,
+          "showCtfView": false,
+          "showScoreboardView": true,
           "teamPasscodeLength": 12,
           "theme": {
             "faviconUrl": "",
@@ -218,7 +222,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 4bfd6325ce9b4a276589f87ee87faa1918536bb1b659f90ad7c6aa6c95ece2c6
+            checksum/config: c55dffac011d8d65912a80e1a956e3f7ba77986762e329663a47168cd4ab3c8e
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -567,6 +571,8 @@ full values render out correctly:
             "volumes": []
           },
           "maxInstances": 10,
+          "showCtfView": false,
+          "showScoreboardView": true,
           "teamPasscodeLength": 12,
           "theme": {
             "faviconUrl": "",
@@ -605,7 +611,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
+            checksum/config: f76c82a1efefc29070890124a899abbcd62296e8c97dd329cbf6e63d45133cf0
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2657,6 +2663,8 @@ production notes work correctly:
             "volumes": []
           },
           "maxInstances": 10,
+          "showCtfView": false,
+          "showScoreboardView": true,
           "teamPasscodeLength": 12,
           "theme": {
             "faviconUrl": "",
@@ -2695,7 +2703,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
+            checksum/config: f76c82a1efefc29070890124a899abbcd62296e8c97dd329cbf6e63d45133cf0
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
