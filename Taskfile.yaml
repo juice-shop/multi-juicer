@@ -57,6 +57,11 @@ tasks:
       - task: go:test
       - task: semgrep:scan
 
+  test:e2e:
+    desc: Builds and tests MultiJuicer in a disposable kind cluster
+    cmds:
+      - bash e2e/run.sh {{.CLI_ARGS}}
+
   semgrep:scan:
     preconditions:
       - sh: which semgrep
