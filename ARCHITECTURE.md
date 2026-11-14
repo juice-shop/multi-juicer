@@ -52,6 +52,7 @@ The backend server is responsible for:
   - `/multi-juicer/api/teams/{team}/status` - Any team's detailed status including solved challenges, position, and instance readiness
   - `/multi-juicer/api/activity-feed` - Recent challenge solutions across all teams (15 most recent events)
 - Admin endpoints for instance management (list, delete, restart)
+- Serves the frontend's `index.html` with the public UI config (e.g. which optional views are enabled via `config.views.<view>.enabled`) embedded as a `<script type="application/json">` block, so the frontend has it on the first render without an extra request
 - Health and readiness probes for Kubernetes orchestration
 
 **Internal Port (`:8082`)**
@@ -113,6 +114,7 @@ The web frontend provides a user-friendly interface for participants and organiz
 **Technical Implementation**
 - Built with React, TypeScript, and Vite for fast development and production builds
 - Uses React Router for client-side routing
+- Reads the UI config embedded into `index.html` synchronously on startup (`ui/src/lib/uiConfig.ts`); disabled views are left out of the navigation and their routes redirect to the start page
 - Custom hooks for managing long polling connections:
   - `useHttpLongPoll` - Generic HTTP long polling implementation
   - `useScoreboard` - Fetches global leaderboard with top teams

@@ -8,6 +8,7 @@ import type { PopupActions } from "reactjs-popup/dist/types";
 import { Card } from "@/components/Card";
 import { NotificationBanner } from "@/components/NotificationBanner";
 import { useNotifications } from "@/hooks/useNotifications";
+import { uiConfig } from "@/lib/uiConfig";
 import availableLanguages, { type Language } from "@/translations";
 import { classNames } from "@/util/classNames";
 
@@ -338,18 +339,22 @@ function Navigation({
             <FormattedMessage id="navigation.admin" defaultMessage="Admin" />
           </NavbarPill>
         )}
-        <NavbarPill to="/score-overview" activeMatchingExact={true}>
-          <FormattedMessage
-            id="navigation.scoreboard"
-            defaultMessage="Score Overview"
-          />
-        </NavbarPill>
-        <NavbarPill to="/ctf" activeMatchingExact={true}>
-          <FormattedMessage
-            id="navigation.ctf-view"
-            defaultMessage="CTF View"
-          />
-        </NavbarPill>
+        {uiConfig.views.scoreOverview.enabled && (
+          <NavbarPill to="/score-overview" activeMatchingExact={true}>
+            <FormattedMessage
+              id="navigation.scoreboard"
+              defaultMessage="Score Overview"
+            />
+          </NavbarPill>
+        )}
+        {uiConfig.views.ctf.enabled && (
+          <NavbarPill to="/ctf" activeMatchingExact={true}>
+            <FormattedMessage
+              id="navigation.ctf-view"
+              defaultMessage="CTF View"
+            />
+          </NavbarPill>
+        )}
       </div>
       <ContextMenu
         switchLanguage={switchLanguage}

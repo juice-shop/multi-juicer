@@ -34,13 +34,13 @@ After clicking **Start Hacking** the participant lands in their personal JuiceSh
 
 ## Scoreboard
 
-The scoreboard lists every team and their solved-challenge progress. Useful during the event so participants can compare standings. The ScoreBoard also allows for detail pages for challenges and teams, to see which teams have solved which challenges.
+The scoreboard lists every team and their solved-challenge progress. Useful during the event so participants can compare standings. The ScoreBoard also allows for detail pages for challenges and teams, to see which teams have solved which challenges. It can be disabled with `config.views.scoreOverview.enabled: false`.
 
 ![MultiJuicer scoreboard listing three teams in a leaderboard table, each row showing the team name, the number of solved challenges and the score.](../../images/screenshots/user-flow-6-regular-scoreboard.webp)
 
 ## CTF / projector view
 
-The CTF view is primarily meant for in-person events, something to put on a projector for some additional visual eye candy and to spread some hacker vibes.
+The CTF view is primarily meant for in-person events, something to put on a projector for some additional visual eye candy and to spread some hacker vibes. It can be disabled with `config.views.ctf.enabled: false`.
 
 ![MultiJuicer CTF projector view showing the top teams in a large, high-contrast layout suitable for a screen at the front of the room during a live CTF event.](../../images/screenshots/user-flow-7-ctf-view.webp)
 

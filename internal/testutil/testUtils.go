@@ -64,6 +64,7 @@ func NewTestBundleWithCustomFakeClient(clientset kubernetes.Interface) *bundle.B
 		LongPollDefaultWaitTimeout: 3 * time.Second,
 		Config: &bundle.Config{
 			MaxInstances: 100,
+			Views:        bundle.DefaultViewsConfig(),
 			JuiceShopConfig: bundle.JuiceShopConfig{
 				ImagePullPolicy: "IfNotPresent",
 				Image:           "bkimminich/juice-shop",

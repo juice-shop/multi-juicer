@@ -134,4 +134,25 @@ func TestStaticFileHandler(t *testing.T) {
 			assert.Equal(t, "/multi-juicer/custom/favicon.png", rr.Header().Get("Location"))
 		}
 	})
+
+	t.Run("should embed the ui config into index.html", func(t *testing.T) {
+		for _, path := range []string{"/multi-juicer", "/multi-juicer/", "/multi-juicer/index.html", "/multi-juicer/admin", "/multi-juicer/ctf", "/multi-juicer/score-overview"} {
+			req, _ := http.NewRequest("GET", path, nil)
+			rr := httptest.NewRecorder()
+
+			server := http.NewServeMux()
+			bundle := testutil.NewTestBundle()
+			bundle.Config.Views.Ctf.Enabled = false
+			AddRoutes(server, bundle)
+
+			server.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusOK, rr.Code, path)
+			assert.Equal(t, "text/html; charset=utf-8", rr.Header().Get("Content-Type"), path)
+			body := rr.Body.String()
+			assert.Contains(t, body, `<script id="multi-juicer-ui-config" type="application/json">{"views":{"scoreOverview":{"enabled":true},"ctf":{"enabled":false}}}</script>`, path)
+			assert.NotContains(t, body, string(uiConfigPlaceholder), path)
+			assert.NotContains(t, body, bundle.Config.CookieConfig.SigningKey, path)
+		}
+	})
 }

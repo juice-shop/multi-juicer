@@ -85,6 +85,14 @@ custom balancer theme renders into the config map:
           "theme": {
             "faviconUrl": "https://example.com/custom-favicon.ico",
             "logoUrl": "https://example.com/custom-logo.svg"
+          },
+          "views": {
+            "ctf": {
+              "enabled": true
+            },
+            "scoreOverview": {
+              "enabled": true
+            }
           }
         }
     kind: ConfigMap
@@ -184,6 +192,14 @@ default values render correctly:
           "theme": {
             "faviconUrl": "",
             "logoUrl": ""
+          },
+          "views": {
+            "ctf": {
+              "enabled": true
+            },
+            "scoreOverview": {
+              "enabled": true
+            }
           }
         }
     kind: ConfigMap
@@ -218,7 +234,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 4bfd6325ce9b4a276589f87ee87faa1918536bb1b659f90ad7c6aa6c95ece2c6
+            checksum/config: 08acbb3c0dc534112b700f788a6cda26656fb3562060b04fc6b57ae92f22fb31
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -571,6 +587,14 @@ full values render out correctly:
           "theme": {
             "faviconUrl": "",
             "logoUrl": ""
+          },
+          "views": {
+            "ctf": {
+              "enabled": true
+            },
+            "scoreOverview": {
+              "enabled": true
+            }
           }
         }
     kind: ConfigMap
@@ -605,7 +629,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
+            checksum/config: 9b03614524d210bee9896246215646a9f825520d87fdc19b16e066c521919adb
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2661,6 +2685,14 @@ production notes work correctly:
           "theme": {
             "faviconUrl": "",
             "logoUrl": ""
+          },
+          "views": {
+            "ctf": {
+              "enabled": true
+            },
+            "scoreOverview": {
+              "enabled": true
+            }
           }
         }
     kind: ConfigMap
@@ -2695,7 +2727,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 324355ca2ed6796ccceb6d96a6aa6074133c5fa0a329b39e39f35db52f157f7b
+            checksum/config: 9b03614524d210bee9896246215646a9f825520d87fdc19b16e066c521919adb
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME

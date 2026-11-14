@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { IntlProvider } from "react-intl";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { Spinner } from "@/components/Spinner";
 import { Layout } from "@/Layout";
+import { uiConfig } from "@/lib/uiConfig";
 import { JoiningPage } from "@/pages/JoiningPage";
 import { JoinPage } from "@/pages/JoinPage";
 import { TeamStatusPage } from "@/pages/TeamStatusPage";
@@ -97,9 +98,13 @@ function App() {
           <Route
             path="/ctf"
             element={
-              <Suspense fallback={<Spinner />}>
-                <CtfPage />
-              </Suspense>
+              uiConfig.views.ctf.enabled ? (
+                <Suspense fallback={<Spinner />}>
+                  <CtfPage />
+                </Suspense>
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           />
           <Route
@@ -131,18 +136,29 @@ function App() {
                       path="/teams/:team/joining/"
                       element={<JoiningPage setActiveTeam={setActiveTeam} />}
                     />
-                    <Route
-                      path="/score-overview"
-                      element={<ScoreOverviewPage activeTeam={activeTeam} />}
-                    />
-                    <Route
-                      path="/score-overview/teams/:team"
-                      element={<TeamDetailPage />}
-                    />
-                    <Route
-                      path="/score-overview/challenges/:challengeKey"
-                      element={<ChallengeDetailPage />}
-                    />
+                    {uiConfig.views.scoreOverview.enabled ? (
+                      <>
+                        <Route
+                          path="/score-overview"
+                          element={
+                            <ScoreOverviewPage activeTeam={activeTeam} />
+                          }
+                        />
+                        <Route
+                          path="/score-overview/teams/:team"
+                          element={<TeamDetailPage />}
+                        />
+                        <Route
+                          path="/score-overview/challenges/:challengeKey"
+                          element={<ChallengeDetailPage />}
+                        />
+                      </>
+                    ) : (
+                      <Route
+                        path="/score-overview/*"
+                        element={<Navigate to="/" replace />}
+                      />
+                    )}
                   </Routes>
                 </Suspense>
               </Layout>

@@ -51,6 +51,7 @@ type Config struct {
 	TeamPasscodeLength    int             `json:"teamPasscodeLength"`
 	CookieConfig          CookieConfig    `json:"cookie"`
 	ThemeConfig           ThemeConfig     `json:"theme"`
+	Views                 ViewsConfig     `json:"views"`
 	AdminConfig           *AdminConfig
 	ContentSecurityPolicy string
 	Cleanup               CleanupConfig
@@ -62,6 +63,25 @@ type ThemeConfig struct {
 	LogoURL string `json:"logoUrl"`
 	// FaviconURL overrides the favicon used by the balancer UI.
 	FaviconURL string `json:"faviconUrl"`
+}
+
+// ViewsConfig controls which optional pages of the MultiJuicer balancer UI are enabled.
+// Each view has its own struct so that view specific options can be added later on.
+type ViewsConfig struct {
+	ScoreOverview ViewConfig `json:"scoreOverview"`
+	Ctf           ViewConfig `json:"ctf"`
+}
+
+type ViewConfig struct {
+	Enabled bool `json:"enabled"`
+}
+
+// DefaultViewsConfig returns the views config used for keys missing in the config file. All views are enabled by default.
+func DefaultViewsConfig() ViewsConfig {
+	return ViewsConfig{
+		ScoreOverview: ViewConfig{Enabled: true},
+		Ctf:           ViewConfig{Enabled: true},
+	}
 }
 
 type CleanupConfig struct {
@@ -325,7 +345,8 @@ func New() *Bundle {
 }
 
 func readConfigFromFile(filePath string) (*Config, error) {
-	var config Config
+	// pre-populate defaults, the decoder only overwrites the keys present in the file
+	config := Config{Views: DefaultViewsConfig()}
 
 	file, err := os.Open(filePath)
 	if err != nil {
