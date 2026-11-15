@@ -11,8 +11,8 @@ You'll need the following installed locally before working on MultiJuicer:
 - **[Task](https://taskfile.dev/installation/)** — task runner used to drive all dev/test/lint commands
 - **[Go](https://go.dev/doc/install)** (matching the version in [`go.mod`](./go.mod)) — backend services
 - **[Node.js](https://nodejs.org/)** with [npm](https://docs.npmjs.com/) (or optionally [Bun](https://bun.sh/) for faster UI tests) — frontend toolchain
-- **[Docker](https://docs.docker.com/get-docker/)** — builds the component images
-- **A local Kubernetes cluster** sharing Docker's image cache, e.g. [Docker Desktop's built-in cluster](https://docs.docker.com/desktop/features/kubernetes/) or [kind - recommended](https://kind.sigs.k8s.io/docs/user/quick-start/)
+- **[Docker](https://docs.docker.com/get-docker/)** or **[Podman](https://podman.io/docs/installation)** — builds the component images (auto-detected, docker preferred; force one with `CONTAINER_ENGINE=podman task dev`)
+- **A local Kubernetes cluster**, e.g. [kind - recommended](https://kind.sigs.k8s.io/docs/user/quick-start/) (images are loaded into it automatically) or a cluster sharing the container engine's image cache like [Docker Desktop's built-in cluster](https://docs.docker.com/desktop/features/kubernetes/)
 - **[kubectl](https://kubernetes.io/docs/tasks/tools/)** — talks to the cluster
 - **[Helm](https://helm.sh/docs/intro/install/)** — installs MultiJuicer into the cluster
 - **[helm unittest plugin](https://github.com/helm-unittest/helm-unittest)** — runs the Helm chart tests (`helm plugin install https://github.com/helm-unittest/helm-unittest.git`)

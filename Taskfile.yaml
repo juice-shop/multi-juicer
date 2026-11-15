@@ -15,14 +15,33 @@ tasks:
   build-and-deploy:
     desc: |
       Builds all MultiJuicer components and installs them to a local kubernetes cluster.
-      For this to work the local kubernetes cluster must have access to the same local registry / image cache which 'docker build ...' writes its image to.
+      Works with docker or podman (auto-detected, docker preferred). Override with CONTAINER_ENGINE=podman.
+      For this to work the local kubernetes cluster must either be a kind cluster (context "kind-kind")
+      or have access to the same local image store the container engine writes its image to.
       For example docker-desktop with its included k8s cluster.
     vars:
       VERSION: '{{uuid}}'
+      CONTAINER_ENGINE:
+        sh: |
+          if [ -n "${CONTAINER_ENGINE:-}" ]; then echo "$CONTAINER_ENGINE"
+          elif command -v docker >/dev/null 2>&1; then echo docker
+          elif command -v podman >/dev/null 2>&1; then echo podman
+          else echo docker; fi
+      # fully qualified so that podman doesn't prefix the name with "localhost/",
+      # which wouldn't match the image name referenced in the helm chart
+      IMAGE: 'docker.io/local/multi-juicer:{{.VERSION}}'
+    preconditions:
+      - sh: command -v {{.CONTAINER_ENGINE}}
+        msg: "Neither docker nor podman found. Install one of them (or set CONTAINER_ENGINE)."
     cmds:
-      - docker build --progress quiet -t local/multi-juicer:{{.VERSION}} .
-      - if: '[ $(kubectl config current-context) == "kind-kind" ]'
-        cmd: kind load docker-image "local/multi-juicer:{{.VERSION}}"
+      - '{{.CONTAINER_ENGINE}} build --quiet -t {{.IMAGE}} .'
+      - if: '[ "$(kubectl config current-context)" = "kind-kind" ]'
+        cmd: |
+          # load via image archive, as 'kind load docker-image' requires the docker cli
+          ARCHIVE="$(mktemp -t multi-juicer-image.XXXXXX)"
+          trap 'rm -f "$ARCHIVE"' EXIT
+          {{.CONTAINER_ENGINE}} save -o "$ARCHIVE" {{.IMAGE}}
+          kind load image-archive "$ARCHIVE"
       - |
         helm upgrade --install multi-juicer ./helm/multi-juicer \
           --set="imagePullPolicy=IfNotPresent" \
