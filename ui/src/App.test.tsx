@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, waitFor } from "@testing-library/react";
+import { act, cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { defaultUIConfig, uiConfig } from "@/lib/uiConfig";
@@ -21,11 +21,16 @@ afterEach(() => {
 
 beforeEach(() => {
   // mock fetch
-  globalThis.fetch = vi.fn(
-    () =>
-      Promise.resolve({
-        json: () => Promise.resolve({}),
-      }) as Promise<Response>
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(() =>
+      Promise.resolve(
+        new Response("{}", {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        })
+      )
+    )
   );
 
   // mock localStorage
@@ -36,13 +41,13 @@ beforeEach(() => {
     clear: vi.fn(),
   };
   vi.stubGlobal("localStorage", localStorageMock);
-
-  // Suppress Router basename warning in test environment
-  vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 
-test("renders without crashing", () => {
-  const { container } = render(<App />);
+test("renders without crashing", async () => {
+  window.history.pushState({}, "", "/multi-juicer");
+
+  // async act flushes the state updates triggered by App's mount effects (fetches)
+  const { container } = await act(async () => render(<App />));
   expect(container).toBeInTheDocument();
 });
 
