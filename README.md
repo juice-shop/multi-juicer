@@ -58,7 +58,7 @@ To customize the theming of the JuiceShop instances and the MultiJuicer UI (them
 ### Optional Pages
 
 The MultiJuicer UI includes optional pages suited to different kinds of events.
-Both are enabled by default. Depending on whether you are running a training, a university lecture, a workshop or a CTF, you may want to disable some of them.
+The Score Overview and the CTF View are enabled by default, the Class Progress has to be configured first. Depending on whether you are running a training, a university lecture, a workshop or a CTF, you may want to disable some of them.
 Disabled pages are removed from the navigation and redirect to the start page when opened directly.
 
 #### Score Overview
@@ -93,6 +93,30 @@ config:
     ctf:
       enabled: false
 ```
+
+#### Class Progress
+
+![Class Progress](./images/screenshots/view-class-progress.png)
+
+Shows which team has solved which of the challenges picked for a training or lecture, organized in named groups, e.g. one group per week or topic.
+
+To enable it, set `config.views.classProgress.enabled` to `true` and list the challenge groups:
+
+```yaml
+config:
+  views:
+    classProgress:
+      enabled: true
+      groups:
+        - name: "Week 1"
+          challenges: [scoreBoardChallenge, localXssChallenge, loginAdminChallenge]
+        - name: "Week 2"
+          challenges: [loginJimChallenge, forgedFeedbackChallenge]
+        - name: "Bonus"
+          challenges: [nullByteChallenge]
+```
+
+The keys of all challenges are listed under `/multi-juicer/api/challenges`.
 
 ### Deinstallation
 

@@ -104,6 +104,11 @@ config:
     ctf:
       # -- Enables the "CTF View" page of the MultiJuicer balancer UI. Meant to be put on a projector at in-person events.
       enabled: true
+    classProgress:
+      # -- Enables the "Class Progress" page of the MultiJuicer balancer UI. Meant for trainings, it shows which team solved which of the challenges listed in `config.views.classProgress.groups`.
+      enabled: false
+      # -- Groups of challenges shown on the "Class Progress" page, e.g. one per week or topic. Each group has a `name` and a list of challenge keys (`challenges`).
+      groups: []
   theme:
     # -- Optional URL to a custom logo for the MultiJuicer balancer UI (the team join, scoreboard and admin pages), e.g. `http://example.com/logo.svg`. A horizontally-oriented logo is preferred, as the default MultiJuicer logo combines an icon with the "MultiJuicer" wordmark. This does NOT theme the Juice Shop instances themselves — use `config.juiceShop.config.application.logo` for that. If this points to an external host, update `contentSecurityPolicy` to allow that image source.
     logoUrl: ""

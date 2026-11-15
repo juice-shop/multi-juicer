@@ -59,6 +59,10 @@ describe("disabled views", () => {
       "/multi-juicer/score-overview/teams/foobar",
       { scoreOverview: { enabled: false } },
     ],
+    [
+      "/multi-juicer/class-progress",
+      { classProgress: { enabled: false, groups: [] } },
+    ],
   ])("%s redirects to the start page", async (path, views) => {
     uiConfig.views = { ...uiConfig.views, ...views };
     window.history.pushState({}, "", path);

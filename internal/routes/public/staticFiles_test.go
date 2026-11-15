@@ -36,6 +36,7 @@ func TestStaticFileHandler(t *testing.T) {
 			"/multi-juicer/score-overview/",
 			"/multi-juicer/score-overview/teams/abc/score/",
 			"/multi-juicer/ctf",
+			"/multi-juicer/class-progress",
 		}
 
 		server := http.NewServeMux()
@@ -136,7 +137,7 @@ func TestStaticFileHandler(t *testing.T) {
 	})
 
 	t.Run("should embed the ui config into index.html", func(t *testing.T) {
-		for _, path := range []string{"/multi-juicer", "/multi-juicer/", "/multi-juicer/index.html", "/multi-juicer/admin", "/multi-juicer/ctf", "/multi-juicer/score-overview"} {
+		for _, path := range []string{"/multi-juicer", "/multi-juicer/", "/multi-juicer/index.html", "/multi-juicer/admin", "/multi-juicer/ctf", "/multi-juicer/score-overview", "/multi-juicer/class-progress"} {
 			req, _ := http.NewRequest("GET", path, nil)
 			rr := httptest.NewRecorder()
 
@@ -150,7 +151,7 @@ func TestStaticFileHandler(t *testing.T) {
 			assert.Equal(t, http.StatusOK, rr.Code, path)
 			assert.Equal(t, "text/html; charset=utf-8", rr.Header().Get("Content-Type"), path)
 			body := rr.Body.String()
-			assert.Contains(t, body, `<script id="multi-juicer-ui-config" type="application/json">{"views":{"scoreOverview":{"enabled":true},"ctf":{"enabled":false}}}</script>`, path)
+			assert.Contains(t, body, `<script id="multi-juicer-ui-config" type="application/json">{"views":{"scoreOverview":{"enabled":true},"ctf":{"enabled":false},"classProgress":{"enabled":false,"groups":[]}}}</script>`, path)
 			assert.NotContains(t, body, string(uiConfigPlaceholder), path)
 			assert.NotContains(t, body, bundle.Config.CookieConfig.SigningKey, path)
 		}
