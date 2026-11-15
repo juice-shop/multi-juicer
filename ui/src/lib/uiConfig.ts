@@ -2,10 +2,20 @@ export interface ViewConfig {
   enabled: boolean;
 }
 
+export interface ChallengeGroup {
+  name: string;
+  challenges: string[];
+}
+
+export interface ClassProgressViewConfig extends ViewConfig {
+  groups: ChallengeGroup[];
+}
+
 export interface UIConfig {
   views: {
     scoreOverview: ViewConfig;
     ctf: ViewConfig;
+    classProgress: ClassProgressViewConfig;
   };
 }
 
@@ -13,6 +23,7 @@ export const defaultUIConfig: UIConfig = {
   views: {
     scoreOverview: { enabled: true },
     ctf: { enabled: true },
+    classProgress: { enabled: false, groups: [] },
   },
 };
 
@@ -40,6 +51,10 @@ export function parseUIConfig(raw: string | null | undefined): UIConfig {
         ...parsed.views?.scoreOverview,
       },
       ctf: { ...defaultUIConfig.views.ctf, ...parsed.views?.ctf },
+      classProgress: {
+        ...defaultUIConfig.views.classProgress,
+        ...parsed.views?.classProgress,
+      },
     },
   };
 }

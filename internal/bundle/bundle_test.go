@@ -27,7 +27,7 @@ func writeConfigFile(t *testing.T, content string) string {
 }
 
 func TestReadConfigFromFile(t *testing.T) {
-	t.Run("enables all views when the views config is missing", func(t *testing.T) {
+	t.Run("uses the default views config when the views config is missing", func(t *testing.T) {
 		config, err := readConfigFromFile(writeConfigFile(t, `{"maxInstances": 10}`))
 		require.NoError(t, err)
 		assert.Equal(t, DefaultViewsConfig(), config.Views)
@@ -38,5 +38,46 @@ func TestReadConfigFromFile(t *testing.T) {
 		require.NoError(t, err)
 		assert.True(t, config.Views.ScoreOverview.Enabled)
 		assert.False(t, config.Views.Ctf.Enabled)
+	})
+
+	t.Run("reads the class progress groups and keeps the defaults of the other views", func(t *testing.T) {
+		config, err := readConfigFromFile(writeConfigFile(t, `{"views": {"classProgress": {"enabled": true, "groups": [{"name": "Week 1", "challenges": ["scoreBoardChallenge", "localXssChallenge"]}]}}}`))
+		require.NoError(t, err)
+		assert.True(t, config.Views.ScoreOverview.Enabled)
+		assert.True(t, config.Views.Ctf.Enabled)
+		assert.Equal(t, ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Name: "Week 1", Challenges: []string{"scoreBoardChallenge", "localXssChallenge"}}},
+		}, config.Views.ClassProgress)
+	})
+}
+
+func TestValidateClassProgressConfig(t *testing.T) {
+	challenges := []JuiceShopChallenge{{Key: "scoreBoardChallenge"}, {Key: "localXssChallenge"}}
+
+	t.Run("ignores the groups of a disabled class progress", func(t *testing.T) {
+		assert.NoError(t, validateClassProgressConfig(ClassProgressViewConfig{
+			Groups: []ChallengeGroup{{Name: "Week 1", Challenges: []string{"unknownChallenge"}}},
+		}, challenges))
+	})
+
+	t.Run("accepts groups of known challenges", func(t *testing.T) {
+		assert.NoError(t, validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Name: "Week 1", Challenges: []string{"scoreBoardChallenge", "localXssChallenge"}}},
+		}, challenges))
+	})
+
+	t.Run("rejects an enabled class progress without groups", func(t *testing.T) {
+		err := validateClassProgressConfig(ClassProgressViewConfig{Enabled: true}, challenges)
+		assert.EqualError(t, err, "views.classProgress.groups must not be empty")
+	})
+
+	t.Run("rejects unknown challenges", func(t *testing.T) {
+		err := validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Name: "Week 1", Challenges: []string{"loginAdmnChallenge"}}},
+		}, challenges)
+		assert.EqualError(t, err, `views.classProgress.groups contains unknown challenge "loginAdmnChallenge"`)
 	})
 }

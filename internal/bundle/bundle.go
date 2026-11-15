@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -68,20 +69,49 @@ type ThemeConfig struct {
 // ViewsConfig controls which optional pages of the MultiJuicer balancer UI are enabled.
 // Each view has its own struct so that view specific options can be added later on.
 type ViewsConfig struct {
-	ScoreOverview ViewConfig `json:"scoreOverview"`
-	Ctf           ViewConfig `json:"ctf"`
+	ScoreOverview ViewConfig              `json:"scoreOverview"`
+	Ctf           ViewConfig              `json:"ctf"`
+	ClassProgress ClassProgressViewConfig `json:"classProgress"`
 }
 
 type ViewConfig struct {
 	Enabled bool `json:"enabled"`
 }
 
-// DefaultViewsConfig returns the views config used for keys missing in the config file. All views are enabled by default.
+type ClassProgressViewConfig struct {
+	Enabled bool             `json:"enabled"`
+	Groups  []ChallengeGroup `json:"groups"`
+}
+
+type ChallengeGroup struct {
+	Name       string   `json:"name"`
+	Challenges []string `json:"challenges"`
+}
+
+// DefaultViewsConfig returns the views config used for keys missing in the config file. All views except the class progress are enabled by default.
 func DefaultViewsConfig() ViewsConfig {
 	return ViewsConfig{
 		ScoreOverview: ViewConfig{Enabled: true},
 		Ctf:           ViewConfig{Enabled: true},
+		ClassProgress: ClassProgressViewConfig{Groups: []ChallengeGroup{}},
 	}
+}
+
+func validateClassProgressConfig(classProgress ClassProgressViewConfig, challenges []JuiceShopChallenge) error {
+	if !classProgress.Enabled {
+		return nil
+	}
+	if len(classProgress.Groups) == 0 {
+		return errors.New("views.classProgress.groups must not be empty")
+	}
+	for _, group := range classProgress.Groups {
+		for _, key := range group.Challenges {
+			if !slices.ContainsFunc(challenges, func(challenge JuiceShopChallenge) bool { return challenge.Key == key }) {
+				return fmt.Errorf("views.classProgress.groups contains unknown challenge %q", key)
+			}
+		}
+	}
+	return nil
 }
 
 type CleanupConfig struct {
@@ -325,6 +355,10 @@ func New() *Bundle {
 	var challenges []JuiceShopChallenge
 	err = json.Unmarshal(challengesBytes, &challenges)
 	if err != nil {
+		panic(err)
+	}
+
+	if err := validateClassProgressConfig(config.Views.ClassProgress, challenges); err != nil {
 		panic(err)
 	}
 
