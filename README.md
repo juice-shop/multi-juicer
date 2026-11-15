@@ -55,6 +55,45 @@ helm install -f values.yaml multi-juicer ./multi-juicer/helm/multi-juicer/
 
 To customize the theming of the JuiceShop instances and the MultiJuicer UI (theme, logo, enabled challenges, ...), see the [JuiceShop customization guide](./guides/customization/customization.md).
 
+### Optional Pages
+
+The MultiJuicer UI includes optional pages suited to different kinds of events.
+Both are enabled by default. Depending on whether you are running a training, a university lecture, a workshop or a CTF, you may want to disable some of them.
+Disabled pages are removed from the navigation and redirect to the start page when opened directly.
+
+#### Score Overview
+
+![Score Overview](./images/screenshots/view-score-overview.png)
+
+Shows a ranked list of all teams with their scores and number of solved challenges, with detail pages for each team and challenge.
+Disabling the Score Overview also disables these detail pages.
+
+To disable it, set `config.views.scoreOverview.enabled` to `false`:
+
+```yaml
+config:
+  views:
+    scoreOverview:
+      enabled: false
+```
+
+#### CTF View
+
+![CTF View](./images/screenshots/view-ctf-globe.png)
+
+The CTF view shows a 3D globe on which each challenge is represented by a country.
+Once a team is the first to solve a challenge, its country is filled with that team's pattern.
+This view is mostly intended to be displayed on a projector or large screen, but can also be used as a regular score overview page.
+
+To disable it, set `config.views.ctf.enabled` to `false`:
+
+```yaml
+config:
+  views:
+    ctf:
+      enabled: false
+```
+
 ### Deinstallation
 
 ```sh
