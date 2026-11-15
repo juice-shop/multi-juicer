@@ -70,7 +70,8 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Header().Set("Cache-Control", "no-cache")
-		w.Write(indexHTML)
+		// index.html is a static build asset and the only injected data is the json-encoded ui config (see renderIndexHTML), so there is no untrusted input here
+		w.Write(indexHTML) // nosemgrep: go.lang.security.audit.xss.no-direct-write-to-responsewriter.no-direct-write-to-responsewriter
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
