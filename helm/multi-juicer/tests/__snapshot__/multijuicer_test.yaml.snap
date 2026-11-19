@@ -87,6 +87,10 @@ custom balancer theme renders into the config map:
             "logoUrl": "https://example.com/custom-logo.svg"
           },
           "views": {
+            "classProgress": {
+              "enabled": false,
+              "groups": []
+            },
             "ctf": {
               "enabled": true
             },
@@ -194,6 +198,10 @@ default values render correctly:
             "logoUrl": ""
           },
           "views": {
+            "classProgress": {
+              "enabled": false,
+              "groups": []
+            },
             "ctf": {
               "enabled": true
             },
@@ -234,7 +242,7 @@ default values render correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 08acbb3c0dc534112b700f788a6cda26656fb3562060b04fc6b57ae92f22fb31
+            checksum/config: 43c692a4dbefa2f896070fb8c4b180384ec890b10a4293593ad88a6632cd7460
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -589,6 +597,10 @@ full values render out correctly:
             "logoUrl": ""
           },
           "views": {
+            "classProgress": {
+              "enabled": false,
+              "groups": []
+            },
             "ctf": {
               "enabled": true
             },
@@ -629,7 +641,7 @@ full values render out correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 9b03614524d210bee9896246215646a9f825520d87fdc19b16e066c521919adb
+            checksum/config: f013714620089c1c9fb2aa6fd70ec3943d1efff87ced8697794f9ad8a0129f66
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME
@@ -2687,6 +2699,10 @@ production notes work correctly:
             "logoUrl": ""
           },
           "views": {
+            "classProgress": {
+              "enabled": false,
+              "groups": []
+            },
             "ctf": {
               "enabled": true
             },
@@ -2727,7 +2743,7 @@ production notes work correctly:
       template:
         metadata:
           annotations:
-            checksum/config: 9b03614524d210bee9896246215646a9f825520d87fdc19b16e066c521919adb
+            checksum/config: f013714620089c1c9fb2aa6fd70ec3943d1efff87ced8697794f9ad8a0129f66
             checksum/secret: f7800567d41653aae188937f74d4b98772b4117213f6642f5e718440c9e4d636
           labels:
             app.kubernetes.io/instance: multi-juicer-RELEASE-NAME

@@ -19,7 +19,20 @@ describe("parseUIConfig", () => {
       views: {
         scoreOverview: { enabled: true },
         ctf: { enabled: false },
+        classProgress: { enabled: false, groups: [] },
       },
     });
+  });
+
+  test("uses the embedded class progress groups", () => {
+    const groups = [
+      { name: "Week 1", challenges: ["scoreBoardChallenge"] },
+      { name: "Bonus", challenges: ["nullByteChallenge", "loginJimChallenge"] },
+    ];
+    expect(
+      parseUIConfig(
+        JSON.stringify({ views: { classProgress: { enabled: true, groups } } })
+      ).views.classProgress
+    ).toEqual({ enabled: true, groups });
   });
 });

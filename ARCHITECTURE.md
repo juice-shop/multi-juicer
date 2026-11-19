@@ -51,6 +51,7 @@ The backend server is responsible for:
   - `/multi-juicer/api/teams/status` - Current logged-in team's detailed status (requires authentication)
   - `/multi-juicer/api/teams/{team}/status` - Any team's detailed status including solved challenges, position, and instance readiness
   - `/multi-juicer/api/activity-feed` - Recent challenge solutions across all teams (15 most recent events)
+  - `/multi-juicer/api/class-progress` - Which team has solved which of the challenges listed in `config.views.classProgress.groups`
 - Admin endpoints for instance management (list, delete, restart)
 - Serves the frontend's `index.html` with the public UI config (e.g. which optional views are enabled via `config.views.<view>.enabled`) embedded as a `<script type="application/json">` block, so the frontend has it on the first render without an extra request
 - Health and readiness probes for Kubernetes orchestration
@@ -105,6 +106,7 @@ The web frontend provides a user-friendly interface for participants and organiz
 - Team status dashboard displaying instance readiness and current ranking
 - Challenge detail pages showing which teams have solved specific challenges
 - Live activity feed showing recent challenge solutions across all teams
+- Class progress page showing which team solved which of the challenges picked for a training
 
 **Admin Features**
 - Overview of all active instances with their status
@@ -120,6 +122,7 @@ The web frontend provides a user-friendly interface for participants and organiz
   - `useScoreboard` - Fetches global leaderboard with top teams
   - `useTeamStatus` - Fetches team status (supports both current user and specific teams)
   - `useActivityFeed` - Fetches recent activity feed events
+  - `useClassProgress` - Fetches which team solved which class progress challenge
 - Framer Motion for smooth animations and transitions
 - Tailwind CSS for styling
 - Internationalization support via react-intl

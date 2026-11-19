@@ -41,19 +41,37 @@ afterEach(() => {
 });
 
 describe("Layout navigation", () => {
-  test("shows all views by default", () => {
+  test("shows all views except the class progress by default", () => {
     renderLayout(structuredClone(defaultUIConfig.views));
 
     expect(
       screen.getByRole("link", { name: "Score Overview" })
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "CTF View" })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Class Progress" })
+    ).not.toBeInTheDocument();
+  });
+
+  test("shows the class progress when it is enabled", () => {
+    renderLayout({
+      ...structuredClone(defaultUIConfig.views),
+      classProgress: {
+        enabled: true,
+        groups: [{ name: "Week 1", challenges: ["scoreBoardChallenge"] }],
+      },
+    });
+
+    expect(
+      screen.getByRole("link", { name: "Class Progress" })
+    ).toBeInTheDocument();
   });
 
   test("hides the views disabled in the config", () => {
     renderLayout({
       scoreOverview: { enabled: false },
       ctf: { enabled: false },
+      classProgress: { enabled: false, groups: [] },
     });
 
     expect(

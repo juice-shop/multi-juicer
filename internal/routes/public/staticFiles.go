@@ -50,6 +50,7 @@ func handleStaticFiles(bundle *bundle.Bundle) http.Handler {
 		regexp.MustCompile("/multi-juicer/score-overview/teams/" + teamNamePatternString),
 		regexp.MustCompile("/multi-juicer/score-overview/challenges/" + teamNamePatternString),
 		regexp.MustCompile("/multi-juicer/ctf"),
+		regexp.MustCompile("/multi-juicer/class-progress"),
 	}
 
 	// index.html and the config don't change at runtime, so it only has to be rendered once

@@ -16,6 +16,7 @@ const ScoreOverviewPage = lazy(() => import("@/pages/ScoreOverviewPage"));
 const TeamDetailPage = lazy(() => import("@/pages/TeamDetailPage"));
 const ChallengeDetailPage = lazy(() => import("@/pages/ChallengeDetailPage"));
 const CtfPage = lazy(() => import("@/pages/CtfPage"));
+const ClassProgressPage = lazy(() => import("@/pages/ClassProgressPage"));
 
 interface SimplifiedTeamStatusResponse {
   name: string;
@@ -159,6 +160,16 @@ function App() {
                         element={<Navigate to="/" replace />}
                       />
                     )}
+                    <Route
+                      path="/class-progress"
+                      element={
+                        uiConfig.views.classProgress.enabled ? (
+                          <ClassProgressPage activeTeam={activeTeam} />
+                        ) : (
+                          <Navigate to="/" replace />
+                        )
+                      }
+                    />
                   </Routes>
                 </Suspense>
               </Layout>

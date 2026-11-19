@@ -347,6 +347,14 @@ function Navigation({
             />
           </NavbarPill>
         )}
+        {uiConfig.views.classProgress.enabled && (
+          <NavbarPill to="/class-progress" activeMatchingExact={true}>
+            <FormattedMessage
+              id="navigation.class-progress"
+              defaultMessage="Class Progress"
+            />
+          </NavbarPill>
+        )}
         {uiConfig.views.ctf.enabled && (
           <NavbarPill to="/ctf" activeMatchingExact={true}>
             <FormattedMessage
