@@ -80,4 +80,54 @@ func TestValidateClassProgressConfig(t *testing.T) {
 		}, challenges)
 		assert.EqualError(t, err, `views.classProgress.groups contains unknown challenge "loginAdmnChallenge"`)
 	})
+
+	t.Run("rejects groups without challenges", func(t *testing.T) {
+		err := validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Name: "Week 1"}},
+		}, challenges)
+		assert.EqualError(t, err, `views.classProgress.groups group "Week 1" must contain at least one challenge`)
+
+		err = validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Name: "Week 1", Challenges: []string{}}},
+		}, challenges)
+		assert.EqualError(t, err, `views.classProgress.groups group "Week 1" must contain at least one challenge`)
+	})
+
+	t.Run("rejects challenges listed more than once", func(t *testing.T) {
+		err := validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Name: "Week 1", Challenges: []string{"scoreBoardChallenge", "scoreBoardChallenge"}}},
+		}, challenges)
+		assert.EqualError(t, err, `views.classProgress.groups contains the challenge "scoreBoardChallenge" more than once`)
+
+		err = validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups: []ChallengeGroup{
+				{Name: "Week 1", Challenges: []string{"scoreBoardChallenge"}},
+				{Name: "Week 2", Challenges: []string{"scoreBoardChallenge"}},
+			},
+		}, challenges)
+		assert.EqualError(t, err, `views.classProgress.groups contains the challenge "scoreBoardChallenge" more than once`)
+	})
+
+	t.Run("rejects groups without a name", func(t *testing.T) {
+		err := validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups:  []ChallengeGroup{{Challenges: []string{"scoreBoardChallenge"}}},
+		}, challenges)
+		assert.EqualError(t, err, "views.classProgress.groups contains a group without a name")
+	})
+
+	t.Run("rejects group names used more than once", func(t *testing.T) {
+		err := validateClassProgressConfig(ClassProgressViewConfig{
+			Enabled: true,
+			Groups: []ChallengeGroup{
+				{Name: "Bonus", Challenges: []string{"scoreBoardChallenge"}},
+				{Name: "Bonus", Challenges: []string{"localXssChallenge"}},
+			},
+		}, challenges)
+		assert.EqualError(t, err, `views.classProgress.groups contains the group name "Bonus" more than once`)
+	})
 }

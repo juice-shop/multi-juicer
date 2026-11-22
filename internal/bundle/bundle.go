@@ -104,11 +104,27 @@ func validateClassProgressConfig(classProgress ClassProgressViewConfig, challeng
 	if len(classProgress.Groups) == 0 {
 		return errors.New("views.classProgress.groups must not be empty")
 	}
+	seenGroupNames := map[string]bool{}
+	seenChallenges := map[string]bool{}
 	for _, group := range classProgress.Groups {
+		if group.Name == "" {
+			return errors.New("views.classProgress.groups contains a group without a name")
+		}
+		if seenGroupNames[group.Name] {
+			return fmt.Errorf("views.classProgress.groups contains the group name %q more than once", group.Name)
+		}
+		seenGroupNames[group.Name] = true
+		if len(group.Challenges) == 0 {
+			return fmt.Errorf("views.classProgress.groups group %q must contain at least one challenge", group.Name)
+		}
 		for _, key := range group.Challenges {
 			if !slices.ContainsFunc(challenges, func(challenge JuiceShopChallenge) bool { return challenge.Key == key }) {
 				return fmt.Errorf("views.classProgress.groups contains unknown challenge %q", key)
 			}
+			if seenChallenges[key] {
+				return fmt.Errorf("views.classProgress.groups contains the challenge %q more than once", key)
+			}
+			seenChallenges[key] = true
 		}
 	}
 	return nil
