@@ -69,7 +69,7 @@ export const ClassProgressPage = ({
     );
   }
 
-  if (error || !teams) {
+  if (!teams) {
     return (
       <p className="text-red-500">
         <FormattedMessage
@@ -147,6 +147,15 @@ export const ClassProgressPage = ({
           ))}
         </div>
       </div>
+
+      {error && (
+        <p className="text-sm text-red-500">
+          <FormattedMessage
+            id="class_progress.stale_error"
+            defaultMessage="Could not refresh class progress, showing the last known state. Retrying..."
+          />
+        </p>
+      )}
 
       <Card className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
